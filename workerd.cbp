@@ -39,9 +39,15 @@
 		<Linker>
 			<Add library="tinyxml" />
 			<Add library="fastdb" />
+			<Add library="sqlite3" />
 		</Linker>
 		<Unit filename="config.xml" />
 		<Unit filename="include/Config.h" />
+		<Unit filename="include/DataBase.h" />
+		<Unit filename="include/KompexSQLiteDatabase.h" />
+		<Unit filename="include/KompexSQLiteException.h" />
+		<Unit filename="include/KompexSQLitePrerequisites.h" />
+		<Unit filename="include/KompexSQLiteStatement.h" />
 		<Unit filename="include/Log.h" />
 		<Unit filename="include/MainDb.h" />
 		<Unit filename="include/Message.h" />
@@ -50,6 +56,9 @@
 		<Unit filename="include/Worker.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Config.cpp" />
+		<Unit filename="src/DataBase.cpp" />
+		<Unit filename="src/KompexSQLiteDatabase.cpp" />
+		<Unit filename="src/KompexSQLiteStatement.cpp" />
 		<Unit filename="src/Log.cpp" />
 		<Unit filename="src/MainDb.cpp" />
 		<Unit filename="src/Message.cpp" />

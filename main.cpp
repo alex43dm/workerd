@@ -1,7 +1,11 @@
+#include <pthread.h>
+#include <bits/local_lim.h>
+#include <unistd.h>
+
 #include <Log.h>
 #include <Config.h>
 #include <Queue.h>
-#include <MainDb.h>
+#include <DataBase.h>
 #include <Worker.h>
 
 #define MY_PRIORITY (49)
@@ -19,12 +23,12 @@ int main(int argc, char *argv[])
 
     Log::info("use config: %s",config.c_str());
 
-    MainDb *db1 = new MainDb(cfg->dbpath_);
+    DataBase *db1 = new DataBase();
 
     //make queue
     Queue *q = new Queue();
 
-    //dbDatabase *db = new dbDatabase(dbDatabase::dbAllAccess);
+    //dbDatabase *db = new dbDatabase(dbDatabase::dbReadOnly);
     //db->open(cfg->dbpath_.c_str());
     /*
         struct sched_param param;
@@ -45,9 +49,9 @@ int main(int argc, char *argv[])
     int i;
     pthread_t *threads = new pthread_t[cfg->server_children_];
 
-    for(i = 1; i < cfg->server_children_; i++)
+    for(i = 0; i < cfg->server_children_; i++)
     {
-        Worker *w = new Worker(q, db1->db);
+        Worker *w = new Worker(q, db1->pDatabase);
 
         if(pthread_create(&threads[i], attributes, &w->run, w))
         {
@@ -58,23 +62,23 @@ int main(int argc, char *argv[])
     pthread_attr_destroy(attributes);
 
     //main loop
-    db1->gen(1024);
+    db1->gen(0, 1024);
     Message *m = new Message(1);
-
+    int j = 0;
     while(1)
     {
-        for(i = 1; i < cfg->server_children_; i++)
+        for(i = 0; i < cfg->server_children_; i++)
         {
             q->put(m);
         }
 
         printf("put\n");
-        //db1->gen(1024);
+        db1->gen(++j * 1024, 1024);
         sleep(1);
     }
 
     //main loop end
-    for(i = 1; i < cfg->server_children_; i++)
+    for(i = 0; i < cfg->server_children_; i++)
     {
         pthread_join(threads[i], 0);
     }

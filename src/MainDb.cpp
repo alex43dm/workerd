@@ -17,15 +17,14 @@ MainDb::~MainDb()
     delete db;
 }
 
-bool MainDb::gen(int len)
+bool MainDb::gen(int from, int len)
 {
     Offer *of;
 
     for(auto i = 0; i < len; i++)
     {
         of = new Offer();
-        of->id = i;//(const char*)malloc(1024*4);
-        //snprintf((char*)of->id, 1024*4, "%d", i);
+        of->id = from + i;
         db->insert(*of);
     }
 

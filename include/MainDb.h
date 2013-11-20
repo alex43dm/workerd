@@ -58,7 +58,7 @@ public:
 
     MainDb(const std::string &path);
     virtual ~MainDb();
-    bool gen(int len);
+    bool gen(int from, int len);
     bool get();
 protected:
 private:

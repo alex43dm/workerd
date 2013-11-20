@@ -113,7 +113,7 @@
     <!--путь к файлу сокета-->
     <socket_path>/var/run/workerd.sock</socket_path>
     <!--количество ниток на обработку-->
-    <children>2</children>
+    <children>10</children>
     <!--путь к фалу базы данных-->
     <dbpath>/tmp/fastdb</dbpath>
 </server>

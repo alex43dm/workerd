@@ -1,8 +1,11 @@
 #include <exception>
 #include <iostream>
+
+#include "KompexSQLiteException.h"
+
 #include "Worker.h"
 
-Worker::Worker(Queue *q_, dbDatabase *d_) :
+Worker::Worker(Queue *q_, SQLiteDatabase *d_) :
     q(q_)
     ,db(d_)
 {
@@ -19,16 +22,9 @@ void* Worker::run(void *data)
 {
     Worker *w = (Worker*)data;
 
-    w->db->attach();
-/*
-    dbDatabase *db = new dbDatabase(dbDatabase::dbConcurrentRead);
-    db->open("/tmp/fastdb");
-*/
-    dbCursor<Offer> cOffers;
-
-    dbQuery qOffers;
-    qOffers.reset();
-    qOffers.And("id=").add(22);
+    SQLiteStatement *pStmt;
+    pStmt = new SQLiteStatement(w->db);
+    pStmt->Sql("SELECT id FROM Offer WHERE id > 22000");
 
     //Message *m;
     while(1)
@@ -37,20 +33,17 @@ void* Worker::run(void *data)
         w->q->get();
         try
         {
-            if (cOffers.select(qOffers) > 0)
+            while(pStmt->FetchRow())
             {
-                do
-                {
-                    printf("%d\n", cOffers->id);
-                }
-                while (cOffers.next());
+                long id = pStmt->GetColumnInt64(0);
+                //printf("%ld\n",id);
             }
         }
-        catch(std::exception &e)
+        catch(SQLiteException &ex)
         {
-            std::cerr << "exception caught: " << e.what() << '\n';
+            printf("Worker DB error: %s", ex.GetString().c_str());
         }
     }
-
+    pStmt->FreeQuery();
     return nullptr;
 }
