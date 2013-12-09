@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS Categories
+(
+id INT8 NOT NULL,
+guid VARCHAR(35),
+title VARCHAR(35),
+UNIQUE (id) ON CONFLICT REPLACE,
+UNIQUE (guid) ON CONFLICT REPLACE
+);
+CREATE INDEX IF NOT EXISTS idx_Categories_id ON Categories (id);
+CREATE INDEX IF NOT EXISTS idx_Categories_guid ON Categories (guid);
