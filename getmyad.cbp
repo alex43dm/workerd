@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="getmyad" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/getmyad" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/getmyad" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c++11" />
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add directory="include" />
+			<Add directory="." />
+		</Compiler>
+		<Linker>
+			<Add option="/usr/lib/libamqpcpp.a" />
+			<Add library="mongoclient" />
+			<Add library="fcgi" />
+			<Add library="sphinxclient" />
+			<Add library="clucene-core" />
+			<Add library="GeoIP" />
+			<Add library="rabbitmq" />
+			<Add library="boost_date_time" />
+			<Add library="boost_regex" />
+			<Add library="icui18n" />
+			<Add library="icuuc" />
+			<Add library="icudata" />
+			<Add library="tinyxml" />
+			<Add library="sqlite3" />
+			<Add library="hiredis" />
+		</Linker>
+		<Unit filename="BaseCore.cpp" />
+		<Unit filename="BaseCore.h" />
+		<Unit filename="Campaign.cpp" />
+		<Unit filename="Campaign.h" />
+		<Unit filename="CampaignShowOptions.cpp" />
+		<Unit filename="CampaignShowOptions.h" />
+		<Unit filename="CgiService.cpp" />
+		<Unit filename="CgiService.h" />
+		<Unit filename="Config.cpp" />
+		<Unit filename="Config.h" />
+		<Unit filename="Core.cpp" />
+		<Unit filename="Core.h" />
+		<Unit filename="DB.cpp" />
+		<Unit filename="DB.h" />
+		<Unit filename="DBAccessor/DBConnectionParams.h" />
+		<Unit filename="DBAccessor/DBWrapper.h" />
+		<Unit filename="DBAccessor/anet.cpp" />
+		<Unit filename="DBAccessor/anet.h" />
+		<Unit filename="DBAccessor/fmacros.h" />
+		<Unit filename="DBAccessor/redisclient.h" />
+		<Unit filename="DataBase.cpp" />
+		<Unit filename="DataBase.h" />
+		<Unit filename="FullTextSearcher/SearcherWrapper.cpp" />
+		<Unit filename="FullTextSearcher/SearcherWrapper.h" />
+		<Unit filename="FullTextSearcher/XXXSearcher.cpp" />
+		<Unit filename="FullTextSearcher/XXXSearcher.h" />
+		<Unit filename="HistoryManager.cpp" />
+		<Unit filename="HistoryManager.h" />
+		<Unit filename="Informer.cpp" />
+		<Unit filename="Informer.h" />
+		<Unit filename="InformerTemplate.cpp" />
+		<Unit filename="InformerTemplate.h" />
+		<Unit filename="KompexSQLiteDatabase.cpp" />
+		<Unit filename="KompexSQLiteDatabase.h" />
+		<Unit filename="KompexSQLiteException.h" />
+		<Unit filename="KompexSQLitePrerequisites.h" />
+		<Unit filename="KompexSQLiteStatement.cpp" />
+		<Unit filename="KompexSQLiteStatement.h" />
+		<Unit filename="Log.cpp" />
+		<Unit filename="Log.h" />
+		<Unit filename="Offer.cpp" />
+		<Unit filename="Offer.h" />
+		<Unit filename="Params.h" />
+		<Unit filename="RandomEntity.cpp" />
+		<Unit filename="RandomEntity.h" />
+		<Unit filename="Rules.cpp" />
+		<Unit filename="Rules.h" />
+		<Unit filename="UserHistory.cpp" />
+		<Unit filename="UserHistory.h" />
+		<Unit filename="config.xml" />
+		<Unit filename="include/CHiredis.h" />
+		<Unit filename="include/GeoRerions.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="pch.h" />
+		<Unit filename="src/CHiredis.cpp" />
+		<Unit filename="src/GeoRerions.cpp" />
+		<Unit filename="utils/Comparators.h" />
+		<Unit filename="utils/Cookie.cpp" />
+		<Unit filename="utils/Cookie.h" />
+		<Unit filename="utils/GeoIPTools.cpp" />
+		<Unit filename="utils/GeoIPTools.h" />
+		<Unit filename="utils/SearchEngines.cpp" />
+		<Unit filename="utils/SearchEngines.h" />
+		<Unit filename="utils/UrlParser.cpp" />
+		<Unit filename="utils/UrlParser.h" />
+		<Unit filename="utils/base64.cpp" />
+		<Unit filename="utils/base64.h" />
+		<Unit filename="utils/benchmark.h" />
+		<Extensions>
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

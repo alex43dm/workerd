@@ -1,0 +1,832 @@
+# depslib dependency file v1.0
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/Campaign.cpp
+	"Campaign.h"
+	"CampaignShowOptions.h"
+	"DB.h"
+	<glog/logging.h>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/Campaign.h
+	<string>
+	<map>
+	<list>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/CampaignShowOptions.h
+	<string>
+	<list>
+	<set>
+	<map>
+	<boost/date_time.hpp>
+	"Campaign.h"
+	"Informer.h"
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/Informer.h
+	<string>
+	<map>
+	<set>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/DB.h
+	<mongo/client/connpool.h>
+	<glog/logging.h>
+	<string>
+	<utility>
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/CampaignShowOptions.cpp
+	"DB.h"
+	"CampaignShowOptions.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/CgiService.cpp
+	"DB.h"
+	<glog/logging.h>
+	<boost/algorithm/string.hpp>
+	"CgiService.h"
+	"utils/UrlParser.h"
+	"utils/GeoIPTools.h"
+	"Core.h"
+	"Informer.h"
+	"utils/SearchEngines.h"
+	"HistoryManager.h"
+	"InformerTemplate.h"
+	<fcgi_stdio.h>
+	"utils/Cookie.h"
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/CgiService.h
+	<string>
+	"utils/Cookie.h"
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/utils/Cookie.h
+	<string>
+	<time.h>
+	<boost/date_time/posix_time/posix_time_types.hpp>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/utils/UrlParser.h
+	<map>
+	<string>
+	<vector>
+	<boost/algorithm/string.hpp>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/utils/GeoIPTools.h
+	<GeoIP.h>
+	<GeoIPCity.h>
+	<string>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/Core.h
+	<list>
+	<vector>
+	<map>
+	<utility>
+	<boost/date_time.hpp>
+	<boost/algorithm/string.hpp>
+	<AMQPcpp.h>
+	"Rules.h"
+	"RandomEntity.h"
+	"Offer.h"
+	"Informer.h"
+	"Params.h"
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/Rules.h
+	<list>
+	<set>
+	<map>
+	<string>
+	<boost/date_time.hpp>
+	"Informer.h"
+	"Campaign.h"
+	"CampaignShowOptions.h"
+	"Offer.h"
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/Offer.h
+	<string>
+	<list>
+	<map>
+	<mongo/client/dbclientinterface.h>
+	"Campaign.h"
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/RandomEntity.h
+	<list>
+	<cstdlib>
+	<ctime>
+	<algorithm>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/Params.h
+	<boost/date_time.hpp>
+	<string>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/utils/SearchEngines.h
+	<map>
+	<vector>
+	<string>
+	<fstream>
+	<cstring>
+	<iostream>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/HistoryManager.h
+	<string>
+	<vector>
+	<list>
+	"DBAccessor/DBWrapper.h"
+	"DBAccessor/DBConnectionParams.h"
+	"FullTextSearcher/SearcherWrapper.h"
+	"Params.h"
+	"Offer.h"
+	"Campaign.h"
+	"utils/benchmark.h"
+	<glog/logging.h>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/DBAccessor/DBWrapper.h
+	"redisclient.h"
+	"DBConnectionParams.h"
+	"../UserHistory.h"
+	"../Offer.h"
+	<iostream>
+	<fstream>
+	<cstring>
+	<boost/date_time.hpp>
+	<boost/date_time/gregorian/gregorian.hpp>
+	<glog/logging.h>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/DBAccessor/redisclient.h
+	<errno.h>
+	<sys/socket.h>
+	<string>
+	<vector>
+	<map>
+	<set>
+	<stdexcept>
+	<ctime>
+	<sstream>
+	<boost/concept_check.hpp>
+	<boost/lexical_cast.hpp>
+	<boost/functional/hash.hpp>
+	<boost/foreach.hpp>
+	<boost/thread/mutex.hpp>
+	<boost/thread/condition_variable.hpp>
+	<boost/random.hpp>
+	<boost/cstdint.hpp>
+	<boost/date_time/posix_time/ptime.hpp>
+	<boost/date_time/posix_time/posix_time_types.hpp>
+	<boost/optional.hpp>
+	<boost/variant.hpp>
+	"anet.h"
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/DBAccessor/anet.h
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/DBAccessor/DBConnectionParams.h
+	<string>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/UserHistory.h
+	<string>
+	<sstream>
+	<list>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/FullTextSearcher/SearcherWrapper.h
+	<string>
+	<vector>
+	<list>
+	<algorithm>
+	"XXXSearcher.h"
+	"../Campaign.h"
+	"../UserHistory.h"
+	<boost/algorithm/string.hpp>
+	<boost/algorithm/string/split.hpp>
+	<glog/logging.h>
+	<boost/regex.hpp>
+	<boost/regex/icu.hpp>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/FullTextSearcher/XXXSearcher.h
+	<string>
+	<list>
+	<vector>
+	<map>
+	<stdlib.h>
+	<glog/logging.h>
+	<boost/crc.hpp>
+	<CLucene.h>
+	<CLucene/search/QueryFilter.h>
+	<sphinxclient.h>
+	<stdarg.h>
+	<stdlib.h>
+	<typeinfo>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/utils/benchmark.h
+	<string>
+	<boost/date_time/posix_time/ptime.hpp>
+	<glog/logging.h>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/InformerTemplate.h
+	<string>
+	<iostream>
+	<fstream>
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/Core.cpp
+	"DB.h"
+	<boost/foreach.hpp>
+	<boost/date_time/posix_time/ptime.hpp>
+	<boost/date_time/posix_time/posix_time_io.hpp>
+	<boost/format.hpp>
+	<boost/algorithm/string.hpp>
+	<glog/logging.h>
+	<ctime>
+	<cstdlib>
+	<sstream>
+	<mongo/util/version.h>
+	<mongo/bson/bsonobjbuilder.h>
+	"Core.h"
+	"InformerTemplate.h"
+	"utils/base64.h"
+	"utils/benchmark.h"
+	"HistoryManager.h"
+	"utils/Comparators.h"
+	"utils/GeoIPTools.h"
+	<mongo/bson/bsonobjbuilder.h>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/utils/base64.h
+	<string>
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/utils/Comparators.h
+	<iostream>
+	<string>
+	<vector>
+	<list>
+	<stdlib.h>
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/DB.cpp
+	"DB.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/DBAccessor/anet.cpp
+	"fmacros.h"
+	<sys/types.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<unistd.h>
+	<fcntl.h>
+	<string.h>
+	<netdb.h>
+	<errno.h>
+	<stdarg.h>
+	<stdio.h>
+	"anet.h"
+
+1385059816 /home/alex/Projects/workerd/libgetmyad/DBAccessor/fmacros.h
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/FullTextSearcher/SearcherWrapper.cpp
+	"SearcherWrapper.h"
+
+1385107356 source:/home/alex/Projects/workerd/libgetmyad/FullTextSearcher/XXXSearcher.cpp
+	"XXXSearcher.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/HistoryManager.cpp
+	"HistoryManager.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/Informer.cpp
+	"DB.h"
+	<map>
+	<glog/logging.h>
+	<boost/algorithm/string.hpp>
+	"Informer.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/InformerTemplate.cpp
+	"InformerTemplate.h"
+
+1385108427 source:/home/alex/Projects/workerd/libgetmyad/main.cpp
+	<glog/logging.h>
+	"CgiService.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/Offer.cpp
+	"DB.h"
+	<glog/logging.h>
+	"Offer.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/RandomEntity.cpp
+	"RandomEntity.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/Rules.cpp
+	"DB.h"
+	<iostream>
+	<glog/logging.h>
+	<cmath>
+	<map>
+	<algorithm>
+	<boost/lexical_cast.hpp>
+	<boost/date_time/gregorian_calendar.hpp>
+	"Rules.h"
+	"utils/GeoIPTools.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/UserHistory.cpp
+	"UserHistory.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/utils/base64.cpp
+	"base64.h"
+	<iostream>
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/utils/Cookie.cpp
+	"Cookie.h"
+	<string.h>
+	<boost/date_time/posix_time/posix_time.hpp>
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/utils/GeoIPTools.cpp
+	"GeoIPTools.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/utils/SearchEngines.cpp
+	"SearchEngines.h"
+
+1385059816 source:/home/alex/Projects/workerd/libgetmyad/utils/UrlParser.cpp
+	<iostream>
+	<sstream>
+	<glog/logging.h>
+	"UrlParser.h"
+	"SearchEngines.h"
+
+1386075924 source:/home/alex/Projects/getmyad/Campaign.cpp
+	<boost/algorithm/string/replace.hpp>
+	"Campaign.h"
+	"CampaignShowOptions.h"
+	"DB.h"
+	"Log.h"
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+
+1385383650 /home/alex/Projects/getmyad/Campaign.h
+	<string>
+	<map>
+	<list>
+	"KompexSQLiteDatabase.h"
+
+1385059816 /home/alex/Projects/getmyad/CampaignShowOptions.h
+	<string>
+	<list>
+	<set>
+	<map>
+	<boost/date_time.hpp>
+	"Campaign.h"
+	"Informer.h"
+
+1385639153 /home/alex/Projects/getmyad/Informer.h
+	<string>
+	<map>
+	<set>
+	"KompexSQLiteDatabase.h"
+
+1385121567 /home/alex/Projects/getmyad/DB.h
+	<mongo/client/connpool.h>
+	"Log.h"
+	<string>
+	<utility>
+
+1385059816 source:/home/alex/Projects/getmyad/CampaignShowOptions.cpp
+	"DB.h"
+	"CampaignShowOptions.h"
+
+1386319054 source:/home/alex/Projects/getmyad/CgiService.cpp
+	"DB.h"
+	<boost/algorithm/string.hpp>
+	"Log.h"
+	"CgiService.h"
+	"utils/UrlParser.h"
+	"utils/GeoIPTools.h"
+	"BaseCore.h"
+	"Core.h"
+	"Informer.h"
+	"utils/SearchEngines.h"
+	"HistoryManager.h"
+	"InformerTemplate.h"
+	<fcgi_stdio.h>
+	"utils/Cookie.h"
+	"DataBase.h"
+	"CHiredis.h"
+
+1386238067 /home/alex/Projects/getmyad/CgiService.h
+	<string>
+	<fcgiapp.h>
+	"BaseCore.h"
+	"Config.h"
+
+1385059816 /home/alex/Projects/getmyad/utils/Cookie.h
+	<string>
+	<time.h>
+	<boost/date_time/posix_time/posix_time_types.hpp>
+
+1385059816 /home/alex/Projects/getmyad/utils/UrlParser.h
+	<map>
+	<string>
+	<vector>
+	<boost/algorithm/string.hpp>
+
+1385059816 /home/alex/Projects/getmyad/utils/GeoIPTools.h
+	<GeoIP.h>
+	<GeoIPCity.h>
+	<string>
+
+1386326584 /home/alex/Projects/getmyad/Core.h
+	<list>
+	<vector>
+	<map>
+	<utility>
+	<boost/date_time.hpp>
+	<boost/algorithm/string.hpp>
+	"Rules.h"
+	"RandomEntity.h"
+	"Offer.h"
+	"Informer.h"
+	"Params.h"
+	"DataBase.h"
+
+1385059816 /home/alex/Projects/getmyad/Rules.h
+	<list>
+	<set>
+	<map>
+	<string>
+	<boost/date_time.hpp>
+	"Informer.h"
+	"Campaign.h"
+	"CampaignShowOptions.h"
+	"Offer.h"
+
+1386147604 /home/alex/Projects/getmyad/Offer.h
+	<string>
+	<list>
+	<map>
+	<mongo/client/dbclientinterface.h>
+	"Campaign.h"
+	"KompexSQLiteDatabase.h"
+
+1385059816 /home/alex/Projects/getmyad/RandomEntity.h
+	<list>
+	<cstdlib>
+	<ctime>
+	<algorithm>
+
+1385059816 /home/alex/Projects/getmyad/Params.h
+	<boost/date_time.hpp>
+	<string>
+
+1385059816 /home/alex/Projects/getmyad/utils/SearchEngines.h
+	<map>
+	<vector>
+	<string>
+	<fstream>
+	<cstring>
+	<iostream>
+
+1386236638 /home/alex/Projects/getmyad/HistoryManager.h
+	<string>
+	<vector>
+	<list>
+	"DBAccessor/DBWrapper.h"
+	"DBAccessor/DBConnectionParams.h"
+	"FullTextSearcher/SearcherWrapper.h"
+	"Params.h"
+	"Offer.h"
+	"Campaign.h"
+	"utils/benchmark.h"
+	"Core.h"
+
+1386236554 /home/alex/Projects/getmyad/DBAccessor/DBWrapper.h
+	"redisclient.h"
+	"DBConnectionParams.h"
+	"UserHistory.h"
+	"Offer.h"
+	<iostream>
+	<fstream>
+	<cstring>
+	<boost/date_time.hpp>
+	<boost/date_time/gregorian/gregorian.hpp>
+	"Log.h"
+	"Core.h"
+
+1385059816 /home/alex/Projects/getmyad/DBAccessor/redisclient.h
+	<errno.h>
+	<sys/socket.h>
+	<string>
+	<vector>
+	<map>
+	<set>
+	<stdexcept>
+	<ctime>
+	<sstream>
+	<boost/concept_check.hpp>
+	<boost/lexical_cast.hpp>
+	<boost/functional/hash.hpp>
+	<boost/foreach.hpp>
+	<boost/thread/mutex.hpp>
+	<boost/thread/condition_variable.hpp>
+	<boost/random.hpp>
+	<boost/cstdint.hpp>
+	<boost/date_time/posix_time/ptime.hpp>
+	<boost/date_time/posix_time/posix_time_types.hpp>
+	<boost/optional.hpp>
+	<boost/variant.hpp>
+	"anet.h"
+
+1385059816 /home/alex/Projects/getmyad/DBAccessor/anet.h
+
+1385059816 /home/alex/Projects/getmyad/DBAccessor/DBConnectionParams.h
+	<string>
+
+1385059816 /home/alex/Projects/getmyad/UserHistory.h
+	<string>
+	<sstream>
+	<list>
+
+1385123112 /home/alex/Projects/getmyad/FullTextSearcher/SearcherWrapper.h
+	<string>
+	<vector>
+	<list>
+	<algorithm>
+	"XXXSearcher.h"
+	"../Campaign.h"
+	"../UserHistory.h"
+	<boost/algorithm/string.hpp>
+	<boost/algorithm/string/split.hpp>
+	"../Log.h"
+	<boost/regex.hpp>
+	<boost/regex/icu.hpp>
+
+1385121875 /home/alex/Projects/getmyad/FullTextSearcher/XXXSearcher.h
+	<string>
+	<list>
+	<vector>
+	<map>
+	<stdlib.h>
+	<boost/crc.hpp>
+	<CLucene.h>
+	<CLucene/search/QueryFilter.h>
+	<sphinxclient.h>
+	<stdarg.h>
+	<stdlib.h>
+	<typeinfo>
+
+1385120984 /home/alex/Projects/getmyad/utils/benchmark.h
+	<string>
+	<boost/date_time/posix_time/ptime.hpp>
+	"../Log.h"
+
+1385059816 /home/alex/Projects/getmyad/InformerTemplate.h
+	<string>
+	<iostream>
+	<fstream>
+
+1386340807 source:/home/alex/Projects/getmyad/Core.cpp
+	"DB.h"
+	<boost/foreach.hpp>
+	<boost/date_time/posix_time/ptime.hpp>
+	<boost/date_time/posix_time/posix_time_io.hpp>
+	<boost/format.hpp>
+	<boost/algorithm/string.hpp>
+	<ctime>
+	<cstdlib>
+	<sstream>
+	<mongo/util/version.h>
+	<mongo/bson/bsonobjbuilder.h>
+	"Log.h"
+	"Core.h"
+	"InformerTemplate.h"
+	"utils/base64.h"
+	"utils/benchmark.h"
+	"HistoryManager.h"
+	"utils/Comparators.h"
+	"utils/GeoIPTools.h"
+	<mongo/bson/bsonobjbuilder.h>
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+
+1385059816 /home/alex/Projects/getmyad/utils/base64.h
+	<string>
+
+1386239101 /home/alex/Projects/getmyad/utils/Comparators.h
+	<iostream>
+	<string>
+	<vector>
+	<list>
+	<stdlib.h>
+
+1385059816 source:/home/alex/Projects/getmyad/DB.cpp
+	"DB.h"
+
+1385059816 source:/home/alex/Projects/getmyad/DBAccessor/anet.cpp
+	"fmacros.h"
+	<sys/types.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<unistd.h>
+	<fcntl.h>
+	<string.h>
+	<netdb.h>
+	<errno.h>
+	<stdarg.h>
+	<stdio.h>
+	"anet.h"
+
+1385059816 /home/alex/Projects/getmyad/DBAccessor/fmacros.h
+
+1385059816 source:/home/alex/Projects/getmyad/FullTextSearcher/SearcherWrapper.cpp
+	"SearcherWrapper.h"
+
+1385123883 source:/home/alex/Projects/getmyad/FullTextSearcher/XXXSearcher.cpp
+	"../Log.h"
+	"XXXSearcher.h"
+
+1385647788 source:/home/alex/Projects/getmyad/HistoryManager.cpp
+	"HistoryManager.h"
+
+1385639357 source:/home/alex/Projects/getmyad/Informer.cpp
+	"DB.h"
+	<map>
+	<boost/algorithm/string.hpp>
+	"Informer.h"
+	"Log.h"
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+
+1385198889 source:/home/alex/Projects/getmyad/InformerTemplate.cpp
+	"Config.h"
+	"InformerTemplate.h"
+
+1386151440 source:/home/alex/Projects/getmyad/Offer.cpp
+	"Offer.h"
+	"DB.h"
+	"Log.h"
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+
+1385059816 source:/home/alex/Projects/getmyad/RandomEntity.cpp
+	"RandomEntity.h"
+
+1385845409 source:/home/alex/Projects/getmyad/Rules.cpp
+	"DB.h"
+	<iostream>
+	"Log.h"
+	<cmath>
+	<map>
+	<algorithm>
+	<boost/lexical_cast.hpp>
+	<boost/date_time/gregorian_calendar.hpp>
+	"Rules.h"
+	"utils/GeoIPTools.h"
+
+1385059816 source:/home/alex/Projects/getmyad/UserHistory.cpp
+	"UserHistory.h"
+
+1385059816 source:/home/alex/Projects/getmyad/utils/base64.cpp
+	"base64.h"
+	<iostream>
+
+1385059816 source:/home/alex/Projects/getmyad/utils/Cookie.cpp
+	"Cookie.h"
+	<string.h>
+	<boost/date_time/posix_time/posix_time.hpp>
+
+1385059816 source:/home/alex/Projects/getmyad/utils/GeoIPTools.cpp
+	"GeoIPTools.h"
+
+1385059816 source:/home/alex/Projects/getmyad/utils/SearchEngines.cpp
+	"SearchEngines.h"
+
+1385123496 source:/home/alex/Projects/getmyad/utils/UrlParser.cpp
+	<iostream>
+	<sstream>
+	"UrlParser.h"
+	"SearchEngines.h"
+
+1385475908 source:/home/alex/Projects/getmyad/Log.cpp
+	"Log.h"
+
+1386169328 /home/alex/Projects/getmyad/Log.h
+	<stdio.h>
+	<syslog.h>
+	<stdarg.h>
+	<pthread.h>
+
+1385130584 source:/home/alex/Projects/getmyad/main.cpp
+	"CgiService.h"
+	"Log.h"
+
+1385208372 source:/home/alex/Projects/getmyad/Config.cpp
+	<iostream>
+	<fstream>
+	<string.h>
+	<stdlib.h>
+	"Log.h"
+	"Config.h"
+	<assert.h>
+
+1385208301 /home/alex/Projects/getmyad/Config.h
+	<string>
+	<list>
+	<tinyxml.h>
+
+1386586226 source:/home/alex/Projects/getmyad/DataBase.cpp
+	<iostream>
+	<signal.h>
+	<time.h>
+	<dirent.h>
+	<sys/stat.h>
+	<strings.h>
+	<stdlib.h>
+	"Log.h"
+	"DataBase.h"
+	"KompexSQLiteException.h"
+	"GeoRerions.h"
+
+1386572041 /home/alex/Projects/getmyad/DataBase.h
+	<string>
+	<stdio.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<fcntl.h>
+	<unistd.h>
+	"KompexSQLiteDatabase.h"
+	"KompexSQLiteStatement.h"
+
+1385131827 /home/alex/Projects/getmyad/KompexSQLiteDatabase.h
+	<string>
+	"sqlite3.h"
+	"KompexSQLitePrerequisites.h"
+
+1385131827 /home/alex/Projects/getmyad/KompexSQLitePrerequisites.h
+
+1385131827 /home/alex/Projects/getmyad/KompexSQLiteStatement.h
+	<map>
+	<string>
+	"sqlite3.h"
+	"KompexSQLitePrerequisites.h"
+
+1385131827 /home/alex/Projects/getmyad/KompexSQLiteException.h
+	<map>
+	<string>
+	<sstream>
+	<iostream>
+	"KompexSQLitePrerequisites.h"
+
+1386233504 source:/home/alex/Projects/getmyad/KompexSQLiteDatabase.cpp
+	<fstream>
+	<iostream>
+	<exception>
+	"KompexSQLiteDatabase.h"
+	"KompexSQLiteException.h"
+
+1385132619 source:/home/alex/Projects/getmyad/KompexSQLiteStatement.cpp
+	<iostream>
+	<iomanip>
+	<exception>
+	<sstream>
+	<string.h>
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteDatabase.h"
+	"KompexSQLiteException.h"
+
+1385723197 source:/home/alex/Projects/getmyad/src/CHiredis.cpp
+	<unistd.h>
+	"CHiredis.h"
+	"../Log.h"
+
+1385718603 /home/alex/Projects/getmyad/include/CHiredis.h
+	<string>
+	<vector>
+	<hiredis/hiredis.h>
+	<boost/date_time.hpp>
+	<boost/date_time/gregorian/gregorian.hpp>
+
+1385970588 source:/home/alex/Projects/getmyad/src/GeoRerions.cpp
+	<iostream>
+	<fstream>
+	<string>
+	<strings.h>
+	<string.h>
+	"GeoRerions.h"
+	"Log.h"
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+
+1385970238 /home/alex/Projects/getmyad/include/GeoRerions.h
+	"KompexSQLiteDatabase.h"
+
+1386251679 source:/home/alex/Projects/getmyad/BaseCore.cpp
+	"DB.h"
+	<boost/foreach.hpp>
+	<boost/date_time/posix_time/ptime.hpp>
+	<boost/date_time/posix_time/posix_time_io.hpp>
+	<boost/format.hpp>
+	<ctime>
+	<cstdlib>
+	<sstream>
+	"Log.h"
+	"BaseCore.h"
+	"utils/base64.h"
+	"utils/benchmark.h"
+	"Informer.h"
+	"Campaign.h"
+	"Offer.h"
+
+1386241732 /home/alex/Projects/getmyad/BaseCore.h
+	<list>
+	<vector>
+	<map>
+	<utility>
+	<boost/date_time.hpp>
+	<AMQPcpp.h>
+	"DataBase.h"
+
