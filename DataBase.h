@@ -2,6 +2,7 @@
 #define DATABASE_H
 
 #include <string>
+#include <vector>
 
 #include <stdio.h>
 
@@ -32,6 +33,7 @@ private:
     bool openDb();
     long fileSize(int fd);
     void readDir(const std::string &dirName);
+    bool runSqlFiles(const std::vector<std::string> &files);
 };
 
 #endif // DATABASE_H

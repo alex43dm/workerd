@@ -45,24 +45,10 @@ Core::Core(DataBase *_pDb) :
     try
     {
         pStmtInformer = new SQLiteStatement(pDb->pDatabase);
-        char *qsql = sqlite3_mprintf("SELECT guid,capacity,bannersCss,teasersCss FROM Informer WHERE guid=@q LIMIT 1");
-        pStmtInformer->Sql(qsql);
-        sqlite3_free(qsql);
+        pStmtInformer->Sql("SELECT guid,capacity,bannersCss,teasersCss FROM Informer WHERE guid=@q LIMIT 1");
 
         pStmtOffer = new SQLiteStatement(pDb->pDatabase);
-        qsql = sqlite3_mprintf(
-                   "SELECT ofrs.id,ofrs.guid,ofrs.title,ofrs.price,ofrs.description,ofrs.url,ofrs.image,ofrs.swf,\
-        ofrs.campaignId,ofrs.isOnClick,ofrs.type,\
-        ofrs.rating,ofrs.uniqueHits,ofrs.height,ofrs.width,0 \
-        FROM Offer AS ofrs \
-        INNER JOIN Campaign2Time AS c2t ON ofrs.campaignId=c2t.id \
-        LEFT JOIN Campaign2Doms AS c2d ON c2d.allowed=1 AND c2d.name='?' AND ofrs.campaignId=c2d.id \
-        LEFT JOIN Campaign2Acnts AS c2a ON c2a.allowed=1 AND c2a.name=c2d.name AND ofrs.campaignId=c2a.id \
-        LEFT JOIN Campaign2Infs AS c2i ON c2i.allowed=1 AND c2i.guid='?' AND ofrs.campaignId=c2a.id \
-        ORDER BY ofrs.rating DESC \
-        LIMIT 5");
-        pStmtOffer->Sql(qsql);
-        sqlite3_free(qsql);
+        pStmtOffer->Sql("SELECT o.id,o.guid,o.title,o.price,o.description,o.url,o.image,o.swf,o.campaignId,o.isOnClick,o.type,o.rating,o.uniqueHits,o.height,o.width,o.social FROM getOffers01 AS o WHERE o.name=@q AND o.guid=@g");
     }
     catch(SQLiteException &ex)
     {
@@ -355,8 +341,8 @@ vector<Offer> Core::getOffers(const Params &params)
     vector<Offer> result;
     try
     {
-        pStmtInformer->BindString(0, params.location_);
-        pStmtInformer->BindString(1, params.informer_);
+        pStmtOffer->BindString(1, params.location_);
+        pStmtOffer->BindString(2, params.informer_);
     }
     catch(SQLiteException &ex)
     {

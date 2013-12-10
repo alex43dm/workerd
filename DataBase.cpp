@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 
 #include <signal.h>
 #include <time.h>
@@ -140,47 +141,60 @@ void DataBase::readDir(const std::string &dirName)
             printf("scandir error\n");
             return;
         }
-        std::string fname;
+        std::vector<std::string> files;
         while( (sql_name = readdir(dir)) != NULL )
         {
             if(sql_name->d_type != DT_REG)
                 continue;
-            fname = dname + "/" + sql_name->d_name;
-            int fd;
-            if( (fd = open(fname.c_str(), O_RDONLY))>0 )
-            {
-                ssize_t sz = fileSize(fd);
-                char *buf = (char*)malloc(sz);
-
-                bzero(buf,sz);
-
-                int ret = read(fd, buf, sz);
-
-                if( ret != sz )
-                {
-                    printf("Error read file: %s",fname.c_str());
-                    ::exit(1);
-                }
-                close(fd);
-
-                pStmt->SqlStatement(buf);
-
-                char *p = buf;
-                while(p < buf+sz)
-                {
-                    if(*p==';' && p < buf+sz-30)
-                    {
-                        pStmt->SqlStatement(++p);
-                    }
-                    else
-                    {
-                        p++;
-                    }
-                }
-
-                free(buf);
-            }
+            files.push_back(dname + "/" + sql_name->d_name);
         }
         closedir(dir);
+        std::sort (files.begin(), files.end());
+        runSqlFiles(files);
     }//for
+}
+
+bool DataBase::runSqlFiles(const std::vector<std::string> &files)
+{
+    int fd;
+
+    for (auto it = files.begin(); it != files.end(); it++)
+    {
+        if( (fd = open((*it).c_str(), O_RDONLY))<2 )
+        {
+            continue;
+        }
+        ssize_t sz = fileSize(fd);
+        char *buf = (char*)malloc(sz);
+
+        bzero(buf,sz);
+
+        int ret = read(fd, buf, sz);
+
+        if( ret != sz )
+        {
+            printf("Error read file: %s",(*it).c_str());
+            ::exit(1);
+        }
+        close(fd);
+
+        pStmt->SqlStatement(buf);
+
+        char *p = buf;
+        while(p < buf+sz)
+        {
+            if(*p==';' && p < buf+sz-30)
+            {
+                pStmt->SqlStatement(++p);
+            }
+            else
+            {
+                p++;
+            }
+        }
+
+        free(buf);
+    }
+
+    return true;
 }
