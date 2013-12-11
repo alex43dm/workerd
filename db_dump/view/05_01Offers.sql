@@ -19,4 +19,5 @@ SELECT ofrs.id,
 	c2r.cid
 	FROM Offer AS ofrs
 	INNER JOIN Campaign AS ca ON ofrs.campaignId=ca.id
-	INNER JOIN Campaign2Time AS cn ON cn.id=ca.id;
+	INNER JOIN Campaign2Time AS cn ON cn.id=ca.id
+	LEFT JOIN Campaign2GeoRerions AS c2r ON cn.id=c2r.id;

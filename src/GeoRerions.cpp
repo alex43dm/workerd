@@ -33,7 +33,7 @@ bool GeoRerions::load(Kompex::SQLiteDatabase *pdb)
     pData = buf + sz;
     sz = sizeof(buf) - sz;
 
-    std::ifstream infile("/home/alex/Projects/getmyad/region.csv");
+    std::ifstream infile("/home/alex/Projects/worker/region.csv");
 
     std::string line;
     pStmt->BeginTransaction();
