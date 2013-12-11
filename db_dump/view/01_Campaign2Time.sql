@@ -1,5 +1,5 @@
 CREATE VIEW Campaign2Time AS
-SELECT id FROM Campaign2Now AS alw WHERE startStop=1
+SELECT id FROM CampaignNow WHERE startStop=1
 EXCEPT
-SELECT id FROM Campaign2Now AS alw WHERE startStop=0
+SELECT id FROM CampaignNow WHERE startStop=0
 ;

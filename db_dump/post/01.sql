@@ -1,4 +1,4 @@
-CREATE TABLE Campaign2Now AS
+INSERT INTO CampaignNow(id, startStop)
 SELECT id_cam AS id, startStop FROM CronCampaign
 WHERE (Day = cast(strftime('%w','now') AS INT) OR Day IS NULL)
 AND (Hour < cast(strftime('%H','now') AS INT)

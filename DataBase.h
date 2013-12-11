@@ -24,16 +24,18 @@ public:
     DataBase(bool create = false);
     virtual ~DataBase();
     bool gen(int from, unsigned int len);
+    void postDataLoad();
 protected:
 
 private:
     std::string dbFileName;
+    std::string dirName;
     bool create;
     SQLiteStatement *pStmt;
 
     bool openDb();
     long fileSize(int fd);
-    void readDir(const std::string &dirName);
+    void readDir();
     bool runSqlFiles(const std::vector<std::string> &files);
 };
 

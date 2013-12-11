@@ -119,18 +119,6 @@ void Offer::loadFromDatabase(Kompex::SQLiteDatabase *pdb)
 
     }
 
-    bzero(buf,sizeof(buf));
-    snprintf(buf,sizeof(buf),"REINDEX");
-    try
-    {
-        pStmt->SqlStatement(buf);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        Log::err("Offers::_loadFromQuery REINDEX(%s) error: %s", buf, ex.GetString().c_str());
-        skipped++;
-    }
-
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
     delete pStmt;

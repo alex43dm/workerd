@@ -178,6 +178,7 @@ void BaseCore::LoadAllEntities()
     //pDb->pDatabase->MoveDatabaseToMemory();
     // Проверяем, нет ли кампаний с 0 предложений
     // Сбрасываем кеш
+    pDb->postDataLoad();
 }
 
 

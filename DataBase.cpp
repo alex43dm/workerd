@@ -19,7 +19,8 @@
 
 DataBase::DataBase(bool create) :
     create(create),
-    pStmt(nullptr)
+    pStmt(nullptr),
+    dirName("db_dump")
 {
 
     dbFileName = Config::Instance()->dbpath_;//":memory:"
@@ -59,7 +60,7 @@ bool DataBase::openDb()
         pStmt = new SQLiteStatement(pDatabase);
 
         //load db dump from directory
-        readDir("db_dump");
+        readDir();
         //geo table fill
         GeoRerions::load(pDatabase);
 
@@ -129,7 +130,7 @@ long DataBase::fileSize(int fd)
     return fstat(fd, &stat_buf) == 0 ? stat_buf.st_size : -1;
 }
 
-void DataBase::readDir(const std::string &dirName)
+void DataBase::readDir()
 {
     struct dirent *sql_name;
 
@@ -208,4 +209,13 @@ bool DataBase::runSqlFiles(const std::vector<std::string> &files)
     }
 
     return true;
+}
+
+
+void DataBase::postDataLoad()
+{
+    std::vector<std::string> files;
+    files.push_back(dirName + "/post/01.sql");
+    files.push_back(dirName + "/post/00.sql");
+    runSqlFiles(files);
 }

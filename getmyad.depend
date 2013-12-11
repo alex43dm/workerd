@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1386588626 source:/home/alex/Projects/worker/BaseCore.cpp
+1386762217 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -868,7 +868,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1386661651 /home/alex/Projects/worker/DataBase.h
+1386762142 /home/alex/Projects/worker/DataBase.h
 	<string>
 	<vector>
 	<stdio.h>
@@ -949,7 +949,7 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1386682738 source:/home/alex/Projects/worker/CgiService.cpp
+1386751596 source:/home/alex/Projects/worker/CgiService.cpp
 	"DB.h"
 	<boost/algorithm/string.hpp>
 	"Log.h"
@@ -967,7 +967,7 @@
 	"DataBase.h"
 	"CHiredis.h"
 
-1386588626 /home/alex/Projects/worker/CgiService.h
+1386751070 /home/alex/Projects/worker/CgiService.h
 	<string>
 	<fcgiapp.h>
 	"BaseCore.h"
@@ -1137,7 +1137,7 @@
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 
-1386588626 source:/home/alex/Projects/worker/Config.cpp
+1386754643 source:/home/alex/Projects/worker/Config.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -1146,7 +1146,7 @@
 	"Config.h"
 	<assert.h>
 
-1386667356 source:/home/alex/Projects/worker/Core.cpp
+1386753629 source:/home/alex/Projects/worker/Core.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -1177,7 +1177,7 @@
 	<list>
 	<stdlib.h>
 
-1386664041 source:/home/alex/Projects/worker/DataBase.cpp
+1386762095 source:/home/alex/Projects/worker/DataBase.cpp
 	<iostream>
 	<algorithm>
 	<signal.h>
@@ -1186,10 +1186,12 @@
 	<sys/stat.h>
 	<strings.h>
 	<stdlib.h>
+	<string.h>
 	"Log.h"
 	"DataBase.h"
 	"KompexSQLiteException.h"
 	"GeoRerions.h"
+	"Config.h"
 
 1386588626 /home/alex/Projects/worker/include/GeoRerions.h
 	"KompexSQLiteDatabase.h"
@@ -1262,7 +1264,7 @@
 	"CgiService.h"
 	"Log.h"
 
-1386588626 source:/home/alex/Projects/worker/Offer.cpp
+1386761716 source:/home/alex/Projects/worker/Offer.cpp
 	"Offer.h"
 	"DB.h"
 	"Log.h"
