@@ -113,9 +113,11 @@
     <!--путь к файлу сокета-->
     <socket_path>/tmp/workerd.sock</socket_path>
     <!--количество ниток на обработку-->
-    <children>1</children>
+    <children>100</children>
     <!--путь к фалу базы данных-->
-    <dbpath>/tmp/fastdb</dbpath>
+    <!--dbpath>mem.db</dbpath-->
+    <dbpath>:memory:</dbpath>
+
     <!--Шаблон информера с баннером-->
     <swfobject_js>/home/alex/Projects/getmyad/js/swfobject.js</swfobject_js>
     <geoGity>/usr/share/GeoIP/GeoLiteCity.dat</geoGity>

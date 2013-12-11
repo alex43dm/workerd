@@ -252,6 +252,7 @@ private:
     bool isSocial (Offer& i);
     DataBase *pDb;
     SQLiteStatement *pStmtInformer, *pStmtOffer;
+    pthread_t tid;
 };
 
 

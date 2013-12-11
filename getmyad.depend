@@ -949,7 +949,7 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1386588626 source:/home/alex/Projects/worker/CgiService.cpp
+1386682738 source:/home/alex/Projects/worker/CgiService.cpp
 	"DB.h"
 	<boost/algorithm/string.hpp>
 	"Log.h"
@@ -989,7 +989,7 @@
 	<GeoIPCity.h>
 	<string>
 
-1386588626 /home/alex/Projects/worker/Core.h
+1386666489 /home/alex/Projects/worker/Core.h
 	<list>
 	<vector>
 	<map>
@@ -1146,7 +1146,7 @@
 	"Config.h"
 	<assert.h>
 
-1386662453 source:/home/alex/Projects/worker/Core.cpp
+1386667356 source:/home/alex/Projects/worker/Core.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -1177,7 +1177,7 @@
 	<list>
 	<stdlib.h>
 
-1386662502 source:/home/alex/Projects/worker/DataBase.cpp
+1386664041 source:/home/alex/Projects/worker/DataBase.cpp
 	<iostream>
 	<algorithm>
 	<signal.h>

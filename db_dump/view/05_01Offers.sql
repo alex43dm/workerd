@@ -15,15 +15,9 @@ SELECT ofrs.id,
 	ofrs.height,
 	ofrs.width,
 	ca.social,
-	c2d.name,
-	c2i.guid
+	null,
+	null
 	FROM Offer AS ofrs
 	INNER JOIN Campaign AS ca ON ofrs.campaignId=ca.id
-	INNER JOIN Campaign2Time AS c2t ON ca.id=c2t.id 
-	LEFT JOIN Campaign2Doms AS c2d ON c2d.allowed=1 
-		AND ca.id=c2d.id 
-	LEFT JOIN Campaign2Acnts AS c2a ON c2a.allowed=1 
-		AND ca.id=c2a.id 
-	LEFT JOIN Campaign2Infs AS c2i ON c2i.allowed=1 
-		AND ca.id=c2a.id 
+	INNER JOIN Campaign2Time AS c2t ON ca.id=c2t.id
 ORDER BY ofrs.rating DESC;

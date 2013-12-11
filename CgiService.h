@@ -54,8 +54,7 @@ private:
      * \param content_type Заголовок "Content-Type".
      * \param cookie    Заголовок "Set-Cookie". Параметр передается в виде обертки Cookie
      */
-    void Response(FCGX_Request *stream, const char *out, int status,
-                  const char *content_type = "text/html",
+    void Response(FCGX_Request *stream, const std::string &out,
                   const std::string &c = "");
 
     /** Возвращает ответ FastCgi серверу.

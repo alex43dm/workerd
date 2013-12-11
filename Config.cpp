@@ -213,8 +213,8 @@ bool Config::LoadConfig(const std::string fName)
         }
         else
         {
-            Log::warn("element dbpath is not inited");
-            dbpath_ = "/tmp/fastdb.fdb";
+            Log::warn("element dbpath is not inited: :memory:");
+            dbpath_ = ":memory:";
         }
 
         if( (mel = mElem->FirstChildElement("swfobject_js")) && (mel->GetText()) )

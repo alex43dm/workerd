@@ -43,7 +43,7 @@ convert (const posix_time::ptime& t)
 CgiService::CgiService(int argc, char *argv[])
     : argc(argc), argv(argv)
 {
-    std::string config = "/home/alex/Projects/getmyad/config.xml";
+    std::string config = "/home/alex/Projects/worker/config.xml";
 
     cfg = Config::Instance();
     cfg->LoadConfig(config);
@@ -155,56 +155,15 @@ string CgiService::getenv(const char *name, const char *default_value)
 */
 
 void CgiService::Response(FCGX_Request *req,
-                          const char *out,
-                          int status,
-                          const char *content_type,
-                          const string &cookie)
+                          const std::string &out,
+                          const std::string &cookie)
 {
-    string headers;
-    headers += "Content-type: ";
-    headers += content_type;
-    headers += "\r\n";
+    FCGX_FPrintF(req->out,"Content-type: text/html\r\n");
+    FCGX_FPrintF(req->out,"Set-Cookie: %s\r\n", cookie.c_str());
+    FCGX_FPrintF(req->out,"Status: 200 OK\r\n");
+    FCGX_FFlush(req->out);
+    FCGX_FPrintF(req->out,"%s\r\n", out.c_str());
 
-
-    headers += "Set-Cookie: ";
-    headers += cookie;
-    headers += "\r\n";
-
-    headers += "Status: ";
-    switch (status)
-    {
-    case 200:
-        headers += "200 OK";
-        break;
-    case 301:
-        headers += "301 Moved Permanently";
-        break;
-    case 302:
-        headers += "302 Found";
-        break;
-    case 307:
-        headers += "307 Temporary Redirect";
-        break;
-    case 400:
-        headers += "400 Bad Request";
-        break;
-    case 403:
-        headers += "403 Forbidden";
-        break;
-    case 500:
-        headers += "500 Internal Server Error";
-        break;
-    case 503:
-        headers += "503 Service Unavailable";
-        break;
-    default:
-        headers += "200 OK";
-        Log::warn("Attempt to return unknown HTTP status: %d", status);
-        break;
-    }
-    headers += "\r\n";
-    FCGX_PutS(headers.c_str(), req->out);
-    FCGX_PutS(out, req->out);
     FCGX_Finish_r(req);
 }
 
@@ -298,7 +257,6 @@ void *CgiService::Serve(void *data)
     for(;;)
     {
         static pthread_mutex_t accept_mutex = PTHREAD_MUTEX_INITIALIZER;
-
         pthread_mutex_lock(&accept_mutex);
         int rc = FCGX_Accept_r(&request);
         pthread_mutex_unlock(&accept_mutex);
@@ -325,28 +283,22 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
     if (!(tmp_str = FCGX_GetParam("QUERY_STRING", req->envp)))
     {
         Log::warn("query string is not set");
-        FCGX_PutS("Используйте getmyad или как fastcgi модуль, \
-                 или из командой строки: \n\
-                 getmyad QUERY_STRING \n", req->out);
         return;
     }
     else
     {
         query = std::string(tmp_str);
         if(!query.size() || query == "/favicon.ico")
-	{
-	    Response(req, "favicon.ico", 200, "text/html", "");
+        {
+            Response(req, "favicon.ico", "");
             return;
-	}
+        }
     }
 
     tmp_str = nullptr;
     if( !(tmp_str = FCGX_GetParam("REMOTE_ADDR", req->envp)) )
     {
         Log::warn("remote address is not set");
-        FCGX_PutS("Используйте getmyad или как fastcgi модуль, \
-                 или из командой строки: \n\
-                 getmyad REMOTE_ADDR \n", req->out);
         return;
     }
     else
@@ -358,9 +310,6 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
     if (!(tmp_str = FCGX_GetParam("SCRIPT_NAME", req->envp)))
     {
         Log::warn("script name is not set");
-        FCGX_PutS("Используйте getmyad или как fastcgi модуль, \
-                 или из командой строки: \n\
-                 getmyad SCRIPT_NAME \n", req->out);
         return;
     }
     else
@@ -371,17 +320,12 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
     tmp_str = nullptr;
     if (!(tmp_str = FCGX_GetParam("HTTP_COOKIE", req->envp)))
     {
-        Log::warn("cookie is not set");
-        FCGX_PutS("Используйте getmyad или как fastcgi модуль, \
-                 или из командой строки: \n\
-                 getmyad HTTP_COOKIE \n", req->out);
+        //Log::warn("cookie is not set");
     }
     else
     {
         visitor_cookie = std::string(tmp_str);
     }
-
-   // Log::info("query: %s",query.c_str());
 
     UrlParser url(query);
 
@@ -439,7 +383,7 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
 
         vector<Core::ImpressionItem> items;
         string result = core->Process(prm, items);
-        Response(req, result, 200, "text/html", c.to_string());
+        Response(req, result, c.to_string());
 /*
         static pthread_mutex_t redis_mutex = PTHREAD_MUTEX_INITIALIZER;
         pthread_mutex_lock(&redis_mutex);

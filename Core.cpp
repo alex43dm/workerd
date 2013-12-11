@@ -40,6 +40,7 @@ Core::Core(DataBase *_pDb) :
     redirect_script_("/redirect"),
     pDb(_pDb)
 {
+    tid = pthread_self();
     //pDb = new DataBase(false);
     //time_service_started_ = second_clock::local_time();
     try
@@ -48,13 +49,15 @@ Core::Core(DataBase *_pDb) :
         pStmtInformer->Sql("SELECT guid,capacity,bannersCss,teasersCss FROM Informer WHERE guid=@q LIMIT 1");
 
         pStmtOffer = new SQLiteStatement(pDb->pDatabase);
-        pStmtOffer->Sql("SELECT o.id,o.guid,o.title,o.price,o.description,o.url,o.image,o.swf,o.campaignId,o.isOnClick,o.type,o.rating,o.uniqueHits,o.height,o.width,o.social FROM getOffers01 AS o WHERE o.name=@q AND o.guid=@g");
+        pStmtOffer->Sql("SELECT o.id,o.guid,o.title,o.price,o.description,o.url,o.image,o.swf,o.campaignId,o.isOnClick,o.type,o.rating,o.uniqueHits,o.height,o.width,o.social,@q,@g FROM getOffers01 AS o LIMIT 4");
     }
     catch(SQLiteException &ex)
     {
         Log::err("DB error: %s", ex.GetString().c_str());
         exit(1);
     }
+
+    Log::info("[%ld]core start",tid);
 }
 
 Core::~Core()
@@ -151,12 +154,12 @@ public:
 	Изменён RealInvest Soft */
 std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
 {
-    Log::gdb("Core::Process start");
+   // Log::info("[%ld]Core::Process start",tid);
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = microsec_clock::local_time();
 
     Informer *informer = getInformer(params);
-    Log::gdb("getInformer done");
+    //Log::info("[%ld]getInformer done",tid);
     /*
         request_processed_++;
         time_request_started_ = microsec_clock::local_time();
@@ -203,7 +206,7 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
 
     ////если полученный вектор пуст, используем старый алгоритм, в противном случае используем наш алгоритм
     offers = getOffers(params);
-    Log::gdb("get %d offers done",offers.size());
+    //Log::info("[%ld]get %d offers done",tid,offers.size());
     /*
         if (offersIds.size()==0)
         {
@@ -214,7 +217,7 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
         {*/
     //новый алгоритм
     RISAlgorithm(offers, params, cleared, informer->capacity);
-    Log::gdb("RISAlgorithm: done");
+    //Log::info("RISAlgorithm: done",tid);
     //offers = getOffersRIS(offersIds, params, camps, clean, updateShort, updateContext);
     if (!offers.size())
     {
@@ -246,16 +249,16 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
     // Каждому элементу просмотра присваиваем уникальный токен
     GenerateToken token_generator(params);
     std::transform(offers.begin(), offers.end(), back_inserter(items), token_generator);
-    Log::gdb("token_generator transform done");
+   /// Log::info("[%ld]token_generator transform done",tid);
     // Составляем ссылку перенаправления для каждого элемента
 
     GenerateRedirectLink redirect_generator(params.informer_,
                                             server_ip(),
                                             redirect_script(),
                                             params.location_);
-    Log::gdb("GenerateRedirectLink: done");
+    //Log::info("[%ld]GenerateRedirectLink: done",tid);
     std::for_each(items.begin(), items.end(), redirect_generator);
-    Log::gdb("redirect_generator: done size:%d",items.size());
+   // Log::info("[%ld]redirect_generator: done size:%d",tid,items.size());
     std::string ret;
     if (params.json_)
         ret = OffersToJson(items);
@@ -264,7 +267,7 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
     //Log::info("OffersToJson/OffersToHtml: done");
     delete informer;
 
-    Log::gdb("core time: %s", to_simple_string(microsec_clock::local_time() - startTime).c_str());
+    Log::info("[%ld]core time: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
     return ret;
 }
 
@@ -349,9 +352,8 @@ vector<Offer> Core::getOffers(const Params &params)
         Log::err("DB error: %s", ex.GetString().c_str());
         exit(1);
     }
-
     //pStmtInformer->BindString(1, country_code_by_addr("93.77.122.93"));
-    Log::gdb("getOffers start FetchRow");
+    //Log::gdb("getOffers start FetchRow");
     while(pStmtOffer->FetchRow())
     {
         Offer off = Offer(pStmtOffer->GetColumnString(1),

@@ -7,11 +7,13 @@
 #include <sys/stat.h>
 #include <strings.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "Log.h"
 #include "DataBase.h"
 #include "KompexSQLiteException.h"
 #include "GeoRerions.h"
+#include "Config.h"
 
 #define INSERTSTATMENT "INSERT INTO Offer (id) VALUES (%lu)"
 
@@ -19,6 +21,8 @@ DataBase::DataBase(bool create) :
     create(create),
     pStmt(nullptr)
 {
+
+    dbFileName = Config::Instance()->dbpath_;//":memory:"
     openDb();
 }
 
@@ -38,14 +42,14 @@ bool DataBase::openDb()
     {
         if(!create)
         {
-            pDatabase = new SQLiteDatabase(":memory:",//file::memory:",//:memory:",//"/tmp/mem.db",//?cache=shared
-                                           SQLITE_OPEN_READONLY | SQLITE_OPEN_FULLMUTEX, NULL);//SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | | SQLITE_OPEN_FULLMUTEX
+            pDatabase = new SQLiteDatabase(dbFileName,
+                                           SQLITE_OPEN_READONLY, NULL);//SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | | SQLITE_OPEN_FULLMUTEX
             return true;
         }
 
         Log::gdb("open and create db");
 
-        pDatabase = new SQLiteDatabase(":memory:",//file::memory:",//:memory:",//"/tmp/mem.db",//
+        pDatabase = new SQLiteDatabase(dbFileName,
                                        SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);//SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | | SQLITE_OPEN_FULLMUTEX
 
         if(pStmt)
@@ -146,7 +150,8 @@ void DataBase::readDir(const std::string &dirName)
         {
             if(sql_name->d_type != DT_REG)
                 continue;
-            files.push_back(dname + "/" + sql_name->d_name);
+            if(strstr(sql_name->d_name, ".sql") != NULL)
+                files.push_back(dname + "/" + sql_name->d_name);
         }
         closedir(dir);
         std::sort (files.begin(), files.end());
@@ -157,7 +162,6 @@ void DataBase::readDir(const std::string &dirName)
 bool DataBase::runSqlFiles(const std::vector<std::string> &files)
 {
     int fd;
-
     for (auto it = files.begin(); it != files.end(); it++)
     {
         if( (fd = open((*it).c_str(), O_RDONLY))<2 )
@@ -178,8 +182,15 @@ bool DataBase::runSqlFiles(const std::vector<std::string> &files)
         }
         close(fd);
 
-        pStmt->SqlStatement(buf);
-
+        try
+        {
+            pStmt->SqlStatement(buf);
+        }
+        catch(SQLiteException &ex)
+        {
+            printf("error in file: %s: %s\n", (*it).c_str(), ex.GetString().c_str());
+            ::exit(1);
+        }
         char *p = buf;
         while(p < buf+sz)
         {

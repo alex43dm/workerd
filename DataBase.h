@@ -27,6 +27,7 @@ public:
 protected:
 
 private:
+    std::string dbFileName;
     bool create;
     SQLiteStatement *pStmt;
 
