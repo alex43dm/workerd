@@ -49,7 +49,7 @@ Core::Core(DataBase *_pDb) :
         pStmtInformer->Sql("SELECT guid,capacity,bannersCss,teasersCss FROM Informer WHERE guid=@q LIMIT 1");
 
         pStmtOffer = new SQLiteStatement(pDb->pDatabase);
-        pStmtOffer->Sql("SELECT o.id,o.guid,o.title,o.price,o.description,o.url,o.image,o.swf,o.campaignId,o.isOnClick,o.type,o.rating,o.uniqueHits,o.height,o.width,o.social FROM getOffers01 AS o WHERE o.cid=@q OR o.cid IS NULL OR o.rname=@g  LIMIT 4");
+        pStmtOffer->Sql("SELECT o.id,o.guid,o.title,o.price,o.description,o.url,o.image,o.swf,o.campaignId,o.isOnClick,o.type,o.rating,o.uniqueHits,o.height,o.width,o.social FROM getOffers01 AS o WHERE o.cid=@q OR o.cid IS NULL OR o.rname=@g OR o.dname=@d  LIMIT 4");
     }
     catch(SQLiteException &ex)
     {
@@ -346,6 +346,7 @@ vector<Offer> Core::getOffers(const Params &params)
     {
         pStmtOffer->BindString(1, params.location_);
         pStmtOffer->BindString(2, params.informer_);
+        pStmtOffer->BindString(3, "google.com");
     }
     catch(SQLiteException &ex)
     {
