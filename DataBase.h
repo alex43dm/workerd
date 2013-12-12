@@ -25,17 +25,21 @@ public:
     virtual ~DataBase();
     bool gen(int from, unsigned int len);
     void postDataLoad();
+    void indexRebuild();
+    bool runSqlFile(const std::string &file);
+    bool getSqlFile(const std::string &file, std::string &retString);
 protected:
 
 private:
     std::string dbFileName;
     std::string dirName;
+    std::string geoCsv;
     bool create;
     SQLiteStatement *pStmt;
 
     bool openDb();
     long fileSize(int fd);
-    void readDir();
+    void readDir(const std::string &dname);
     bool runSqlFiles(const std::vector<std::string> &files);
 };
 

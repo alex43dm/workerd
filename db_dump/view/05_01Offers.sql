@@ -14,12 +14,12 @@ SELECT ofrs.id,
 	ofrs.uniqueHits,
 	ofrs.height,
 	ofrs.width,
-	ca.social,
-	c2r.rname AS rname,
-	c2r.cid AS cid,
-	c2d.name AS dname
+	ca.social
 	FROM Offer AS ofrs
 	INNER JOIN Campaign AS ca ON ofrs.campaignId=ca.id
-	INNER JOIN Campaign2Time AS cn ON cn.id=ca.id
-	LEFT JOIN Campaign2GeoRerions AS c2r ON cn.id=c2r.id
-	LEFT JOIN Campaign2Doms AS c2d ON cn.id=c2d.id AND allowed = 1;
+	INNER JOIN (
+        SELECT id FROM(
+            SELECT cn.id FROM Campaign2Time AS cn
+            EXCEPT
+            SELECT c2d.id FROM Campaign2Doms AS c2d WHERE c2d.name='google.com'
+            ) GROUP BY id ) AS c ON ca.id=c.id;

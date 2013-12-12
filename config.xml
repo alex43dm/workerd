@@ -117,6 +117,10 @@
     <!--путь к фалу базы данных-->
     <!--dbpath>mem.db</dbpath-->
     <dbpath>:memory:</dbpath>
+    <!--путь к каталогу дампа sqlite базы-->
+    <db_dump_path>db_dump</db_dump_path>
+    <!--путь к csv файлу содержимого таблицы GeoRerions-->
+    <db_geo_csv>db_dump/region.csv</db_geo_csv>
 
     <!--Шаблон информера с баннером-->
     <swfobject_js>/home/alex/Projects/getmyad/js/swfobject.js</swfobject_js>

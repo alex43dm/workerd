@@ -211,6 +211,14 @@ bool Config::LoadConfig(const std::string fName)
         {
             dbpath_ = mel->GetText();
         }
+        if( (mel = mElem->FirstChildElement("db_dump_path")) && (mel->GetText()) )
+        {
+            db_dump_path_ = mel->GetText();
+        }
+        if( (mel = mElem->FirstChildElement("db_geo_csv")) && (mel->GetText()) )
+        {
+            db_geo_csv_ = mel->GetText();
+        }
         else
         {
             Log::warn("element dbpath is not inited: :memory:");

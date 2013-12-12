@@ -19,7 +19,7 @@ GeoRerions::~GeoRerions()
     //dtor
 }
 
-bool GeoRerions::load(Kompex::SQLiteDatabase *pdb)
+bool GeoRerions::load(Kompex::SQLiteDatabase *pdb, const std::string &fname)
 {
     Kompex::SQLiteStatement *pStmt;
     pStmt = new Kompex::SQLiteStatement(pdb);
@@ -33,7 +33,7 @@ bool GeoRerions::load(Kompex::SQLiteDatabase *pdb)
     pData = buf + sz;
     sz = sizeof(buf) - sz;
 
-    std::ifstream infile("/home/alex/Projects/worker/region.csv");
+    std::ifstream infile(fname);
 
     std::string line;
     pStmt->BeginTransaction();

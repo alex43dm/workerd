@@ -12,6 +12,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
+				<Option parameters="-c /home/alex/Projects/worker/config.xml" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -22,6 +23,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
+				<Option parameters="-c /home/alex/Projects/worker/config.xml -s /tmp/dcg,sock" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
@@ -99,11 +101,11 @@
 		<Unit filename="Params.h" />
 		<Unit filename="RandomEntity.cpp" />
 		<Unit filename="RandomEntity.h" />
-		<Unit filename="Rules.cpp" />
-		<Unit filename="Rules.h" />
 		<Unit filename="UserHistory.cpp" />
 		<Unit filename="UserHistory.h" />
 		<Unit filename="config.xml" />
+		<Unit filename="db_dump/post/01.sql" />
+		<Unit filename="db_dump/requests/01.sql" />
 		<Unit filename="db_dump/schema/wokers.mwb" />
 		<Unit filename="db_dump/schema/wokers.mwb.bak" />
 		<Unit filename="db_dump/tables/00_Campaign.sql" />
@@ -121,8 +123,8 @@
 		<Unit filename="db_dump/tables/12_GeoRerions.sql" />
 		<Unit filename="db_dump/tables/13_geoTargeting.sql" />
 		<Unit filename="db_dump/tables/14_regionTargeting.sql" />
+		<Unit filename="db_dump/tables/15_CampaignNow.sql" />
 		<Unit filename="db_dump/view/00_Campaign2GeoRerions.sql" />
-		<Unit filename="db_dump/view/00_CampaignNow.sql" />
 		<Unit filename="db_dump/view/01_Campaign2Time.sql" />
 		<Unit filename="db_dump/view/02_Campaign2Doms.sql" />
 		<Unit filename="db_dump/view/03_Campaign2Acnts.sql" />
@@ -157,7 +159,7 @@
 				<general />
 			</DoxyBlocks>
 			<code_completion />
-			<envvars />
+			<envvars set="default" />
 			<debugger />
 			<lib_finder disable_auto="1" />
 		</Extensions>

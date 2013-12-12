@@ -41,19 +41,20 @@ Core::Core(DataBase *_pDb) :
     pDb(_pDb)
 {
     tid = pthread_self();
-    //pDb = new DataBase(false);
-    //time_service_started_ = second_clock::local_time();
+    std::string sql;
+
     try
     {
         pStmtInformer = new SQLiteStatement(pDb->pDatabase);
-        pStmtInformer->Sql("SELECT guid,capacity,bannersCss,teasersCss FROM Informer WHERE guid=@q LIMIT 1");
+        pStmtInformer->Sql("SELECT id,capacity,bannersCss,teasersCss FROM Informer WHERE guid=@q LIMIT 1");
 
         pStmtOffer = new SQLiteStatement(pDb->pDatabase);
-        pStmtOffer->Sql("SELECT o.id,o.guid,o.title,o.price,o.description,o.url,o.image,o.swf,o.campaignId,o.isOnClick,o.type,o.rating,o.uniqueHits,o.height,o.width,o.social FROM getOffers01 AS o WHERE o.cid=@q OR o.cid IS NULL OR o.rname=@g OR o.dname=@d  LIMIT 4");
+        pDb->getSqlFile("requests/01.sql",sql);
+        pStmtOffer->Sql(sql);
     }
     catch(SQLiteException &ex)
     {
-        Log::err("DB error: %s", ex.GetString().c_str());
+        Log::err("DB error: %s: %s", ex.GetString().c_str(), sql.c_str());
         exit(1);
     }
 
@@ -205,7 +206,7 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
     //LOG(INFO) << "время получения РП = " << (endTime - startTime) << "\n";
 
     ////если полученный вектор пуст, используем старый алгоритм, в противном случае используем наш алгоритм
-    offers = getOffers(params);
+    offers = getOffers(params, *informer);
     //Log::info("[%ld]get %d offers done",tid,offers.size());
     /*
         if (offersIds.size()==0)
@@ -288,7 +289,7 @@ void Core::ProcessSaveResults(const Params &params, const vector<ImpressionItem>
         list<string> shortTerm = HistoryManager::instance()->getShortHistoryByUser(params);
         list<string> longTerm = HistoryManager::instance()->getLongHistoryByUser(params);
         list<string> contextTerm = HistoryManager::instance()->getContextHistoryByUser(params);
-        markAsShown(items, params, shortTerm, longTerm, contextTerm);
+//        markAsShown(items, params, shortTerm, longTerm, contextTerm);
         //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
         HistoryManager::instance()->updateUserHistory(items, params, clean, updateShort, updateContext);
     }
@@ -299,6 +300,22 @@ void Core::ProcessSaveResults(const Params &params, const vector<ImpressionItem>
 
 }
 
+Informer *Core::getInformer(const Params &params)
+{
+    Informer *result;
+    pStmtInformer->BindString(1, params.informer_);
+    while(pStmtInformer->FetchRow())
+    {
+        result = new Informer(pStmtInformer->GetColumnInt64(0),
+                              pStmtInformer->GetColumnInt(1),
+                              pStmtInformer->GetColumnString(2),
+                              pStmtInformer->GetColumnString(3)
+                             );
+    }
+    pStmtInformer->Reset();
+    //pStmtInformer->FreeQuery();
+    return result;
+}
 /**
     Алгоритм работы таков:
 file::memory:?cache=shared
@@ -338,15 +355,18 @@ file::memory:?cache=shared
 	-#  Предложения, указанные в \c params.exluded_offers, по возможности
 	    исключаются из просмотра. Это используется в прокрутке информера.
  */
-vector<Offer> Core::getOffers(const Params &params)
+vector<Offer> Core::getOffers(const Params &params, const Informer& inf)
 {
 //    Log::info("getOffers start");
     vector<Offer> result;
     try
     {
-        pStmtOffer->BindString(1, params.location_);
-        pStmtOffer->BindString(2, params.informer_);
-        pStmtOffer->BindString(3, "google.com");
+        pStmtOffer->BindString(1, "19,32");//from informer domains id
+        pStmtOffer->BindInt(2, inf.id);//from informer account id
+        pStmtOffer->BindString(3, "UA");//from informer country id
+
+        //pStmtOffer->BindString(2, "UA");//params.location_);
+        //pStmtOffer->BindString(2, params.informer_);
     }
     catch(SQLiteException &ex)
     {
@@ -382,154 +402,6 @@ vector<Offer> Core::getOffers(const Params &params)
 //    Log::info("getOffers end");
     return result;
 }
-
-Informer *Core::getInformer(const Params &params)
-{
-    Informer *result;
-    pStmtInformer->BindString(1, params.informer_);
-    while(pStmtInformer->FetchRow())
-    {
-        result = new Informer(pStmtInformer->GetColumnString(0),
-                              pStmtInformer->GetColumnInt(1),
-                              pStmtInformer->GetColumnString(2),
-                              pStmtInformer->GetColumnString(3)
-                             );
-    }
-    pStmtInformer->Reset();
-    //pStmtInformer->FreeQuery();
-    return result;
-}
-
-/** Возвращает в параметре \a out_campaigns список кампаний, подходящих под
-    параметры \a params. */
-void Core::getCampaigns(const Params &params,
-                        list<Campaign> &out_campaigns) const
-{
-    Rules rules;
-    rules.set_ip(params.ip_);
-    rules.set_informer(params.informer_);
-    rules.set_time(params.time_);
-    if (!params.country_.empty())
-        rules.set_country(params.country_);
-    if (!params.region_.empty())
-        rules.set_region(params.region_);
-    out_campaigns = rules.campaignsNotSocial();
-}
-/** Возвращает в параметре \a out_campaigns список кампаний, подходящих под
-    параметры \a params. */
-void Core::getSocCampaigns(const Params &params,
-                           list<Campaign> &out_campaigns) const
-{
-    Rules rules;
-    rules.set_ip(params.ip_);
-    rules.set_informer(params.informer_);
-    rules.set_time(params.time_);
-    if (!params.country_.empty())
-        rules.set_country(params.country_);
-    if (!params.region_.empty())
-        rules.set_region(params.region_);
-    out_campaigns = rules.campaignsSocial();
-}
-
-/** Возвращает в параметре \a out_campaigns список кампаний без учета привязки к РБ. */
-void Core::getAllGeoCampaigns(const Params &params,
-                              list<Campaign> &out_campaigns) const
-{
-    Rules rules;
-    rules.set_ip(params.ip_);
-    rules.set_time(params.time_);
-    if (!params.country_.empty())
-        rules.set_country(params.country_);
-    if (!params.region_.empty())
-        rules.set_region(params.region_);
-    out_campaigns = rules.campaigns();
-}
-
-/** Добавляет в журнал просмотров log.impressions предложения \a items.
-    Если показ информера осуществляется в тестовом режиме, запись не происходит.
-
-    Внимание: Используется база данных, зарегистрированная под именем 'log'.
- */
-void Core::markAsShown(const vector<ImpressionItem> &items, const Params &params, list<string> &shortTerm, list<string> &longTerm, list<string> &contextTerm )
-{
-    if (params.test_mode_)
-        return;
-    mongo::DB db("log");
-    //LOG(INFO) << "writing to log...";
-
-    int count = 0;
-    list<string>::iterator it;
-
-    mongo::BSONArrayBuilder b1,b2,b3;
-    for (it=shortTerm.begin() ; it != shortTerm.end(); it++ )
-        b1.append(*it);
-    mongo::BSONArray shortTermArray = b1.arr();
-    for (it=longTerm.begin() ; it != longTerm.end(); it++ )
-        b2.append(*it);
-    mongo::BSONArray longTermArray = b2.arr();
-    for (it=contextTerm.begin() ; it != contextTerm.end(); it++ )
-        b3.append(*it);
-    mongo::BSONArray contextTermArray = b3.arr();
-    Informer informer(params.informer_);
-
-    BOOST_FOREACH (const ImpressionItem &i, items)
-    {
-
-
-        if (i.offer.id.empty()) return;
-
-        std::tm dt_tm;
-        dt_tm = boost::posix_time::to_tm(params.time_);
-        mongo::Date_t dt( (mktime(&dt_tm)) * 1000LLU);
-        Campaign campaign(i.offer.campaign_id);
-
-        mongo::BSONObj keywords = mongo::BSONObjBuilder().
-                                  append("search", params.getSearch()).
-                                  append("context", params.getContext()).
-                                  append("ShortTermHistory", shortTermArray).
-                                  append("longtermhistory", longTermArray).
-                                  append("contexttermhistory", contextTermArray).
-                                  obj();
-
-        string country = country_code_by_addr(params.ip_);
-        string region = region_code_by_addr(params.ip_);
-
-        mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
-                                append("dt", dt).
-                                append("id", i.offer.id).
-                                append("id_int", i.offer.id_int).
-                                append("title", i.offer.title).
-                                append("inf", params.informer_).
-                                append("inf_int", informer.id_int).
-                                append("ip", params.ip_).
-                                append("cookie", params.cookie_id_).
-                                append("social", !(campaign.valid() && !campaign.social())).
-                                append("token", i.token).
-                                append("type", i.offer.type).
-                                append("isOnClick", i.offer.isOnClick).
-                                append("campaignId", campaign.id()).
-                                append("campaignId_int", campaign.id_int()).
-                                append("campaignTitle", campaign.title()).
-                                append("project", campaign.project()).
-                                append("country", (country.empty()?"NOT FOUND":country)).
-                                append("region", (region.empty()?"NOT FOUND":region)).
-                                append("keywords", keywords).
-                                append("branch", i.offer.branch).
-                                append("conformity", i.offer.conformity).
-                                append("matching", i.offer.matching).
-                                obj();
-
-        db.insert("log.impressions", record, true);
-        count++;
-
-        offer_processed_ ++;
-        if (campaign.social()) social_processed_ ++;
-    }
-
-    if(count == 0)
-        Log::warn("No items was added to log.impressions!");
-}
-
 
 
 std::string Core::OffersToHtml(const std::vector<ImpressionItem> &items, const Params &params, Informer *informer) const
@@ -778,7 +650,7 @@ void Core::createVectorOffersByIds(const list<pair<pair<string, float>,
 void Core::filterOffersSize(vector<Offer> &result, const string& informerId)
 {
     //LOG(INFO) << "filterOffersSize start\n";
-    filterOffersSize(result, Informer(informerId));
+//    filterOffersSize(result, Informer(informerId));
     //LOG(INFO) << "filterOffersSize end\n";
 }
 

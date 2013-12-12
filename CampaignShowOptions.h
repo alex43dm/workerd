@@ -57,7 +57,7 @@ public:
     }
 
     /** Множество информеров, на которых можно показывать кампанию */
-    std::set<Informer> allowed_informers() const
+    std::set<long> allowed_informers() const
     {
         return allowed_informers_;
     }
@@ -75,7 +75,7 @@ public:
     }
 
     /** Множество информеров, на которых НЕ нужно показывать кампанию */
-    std::set<Informer> ignored_informers() const
+    std::set<long> ignored_informers() const
     {
         return ignored_informers_;
     }
@@ -158,10 +158,10 @@ private:
     Campaign campaign_;
     std::set<std::string> country_targeting_;
     std::set<std::string> region_targeting_;
-    std::set<Informer> allowed_informers_;
+    std::set<long> allowed_informers_;
     std::set<std::string> allowed_domains_;
     std::set<std::string> allowed_accounts_;
-    std::set<Informer> ignored_informers_;
+    std::set<long> ignored_informers_;
     std::set<std::string> ignored_domains_;
     std::set<std::string> ignored_accounts_;
     ShowCoverage show_coverage_;

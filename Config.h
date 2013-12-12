@@ -52,6 +52,9 @@ public:
     std::string cookie_name_;
     std::string cookie_domain_;
     std::string cookie_path_;
+    std::string db_dump_path_;
+    std::string db_geo_csv_;
+
 
     static Config* Instance();
     bool LoadConfig(const std::string fName);

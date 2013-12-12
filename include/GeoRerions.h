@@ -8,7 +8,7 @@ class GeoRerions
     public:
         GeoRerions();
         virtual ~GeoRerions();
-        static bool load(Kompex::SQLiteDatabase *pdb);
+        static bool load(Kompex::SQLiteDatabase *pdb, const std::string &fname);
     protected:
     private:
 };

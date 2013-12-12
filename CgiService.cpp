@@ -44,9 +44,31 @@ CgiService::CgiService(int argc, char *argv[])
     : argc(argc), argv(argv)
 {
     std::string config = "/home/alex/Projects/worker/config.xml";
+    std::string sock_path;
+    int ret;
+    while ( (ret = getopt(argc,argv,"c:s:")) != -1)
+    {
+        switch (ret)
+        {
+        case 'c':
+            config = optarg;
+            break;
+        case 's':
+            sock_path = optarg;
+            break;
+        default:
+            printf("Error found! %s -c config_file -s socket_path\n",argv[0]);
+            ::exit(1);
+        };
+    };
 
     cfg = Config::Instance();
     cfg->LoadConfig(config);
+
+    if( sock_path.size() > 8 )
+    {
+        cfg->server_socket_path_ = sock_path;
+    }
 
     mongo_main_host_ = cfg->mongo_main_host_;
     mongo_main_db_ = cfg->mongo_main_db_;
@@ -126,11 +148,16 @@ CgiService::CgiService(int argc, char *argv[])
     }
     pthread_attr_destroy(attributes);
     //main loop
-    for(;;)
+    for(i=0;;i++)
     {
         //todo make lock on mq read
 //        core->ProcessMQ();
         sleep(1);
+        if( i >= 15*60 )
+        {
+            bcore->ReloadAllEntities();
+            i = 0;
+        }
     }
 
     //main loop end

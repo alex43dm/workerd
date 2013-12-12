@@ -40,6 +40,7 @@ void CampaignShowOptions::reset()
 /** Загружает правила из базы данных */
 bool CampaignShowOptions::load()
 {
+    /*
     reset();
     DB db;
     BSONObj adv = db.findOne("campaign", QUERY("guid" << campaign_.id()));
@@ -93,7 +94,7 @@ bool CampaignShowOptions::load()
     // Множества информеров, аккаунтов и доменов, на которых разрешён показ
     it = o.getObjectField("allowed").getObjectField("informers");
     while (it.more())
-        allowed_informers_.insert(Informer(it.next().str()));
+        allowed_informers_.insert(it.next().str());
     it = o.getObjectField("allowed").getObjectField("accounts");
     while (it.more())
         allowed_accounts_.insert(it.next().str());
@@ -116,7 +117,7 @@ bool CampaignShowOptions::load()
     it = o.getObjectField("categories");
     while (it.more())
         categories_.insert(it.next().str());
-
+*/
     loaded_ = true;
     return true;
 }

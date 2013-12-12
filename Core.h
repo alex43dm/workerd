@@ -68,7 +68,7 @@ public:
     void ProcessSaveResults(const Params &params, const std::vector<ImpressionItem> &items);
 
 
-    std::vector<Offer> getOffers(const Params &params);
+    std::vector<Offer> getOffers(const Params &params,const Informer& inf);
 
     Informer *getInformer(const Params &params);
 

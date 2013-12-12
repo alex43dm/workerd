@@ -179,11 +179,14 @@ void BaseCore::LoadAllEntities()
     // Проверяем, нет ли кампаний с 0 предложений
     // Сбрасываем кеш
     pDb->postDataLoad();
+
+    pDb->indexRebuild();
 }
 
 
 void BaseCore::ReloadAllEntities()
 {
+    pDb->postDataLoad();
 }
 
 /** \brief  Инициализация очереди сообщений (AMQP).

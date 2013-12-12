@@ -29,7 +29,7 @@ public:
     };
 
 public:
-        std::string id;                         //Индентификатор РБ
+        long id;                         //Индентификатор РБ
         sphinx_int64_t id_int;                             //Индентификатор РБ
         std::string title;                      //Название РБ
         std::string teasersCss;                 //Стиль CSS РБ для отображения тизеров
@@ -47,8 +47,8 @@ public:
         int height_banner;                      //Высота отображаемых банеров
         int width_banner;                       //Ширина отображаемых банеров
 
-    Informer(const std::string &id = "");
-    Informer(const std::string &id, int capacity, const std::string &bannersCss, const std::string &teasersCss);
+    Informer(long id);
+    Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss);
     virtual ~Informer();
 
     /** Загружает информацию обо всех информерах */
@@ -56,7 +56,7 @@ public:
 
     bool is_null() const
     {
-        return id.empty();
+        return id==0;
     }
 
     bool operator==(const Informer &other) const;

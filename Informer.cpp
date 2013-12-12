@@ -12,12 +12,12 @@ using namespace mongo;
 /** Ищет данные информера по id, если не находит, то вставляет пустой элемент,
     у которого valid = false
 */
-Informer::Informer(const std::string &id) :
+Informer::Informer(long id) :
     id(id)
 {
 }
 
-Informer::Informer(const std::string &id, int capacity, const std::string &bannersCss, const std::string &teasersCss) :
+Informer::Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss) :
     id(id),
     teasersCss(teasersCss),
     bannersCss(bannersCss),

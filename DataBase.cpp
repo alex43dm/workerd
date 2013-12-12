@@ -18,12 +18,12 @@
 #define INSERTSTATMENT "INSERT INTO Offer (id) VALUES (%lu)"
 
 DataBase::DataBase(bool create) :
+    dbFileName(Config::Instance()->dbpath_),
+    dirName(Config::Instance()->db_dump_path_),
+    geoCsv(Config::Instance()->db_geo_csv_),
     create(create),
-    pStmt(nullptr),
-    dirName("db_dump")
+    pStmt(nullptr)
 {
-
-    dbFileName = Config::Instance()->dbpath_;//":memory:"
     openDb();
 }
 
@@ -60,10 +60,12 @@ bool DataBase::openDb()
         pStmt = new SQLiteStatement(pDatabase);
 
         //load db dump from directory
-        readDir();
-        //geo table fill
-        GeoRerions::load(pDatabase);
 
+        readDir(dirName + "/tables");
+        readDir(dirName + "/view");
+
+        //geo table fill
+        GeoRerions::load(pDatabase,geoCsv);
     }
     catch(SQLiteException &ex)
     {
@@ -130,82 +132,35 @@ long DataBase::fileSize(int fd)
     return fstat(fd, &stat_buf) == 0 ? stat_buf.st_size : -1;
 }
 
-void DataBase::readDir()
+void DataBase::readDir(const std::string &dname)
 {
     struct dirent *sql_name;
 
-    for(int i=0; i<2; i++)
+    DIR *dir = opendir(dname.c_str());
+
+    if (dir == NULL)
     {
-        std::string dname = dirName;
-        if( i==0 ){ dname += "/tables"; }else{ dname += "/view"; }
-
-        DIR *dir = opendir(dname.c_str());
-
-        if (dir == NULL)
-        {
-            printf("scandir error\n");
-            return;
-        }
-        std::vector<std::string> files;
-        while( (sql_name = readdir(dir)) != NULL )
-        {
-            if(sql_name->d_type != DT_REG)
-                continue;
-            if(strstr(sql_name->d_name, ".sql") != NULL)
-                files.push_back(dname + "/" + sql_name->d_name);
-        }
-        closedir(dir);
-        std::sort (files.begin(), files.end());
-        runSqlFiles(files);
-    }//for
+        Log::err("scandir: %s error",dname.c_str());
+        return;
+    }
+    std::vector<std::string> files;
+    while( (sql_name = readdir(dir)) != NULL )
+    {
+        if(sql_name->d_type != DT_REG)
+            continue;
+        if(strstr(sql_name->d_name, ".sql") != NULL)
+            files.push_back(dname + "/" + sql_name->d_name);
+    }
+    closedir(dir);
+    std::sort (files.begin(), files.end());
+    runSqlFiles(files);
 }
 
 bool DataBase::runSqlFiles(const std::vector<std::string> &files)
 {
-    int fd;
     for (auto it = files.begin(); it != files.end(); it++)
     {
-        if( (fd = open((*it).c_str(), O_RDONLY))<2 )
-        {
-            continue;
-        }
-        ssize_t sz = fileSize(fd);
-        char *buf = (char*)malloc(sz);
-
-        bzero(buf,sz);
-
-        int ret = read(fd, buf, sz);
-
-        if( ret != sz )
-        {
-            printf("Error read file: %s",(*it).c_str());
-            ::exit(1);
-        }
-        close(fd);
-
-        try
-        {
-            pStmt->SqlStatement(buf);
-        }
-        catch(SQLiteException &ex)
-        {
-            printf("error in file: %s: %s\n", (*it).c_str(), ex.GetString().c_str());
-            ::exit(1);
-        }
-        char *p = buf;
-        while(p < buf+sz)
-        {
-            if(*p==';' && p < buf+sz-30)
-            {
-                pStmt->SqlStatement(++p);
-            }
-            else
-            {
-                p++;
-            }
-        }
-
-        free(buf);
+        runSqlFile(*it);
     }
 
     return true;
@@ -214,8 +169,110 @@ bool DataBase::runSqlFiles(const std::vector<std::string> &files)
 
 void DataBase::postDataLoad()
 {
-    std::vector<std::string> files;
-    files.push_back(dirName + "/post/01.sql");
-    files.push_back(dirName + "/post/00.sql");
-    runSqlFiles(files);
+    try
+    {
+        pStmt->BeginTransaction();
+
+        readDir(dirName + "/post");
+
+        pStmt->CommitTransaction();
+    }
+    catch(SQLiteException &ex)
+    {
+        Log::err("DataBase DB error: postDataLoad: %s", ex.GetString().c_str());
+    }
+}
+
+//The REINDEX command is used to delete and recreate indices from scratch.
+void DataBase::indexRebuild()
+{
+    try
+    {
+        pStmt->BeginTransaction();
+        pStmt->SqlStatement("REINDEX");
+        pStmt->CommitTransaction();
+    }
+    catch(SQLiteException &ex)
+    {
+        Log::err("DataBase DB error: indexRebuild: %s", ex.GetString().c_str());
+    }
+}
+
+bool DataBase::runSqlFile(const std::string &file)
+{
+    int fd;
+
+    if( (fd = open(file.c_str(), O_RDONLY))<2 )
+    {
+        return false;
+    }
+
+    ssize_t sz = fileSize(fd);
+    char *buf = (char*)malloc(sz);
+
+    bzero(buf,sz);
+
+    int ret = read(fd, buf, sz);
+
+    if( ret != sz )
+    {
+        printf("Error read file: %s",file.c_str());
+        ::exit(1);
+    }
+    close(fd);
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(SQLiteException &ex)
+    {
+        printf("error in file: %s: %s\n", file.c_str(), ex.GetString().c_str());
+        ::exit(1);
+    }
+    char *p = buf;
+    while(p < buf+sz)
+    {
+        if(*p==';' && p < buf+sz-30)
+        {
+            pStmt->SqlStatement(++p);
+        }
+        else
+        {
+            p++;
+        }
+    }
+
+    free(buf);
+
+    return true;
+}
+
+bool DataBase::getSqlFile(const std::string &file, std::string &retString)
+{
+    int fd;
+
+    if( (fd = open((dirName + "/" + file).c_str(), O_RDONLY))<2 )
+    {
+        return false;
+    }
+    ssize_t sz = fileSize(fd);
+    char *buf = (char*)malloc(sz);
+
+    bzero(buf,sz);
+
+    int ret = read(fd, buf, sz);
+
+    if( ret != sz )
+    {
+        printf("Error read file: %s",(dirName + "/" + file).c_str());
+        ::exit(1);
+    }
+    close(fd);
+
+    retString = buf;
+
+    free(buf);
+
+    return true;
 }

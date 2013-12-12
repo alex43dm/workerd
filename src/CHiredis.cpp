@@ -56,7 +56,7 @@ bool CHiredis::getRange(const std::string &key,
         return false;
     }
 
-    for ( int i = 0; i < rlink->elements; i++ )
+    for ( unsigned int i = 0; i < rlink->elements; i++ )
     {
         ret.push_back(rlink->element[i]->str);
     }
