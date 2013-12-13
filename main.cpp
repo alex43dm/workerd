@@ -223,7 +223,7 @@
 int main(int argc, char *argv[])
 {
     Log(LOG_LOCAL0);
-    CgiService(argc, argv);
+    CgiService(argc, argv).run();
     return 0;
 }
 

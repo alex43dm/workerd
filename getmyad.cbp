@@ -44,7 +44,6 @@
 			<Add library="mongoclient" />
 			<Add library="fcgi" />
 			<Add library="sphinxclient" />
-			<Add library="clucene-core" />
 			<Add library="GeoIP" />
 			<Add library="rabbitmq" />
 			<Add library="boost_date_time" />

@@ -948,7 +948,7 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1386835781 source:/home/alex/Projects/worker/CgiService.cpp
+1386922413 source:/home/alex/Projects/worker/CgiService.cpp
 	"DB.h"
 	<boost/algorithm/string.hpp>
 	"Log.h"
@@ -966,7 +966,7 @@
 	"DataBase.h"
 	"CHiredis.h"
 
-1386751070 /home/alex/Projects/worker/CgiService.h
+1386922452 /home/alex/Projects/worker/CgiService.h
 	<string>
 	<fcgiapp.h>
 	"BaseCore.h"
@@ -988,14 +988,13 @@
 	<GeoIPCity.h>
 	<string>
 
-1386918371 /home/alex/Projects/worker/Core.h
+1386921543 /home/alex/Projects/worker/Core.h
 	<list>
 	<vector>
 	<map>
 	<utility>
 	<boost/date_time.hpp>
 	<boost/algorithm/string.hpp>
-	"RandomEntity.h"
 	"Offer.h"
 	"Informer.h"
 	"Params.h"

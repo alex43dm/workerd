@@ -45,6 +45,7 @@ public:
      * запросы.
      */
     static void *Serve(void*);
+    void run();
 
 private:
     /** Возвращает ответ FastCgi серверу.
@@ -98,7 +99,6 @@ private:
      *                  порцию предложений.
      */
     void ProcessRequest(FCGX_Request*, Core *);
-
 private:
 
     int argc;

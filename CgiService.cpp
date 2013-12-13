@@ -147,8 +147,12 @@ CgiService::CgiService(int argc, char *argv[])
         }
     }
     pthread_attr_destroy(attributes);
-    //main loop
-    for(i=0;;i++)
+}
+
+void CgiService::run()
+{
+   //main loop
+    for(int i=0;;i++)
     {
         //todo make lock on mq read
 //        core->ProcessMQ();
@@ -159,16 +163,15 @@ CgiService::CgiService(int argc, char *argv[])
             i = 0;
         }
     }
-
-    //main loop end
-    for(i = 0; i < cfg->server_children_; i++)
-    {
-        pthread_join(threads[i], 0);
-    }
 }
 
 CgiService::~CgiService()
 {
+   for(int i = 0; i < cfg->server_children_; i++)
+    {
+        pthread_join(threads[i], 0);
+    }
+
    delete []threads;
    delete bcore;
 }
