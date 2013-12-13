@@ -263,7 +263,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb)
         while (it.more())
         {
             bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Domains(name) VALUES('%q')",it.next().str().c_str());
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q')",it.next().str().c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -301,7 +301,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb)
         while (it.more())
         {
             bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Domains(name) VALUES('%q')",it.next().str().c_str());
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q')",it.next().str().c_str());
             try
             {
                 pStmt->SqlStatement(buf);

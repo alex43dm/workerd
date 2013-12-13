@@ -248,13 +248,14 @@ bool DataBase::runSqlFile(const std::string &file)
     return true;
 }
 
-bool DataBase::getSqlFile(const std::string &file, std::string &retString)
+std::string DataBase::getSqlFile(const std::string &file)
 {
     int fd;
+    std::string retString;
 
     if( (fd = open((dirName + "/" + file).c_str(), O_RDONLY))<2 )
     {
-        return false;
+        throw "error open: " + dirName + "/" + file;
     }
     ssize_t sz = fileSize(fd);
     char *buf = (char*)malloc(sz);
@@ -274,5 +275,5 @@ bool DataBase::getSqlFile(const std::string &file, std::string &retString)
 
     free(buf);
 
-    return true;
+    return retString;
 }

@@ -27,7 +27,7 @@ public:
     void postDataLoad();
     void indexRebuild();
     bool runSqlFile(const std::string &file);
-    bool getSqlFile(const std::string &file, std::string &retString);
+    std::string getSqlFile(const std::string &file);
 protected:
 
 private:

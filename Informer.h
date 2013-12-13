@@ -46,9 +46,11 @@ public:
         int width;                              //Ширина блока
         int height_banner;                      //Высота отображаемых банеров
         int width_banner;                       //Ширина отображаемых банеров
+        long domainId;
+        long accountId;
 
     Informer(long id);
-    Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss);
+    Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss, long , long);
     virtual ~Informer();
 
     /** Загружает информацию обо всех информерах */

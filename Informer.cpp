@@ -17,11 +17,14 @@ Informer::Informer(long id) :
 {
 }
 
-Informer::Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss) :
+Informer::Informer(long id, int capacity, const std::string &bannersCss,
+                   const std::string &teasersCss, long domainId, long accountId) :
     id(id),
     teasersCss(teasersCss),
     bannersCss(bannersCss),
-    capacity(capacity)
+    capacity(capacity),
+    domainId(domainId),
+    accountId(accountId)
 {
 }
 
@@ -38,14 +41,15 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
     //std::set<std::string> blocked_accounts = GetBlockedAccounts();
     int skipped = 0;
     Kompex::SQLiteStatement *pStmt;
-    char buf[8192], *pData;
+    char buf[8192], *pData, *buf1;
     int sz, i = 0;
+    long domainId,accountId;
 
     pStmt = new Kompex::SQLiteStatement(pdb);
 
 //teasersCss?
     bzero(buf,sizeof(buf));
-    snprintf(buf,sizeof(buf),"INSERT INTO Informer(id,guid,title,bannersCss,domain,user,blocked,\
+    snprintf(buf,sizeof(buf),"INSERT INTO Informer(id,guid,title,bannersCss,domainId,accountId,blocked,\
              nonrelevant,valid,height,width,height_banner,width_banner,capacity) VALUES(");
     sz = strlen(buf);
     pData = buf + sz;
@@ -78,28 +82,84 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
             capacity = 0;
         }
 
+        buf1 = sqlite3_mprintf("INSERT OR IGNORE INTO Domains(name) VALUES('%q')",x.getStringField("domain"));
+        try
+        {
+            pStmt->SqlStatement(buf1);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("Informer::Domains insert(%s) error: %s", buf1, ex.GetString().c_str());
+        }
+        sqlite3_free((void*)buf1);
+
+        domainId = 0;
+        try
+        {
+            buf1 = sqlite3_mprintf("SELECT id FROM Domains WHERE name='%q'",x.getStringField("domain"));
+            pStmt->Sql(buf1);
+
+            pStmt->FetchRow();
+            domainId = pStmt->GetColumnInt64(0);
+            pStmt->Reset();
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("Informer::Domains insert(%s) error: %s", buf1, ex.GetString().c_str());
+        }
+        sqlite3_free((void*)buf1);
+
+
+        buf1 = sqlite3_mprintf("INSERT OR IGNORE INTO Accounts(name) VALUES('%q')",x.getStringField("user"));
+        try
+        {
+            pStmt->SqlStatement(buf1);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("Informer::Accounts insert(%s) error: %s", buf1, ex.GetString().c_str());
+        }
+        sqlite3_free((void*)buf1);
+
+        accountId = 0;
+        try
+        {
+            buf1 = sqlite3_mprintf("SELECT id FROM Accounts WHERE name='%q'",x.getStringField("user"));
+            pStmt->Sql(buf1);
+
+            pStmt->FetchRow();
+            accountId = pStmt->GetColumnInt64(0);
+            pStmt->Reset();
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("Informer::Accounts insert(%s) error: %s", buf1, ex.GetString().c_str());
+        }
+        sqlite3_free((void*)buf1);
+
         bzero(pData,sz);
         sqlite3_snprintf(sz,pData,
-                         "%lld,'%q','%q','%q','%q','%q',0,'%q',1,%d,%d,%d,%d,%d)",
+                         "%lld,'%q','%q','%q',%d,%d,0,'%q',1,%d,%d,%d,%d,%d)",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getStringField("title"),
                          x.getStringField("css"),
-                         x.getStringField("domain"),
-                         x.getStringField("user"),
+                         domainId,
+                         accountId,
                          x.getStringField("nonRelevant"),
                          x.getIntField("height"),
                          x.getIntField("width"),
                          x.getIntField("height_banner"),
                          x.getIntField("width_banner"),
-                         capacity);
+                         capacity
+                         );
         try
         {
             pStmt->SqlStatement(buf);
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Informer::_loadFromQuery insert(%s) error: %s", buf, ex.GetString().c_str());
+            Log::err("Informer::_loadFromQuery insert error: %s", ex.GetString().c_str());
             skipped++;
         }
         // Тематические категории

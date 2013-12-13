@@ -41,20 +41,26 @@ Core::Core(DataBase *_pDb) :
     pDb(_pDb)
 {
     tid = pthread_self();
-    std::string sql;
 
     try
     {
         pStmtInformer = new SQLiteStatement(pDb->pDatabase);
-        pStmtInformer->Sql("SELECT id,capacity,bannersCss,teasersCss FROM Informer WHERE guid=@q LIMIT 1");
-
-        pStmtOffer = new SQLiteStatement(pDb->pDatabase);
-        pDb->getSqlFile("requests/01.sql",sql);
-        pStmtOffer->Sql(sql);
+        pStmtInformer->Sql(pDb->getSqlFile("requests/02.sql"));
     }
     catch(SQLiteException &ex)
     {
-        Log::err("DB error: %s: %s", ex.GetString().c_str(), sql.c_str());
+        Log::err("DB error: pStmtInformer: %s %s", ex.GetString().c_str(), pDb->getSqlFile("requests/02.sql").c_str());
+        exit(1);
+    }
+
+    try
+    {
+        pStmtOffer = new SQLiteStatement(pDb->pDatabase);
+        pStmtOffer->Sql(pDb->getSqlFile("requests/01.sql"));
+    }
+    catch(SQLiteException &ex)
+    {
+        Log::err("DB error: pStmtOffer: %s: %s", ex.GetString().c_str(), pDb->getSqlFile("requests/01.sql").c_str());
         exit(1);
     }
 
@@ -309,7 +315,9 @@ Informer *Core::getInformer(const Params &params)
         result = new Informer(pStmtInformer->GetColumnInt64(0),
                               pStmtInformer->GetColumnInt(1),
                               pStmtInformer->GetColumnString(2),
-                              pStmtInformer->GetColumnString(3)
+                              pStmtInformer->GetColumnString(3),
+                              pStmtInformer->GetColumnInt64(4),
+                              pStmtInformer->GetColumnInt64(5)
                              );
     }
     pStmtInformer->Reset();
@@ -361,8 +369,9 @@ vector<Offer> Core::getOffers(const Params &params, const Informer& inf)
     vector<Offer> result;
     try
     {
-        pStmtOffer->BindString(1, "19,32");//from informer domains id
-        pStmtOffer->BindInt(2, inf.id);//from informer account id
+        pStmtOffer->BindInt64(1, inf.domainId);//from informer domains id
+        pStmtOffer->BindInt64(2, inf.accountId);//from informer account id
+        pStmtOffer->BindInt64(2, inf.id);//from informer account id
         pStmtOffer->BindString(3, "UA");//from informer country id
 
         //pStmtOffer->BindString(2, "UA");//params.location_);
