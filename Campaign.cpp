@@ -12,12 +12,6 @@
 */
 Campaign::Campaign(const std::string &id)
 {
-    d = cache()[id];
-    if (!d)
-    {
-        d = new CampaignData(id);
-        cache()[id] = d;
-    }
 }
 
 /** \brief  Закгрузка всех рекламных кампаний из базы данных  Mongo

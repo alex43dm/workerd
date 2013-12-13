@@ -16,28 +16,6 @@ typedef unsigned long long	sphinx_uint64_t;
 */
 class Campaign
 {
-    struct CampaignData
-    {
-        CampaignData(const std::string &id) :
-            id(id), social(false), valid(false) { }
-
-        ///идентификатор рекламной кампании
-        std::string id;
-        sphinx_int64_t id_int;
-
-        ///название рекламной кампании
-        std::string title;
-
-        ///название проэкта которому пренадлежит компания
-        std::string project;
-
-        ///признак, является ли кампания социальной
-        bool social;
-
-        ///признак успешной загрузки кампании
-        bool valid;
-    };
-
 public:
     Campaign(const std::string &id);
 
@@ -103,14 +81,6 @@ public:
     }
 
 private:
-    CampaignData *d;
-
-    static std::map<std::string, CampaignData*> &cache()
-    {
-        static std::map<std::string, CampaignData*> cache_;
-        return cache_;
-    }
-
 
 };
 

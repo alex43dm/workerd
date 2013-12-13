@@ -734,7 +734,7 @@ bool Core::checkBannerSize(const Offer& offer, const Informer& informer)
  */
 void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean, int capacity)
 {
-    if(!result.size())
+    if(result.size() < 5)
         return;
 
     vector<Offer>::iterator p;
@@ -959,4 +959,87 @@ float Core::mediumRating(const vector<Offer>& vectorOffers, const string &typeOf
 bool Core::isSocial (Offer& i)
 {
     return Campaign(i.campaign_id).social();
+}
+
+/** Добавляет в журнал просмотров log.impressions предложения \a items.
+    Если показ информера осуществляется в тестовом режиме, запись не происходит.
+
+    Внимание: Используется база данных, зарегистрированная под именем 'log'.
+ */
+void Core::markAsShown(const vector<ImpressionItem> &items, const Params &params,
+                       list<string> &shortTerm, list<string> &longTerm, list<string> &contextTerm )
+{
+    if (params.test_mode_)
+	return;
+    mongo::DB db("log");
+	//LOG(INFO) << "writing to log...";
+
+    int count = 0;
+	list<string>::iterator it;
+
+	mongo::BSONArrayBuilder b1,b2,b3;
+	for (it=shortTerm.begin() ; it != shortTerm.end(); it++ )
+		b1.append(*it);
+	mongo::BSONArray shortTermArray = b1.arr();
+	for (it=longTerm.begin() ; it != longTerm.end(); it++ )
+		b2.append(*it);
+	mongo::BSONArray longTermArray = b2.arr();
+	for (it=contextTerm.begin() ; it != contextTerm.end(); it++ )
+		b3.append(*it);
+	mongo::BSONArray contextTermArray = b3.arr();
+    Informer informer(params.informer_);
+
+    BOOST_FOREACH (const ImpressionItem &i, items) {
+
+
+	if (i.offer.id().empty()) return;
+
+	std::tm dt_tm;
+	dt_tm = boost::posix_time::to_tm(params.time_);
+	mongo::Date_t dt( (mktime(&dt_tm)) * 1000LLU);
+	Campaign campaign(i.offer.campaign_id());
+
+	mongo::BSONObj keywords = mongo::BSONObjBuilder().
+								append("search", params.getSearch()).
+								append("context", params.getContext()).
+								append("ShortTermHistory", shortTermArray).
+								append("longtermhistory", longTermArray).
+								append("contexttermhistory", contextTermArray).
+								obj();
+
+		string country = country_code_by_addr(params.ip_);
+		string region = region_code_by_addr(params.ip_);
+
+	mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
+								append("dt", dt).
+								append("id", i.offer.id()).
+								append("id_int", i.offer.id_int()).
+								append("title", i.offer.title()).
+								append("inf", params.informer_).
+								append("inf_int", informer.id_int()).
+								append("ip", params.ip_).
+								append("cookie", params.cookie_id_).
+								append("social", !(campaign.valid() && !campaign.social())).
+								append("token", i.token).
+								append("type", i.offer.type()).
+								append("isOnClick", i.offer.isOnClick()).
+								append("campaignId", campaign.id()).
+								append("campaignId_int", campaign.id_int()).
+								append("campaignTitle", campaign.title()).
+								append("project", campaign.project()).
+								append("country", (country.empty()?"NOT FOUND":country)).
+								append("region", (region.empty()?"NOT FOUND":region)).
+								append("keywords", keywords).
+								append("branch", i.offer.branch()).
+								append("conformity", i.offer.conformity()).
+                                append("matching", i.offer.matching()).
+								obj();
+
+	db.insert("log.impressions", record, true);
+	count++;
+
+	offer_processed_ ++;
+	if (campaign.social()) social_processed_ ++;
+    }
+    LOG_IF(WARNING, count == 0 ) << "No items was added to log.impressions!";
 }
