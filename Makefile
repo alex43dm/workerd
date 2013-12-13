@@ -40,11 +40,11 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = bin/Release/getmyad
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/utils/base64.o $(OBJDIR_DEBUG)/utils/UrlParser.o $(OBJDIR_DEBUG)/utils/SearchEngines.o $(OBJDIR_DEBUG)/utils/GeoIPTools.o $(OBJDIR_DEBUG)/utils/Cookie.o $(OBJDIR_DEBUG)/src/GeoRerions.o $(OBJDIR_DEBUG)/src/CHiredis.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/FullTextSearcher/SearcherWrapper.o $(OBJDIR_DEBUG)/DataBase.o $(OBJDIR_DEBUG)/DBAccessor/anet.o $(OBJDIR_DEBUG)/DB.o $(OBJDIR_DEBUG)/Core.o $(OBJDIR_DEBUG)/Config.o $(OBJDIR_DEBUG)/CgiService.o $(OBJDIR_DEBUG)/CampaignShowOptions.o $(OBJDIR_DEBUG)/Campaign.o $(OBJDIR_DEBUG)/UserHistory.o $(OBJDIR_DEBUG)/RandomEntity.o $(OBJDIR_DEBUG)/Offer.o $(OBJDIR_DEBUG)/Log.o $(OBJDIR_DEBUG)/KompexSQLiteStatement.o $(OBJDIR_DEBUG)/BaseCore.o $(OBJDIR_DEBUG)/KompexSQLiteDatabase.o $(OBJDIR_DEBUG)/InformerTemplate.o $(OBJDIR_DEBUG)/Informer.o $(OBJDIR_DEBUG)/HistoryManager.o $(OBJDIR_DEBUG)/FullTextSearcher/XXXSearcher.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/utils/base64.o $(OBJDIR_DEBUG)/utils/UrlParser.o $(OBJDIR_DEBUG)/utils/SearchEngines.o $(OBJDIR_DEBUG)/utils/GeoIPTools.o $(OBJDIR_DEBUG)/utils/Cookie.o $(OBJDIR_DEBUG)/src/GeoRerions.o $(OBJDIR_DEBUG)/src/CHiredis.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/DB.o $(OBJDIR_DEBUG)/Informer.o $(OBJDIR_DEBUG)/HistoryManager.o $(OBJDIR_DEBUG)/DataBase.o $(OBJDIR_DEBUG)/InformerTemplate.o $(OBJDIR_DEBUG)/Core.o $(OBJDIR_DEBUG)/Config.o $(OBJDIR_DEBUG)/CgiService.o $(OBJDIR_DEBUG)/Campaign.o $(OBJDIR_DEBUG)/Offer.o $(OBJDIR_DEBUG)/UserHistory.o $(OBJDIR_DEBUG)/BaseCore.o $(OBJDIR_DEBUG)/Log.o $(OBJDIR_DEBUG)/KompexSQLiteStatement.o $(OBJDIR_DEBUG)/KompexSQLiteDatabase.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/SearchEngines.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/src/CHiredis.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/FullTextSearcher/SearcherWrapper.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/DBAccessor/anet.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/CampaignShowOptions.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/UserHistory.o $(OBJDIR_RELEASE)/RandomEntity.o $(OBJDIR_RELEASE)/Offer.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/FullTextSearcher/XXXSearcher.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/SearchEngines.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/src/CHiredis.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/Offer.o $(OBJDIR_RELEASE)/UserHistory.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o
 
-all: release
+all: debug release
 
 clean: clean_debug clean_release
 
@@ -53,8 +53,6 @@ before_debug:
 	test -d $(OBJDIR_DEBUG)/utils || mkdir -p $(OBJDIR_DEBUG)/utils
 	test -d $(OBJDIR_DEBUG)/src || mkdir -p $(OBJDIR_DEBUG)/src
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
-	test -d $(OBJDIR_DEBUG)/FullTextSearcher || mkdir -p $(OBJDIR_DEBUG)/FullTextSearcher
-	test -d $(OBJDIR_DEBUG)/DBAccessor || mkdir -p $(OBJDIR_DEBUG)/DBAccessor
 
 after_debug: 
 
@@ -87,17 +85,20 @@ $(OBJDIR_DEBUG)/src/CHiredis.o: src/CHiredis.cpp
 $(OBJDIR_DEBUG)/main.o: main.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.cpp -o $(OBJDIR_DEBUG)/main.o
 
-$(OBJDIR_DEBUG)/FullTextSearcher/SearcherWrapper.o: FullTextSearcher/SearcherWrapper.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c FullTextSearcher/SearcherWrapper.cpp -o $(OBJDIR_DEBUG)/FullTextSearcher/SearcherWrapper.o
+$(OBJDIR_DEBUG)/DB.o: DB.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c DB.cpp -o $(OBJDIR_DEBUG)/DB.o
+
+$(OBJDIR_DEBUG)/Informer.o: Informer.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Informer.cpp -o $(OBJDIR_DEBUG)/Informer.o
+
+$(OBJDIR_DEBUG)/HistoryManager.o: HistoryManager.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c HistoryManager.cpp -o $(OBJDIR_DEBUG)/HistoryManager.o
 
 $(OBJDIR_DEBUG)/DataBase.o: DataBase.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c DataBase.cpp -o $(OBJDIR_DEBUG)/DataBase.o
 
-$(OBJDIR_DEBUG)/DBAccessor/anet.o: DBAccessor/anet.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c DBAccessor/anet.cpp -o $(OBJDIR_DEBUG)/DBAccessor/anet.o
-
-$(OBJDIR_DEBUG)/DB.o: DB.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c DB.cpp -o $(OBJDIR_DEBUG)/DB.o
+$(OBJDIR_DEBUG)/InformerTemplate.o: InformerTemplate.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c InformerTemplate.cpp -o $(OBJDIR_DEBUG)/InformerTemplate.o
 
 $(OBJDIR_DEBUG)/Core.o: Core.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Core.cpp -o $(OBJDIR_DEBUG)/Core.o
@@ -108,20 +109,17 @@ $(OBJDIR_DEBUG)/Config.o: Config.cpp
 $(OBJDIR_DEBUG)/CgiService.o: CgiService.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c CgiService.cpp -o $(OBJDIR_DEBUG)/CgiService.o
 
-$(OBJDIR_DEBUG)/CampaignShowOptions.o: CampaignShowOptions.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c CampaignShowOptions.cpp -o $(OBJDIR_DEBUG)/CampaignShowOptions.o
-
 $(OBJDIR_DEBUG)/Campaign.o: Campaign.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Campaign.cpp -o $(OBJDIR_DEBUG)/Campaign.o
+
+$(OBJDIR_DEBUG)/Offer.o: Offer.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Offer.cpp -o $(OBJDIR_DEBUG)/Offer.o
 
 $(OBJDIR_DEBUG)/UserHistory.o: UserHistory.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c UserHistory.cpp -o $(OBJDIR_DEBUG)/UserHistory.o
 
-$(OBJDIR_DEBUG)/RandomEntity.o: RandomEntity.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c RandomEntity.cpp -o $(OBJDIR_DEBUG)/RandomEntity.o
-
-$(OBJDIR_DEBUG)/Offer.o: Offer.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Offer.cpp -o $(OBJDIR_DEBUG)/Offer.o
+$(OBJDIR_DEBUG)/BaseCore.o: BaseCore.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c BaseCore.cpp -o $(OBJDIR_DEBUG)/BaseCore.o
 
 $(OBJDIR_DEBUG)/Log.o: Log.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Log.cpp -o $(OBJDIR_DEBUG)/Log.o
@@ -129,23 +127,8 @@ $(OBJDIR_DEBUG)/Log.o: Log.cpp
 $(OBJDIR_DEBUG)/KompexSQLiteStatement.o: KompexSQLiteStatement.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c KompexSQLiteStatement.cpp -o $(OBJDIR_DEBUG)/KompexSQLiteStatement.o
 
-$(OBJDIR_DEBUG)/BaseCore.o: BaseCore.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c BaseCore.cpp -o $(OBJDIR_DEBUG)/BaseCore.o
-
 $(OBJDIR_DEBUG)/KompexSQLiteDatabase.o: KompexSQLiteDatabase.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c KompexSQLiteDatabase.cpp -o $(OBJDIR_DEBUG)/KompexSQLiteDatabase.o
-
-$(OBJDIR_DEBUG)/InformerTemplate.o: InformerTemplate.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c InformerTemplate.cpp -o $(OBJDIR_DEBUG)/InformerTemplate.o
-
-$(OBJDIR_DEBUG)/Informer.o: Informer.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Informer.cpp -o $(OBJDIR_DEBUG)/Informer.o
-
-$(OBJDIR_DEBUG)/HistoryManager.o: HistoryManager.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c HistoryManager.cpp -o $(OBJDIR_DEBUG)/HistoryManager.o
-
-$(OBJDIR_DEBUG)/FullTextSearcher/XXXSearcher.o: FullTextSearcher/XXXSearcher.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c FullTextSearcher/XXXSearcher.cpp -o $(OBJDIR_DEBUG)/FullTextSearcher/XXXSearcher.o
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
@@ -153,16 +136,12 @@ clean_debug:
 	rm -rf $(OBJDIR_DEBUG)/utils
 	rm -rf $(OBJDIR_DEBUG)/src
 	rm -rf $(OBJDIR_DEBUG)
-	rm -rf $(OBJDIR_DEBUG)/FullTextSearcher
-	rm -rf $(OBJDIR_DEBUG)/DBAccessor
 
 before_release: 
 	test -d bin/Release || mkdir -p bin/Release
 	test -d $(OBJDIR_RELEASE)/utils || mkdir -p $(OBJDIR_RELEASE)/utils
 	test -d $(OBJDIR_RELEASE)/src || mkdir -p $(OBJDIR_RELEASE)/src
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
-	test -d $(OBJDIR_RELEASE)/FullTextSearcher || mkdir -p $(OBJDIR_RELEASE)/FullTextSearcher
-	test -d $(OBJDIR_RELEASE)/DBAccessor || mkdir -p $(OBJDIR_RELEASE)/DBAccessor
 
 after_release: 
 
@@ -195,17 +174,20 @@ $(OBJDIR_RELEASE)/src/CHiredis.o: src/CHiredis.cpp
 $(OBJDIR_RELEASE)/main.o: main.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.cpp -o $(OBJDIR_RELEASE)/main.o
 
-$(OBJDIR_RELEASE)/FullTextSearcher/SearcherWrapper.o: FullTextSearcher/SearcherWrapper.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c FullTextSearcher/SearcherWrapper.cpp -o $(OBJDIR_RELEASE)/FullTextSearcher/SearcherWrapper.o
+$(OBJDIR_RELEASE)/DB.o: DB.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c DB.cpp -o $(OBJDIR_RELEASE)/DB.o
+
+$(OBJDIR_RELEASE)/Informer.o: Informer.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Informer.cpp -o $(OBJDIR_RELEASE)/Informer.o
+
+$(OBJDIR_RELEASE)/HistoryManager.o: HistoryManager.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c HistoryManager.cpp -o $(OBJDIR_RELEASE)/HistoryManager.o
 
 $(OBJDIR_RELEASE)/DataBase.o: DataBase.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c DataBase.cpp -o $(OBJDIR_RELEASE)/DataBase.o
 
-$(OBJDIR_RELEASE)/DBAccessor/anet.o: DBAccessor/anet.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c DBAccessor/anet.cpp -o $(OBJDIR_RELEASE)/DBAccessor/anet.o
-
-$(OBJDIR_RELEASE)/DB.o: DB.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c DB.cpp -o $(OBJDIR_RELEASE)/DB.o
+$(OBJDIR_RELEASE)/InformerTemplate.o: InformerTemplate.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c InformerTemplate.cpp -o $(OBJDIR_RELEASE)/InformerTemplate.o
 
 $(OBJDIR_RELEASE)/Core.o: Core.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Core.cpp -o $(OBJDIR_RELEASE)/Core.o
@@ -216,20 +198,17 @@ $(OBJDIR_RELEASE)/Config.o: Config.cpp
 $(OBJDIR_RELEASE)/CgiService.o: CgiService.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c CgiService.cpp -o $(OBJDIR_RELEASE)/CgiService.o
 
-$(OBJDIR_RELEASE)/CampaignShowOptions.o: CampaignShowOptions.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c CampaignShowOptions.cpp -o $(OBJDIR_RELEASE)/CampaignShowOptions.o
-
 $(OBJDIR_RELEASE)/Campaign.o: Campaign.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Campaign.cpp -o $(OBJDIR_RELEASE)/Campaign.o
+
+$(OBJDIR_RELEASE)/Offer.o: Offer.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Offer.cpp -o $(OBJDIR_RELEASE)/Offer.o
 
 $(OBJDIR_RELEASE)/UserHistory.o: UserHistory.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c UserHistory.cpp -o $(OBJDIR_RELEASE)/UserHistory.o
 
-$(OBJDIR_RELEASE)/RandomEntity.o: RandomEntity.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c RandomEntity.cpp -o $(OBJDIR_RELEASE)/RandomEntity.o
-
-$(OBJDIR_RELEASE)/Offer.o: Offer.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Offer.cpp -o $(OBJDIR_RELEASE)/Offer.o
+$(OBJDIR_RELEASE)/BaseCore.o: BaseCore.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c BaseCore.cpp -o $(OBJDIR_RELEASE)/BaseCore.o
 
 $(OBJDIR_RELEASE)/Log.o: Log.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Log.cpp -o $(OBJDIR_RELEASE)/Log.o
@@ -237,23 +216,8 @@ $(OBJDIR_RELEASE)/Log.o: Log.cpp
 $(OBJDIR_RELEASE)/KompexSQLiteStatement.o: KompexSQLiteStatement.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c KompexSQLiteStatement.cpp -o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o
 
-$(OBJDIR_RELEASE)/BaseCore.o: BaseCore.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c BaseCore.cpp -o $(OBJDIR_RELEASE)/BaseCore.o
-
 $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o: KompexSQLiteDatabase.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c KompexSQLiteDatabase.cpp -o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o
-
-$(OBJDIR_RELEASE)/InformerTemplate.o: InformerTemplate.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c InformerTemplate.cpp -o $(OBJDIR_RELEASE)/InformerTemplate.o
-
-$(OBJDIR_RELEASE)/Informer.o: Informer.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Informer.cpp -o $(OBJDIR_RELEASE)/Informer.o
-
-$(OBJDIR_RELEASE)/HistoryManager.o: HistoryManager.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c HistoryManager.cpp -o $(OBJDIR_RELEASE)/HistoryManager.o
-
-$(OBJDIR_RELEASE)/FullTextSearcher/XXXSearcher.o: FullTextSearcher/XXXSearcher.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c FullTextSearcher/XXXSearcher.cpp -o $(OBJDIR_RELEASE)/FullTextSearcher/XXXSearcher.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
@@ -261,8 +225,6 @@ clean_release:
 	rm -rf $(OBJDIR_RELEASE)/utils
 	rm -rf $(OBJDIR_RELEASE)/src
 	rm -rf $(OBJDIR_RELEASE)
-	rm -rf $(OBJDIR_RELEASE)/FullTextSearcher
-	rm -rf $(OBJDIR_RELEASE)/DBAccessor
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release
 

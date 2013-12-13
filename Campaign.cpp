@@ -1,7 +1,6 @@
 #include <boost/algorithm/string/replace.hpp>
 
 #include "Campaign.h"
-#include "CampaignShowOptions.h"
 #include "DB.h"
 #include "Log.h"
 #include "KompexSQLiteStatement.h"
@@ -27,7 +26,6 @@ Campaign::Campaign(const std::string &id)
 #define CAMINS
 void Campaign::loadAll(Kompex::SQLiteDatabase *pdb)
 {
-    CampaignOptionsCache::invalidate();
     mongo::DB db;
     Kompex::SQLiteStatement *pStmt;
     char buf[8192], *pData;

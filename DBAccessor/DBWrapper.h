@@ -4,7 +4,6 @@
 #ifndef DBWrapper_H
 #define DBWrapper_H
 
-#include "redisclient.h"
 #include "DBConnectionParams.h"
 #include "UserHistory.h"
 #include "Offer.h"
@@ -100,22 +99,22 @@ class DBWrapper
 {
 private:
     ///redis-client для работы с краткосрочной историей
-    boost::shared_ptr<redis::client> shortterm;
+//    boost::shared_ptr<redis::client> shortterm;
 
     ///redis-client для работы с долгосрочной историей
-    boost::shared_ptr<redis::client> longterm;
+//    boost::shared_ptr<redis::client> longterm;
 
     ///redis-client для работы с историей показов
-    boost::shared_ptr<redis::client> views;
+//    boost::shared_ptr<redis::client> views;
 
     ///redis-client для работы с контекстом страницы
-    boost::shared_ptr<redis::client> pagekeywords;
+//    boost::shared_ptr<redis::client> pagekeywords;
 
     ///redis-client для работы с категориями
-    boost::shared_ptr<redis::client> category;
+//    boost::shared_ptr<redis::client> category;
 
     ///redis-client для работы с категориями
-    boost::shared_ptr<redis::client> retargeting;
+//    boost::shared_ptr<redis::client> retargeting;
 
     ///время жизни ключей в базе данных краткосрочной истории
     int shortterm_expire;
@@ -180,6 +179,7 @@ public:
      */
     void updateDeprecatedUserHistory(const std::string & ip, const vector<Core::ImpressionItem> &result)
     {
+        /*
         try
         {
             if (!getViewHistoryStatus())
@@ -257,6 +257,7 @@ public:
         {
             Log::err("Redis updateDeprecatedUserHistory failed with lexical cast error!");
         }
+        */
     }
 
 
@@ -284,7 +285,7 @@ public:
      */
     void updateShortHistory(const std::string & ip, const std::string & query)
     {
-
+/*
         try
         {
             if (!getShortTermStatus())
@@ -320,6 +321,7 @@ public:
         {
             Log::err("Redis updateShortHistory failed!");
         }
+        */
     }
 
 
@@ -346,7 +348,7 @@ public:
      */
     void updateContextHistory(const std::string & ip, const std::string & query)
     {
-
+/*
         try
         {
             if (!getPageKeywordsStatus())
@@ -382,6 +384,7 @@ public:
         {
             Log::err("Redis updateContextHistory failed!");
         }
+        */
     }
 
     /** \brief  Формирование объекта UserHistory по его идентификатору
@@ -410,7 +413,9 @@ public:
     */
     UserHistory * getUserHistoryById(const std::string & ip)
     {
+
         UserHistory * userHistory = new UserHistory (ip);
+        /*
         try
         {
             redis::client::string_vector history;
@@ -497,8 +502,9 @@ public:
             }
 
 
-        }
+        }*/
         return userHistory;
+
     }
 
     /** \brief  Инициализация подключения к базам данных краткосрочной истории, долгосрочной истории и истории показов.
@@ -508,6 +514,7 @@ public:
     int InitConnection(DBConnectionParams& param)
     {
         params_ = param;
+        /*
         try
         {
             shortterm = init_non_cluster_clientt(param.redis_short_term_history_host_, param.redis_short_term_history_port_);
@@ -528,6 +535,7 @@ public:
             Log::err("redis connection failed!");
             return -1;
         }
+        */
         return 1;
     }
 
@@ -536,7 +544,7 @@ public:
     	Возвращает 1 в случае, если подключение работает, и 0 в противном случае.
     */
     int getShortTermStatus()
-    {
+    {/*
         try
         {
             redis::client & db_shortterm= *shortterm;
@@ -547,7 +555,8 @@ public:
         {
             Log::err("Redis DB error. Short term DB is down.");
             return 0;
-        }
+        }*/
+        return 0;
     }
 
     /** \brief  Статус подключения к базе данных долгосрочной истории.
@@ -555,7 +564,7 @@ public:
     	Возвращает 1 в случае, если подключение работает, и 0 в противном случае.
     */
     int getLongTermStatus()
-    {
+    {/*
         try
         {
             redis::client & db_longterm= *longterm;
@@ -566,7 +575,8 @@ public:
         {
             Log::err("Redis DB error. Long term DB is down.");
             return 0;
-        }
+        }*/
+        return 0;
     }
 
     /** \brief  Статус подключения к базе данных истории показов пользователя
@@ -574,7 +584,7 @@ public:
     	Возвращает 1 в случае, если подключение работает, и 0 в противном случае.
     */
     int getViewHistoryStatus()
-    {
+    {/*
         try
         {
             redis::client & db_views= *views;
@@ -585,7 +595,8 @@ public:
         {
             Log::err("Redis DB error. View history DB is down.");
             return 0;
-        }
+        }*/
+        return 0;
     }
 
 
@@ -596,7 +607,7 @@ public:
     	Возвращает 1 в случае, если подключение работает, и 0 в противном случае.
     */
     int getPageKeywordsStatus()
-    {
+    {/*
         try
         {
             redis::client & db_page= *pagekeywords;
@@ -607,7 +618,8 @@ public:
         {
             Log::err("Redis DB error. Page keywords DB is down.");
             return 0;
-        }
+        }*/
+    return 0;
     }
 
     /** \brief  Статус подключения к базе данных категорий
@@ -615,7 +627,7 @@ public:
     	Возвращает 1 в случае, если подключение работает, и 0 в противном случае.
     */
     int getCategoryStatus()
-    {
+    {/*
         try
         {
             redis::client & db_page= *category;
@@ -626,7 +638,8 @@ public:
         {
             Log::err("Redis DB error. Page keywords DB is down.");
             return 0;
-        }
+        }*/
+        return 0;
     }
 
     /** \brief  Статус подключения к базе данных категорий
@@ -634,7 +647,7 @@ public:
     	Возвращает 1 в случае, если подключение работает, и 0 в противном случае.
     */
     int getRetargetingStatus()
-    {
+    {/*
         try
         {
             redis::client & db_page= *retargeting;
@@ -645,12 +658,13 @@ public:
         {
             Log::err("Redis DB error. Page keywords DB is down.");
             return 0;
-        }
+        }*/
+        return 0;
     }
     /** \brief  Создание redis-client с параметрами по умолчанию
 
     Значения по умолчанию: localhost:6379
-    */
+
     boost::shared_ptr<redis::client> init_non_cluster_clientt()
     {
         const char* c_host = getenv("REDIS_HOST");
@@ -660,18 +674,19 @@ public:
         cerr << "HOST" << "  " << host <<endl;
 
         return boost::shared_ptr<redis::client>( new redis::client(host) );
-    }
+    }*/
 
     /** \brief  Создание redis-client
 
         \param server_host        	адрес сервера
         \param server_port     		порт сервера
     */
+    /*
     boost::shared_ptr<redis::client> init_non_cluster_clientt(const std::string &server_host, int server_port)
     {
         return boost::shared_ptr<redis::client>( new redis::client(server_host,server_port) );
     }
-
+*/
 
 
 
@@ -701,7 +716,7 @@ public:
      *Очишяем историю показов пользователя
      * */
     void cutDeprecatedUserHistory(const std::string & ip)
-    {
+    {/*
         redis::client & db_views = *views;
         try
         {
@@ -710,7 +725,7 @@ public:
         catch (redis::redis_error & e)
         {
             Log::err("Redis cutDeprecatedUserHistory failed!");
-        }
+        }*/
     }
 
 };

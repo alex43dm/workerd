@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 #include <list>
+
 #include "DBAccessor/DBWrapper.h"
 #include "DBAccessor/DBConnectionParams.h"
-#include "FullTextSearcher/SearcherWrapper.h"
 #include "Params.h"
 #include "Offer.h"
 #include "Campaign.h"
@@ -30,9 +30,9 @@ private:
     HistoryManager() {}
 protected:
     redisDB::DBWrapper accessor;	///< Объект доступа к базам данных Redis.
-    SearcherWrapper searcher;		///< Объект доступа к библиотеке полнотекстового доступа.
+//    SearcherWrapper searcher;		///< Объект доступа к библиотеке полнотекстового доступа.
     DBConnectionParams connParams;	///< Параматеры подключения к базам данных Redis.
-    Weights w;						///< Весовые коэффициенты для задания приоритета историй при поиске.
+//    Weights w;						///< Весовые коэффициенты для задания приоритета историй при поиске.
 public:
     /** \brief  Метод получения экземпляра класса
 
@@ -106,6 +106,7 @@ public:
     	\param range_on_places 				вес рекламных предложений, типа "реклама на места размещения"
 
     */
+    /*
     void initWeights(
         float range_priority_banners,
         float range_query,
@@ -124,13 +125,7 @@ public:
         w.range_context_term = range_context_term;
         w.range_on_places = range_on_places;
     }
-
-
-    void initLuceneIndexParams(string &folder_offer, string &folder_informer)
-    {
-        searcher.setIndexParams(folder_offer, folder_informer);
-    }
-
+*/
 
     /** \brief  Инициализация весов для задания приоритететов групп рекламных предложений при формировании списка предложений к показу
 
@@ -143,6 +138,7 @@ public:
     		\param range_on_places 				вес рекламных предложений, типа "реклама на места размещения"
 
     	*/
+    	/*
     void initWeights(
         const string &range_priority_banners,
         const string &range_query,
@@ -160,7 +156,7 @@ public:
         w.range_context_term = atof(range_context_term.c_str());
         w.range_on_places = atof(range_on_places.c_str());
     }
-
+*/
 
     /** \brief Получение идентификаторов РП от индекса lucene.
      *
@@ -173,7 +169,7 @@ public:
      *
      * В этом методе происходит обращение к redis за историей пользователя и отбор идентификаторов РП из индекса CLucene.
      */
-    list<pair<pair<string, float>, pair<string, pair<string, string>>>> getOffersByUser1(const Params& params,
+    void getOffersByUser1(const Params& params,
                                                                                          list<Campaign>& campaigns,
                                                                                          list<Campaign>& campaignsSoc,
                                                                                          list<Campaign>& campaignsAllGeo)
@@ -192,11 +188,11 @@ public:
         //LOG(INFO) << "\nAction before search took: " << srch << " ms.\n";
 
 
-        list<pair<pair<string, float>, pair<string, pair<string, string>>>> result = searcher.f1(params.getSearch(), *uh, params.getContext(), params.getInformer(), campaigns, campaignsSoc, campaignsAllGeo, w);
+//        list<pair<pair<string, float>, pair<string, pair<string, string>>>> result = searcher.f1(params.getSearch(), *uh, params.getContext(), params.getInformer(), campaigns, campaignsSoc, campaignsAllGeo, w);
 
         delete uh;
 
-        return result;
+        //return result;
 
     }
 

@@ -8,8 +8,6 @@
 #include <boost/date_time.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "Rules.h"
-#include "RandomEntity.h"
 #include "Offer.h"
 #include "Informer.h"
 #include "Params.h"
@@ -137,7 +135,6 @@ public:
     }
 
 private:
-    RandomEntity<Offer> &offers_by_campaign(const Campaign &campaign);
     std::string RequestDebugInfo(const Params &params) const;
 
     /** \brief  Возвращает в параметре \a out_campaigns список кампаний,
@@ -161,12 +158,6 @@ private:
     /** \brief  Возвращает одно предложение, которое можно добавить к
      *          \a result
      */
-    Offer _get_one_offer(const std::vector<Offer> &result,
-                         RandomEntity<Campaign> &random_campaigns,
-                         const std::vector<std::string> &excluded_offers);
-
-    std::map<Campaign, RandomEntity<Offer> > offers_by_campaign_;
-
 
     /// Счётчик обработанных запросов
     static int request_processed_;
