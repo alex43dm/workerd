@@ -372,8 +372,8 @@ vector<Offer> Core::getOffers(const Params &params, const Informer& inf)
         pStmtOffer->BindInt64(1, inf.domainId);//from informer domains id
         pStmtOffer->BindInt64(2, inf.accountId);//from informer account id
         pStmtOffer->BindInt64(2, inf.id);//from informer account id
-        pStmtOffer->BindString(3, "UA");//from informer country id
-
+        pStmtOffer->BindString(3, country_code_by_addr(params.getIP()));//from informer country id
+        pStmtOffer->BindString(4, region_code_by_addr(params.getIP()));//from informer country id
         //pStmtOffer->BindString(2, "UA");//params.location_);
         //pStmtOffer->BindString(2, params.informer_);
     }
