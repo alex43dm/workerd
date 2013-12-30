@@ -29,7 +29,7 @@ public:
     };
 
 public:
-        long id;                         //Индентификатор РБ
+        long long id;                         //Индентификатор РБ
         sphinx_int64_t id_int;                             //Индентификатор РБ
         std::string title;                      //Название РБ
         std::string teasersCss;                 //Стиль CSS РБ для отображения тизеров

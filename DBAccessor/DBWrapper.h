@@ -177,7 +177,7 @@ public:
 
     	При создании ключа для конкретного пользователя ему выставляется время жизни, которое задается параметром views_expire.
      */
-    void updateDeprecatedUserHistory(const std::string & ip, const vector<Core::ImpressionItem> &result)
+    void updateDeprecatedUserHistory(const std::string & ip, const vector<Offer> &result)
     {
         /*
         try

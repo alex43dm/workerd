@@ -12,24 +12,12 @@
 #include "Informer.h"
 #include "Params.h"
 #include "DataBase.h"
+#include "HistoryManager.h"
 
 /// Класс, который связывает воедино все части системы.
 class Core
 {
 public:
-
-    /** \brief  Единица показа.
-     *
-     *  Структура описывает одно место под рекламное предложение на информере.
-     */
-    struct ImpressionItem
-    {
-        ImpressionItem(const Offer &offer) : offer(offer) { }
-        Offer offer;                ///< Рекламное предложение
-        std::string token;          ///< Токен для проверки ссылки
-        std::string redirect_url;   ///< Cсылка перенаправления
-    };
-
     /** \brief  Создаёт ядро.
      *
      * Производит все необходимые инициализации:
@@ -61,12 +49,12 @@ public:
      *
      * \param params    Параметры запроса.
      */
-    std::string Process(const Params &params, std::vector<ImpressionItem>&);
+    std::string Process(const Params &params, std::vector<Offer>&);
 
-    void ProcessSaveResults(const Params &params, const std::vector<ImpressionItem> &items);
+    void ProcessSaveResults(const Params &params, const std::vector<Offer> &items);
 
 
-    std::vector<Offer> getOffers(const Params &params,const Informer& inf);
+    bool getOffers(const Params &params, std::vector<Offer> &result);
 
     Informer *getInformer(const Params &params);
 
@@ -91,15 +79,15 @@ public:
 
 
     /** \brief  Увеличивает счётчики показов предложений ``items`` */
-    void markAsShown(const std::vector<ImpressionItem> &items,
+    void markAsShown(const std::vector<Offer> &items,
                      const Params &params, std::list<std::string> &shortTerm,
                      std::list<std::string> &longTerm, std::list<std::string> &contextTerm);
 
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
-    std::string OffersToHtml(const std::vector<ImpressionItem> &items, const Params &params, Informer*) const;
+    std::string OffersToHtml(const std::vector<Offer> &items, const std::string &url) const;
 
     /** \brief  Возвращает json-представление предложений ``items`` */
-    std::string OffersToJson(const std::vector<ImpressionItem> &items) const;
+    std::string OffersToJson(const std::vector<Offer> &items) const;
 
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
@@ -230,7 +218,7 @@ private:
     bool checkBannerSize(const Offer& offer, const Informer& informer);
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(std::vector<Offer> &result, const Params &params, bool &clean, int);
+    void RISAlgorithm(std::vector<Offer> &result, const Params &params, bool &clean);
 
     /** \brief  Вычисление среднего рейтинга у РП типа typeOfferStr.
 
@@ -242,8 +230,11 @@ private:
     float mediumRating(const std::vector<Offer>& vectorOffers, const std::string &typeOfferStr);
     bool isSocial (Offer& i);
     DataBase *pDb;
-    SQLiteStatement *pStmtInformer, *pStmtOffer;
+    SQLiteStatement *pStmtInformer, *pStmtOffer, *pStmtOfferDefault;
     pthread_t tid;
+    Informer *informer;
+    HistoryManager *hm;
+    std::string pStmtOfferStr;
 };
 
 

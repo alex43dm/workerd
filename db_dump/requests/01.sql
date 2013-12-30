@@ -21,18 +21,20 @@ INNER JOIN (
 		EXCEPT
             SELECT c2d.id_cam AS id
             FROM Campaign2Domains AS c2d
-            WHERE c2d.id_dom = @domainsId AND c2d.allowed=0
+            WHERE c2d.id_dom=%d AND c2d.allowed=0
 		UNION ALL
             SELECT c2a.id_cam AS id
             FROM Campaign2Accounts AS c2a
-            WHERE c2a.id_acc=@accountId AND c2a.allowed=1
+            WHERE c2a.id_acc=%d AND c2a.allowed=1
         UNION ALL
             SELECT c2i.id_cam AS id
             FROM Campaign2Informer AS c2i
-            WHERE c2i.allowed=1 AND c2i.id_inf=@informerId
+            WHERE c2i.allowed=1 AND c2i.id_inf=%d
         UNION ALL
             SELECT geo.id_cam AS id
             FROM geoTargeting AS geo
-            INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND (reg.cid = @countryId OR reg.rid = @regionCode)
+            INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND (reg.cid='%s' OR reg.rid='%s')
 ) AS c ON ca.id=c.id
+WHERE ofrs.id NOT IN(%s)
+ORDER BY ofrs.rating
 LIMIT 4;

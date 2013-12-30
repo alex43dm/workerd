@@ -10,7 +10,8 @@
 
     \param id        Идентификатор рекламной кампании
 */
-Campaign::Campaign(const std::string &id)
+Campaign::Campaign(long id) :
+    id(id)
 {
 }
 

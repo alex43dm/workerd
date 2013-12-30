@@ -5,12 +5,12 @@ guid VARCHAR(35),
 categoryId INT8,
 campaignId INT8,
 accountId VARCHAR(35),
-rating REAL,
+rating DECIMAL(5,2),
 image VARCHAR(2048),
 height SMALLINT,
 width SMALLINT,
 isOnClick SMALLINT,
-cost REAL,
+cost DECIMAL(4,2),
 uniqueHits SMALLINT,
 swf VARCHAR(2048),
 type SMALLINT,
@@ -28,4 +28,5 @@ CREATE INDEX IF NOT EXISTS idx_Offer_id ON Offer (id);
 CREATE INDEX IF NOT EXISTS idx_Offer_guid ON Offer (guid);
 CREATE INDEX IF NOT EXISTS idx_Offer_rating ON Offer (rating);
 CREATE INDEX IF NOT EXISTS idx_Offer_campaignId ON Offer (campaignId);
+CREATE INDEX IF NOT EXISTS idx_Offer_id_rating ON Offer (id,rating);
 

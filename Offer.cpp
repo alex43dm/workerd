@@ -3,6 +3,7 @@
 #include "Log.h"
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
+#include "json.h"
 
 Offer::Offer(const std::string &id,
              long id_int,
@@ -44,7 +45,7 @@ Offer::~Offer()
 
 }
 /** Загружает все товарные предложения из MongoDb */
-void Offer::loadFromDatabase(Kompex::SQLiteDatabase *pdb)
+void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
 {
     mongo::DB db;
     auto cursor = db.query("offer", mongo::Query());
@@ -54,6 +55,7 @@ void Offer::loadFromDatabase(Kompex::SQLiteDatabase *pdb)
     int sz, i = 0;
 
     pStmt = new Kompex::SQLiteStatement(pdb);
+
 
     bzero(buf,sizeof(buf));
     snprintf(buf,sizeof(buf),"INSERT INTO Offer(id,guid,campaignId,categoryId,accountId,rating,image,height,width,isOnClick,cost\
@@ -126,4 +128,32 @@ void Offer::loadFromDatabase(Kompex::SQLiteDatabase *pdb)
     Log::info("Loaded %d offers", i);
     if (skipped)
         Log::warn("Offers with empty id or image skipped: %d", skipped);
+}
+
+
+std::string Offer::toJson() const
+{
+    std::stringstream json;
+    json << "{" <<
+         "\"id\": \"" << Json::Utils::Escape(id) << "\"," <<
+         "\"title\": \"" << Json::Utils::Escape(title) << "\"," <<
+         "\"description\": \"" << Json::Utils::Escape(description) << "\"," <<
+         "\"price\": \"" << Json::Utils::Escape(price) << "\"," <<
+         "\"image\": \"" << Json::Utils::Escape(image_url) << "\"," <<
+         "\"swf\": \"" << Json::Utils::Escape(swf) << "\"," <<
+         "\"url\": \"" << Json::Utils::Escape(redirect_url) << "\"," <<
+         "\"token\": \"" << Json::Utils::Escape(token) << "\"," <<
+         "\"rating\": \"" << rating << "\"," <<
+         "\"width\": \"" << width << "\"," <<
+         "\"height\": \"" << height << "\"" <<
+         "}";
+
+    return json.str();
+}
+
+void Offer::gen()
+{
+    std::ostringstream s;
+    s << std::hex << rand(); // Cлучайное число в шестнадцатиричном
+    token = s.str();  // исчислении
 }

@@ -15,7 +15,13 @@
 				<Option parameters="-c /home/alex/Projects/worker/config.xml" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="include" />
+					<Add directory="../libredis/" />
 				</Compiler>
+				<Linker>
+					<Add library="../libredis/lib/libredis.a" />
+					<Add library="rt" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/getmyad" prefix_auto="1" extension_auto="1" />
@@ -29,6 +35,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="hiredis" />
 				</Linker>
 			</Target>
 		</Build>
@@ -53,7 +60,7 @@
 			<Add library="icudata" />
 			<Add library="tinyxml" />
 			<Add library="sqlite3" />
-			<Add library="hiredis" />
+			<Add library="boost_system" />
 		</Linker>
 		<Unit filename="BaseCore.cpp" />
 		<Unit filename="BaseCore.h" />
@@ -95,6 +102,7 @@
 		<Unit filename="db_dump/post/01.sql" />
 		<Unit filename="db_dump/requests/01.sql" />
 		<Unit filename="db_dump/requests/02.sql" />
+		<Unit filename="db_dump/requests/default.sql" />
 		<Unit filename="db_dump/schema/wokers.mwb" />
 		<Unit filename="db_dump/schema/wokers.mwb.bak" />
 		<Unit filename="db_dump/tables/00_Campaign.sql" />
@@ -119,12 +127,14 @@
 		<Unit filename="db_dump/view/03_Campaign2Acnts.sql" />
 		<Unit filename="db_dump/view/04_Campaign2Infs.sql" />
 		<Unit filename="db_dump/view/05_01Offers.sql" />
-		<Unit filename="include/CHiredis.h" />
 		<Unit filename="include/GeoRerions.h" />
+		<Unit filename="include/RedisClient.h" />
+		<Unit filename="include/json.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="pch.h" />
-		<Unit filename="src/CHiredis.cpp" />
 		<Unit filename="src/GeoRerions.cpp" />
+		<Unit filename="src/RedisClient.cpp" />
+		<Unit filename="src/json.cpp" />
 		<Unit filename="utils/Comparators.h" />
 		<Unit filename="utils/Cookie.cpp" />
 		<Unit filename="utils/Cookie.h" />

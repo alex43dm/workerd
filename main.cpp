@@ -226,4 +226,3 @@ int main(int argc, char *argv[])
     CgiService(argc, argv).run();
     return 0;
 }
-

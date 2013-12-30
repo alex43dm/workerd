@@ -1,31 +1,46 @@
 #include <unistd.h>
 
 #include "CHiredis.h"
-#include "../Log.h"
+#include "Log.h"
 
 CHiredis::CHiredis(const std::string &host, const std::string &port):
     host(host),
     port(atoi(port.c_str())),
-    cntx(nullptr)
+    isConnected_(false)
 {
 
 }
 
 CHiredis::~CHiredis()
 {
-    if(cntx)
-        redisFree(cntx);
+
+    //redisFree(cntx);
+    Log::warn("CHiredis dest");
 }
 
 bool CHiredis::connect()
 {
-    while((cntx = redisConnect(host.c_str(), port)) && cntx->err)
+    int countDown = 10;
+    redisContext* cntx;
+
+    while( (cntx = redisConnect(host.c_str(), port)) && cntx->err && countDown-- > 0 )
     {
         Log::err("CHiredis::connect %s", cntx->errstr);
         sleep(1);
     }
 
+    redisReply *r= (redisReply *)redisCommand(cntx,"PING");
+
+    //spContext_ = SharedContext(cntx, std::bind(&CHiredis::free, this));
+    spContext_ = UniqueContext(cntx, std::bind(&CHiredis::free, this)); // 3
+
+    isConnected_ = true;
     return true;
+}
+
+void CHiredis::free()
+{
+    redisFree(spContext_.get());
 }
 
 bool CHiredis::getRange(const std::string &key,
@@ -33,12 +48,12 @@ bool CHiredis::getRange(const std::string &key,
                         int stop,
                         std::vector<std::string> &ret)
 {
-    if(!cntx)
-        return false;
-
     redisReply *rlink;
+    redisContext* cntx;
 
-    rlink = (redisReply *)redisCommand(cntx,"EXISTS %s", key.c_str());
+    cntx = spContext_.get();
+/*
+    rlink = static_cast<redisReply*>(redisCommand(cntx,"EXISTS '%s'", key.c_str()));
 
     if(rlink->type != REDIS_REPLY_INTEGER)
     {
@@ -47,8 +62,8 @@ bool CHiredis::getRange(const std::string &key,
     }
 
     freeReplyObject(rlink);
-
-    rlink = (redisReply *)redisCommand(cntx,"ZREVRANGE %s %d %d", key.c_str(), start, stop);
+*/
+    rlink = static_cast<redisReply*>(redisCommand(cntx,"ZREVRANGE %s %d %d", key.c_str(), start, stop));
 
     if(rlink->type != REDIS_REPLY_ARRAY)
     {
@@ -67,9 +82,11 @@ bool CHiredis::getRange(const std::string &key,
 
 bool CHiredis::_addVal(const std::string &key, double score, const std::string &member)
 {
-    if(!cntx)
-        return false;
+
     redisReply *rlink;
+    redisContext* cntx;
+
+    cntx = spContext_.get();
 
     rlink = (redisReply *)redisCommand(cntx,"ZADD %s %f %s",
                                        key.c_str(), score, member.c_str());

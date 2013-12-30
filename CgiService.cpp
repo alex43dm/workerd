@@ -9,12 +9,10 @@
 #include "Core.h"
 #include "Informer.h"
 #include "utils/SearchEngines.h"
-#include "HistoryManager.h"
 #include "InformerTemplate.h"
 #include <fcgi_stdio.h>
 #include "utils/Cookie.h"
 #include "DataBase.h"
-#include "CHiredis.h"
 
 #define THREAD_STACK_SIZE PTHREAD_STACK_MIN + 10 * 1024
 
@@ -267,23 +265,7 @@ void *CgiService::Serve(void *data)
         Log::err("Can not init request");
         return nullptr;
     }
-/*
-    CHiredis *r = new CHiredis(csrv->cfg->redis_category_host_, csrv->cfg->redis_category_port_);
-    r->connect();
 
-    std::vector<std::string> rr;
-    std::string key = "127.0.0.1-345sdg-343-ge46--344476rrh";
-    r->getRange(key , 0, -1, rr);
-    r->addVal(key, "test");
-    r->addVal(key, "test1");
-    r->addVal(key, "test2");
-    r->getRange(key, 0, -1, rr);
-
-    for(int i=0; i<rr.size();i++)
-    {
-        printf("%s\n",rr[i].c_str());
-    }
-*/
     for(;;)
     {
         static pthread_mutex_t accept_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -350,7 +332,7 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
     tmp_str = nullptr;
     if (!(tmp_str = FCGX_GetParam("HTTP_COOKIE", req->envp)))
     {
-        //Log::warn("cookie is not set");
+        Log::warn("cookie is not set");
     }
     else
     {
@@ -392,7 +374,7 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
                       cookie_value,
                       Cookie::Credentials(Cookie::Authority(cfg->cookie_domain_),
                                           Cookie::Path(cfg->cookie_path_),
-                                          Cookie::Expires(posix_time::second_clock::local_time() + years(1))));
+                                          Cookie::Expires(posix_time::second_clock::local_time() + boost::gregorian::years(1))));
     try
     {
         Params prm = Params()
@@ -411,14 +393,12 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
                      .search(url.param("search"))
                      .context(url.param("context"));
 
-        vector<Core::ImpressionItem> items;
+        vector<Offer> items;
         string result = core->Process(prm, items);
         Response(req, result, c.to_string());
-/*
-        static pthread_mutex_t redis_mutex = PTHREAD_MUTEX_INITIALIZER;
-        pthread_mutex_lock(&redis_mutex);
-            core->ProcessSaveResults(prm, items);
-        pthread_mutex_unlock(&redis_mutex);*/
+
+        core->ProcessSaveResults(prm, items);
+        items.clear();
     }
     catch (std::exception const &ex)
     {

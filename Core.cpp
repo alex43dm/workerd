@@ -6,22 +6,17 @@
 #include <boost/algorithm/string.hpp>
 #include <ctime>
 #include <cstdlib>
-#include <sstream>
 #include <mongo/util/version.h>
 #include <mongo/bson/bsonobjbuilder.h>
 
+#include "Config.h"
 #include "Log.h"
 #include "Core.h"
 #include "InformerTemplate.h"
-#include "utils/base64.h"
-#include "utils/benchmark.h"
-#include "HistoryManager.h"
 #include "utils/Comparators.h"
-#include "utils/GeoIPTools.h"
-#include <mongo/bson/bsonobjbuilder.h>
-
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
+#include "utils/base64.h"
 
 using std::list;
 using std::vector;
@@ -42,6 +37,8 @@ Core::Core(DataBase *_pDb) :
 {
     tid = pthread_self();
 
+    pStmtOfferStr = pDb->getSqlFile("requests/01.sql");
+
     try
     {
         pStmtInformer = new SQLiteStatement(pDb->pDatabase);
@@ -53,16 +50,20 @@ Core::Core(DataBase *_pDb) :
         exit(1);
     }
 
+
     try
     {
-        pStmtOffer = new SQLiteStatement(pDb->pDatabase);
-        pStmtOffer->Sql(pDb->getSqlFile("requests/01.sql"));
+        pStmtOfferDefault = new SQLiteStatement(pDb->pDatabase);
+        pStmtOfferDefault->Sql(pDb->getSqlFile("requests/default.sql"));
     }
     catch(SQLiteException &ex)
     {
-        Log::err("DB error: pStmtOffer: %s: %s", ex.GetString().c_str(), pDb->getSqlFile("requests/01.sql").c_str());
+        Log::err("DB error: pStmtOfferDefault: %s: %s", ex.GetString().c_str(), pDb->getSqlFile("requests/default.sql").c_str());
         exit(1);
     }
+
+    hm = new HistoryManager();
+    hm->initDB();
 
     Log::info("[%ld]core start",tid);
 }
@@ -71,41 +72,16 @@ Core::~Core()
 {
     pStmtInformer->FreeQuery();
     delete pStmtInformer;
+
     pStmtOffer->FreeQuery();
     delete pStmtOffer;
+
+    pStmtOfferDefault->FreeQuery();
+    delete pStmtOfferDefault;
+
     delete pDb;
+    delete hm;
 }
-
-/** Функтор генерирует токен для предложения ``offer``.
-    Возвращает структуру Core::ImpressionItem.
-
-    Токен представляет собой некое уникальное значение, введенное для
-    избежания накруток (см. документацию).
-
-    В тестовом режиме токеном является строка "test".
-*/
-class GenerateToken
-{
-    Params params_;
-public:
-    GenerateToken(const Params &params) : params_(params) { }
-    Core::ImpressionItem operator ()(const Offer &offer)
-    {
-        Core::ImpressionItem result(offer);
-
-        // Генерируем токен
-        if (params_.test_mode_)
-            result.token = "test";
-        else
-        {
-            std::ostringstream s;
-            s << std::hex << rand(); // Cлучайное число в шестнадцатиричном
-            result.token = s.str();  // исчислении
-        }
-        return result;
-    }
-};
-
 
 /** Функтор составляет ссылку перенаправления на предложение item.
 
@@ -126,12 +102,12 @@ public:
 */
 class GenerateRedirectLink
 {
-    string informerId;
+    long long informerId;
     string server_ip_;
     string redirect_script_;
     string location_;
 public:
-    GenerateRedirectLink(const string &informerId,
+    GenerateRedirectLink( long long &informerId,
                          const string &server_ip,
                          const string &redirect_script,
                          const string &location)
@@ -139,15 +115,17 @@ public:
           redirect_script_(redirect_script),
           location_(location) { }
 
-    void operator ()(Core::ImpressionItem &item)
+    void operator ()(Offer &item)
     {
+        item.gen();
+
         string query = boost::str(
-                           boost::format("id=%s\ninf=%s\ntoken=%s\nurl=%s\nserver=%s"
+                           boost::format("id=%s\ninf=%d\ntoken=%s\nurl=%s\nserver=%s"
                                          "\nloc=%s")
-                           % item.offer.id
+                           % item.id_int
                            % informerId
                            % item.token
-                           % item.offer.url
+                           % item.url
                            % server_ip_
                            % location_
                        );
@@ -159,13 +137,15 @@ public:
 
 /** Обработка запроса на показ рекламы с параметрами ``params``.
 	Изменён RealInvest Soft */
-std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
+std::string Core::Process(const Params &params, vector<Offer> &items)
 {
    // Log::info("[%ld]Core::Process start",tid);
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = microsec_clock::local_time();
 
-    Informer *informer = getInformer(params);
+    hm->setKey(params.getUserKey());
+
+    informer = getInformer(params);
     //Log::info("[%ld]getInformer done",tid);
     /*
         request_processed_++;
@@ -183,8 +163,7 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
         Log::gdb("got informer: %s", to_simple_string(microsec_clock::local_time() - startTime).c_str());
     */
     //Создаем хранилише РП
-    vector<Offer> offers;
-    bool cleared;
+   bool cleared;
 
     //получаем список кампаний.
     /*
@@ -212,8 +191,8 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
     //LOG(INFO) << "время получения РП = " << (endTime - startTime) << "\n";
 
     ////если полученный вектор пуст, используем старый алгоритм, в противном случае используем наш алгоритм
-    offers = getOffers(params, *informer);
-    //Log::info("[%ld]get %d offers done",tid,offers.size());
+    getOffers(params, items);
+    Log::gdb("%d offers done",items.size());
     /*
         if (offersIds.size()==0)
         {
@@ -223,10 +202,10 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
         else
         {*/
     //новый алгоритм
-    RISAlgorithm(offers, params, cleared, informer->capacity);
+    RISAlgorithm(items, params, cleared);
     //Log::info("RISAlgorithm: done",tid);
     //offers = getOffersRIS(offersIds, params, camps, clean, updateShort, updateContext);
-    if (!offers.size())
+    if (!items.size())
     {
         Log::warn("offers empty");
         //offers.assign(informer.capacity(), Offer(""));
@@ -253,13 +232,11 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
                 return informer.user_code();
         }
     */
-    // Каждому элементу просмотра присваиваем уникальный токен
-    GenerateToken token_generator(params);
-    std::transform(offers.begin(), offers.end(), back_inserter(items), token_generator);
+
    /// Log::info("[%ld]token_generator transform done",tid);
     // Составляем ссылку перенаправления для каждого элемента
 
-    GenerateRedirectLink redirect_generator(params.informer_,
+    GenerateRedirectLink redirect_generator(informer->id_int,
                                             server_ip(),
                                             redirect_script(),
                                             params.location_);
@@ -270,7 +247,7 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
     if (params.json_)
         ret = OffersToJson(items);
     else
-        ret = OffersToHtml(items, params, informer);
+        ret = OffersToHtml(items, params.getUrl());
     //Log::info("OffersToJson/OffersToHtml: done");
     delete informer;
 
@@ -278,26 +255,27 @@ std::string Core::Process(const Params &params, vector<ImpressionItem> &items)
     return ret;
 }
 
-void Core::ProcessSaveResults(const Params &params, const vector<ImpressionItem> &items)
+void Core::ProcessSaveResults(const Params &params, const vector<Offer> &items)
 {
-
+/*
     //Задаем значение очистки истории показов
     bool clean = false;
     //Задаем обнавление краткосрочной истории
     bool updateShort = false;
     //Задаём обнавление долгосрочной истории
     bool updateContext = false;
-
+*/
 // Сохраняем выданные ссылки в базе данных
 
     try
     {
-        list<string> shortTerm = HistoryManager::instance()->getShortHistoryByUser(params);
-        list<string> longTerm = HistoryManager::instance()->getLongHistoryByUser(params);
-        list<string> contextTerm = HistoryManager::instance()->getContextHistoryByUser(params);
+        hm->setDeprecatedOffers(items);
+//        list<string> shortTerm = HistoryManager::instance()->getShortHistoryByUser(params);
+//        list<string> longTerm = HistoryManager::instance()->getLongHistoryByUser(params);
+//        list<string> contextTerm = HistoryManager::instance()->getContextHistoryByUser(params);
 //        markAsShown(items, params, shortTerm, longTerm, contextTerm);
         //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
-        HistoryManager::instance()->updateUserHistory(items, params, clean, updateShort, updateContext);
+//        HistoryManager::instance()->updateUserHistory(items, params, clean, updateShort, updateContext);
     }
     catch (mongo::DBException &ex)
     {
@@ -363,76 +341,97 @@ file::memory:?cache=shared
 	-#  Предложения, указанные в \c params.exluded_offers, по возможности
 	    исключаются из просмотра. Это используется в прокрутке информера.
  */
-vector<Offer> Core::getOffers(const Params &params, const Informer& inf)
+bool Core::getOffers(const Params &params, std::vector<Offer> &result)
 {
+    Kompex::SQLiteStatement *pStmt;
+
+    //pStmt = pStmtOffer;//new Kompex::SQLiteStatement(pDb->pDatabase);
+
+
 //    Log::info("getOffers start");
-    vector<Offer> result;
+    std::string depOffers;
+    hm->getDeprecatedOffers(depOffers);
+//    Log::info("get history - %s",depOffers.c_str());
+
     try
     {
-        pStmtOffer->BindInt64(1, inf.domainId);//from informer domains id
-        pStmtOffer->BindInt64(2, inf.accountId);//from informer account id
-        pStmtOffer->BindInt64(2, inf.id);//from informer account id
-        pStmtOffer->BindString(3, country_code_by_addr(params.getIP()));//from informer country id
-        pStmtOffer->BindString(4, region_code_by_addr(params.getIP()));//from informer country id
-        //pStmtOffer->BindString(2, "UA");//params.location_);
-        //pStmtOffer->BindString(2, params.informer_);
+        pStmt = new SQLiteStatement(pDb->pDatabase);
+
+        char *cmd;// = (char*)malloc(pStmtOfferStr.size()+2048);
+
+        cmd = sqlite3_mprintf(pStmtOfferStr.c_str(),
+                              informer->domainId,
+                              informer->accountId,
+                              informer->id,
+                              params.getCountry().c_str(),
+                              params.getRegion().c_str(),
+                              depOffers.c_str());
+#ifdef DEBUG
+        printf("sql:%s\n",cmd);
+#endif
+        pStmt->Sql(cmd);
+        sqlite3_free(cmd);
+    }
+    catch(SQLiteException &ex)
+    {
+        Log::err("DB error: pStmtOffer: %s: %s", ex.GetString().c_str(), pDb->getSqlFile("requests/01.sql").c_str());
+        delete pStmt;
+        return false;
+    }
+
+    try
+    {
+        while(pStmt->FetchRow())
+        {
+            Offer off = Offer(pStmt->GetColumnString(1),
+                              pStmt->GetColumnInt64(0),
+                              pStmt->GetColumnString(2),
+                              pStmt->GetColumnString(3),
+                              pStmt->GetColumnString(4),
+                              pStmt->GetColumnString(5),
+                              pStmt->GetColumnString(6),
+                              pStmt->GetColumnString(7),
+                              pStmt->GetColumnString(8),
+                              true,
+                              pStmt->GetColumnBool(9),
+                              pStmt->GetColumnString(10),
+                              pStmt->GetColumnDouble(11),
+                              pStmt->GetColumnInt(12),
+                              pStmt->GetColumnInt(13),
+                              pStmt->GetColumnInt(14)
+                             );
+            off.social = pStmt->GetColumnBool(15);
+#ifdef DEBUG
+            printf("%lld ",off.id_int);
+#endif
+            result.push_back(off);
+        }
+#ifdef DEBUG
+        printf("\n");
+#endif
+        pStmt->FreeQuery();
     }
     catch(SQLiteException &ex)
     {
         Log::err("DB error: %s", ex.GetString().c_str());
-        exit(1);
+        delete pStmt;
+        return false;
     }
-    //pStmtInformer->BindString(1, country_code_by_addr("93.77.122.93"));
-    //Log::gdb("getOffers start FetchRow");
-    while(pStmtOffer->FetchRow())
-    {
-        Offer off = Offer(pStmtOffer->GetColumnString(1),
-                          pStmtOffer->GetColumnInt64(0),
-                          pStmtOffer->GetColumnString(2),
-                          pStmtOffer->GetColumnString(3),
-                          pStmtOffer->GetColumnString(4),
-                          pStmtOffer->GetColumnString(5),
-                          pStmtOffer->GetColumnString(6),
-                          pStmtOffer->GetColumnString(7),
-                          pStmtOffer->GetColumnString(8),
-                          true,
-                          pStmtOffer->GetColumnBool(9),
-                          pStmtOffer->GetColumnString(10),
-                          pStmtOffer->GetColumnDouble(11),
-                          pStmtOffer->GetColumnInt(12),
-                          pStmtOffer->GetColumnInt(13),
-                          pStmtOffer->GetColumnInt(14)
-                         );
-        off.social = pStmtOffer->GetColumnBool(15);
-        result.push_back(off);
-    }
-    pStmtOffer->Reset();
-    //pStmt->FreeQuery();
+
+    delete pStmt;
 //    Log::info("getOffers end");
-    return result;
+    return true;
 }
 
 
-std::string Core::OffersToHtml(const std::vector<ImpressionItem> &items, const Params &params, Informer *informer) const
+
+std::string Core::OffersToHtml(const std::vector<Offer> &items, const std::string &url) const
 {
     //Benchmark bench("OffersToHtml закончил свою работу");
-
-    stringstream url;
-    url << params.script_name_ <<
-        "?scr=" << params.informer_ <<
-        "&show=json";
-    if (params.test_mode_)
-        url << "&test=true";
-    if (!params.country_.empty())
-        url << "&country=" << params.country_;
-    if (!params.region_.empty())
-        url << "&region=" << params.region_;
-    url << "&";
-
     std::string informer_html;
 
     //для отображения передаётся или один баннер, или вектор тизеров. это и проверяем
-    if (!items.empty() && items[0].offer.isBanner)
+    if (!items.empty() && items[0].isBanner)
     {
         // Получаем HTML-код информера для отображение баннера
         informer_html =
@@ -449,14 +448,14 @@ std::string Core::OffersToHtml(const std::vector<ImpressionItem> &items, const P
                        % informer->teasersCss
                        % OffersToJson(items)
                        % informer->capacity
-                       % url.str());
+                       % url);
     }
 
     return informer_html;
 }
 
 
-std::string Core::OffersToJson(const vector<ImpressionItem> &items) const
+std::string Core::OffersToJson(const vector<Offer> &items) const
 {
     if(items.empty()) Log::warn("No impressions items to show");
     std::stringstream json;
@@ -465,19 +464,8 @@ std::string Core::OffersToJson(const vector<ImpressionItem> &items) const
     {
         if (it != items.begin())
             json << ",";
-        json << "{" <<
-             "\"id\": \"" << EscapeJson(it->offer.id) << "\"," <<
-             "\"title\": \"" << EscapeJson(it->offer.title) << "\"," <<
-             "\"description\": \"" << EscapeJson(it->offer.description) << "\"," <<
-             "\"price\": \"" << EscapeJson(it->offer.price) << "\"," <<
-             "\"image\": \"" << EscapeJson(it->offer.image_url) << "\"," <<
-             "\"swf\": \"" << EscapeJson(it->offer.swf) << "\"," <<
-             "\"url\": \"" << EscapeJson(it->redirect_url) << "\"," <<
-             "\"token\": \"" << EscapeJson(it->token) << "\"," <<
-             "\"rating\": \"" << it->offer.rating << "\"," <<
-             "\"width\": \"" << it->offer.width << "\"," <<
-             "\"height\": \"" << it->offer.height << "\"" <<
-             "}";
+
+        json << it->toJson();
     }
 
     json << "]";
@@ -486,44 +474,6 @@ std::string Core::OffersToJson(const vector<ImpressionItem> &items) const
 }
 
 
-std::string Core::EscapeJson(const std::string &str)
-{
-    std::string result;
-    for (auto it = str.begin(); it != str.end(); it++)
-    {
-        switch (*it)
-        {
-        case '\t':
-            result.append("\\t");
-            break;
-        case '"':
-            result.append("\\\"");
-            break;
-        case '\\':
-            result.append(" ");
-            break;
-        case '\'':
-            result.append("\\'");
-            break;
-        case '/':
-            result.append("\\/");
-            break;
-        case '\b':
-            result.append("\\b");
-            break;
-        case '\r':
-            result.append("\\r");
-            break;
-        case '\n':
-            result.append("\\n");
-            break;
-        default:
-            result.append(it, it + 1);
-            break;
-        }
-    }
-    return result;
-}
 
 
 /** Возвращает отладочную информацию про текущий запрос */
@@ -684,21 +634,6 @@ void Core::filterOffersSize(vector<Offer> &result, const Informer& informer)
 }
 
 
-bool Core::isOfferInCampaigns(const Offer& offer, const list<Campaign>& camps)
-{
-    list<Campaign>::const_iterator p = camps.begin();
-    while (p != camps.end())
-    {
-        if (offer.campaign_id==p->id())
-        {
-            return true;
-        }
-        p++;
-    }
-    return false;
-}
-
-
 /**
  * Проверяет соответствие размера баннера и размера банероместа РБ
  */
@@ -732,7 +667,7 @@ bool Core::checkBannerSize(const Offer& offer, const Informer& informer)
 	если выбранных тизеров достаточно для РБ, показываем.
 	если нет - добираем из исходного массива стоящие слева тизеры.
  */
-void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean, int capacity)
+void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean)
 {
     if(result.size() < 5)
         return;
@@ -793,7 +728,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
     //кол-во тизеров < кол-ва мест на РБ -> шаг 12.
     //нет -> шаг 14.
 
-    if (teasersCount <= capacity)
+    if (teasersCount <= informer->capacity)
     {
         //LOG(INFO) << "teasersCount <= informer.capacity";
         //шаг 12
@@ -815,7 +750,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         p = std::remove_if(result.begin(), result.end(), CExistElementFunctorByType("banner", EOD_TYPE));
         result.erase(p, result.end());
         int c=0;
-        while ((int)result.size() < capacity)
+        while ((int)result.size() < informer->capacity)
         {
             if (c>=teasersCount)
             {
@@ -861,12 +796,12 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         //если выбрали тизеров меньше, чем мест в информере, добираем тизеры из исходного вектора
         int passage;
         passage = 0;
-        while ((passage <  capacity) && ((int)newResult.size() < capacity))
+        while ((passage <  informer->capacity) && ((int)newResult.size() < informer->capacity))
         {
             p = result.begin();
             camps.clear();
             //LOG(INFO) << "second +";
-            while(p!=result.end() && ((int)newResult.size() < capacity))
+            while(p!=result.end() && ((int)newResult.size() < informer->capacity))
             {
                 //доберём всё за один проход, т.к. result.size > informer.capacity
                 //пробуем сначала добрать без повторений.
@@ -887,7 +822,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         //теперь, если без повторений добрать не получилось, дублируем тизеры.
         //LOG(INFO) << "result count " << (int)newResult.size() ;
         p = result.begin();
-        while(p!=result.end() && ((int)newResult.size() < capacity))
+        while(p!=result.end() && ((int)newResult.size() < informer->capacity))
         {
             //доберём всё за один проход, т.к. result.size > informer.capacity
             //пробуем сначала добрать без повторений.
@@ -898,13 +833,13 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
             p++;
         }
         passage = 0;
-        while ((passage <  capacity) && ((int)newResult.size() < capacity))
+        while ((passage <  informer->capacity) && ((int)newResult.size() < informer->capacity))
         {
             clean = true;
             p = result.begin();
             camps.clear();
             //LOG(INFO) << "second -";
-            while(p!=result.end() && ((int)newResult.size() < capacity))
+            while(p!=result.end() && ((int)newResult.size() < informer->capacity))
             {
                 //доберём всё за один проход, т.к. result.size > informer.capacity
                 //пробуем сначала добрать без повторений.
@@ -922,7 +857,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
             }
         }
         p = result.begin();
-        while(p!=result.end() && ((int)newResult.size() < capacity))
+        while(p!=result.end() && ((int)newResult.size() < informer->capacity))
         {
             //доберём всё за один проход, т.к. result.size > informer.capacity
             //пробуем сначала добрать без повторений.
@@ -932,7 +867,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
             }
             p++;
         }
-        result.assign(newResult.begin(), newResult.begin()+capacity);
+        result.assign(newResult.begin(), newResult.begin()+informer->capacity);
     }
 
 }
@@ -956,17 +891,12 @@ float Core::mediumRating(const vector<Offer>& vectorOffers, const string &typeOf
     return summRating/countElements;
 }
 
-bool Core::isSocial (Offer& i)
-{
-    return Campaign(i.campaign_id).social();
-}
-
 /** Добавляет в журнал просмотров log.impressions предложения \a items.
     Если показ информера осуществляется в тестовом режиме, запись не происходит.
 
     Внимание: Используется база данных, зарегистрированная под именем 'log'.
  */
-void Core::markAsShown(const vector<ImpressionItem> &items, const Params &params,
+void Core::markAsShown(const vector<Offer> &items, const Params &params,
                        list<string> &shortTerm, list<string> &longTerm, list<string> &contextTerm )
 {
     if (params.test_mode_)
@@ -978,26 +908,21 @@ void Core::markAsShown(const vector<ImpressionItem> &items, const Params &params
 	list<string>::iterator it;
 
 	mongo::BSONArrayBuilder b1,b2,b3;
-	for (it=shortTerm.begin() ; it != shortTerm.end(); it++ )
+	for (it=shortTerm.begin() ; it != shortTerm.end(); ++it )
 		b1.append(*it);
 	mongo::BSONArray shortTermArray = b1.arr();
-	for (it=longTerm.begin() ; it != longTerm.end(); it++ )
+	for (it=longTerm.begin() ; it != longTerm.end(); ++it )
 		b2.append(*it);
 	mongo::BSONArray longTermArray = b2.arr();
-	for (it=contextTerm.begin() ; it != contextTerm.end(); it++ )
+	for (it=contextTerm.begin() ; it != contextTerm.end(); ++it )
 		b3.append(*it);
 	mongo::BSONArray contextTermArray = b3.arr();
-    Informer informer(params.informer_);
 
-    BOOST_FOREACH (const ImpressionItem &i, items) {
-
-
-	if (i.offer.id().empty()) return;
+    BOOST_FOREACH (const Offer &i, items) {
 
 	std::tm dt_tm;
 	dt_tm = boost::posix_time::to_tm(params.time_);
 	mongo::Date_t dt( (mktime(&dt_tm)) * 1000LLU);
-	Campaign campaign(i.offer.campaign_id());
 
 	mongo::BSONObj keywords = mongo::BSONObjBuilder().
 								append("search", params.getSearch()).
@@ -1012,34 +937,34 @@ void Core::markAsShown(const vector<ImpressionItem> &items, const Params &params
 
 	mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
 								append("dt", dt).
-								append("id", i.offer.id()).
-								append("id_int", i.offer.id_int()).
-								append("title", i.offer.title()).
+								append("id", i.id).
+								append("id_int", i.id_int).
+								append("title", i.title).
 								append("inf", params.informer_).
-								append("inf_int", informer.id_int()).
+								append("inf_int", informer->id).
 								append("ip", params.ip_).
 								append("cookie", params.cookie_id_).
-								append("social", !(campaign.valid() && !campaign.social())).
+								append("social", i.social).
 								append("token", i.token).
-								append("type", i.offer.type()).
-								append("isOnClick", i.offer.isOnClick()).
-								append("campaignId", campaign.id()).
-								append("campaignId_int", campaign.id_int()).
-								append("campaignTitle", campaign.title()).
-								append("project", campaign.project()).
+								append("type", i.type).
+								append("isOnClick", i.isOnClick).
+								append("campaignId", i.campaign_id).
+								append("campaignId_int", i.campaign_id).
+								append("campaignTitle", "").
+								append("project", "").
 								append("country", (country.empty()?"NOT FOUND":country)).
 								append("region", (region.empty()?"NOT FOUND":region)).
 								append("keywords", keywords).
-								append("branch", i.offer.branch()).
-								append("conformity", i.offer.conformity()).
-                                append("matching", i.offer.matching()).
+								append("branch", i.branch).
+								append("conformity", i.conformity).
+                                append("matching", i.matching).
 								obj();
 
 	db.insert("log.impressions", record, true);
 	count++;
 
 	offer_processed_ ++;
-	if (campaign.social()) social_processed_ ++;
+	if (i.social) social_processed_ ++;
     }
-    LOG_IF(WARNING, count == 0 ) << "No items was added to log.impressions!";
+    //LOG_IF(WARNING, count == 0 ) << "No items was added to log.impressions!";
 }

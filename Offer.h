@@ -40,6 +40,10 @@ public:
         bool social;
         bool isBanner;
 
+        std::string token;          ///< Токен для проверки ссылки
+        std::string redirect_url;   ///< Cсылка перенаправления
+
+
     Offer(){};
 
     Offer(const std::string &id,
@@ -61,10 +65,15 @@ public:
 
     virtual ~Offer();
 
-    static void loadFromDatabase(Kompex::SQLiteDatabase *pdb);
+    static void loadAll(Kompex::SQLiteDatabase *pdb);
 
     bool operator==(const Offer &other) const { return *this == other; }
     bool operator<(const Offer &other) const { return rating < other.rating; }
+
+    // Каждому элементу просмотра присваиваем уникальный токен
+    void gen();
+
+    std::string toJson() const;
 };
 
 #endif // OFFER_H

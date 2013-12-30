@@ -34,7 +34,6 @@ GeoIP *GeoCity(const char *filename)
     return geo;
 }
 
-
 /** Возвращает двухбуквенный код страны по ``ip``.
     Если по какой-либо причине страну определить не удалось, возвращается
     пустая строка
@@ -67,4 +66,14 @@ std::string region_code_by_addr(const std::string &ip)
     return region_name? region_name : "";
 }
 
+std::string city_code_by_addr(const std::string &ip)
+{
+    if (!GeoCity())
+        return "";
 
+    GeoIPRecord *record = GeoIP_record_by_addr(GeoCity(), ip.c_str());
+    if (!record)
+        return "";
+
+    return record->city ? record->city : "";
+}

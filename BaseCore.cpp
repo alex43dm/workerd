@@ -12,6 +12,7 @@
 #include "utils/base64.h"
 #include "utils/benchmark.h"
 
+#include "InformerTemplate.h"
 #include "Informer.h"
 #include "Campaign.h"
 #include "Offer.h"
@@ -173,7 +174,7 @@ void BaseCore::LoadAllEntities()
     //LOG(INFO) << "Загрузили все информеры.\n";
     Campaign::loadAll(pDb->pDatabase);
     //LOG(INFO) << "Загрузили все кампании.\n";
-    Offer::loadFromDatabase(pDb->pDatabase);
+    Offer::loadAll(pDb->pDatabase);
     //LOG(INFO) << "Загрузили все предложения.\n";
     //pDb->pDatabase->MoveDatabaseToMemory();
     // Проверяем, нет ли кампаний с 0 предложений
@@ -412,7 +413,7 @@ std::string BaseCore::Status()
    // out <<  "<tr><td>Драйвер mongo: </td><td>" << mongo::versionString <<
        // "</td></tr>";
     out << "</table>\n";
-
+/*
     std::list<Campaign> campaigns = Campaign::all();
     out << "<p>Загружено <b>" << campaigns.size() << "</b> кампаний: </p>\n";
     out << "<table><tr>\n"
@@ -421,6 +422,7 @@ std::string BaseCore::Status()
         "<th>Социальная</th>"
         "<th>Предложений</th>"
         "</tr>\n";
+        */
         /*
     for (auto it = campaigns.begin(); it != campaigns.end(); it++)
     {

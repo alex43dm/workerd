@@ -31,4 +31,6 @@ std::string country_code_by_addr(const std::string &ip);
 */
 std::string region_code_by_addr(const std::string &ip);
 
+std::string city_code_by_addr(const std::string &ip);
+
 #endif // GEOIPTOOLS_H

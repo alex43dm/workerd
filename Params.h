@@ -1,8 +1,11 @@
 #ifndef PARAMS_H
 #define PARAMS_H
 
+#include <sstream>
+
 #include <boost/date_time.hpp>
 #include <string>
+#include "utils/GeoIPTools.h"
 
 
 /** \brief Параметры, которые определяют показ рекламы */
@@ -18,6 +21,8 @@ public:
     Params &ip(const std::string &ip)
     {
         ip_ = ip;
+        country_ = country_code_by_addr(ip_);
+        region_ = region_code_by_addr(ip_);
         return *this;
     }
 
@@ -230,6 +235,22 @@ public:
     std::string getSearch() const
     {
         return search_;
+    }
+
+    std::string getUrl() const
+    {
+        std::stringstream url;
+        url << script_name_ <<"?scr=" << informer_ <<"&show=json";
+
+        if (test_mode_)
+            url << "&test=true";
+        if (!country_.empty())
+            url << "&country=" << country_;
+        if (!region_.empty())
+            url << "&region=" << region_;
+        url << "&";
+
+        return url.str();
     }
 
     friend class Core;
