@@ -393,7 +393,7 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
                      .search(url.param("search"))
                      .context(url.param("context"));
 
-        vector<Offer> items;
+        vector<Offer*> items;
         string result = core->Process(prm, items);
         Response(req, result, c.to_string());
 

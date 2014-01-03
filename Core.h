@@ -49,12 +49,12 @@ public:
      *
      * \param params    Параметры запроса.
      */
-    std::string Process(const Params &params, std::vector<Offer>&);
+    std::string Process(const Params &params, std::vector<Offer*>&);
 
-    void ProcessSaveResults(const Params &params, const std::vector<Offer> &items);
+    void ProcessSaveResults(const Params &params, const std::vector<Offer*> &items);
 
 
-    bool getOffers(const Params &params, std::vector<Offer> &result);
+    bool getOffers(const Params &params, std::vector<Offer*> &result);
 
     Informer *getInformer(const Params &params);
 
@@ -70,7 +70,7 @@ public:
      * \see RISAlgorithm
      * \see createVectorOffersByIds
      */
-    std::vector<Offer> getOffersRIS(const std::list<std::pair<std::pair<std::string, float>,
+    std::vector<Offer*> getOffersRIS(const std::list<std::pair<std::pair<std::string, float>,
                                     std::pair<std::string, std::pair<std::string, std::string>>>> &offersIds,
                                     const Params &params, const std::list<Campaign> &camps,
                                     bool &clean, bool &updateShort, bool &updateContext);
@@ -79,15 +79,15 @@ public:
 
 
     /** \brief  Увеличивает счётчики показов предложений ``items`` */
-    void markAsShown(const std::vector<Offer> &items,
+    void markAsShown(const std::vector<Offer*> &items,
                      const Params &params, std::list<std::string> &shortTerm,
                      std::list<std::string> &longTerm, std::list<std::string> &contextTerm);
 
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
-    std::string OffersToHtml(const std::vector<Offer> &items, const std::string &url) const;
+    std::string OffersToHtml(const std::vector<Offer*> &items, const std::string &url) const;
 
     /** \brief  Возвращает json-представление предложений ``items`` */
-    std::string OffersToJson(const std::vector<Offer> &items) const;
+    std::string OffersToJson(const std::vector<Offer*> &items) const;
 
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
@@ -171,7 +171,7 @@ private:
     /** \brief Создание вектора РП по списку их идентификаторов, полученного в результате обращения к индексу. */
     void createVectorOffersByIds(const std::list<std::pair<std::pair<std::string, float>,
                                  std::pair<std::string, std::pair<std::string, std::string>>>> &offersIds,
-                                  std::vector<Offer> &result,
+                                  std::vector<Offer*> &result,
                                   const std::list<Campaign> &camps,
                                   const Params& params,
                                   bool &updateShort, bool &updateContext);
@@ -186,7 +186,7 @@ private:
      *
      * Добавлено RealInvest Soft.
      */
-    void filterOffersSize(std::vector<Offer> &result, const std::string& informerId);
+    void filterOffersSize(std::vector<Offer*> &result, const std::string& informerId);
 
     /** \brief Удаление из вектора result баннеров, не подходящих по размеру для информера informer.
      *
@@ -195,7 +195,7 @@ private:
      *
      * Добавлено RealInvest Soft.
      */
-    void filterOffersSize(std::vector<Offer> &result, const Informer& informer);
+    void filterOffersSize(std::vector<Offer*> &result, const Informer& informer);
 
     /** \brief Проверка принадлежности РП offer хотя бы одной кампании из списка camps.
      **
@@ -215,10 +215,10 @@ private:
       *
       * Если РП offer является баннером и его размеры не равны размерам РБ informer, возвращает false. Иначе - true.
       */
-    bool checkBannerSize(const Offer& offer, const Informer& informer);
+    bool checkBannerSize(const Offer *offer, const Informer& informer);
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(std::vector<Offer> &result, const Params &params, bool &clean);
+    void RISAlgorithm(std::vector<Offer*> &result, const Params &params, bool &clean);
 
     /** \brief  Вычисление среднего рейтинга у РП типа typeOfferStr.
 
@@ -227,7 +227,7 @@ private:
 
      Добавлено RealInvest Soft.
      */
-    float mediumRating(const std::vector<Offer>& vectorOffers, const std::string &typeOfferStr);
+    float mediumRating(const std::vector<Offer*>& vectorOffers, Offer::Type);
     bool isSocial (Offer& i);
     DataBase *pDb;
     SQLiteStatement *pStmtInformer, *pStmtOffer, *pStmtOfferDefault;
@@ -235,6 +235,9 @@ private:
     Informer *informer;
     HistoryManager *hm;
     std::string pStmtOfferStr;
+    bool all_social;
+    int teasersCount;
+    char *cmd;
 };
 
 

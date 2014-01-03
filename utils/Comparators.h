@@ -47,13 +47,13 @@ bool isStrInVector(const string& str, const vector<string>& v)
     return it != v.end();
 }
 
-bool isOfferInVector(const Offer &offer, const vector<Offer> &v)
+bool isOfferInVector(const Offer *offer, const vector<Offer*> &v)
 {
         for (size_t i=0; i<v.size(); i++)
         {
                 if (offer==v[i])
                 {
-                        return true;
+                    return true;
                 }
         }
         return false;
@@ -79,12 +79,18 @@ enum EOfferData
 class CExistElementFunctorByType
 {
     string m_str;
-
+    Offer::Type type;
     EOfferData m_EOfferData;
 public:
     CExistElementFunctorByType(string str, EOfferData eOfferData)
     {
         m_str = str;
+        m_EOfferData = eOfferData;
+    }
+
+    CExistElementFunctorByType(Offer::Type t, EOfferData eOfferData)
+    {
+        type = t;
         m_EOfferData = eOfferData;
     }
 
@@ -114,7 +120,7 @@ public:
             return temp.campaign_id == m_str;
 
         case EOD_TYPE:
-            return temp.type == m_str;
+            return temp.type == type;
 
         case EOD_RATING:
             return temp.rating == atof(m_str.c_str());
@@ -125,4 +131,5 @@ public:
 
     }
 };
+
 #endif

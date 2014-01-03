@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1387275796 source:/home/alex/Projects/worker/BaseCore.cpp
+1388392311 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -854,7 +854,7 @@
 	<string>
 	<utility>
 
-1387979260 /home/alex/Projects/worker/Log.h
+1388392311 /home/alex/Projects/worker/Log.h
 	<stdio.h>
 	<syslog.h>
 	<stdarg.h>
@@ -901,27 +901,28 @@
 	<boost/date_time/posix_time/ptime.hpp>
 	"../Log.h"
 
-1387192434 /home/alex/Projects/worker/Informer.h
+1388392311 /home/alex/Projects/worker/Informer.h
 	<string>
 	<map>
 	<set>
 	"KompexSQLiteDatabase.h"
 
-1387188189 /home/alex/Projects/worker/Campaign.h
+1388392311 /home/alex/Projects/worker/Campaign.h
 	<string>
 	<map>
 	<list>
 	"KompexSQLiteDatabase.h"
 
-1387203130 /home/alex/Projects/worker/Offer.h
+1388751522 /home/alex/Projects/worker/Offer.h
 	<string>
 	<list>
 	<map>
+	<vector>
 	<mongo/client/dbclientinterface.h>
 	"Campaign.h"
 	"KompexSQLiteDatabase.h"
 
-1387188227 source:/home/alex/Projects/worker/Campaign.cpp
+1388392311 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"DB.h"
@@ -949,7 +950,7 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1388387558 source:/home/alex/Projects/worker/CgiService.cpp
+1388749334 source:/home/alex/Projects/worker/CgiService.cpp
 	"DB.h"
 	<boost/algorithm/string.hpp>
 	"Log.h"
@@ -982,12 +983,12 @@
 	<vector>
 	<boost/algorithm/string.hpp>
 
-1387285844 /home/alex/Projects/worker/utils/GeoIPTools.h
+1388392311 /home/alex/Projects/worker/utils/GeoIPTools.h
 	<GeoIP.h>
 	<GeoIPCity.h>
 	<string>
 
-1388386785 /home/alex/Projects/worker/Core.h
+1388750274 /home/alex/Projects/worker/Core.h
 	<list>
 	<vector>
 	<map>
@@ -1017,7 +1018,7 @@
 	<ctime>
 	<algorithm>
 
-1387200533 /home/alex/Projects/worker/Params.h
+1388392311 /home/alex/Projects/worker/Params.h
 	<sstream>
 	<boost/date_time.hpp>
 	<string>
@@ -1031,7 +1032,7 @@
 	<cstring>
 	<iostream>
 
-1387895107 /home/alex/Projects/worker/HistoryManager.h
+1388749750 /home/alex/Projects/worker/HistoryManager.h
 	<string>
 	<vector>
 	<map>
@@ -1138,7 +1139,7 @@
 	"Config.h"
 	<assert.h>
 
-1388147581 source:/home/alex/Projects/worker/Core.cpp
+1388753801 source:/home/alex/Projects/worker/Core.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -1158,7 +1159,7 @@
 	"KompexSQLiteException.h"
 	"utils/base64.h"
 
-1386588626 /home/alex/Projects/worker/utils/Comparators.h
+1388750592 /home/alex/Projects/worker/utils/Comparators.h
 	<iostream>
 	<string>
 	<vector>
@@ -1212,7 +1213,7 @@
 	"../Log.h"
 	"XXXSearcher.h"
 
-1387960905 source:/home/alex/Projects/worker/HistoryManager.cpp
+1388749800 source:/home/alex/Projects/worker/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -1250,11 +1251,11 @@
 1386588626 source:/home/alex/Projects/worker/Log.cpp
 	"Log.h"
 
-1387780994 source:/home/alex/Projects/worker/main.cpp
+1388392311 source:/home/alex/Projects/worker/main.cpp
 	"CgiService.h"
 	"Log.h"
 
-1388064802 source:/home/alex/Projects/worker/Offer.cpp
+1388412160 source:/home/alex/Projects/worker/Offer.cpp
 	"Offer.h"
 	"DB.h"
 	"Log.h"
@@ -1305,7 +1306,7 @@
 	<string.h>
 	<boost/date_time/posix_time/posix_time.hpp>
 
-1387285818 source:/home/alex/Projects/worker/utils/GeoIPTools.cpp
+1388392311 source:/home/alex/Projects/worker/utils/GeoIPTools.cpp
 	"GeoIPTools.h"
 
 1386588626 source:/home/alex/Projects/worker/utils/SearchEngines.cpp
@@ -1317,10 +1318,10 @@
 	"UrlParser.h"
 	"SearchEngines.h"
 
-1387265888 /home/alex/Projects/worker/include/json.h
+1388392311 /home/alex/Projects/worker/include/json.h
 	<string>
 
-1387265994 source:/home/alex/Projects/worker/src/json.cpp
+1388392311 source:/home/alex/Projects/worker/src/json.cpp
 	"json.h"
 
 1387872743 /home/alex/Projects/worker/include/History.h
@@ -1334,7 +1335,7 @@
 	"Config.h"
 	"Log.h"
 
-1387892639 /home/alex/Projects/worker/include/RedisClient.h
+1388741152 /home/alex/Projects/worker/include/RedisClient.h
 	<string>
 	<vector>
 	<libredis/redis.h>
@@ -1343,7 +1344,7 @@
 
 1387810444 /home/alex/Projects/libredis//libredis/redis.h
 
-1388147771 source:/home/alex/Projects/worker/src/RedisClient.cpp
+1388747103 source:/home/alex/Projects/worker/src/RedisClient.cpp
 	<strings.h>
 	"RedisClient.h"
 	"Log.h"

@@ -16,7 +16,7 @@ Offer::Offer(const std::string &id,
              const std::string &campaign_id,
              bool valid,
              bool isOnClick,
-             const std::string &type,
+             int type,
              float rating,
              int uniqueHits,
              int height,
@@ -31,12 +31,12 @@ Offer::Offer(const std::string &id,
     campaign_id(campaign_id),
     valid(valid),
     isOnClick(isOnClick),
-    type(type),
+    type(typeFromInt(type)),
     rating(rating),
     uniqueHits(uniqueHits),
     height(height),
     width(width),
-    isBanner(type=="banner")
+    isBanner(this->type==Offer::Type::banner)
 {
 }
 
@@ -59,7 +59,7 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
 
     bzero(buf,sizeof(buf));
     snprintf(buf,sizeof(buf),"INSERT INTO Offer(id,guid,campaignId,categoryId,accountId,rating,image,height,width,isOnClick,cost\
-             ,uniqueHits,swf,description,price,url,title) VALUES(");
+             ,uniqueHits,swf,description,price,url,title,type) VALUES(");
     sz = strlen(buf);
     pData = buf + sz;
     sz = sizeof(buf) - sz;
@@ -88,7 +88,7 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
 
         bzero(pData,sz);
         sqlite3_snprintf(sz,pData,
-                         "%lli,'%q',%lli,%lli,'%q',%f,'%q',%d,%d,%d,%f,%d,'%q','%q','%q','%q','%q')",
+                         "%lli,'%q',%lli,%lli,'%q',%f,'%q',%d,%d,%d,%f,%d,'%q','%q','%q','%q','%q', %d)",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getField("campaignId_int").numberLong(),
@@ -105,7 +105,9 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
                          x.getStringField("description"),
                          x.getStringField("price"),
                          x.getStringField("url"),
-                         x.getStringField("title"));
+                         x.getStringField("title"),
+                         Offer::typeFromString(x.getStringField("type"))
+                         );
 
         try
         {

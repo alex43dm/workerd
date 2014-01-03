@@ -4,6 +4,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <vector>
 
 #include <mongo/client/dbclientinterface.h>
 
@@ -17,6 +18,8 @@ typedef unsigned long long	sphinx_uint64_t;
 class Offer
 {
 public:
+    typedef std::vector<Offer*>::iterator it;
+    typedef enum{ banner, teazer, unknown } Type;
     /// Структура для хранения информации о рекламном предложении.
         std::string id;             ///< ID предложения
         sphinx_int64_t id_int;                 ///< ID предложения
@@ -29,7 +32,7 @@ public:
         std::string campaign_id;    ///< ID кампании, к которой относится предложение
         bool valid;                 ///< Является ли запись действительной.
         bool isOnClick;             ///< Реклама по кликам или показам
-        std::string type;			///< тип РП
+        Type type;			///< тип РП
         std::string conformity;		///< тип соответствия РП и запроса, изменяеться после выбора РП из индекса
         std::string branch;			///< ветка алгоритма по которой было выбрано РП
         std::string matching;       ///< Фраза соответствия
@@ -57,7 +60,7 @@ public:
           const std::string &campaign_id,
           bool valid,
           bool isOnClick,
-          const std::string &type,
+          int type,
           float rating,
           int uniqueHits,
           int height,
@@ -67,13 +70,43 @@ public:
 
     static void loadAll(Kompex::SQLiteDatabase *pdb);
 
-    bool operator==(const Offer &other) const { return *this == other; }
+    bool operator==(const Offer &other) const { return this->id_int == other.id_int; }
     bool operator<(const Offer &other) const { return rating < other.rating; }
+
+    static Type typeFromString(const std::string stype)
+    {
+        if(stype == "banner")
+            return Type::banner;
+        if(stype == "teaser")
+            return Type::teazer;
+        return Type::unknown;
+    }
+
+    static Type typeFromInt(int stype)
+    {
+        if(stype == 0)
+            return Type::banner;
+        if(stype == 1)
+            return Type::teazer;
+        return Type::unknown;
+    }
 
     // Каждому элементу просмотра присваиваем уникальный токен
     void gen();
 
     std::string toJson() const;
+};
+
+class OfferExistByType
+{
+    Offer::Type type;
+public:
+    OfferExistByType(Offer::Type t):type(t){}
+
+    bool operator()(const Offer *temp)
+    {
+            return temp->type == type;
+    }
 };
 
 #endif // OFFER_H

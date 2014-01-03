@@ -29,12 +29,12 @@ OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
 OUT_DEBUG = bin/Debug/getmyad
 
-INC_RELEASE =  $(INC)
+INC_RELEASE =  $(INC) -Iinclude -I../libredis
 CFLAGS_RELEASE =  $(CFLAGS) -O2
 RESINC_RELEASE =  $(RESINC)
 RCFLAGS_RELEASE =  $(RCFLAGS)
 LIBDIR_RELEASE =  $(LIBDIR)
-LIB_RELEASE = $(LIB) -lhiredis
+LIB_RELEASE = $(LIB) ../libredis/lib/libredis.a -lrt
 LDFLAGS_RELEASE =  $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
@@ -44,7 +44,7 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/utils/Cookie.o $(OBJDIR_DEBUG)/utils/base64.o $(OBJD
 
 OBJ_RELEASE = $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/SearchEngines.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/src/json.o $(OBJDIR_RELEASE)/src/RedisClient.o $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/Offer.o $(OBJDIR_RELEASE)/UserHistory.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o
 
-all: debug
+all: release
 
 clean: clean_debug clean_release
 

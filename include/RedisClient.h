@@ -30,6 +30,13 @@ class RedisClient
               int stop,
               std::string &ret);
 
+        bool exists(const std::string &key);
+        long int zrank(const std::string &key, long id);
+        bool zadd(const std::string &key, int score, long id);
+        int zscore(const std::string &key, long id);
+        bool zincrby(const std::string &key, long id, int inc);
+        bool expire(const std::string &key, int time);
+
     protected:
     private:
         std::string host;
@@ -40,7 +47,7 @@ class RedisClient
 
         bool _addVal(const std::string &key, double score, const std::string &member);
         boost::int64_t currentDateToInt();
-
+        bool execCmd(const std::string &cmd);
 };
 
 #endif // REDISCLIENT_H

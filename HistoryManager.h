@@ -34,7 +34,7 @@ public:
         key = _key;
     }
     bool getDBStatus(HistoryType t);
-    bool setDeprecatedOffers(const std::vector<Offer> &items);
+    bool setDeprecatedOffers(const std::vector<Offer*> &items);
     bool getDeprecatedOffers(std::string &);
 
 private:

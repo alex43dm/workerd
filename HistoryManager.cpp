@@ -49,19 +49,33 @@ bool HistoryManager::initDB()
         return true;
     }
 
-    bool HistoryManager::setDeprecatedOffers(const std::vector<Offer> &items)
+    bool HistoryManager::setDeprecatedOffers(const std::vector<Offer*> &items)
     {
-        std::string out;
         for (auto it = items.begin(); it != items.end(); ++it)
         {
-            out += std::to_string((*it).id_int) + ",";
+            if ((*it)->uniqueHits != -1)
+            {
+                if (history_archive[ViewHistory]->exists(key))
+                {
+                    if (history_archive[ViewHistory]->zrank(key,(*it)->id_int) == -1)
+                    {
+                        history_archive[ViewHistory]->zadd(key,(*it)->uniqueHits - 1, (*it)->id_int);
+                    }
+                    else//if rank == -1
+                    {
+                        if (history_archive[ViewHistory]->zscore(key,(*it)->id_int) > 0)
+                        {
+                            history_archive[ViewHistory]->zincrby(key, (*it)->id_int, -1);
+                        }
+                    }
+                }
+                else//if not exists
+                {
+                    history_archive[ViewHistory]->zadd(key,(*it)->uniqueHits - 1, (*it)->id_int);
+                    history_archive[ViewHistory]->expire(key, 60);
+                }
+            }
         }
-
-        if (!out.empty())
-            out.erase(std::prev(out.end()));
-
-        history_archive[ViewHistory]->addVal(key, out);
-
         return true;
     }
     /** \brief Получение идентификаторов РП от индекса lucene.

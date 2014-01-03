@@ -32,10 +32,13 @@
 				<Option parameters="-c /home/alex/Projects/worker/config.xml -s /tmp/dcg,sock" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
+					<Add directory="../libredis" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="hiredis" />
+					<Add library="../libredis/lib/libredis.a" />
+					<Add library="rt" />
 				</Linker>
 			</Target>
 		</Build>

@@ -21,15 +21,15 @@ INNER JOIN (
 		EXCEPT
             SELECT c2d.id_cam AS id
             FROM Campaign2Domains AS c2d
-            WHERE c2d.id_dom=%d AND c2d.allowed=0
+            WHERE c2d.id_dom=%ld AND c2d.allowed=0
 		UNION ALL
             SELECT c2a.id_cam AS id
             FROM Campaign2Accounts AS c2a
-            WHERE c2a.id_acc=%d AND c2a.allowed=1
+            WHERE c2a.id_acc=%ld AND c2a.allowed=1
         UNION ALL
             SELECT c2i.id_cam AS id
             FROM Campaign2Informer AS c2i
-            WHERE c2i.allowed=1 AND c2i.id_inf=%d
+            WHERE c2i.allowed=1 AND c2i.id_inf=%ld
         UNION ALL
             SELECT geo.id_cam AS id
             FROM geoTargeting AS geo
@@ -37,4 +37,4 @@ INNER JOIN (
 ) AS c ON ca.id=c.id
 WHERE ofrs.id NOT IN(%s)
 ORDER BY ofrs.rating
-LIMIT 4;
+LIMIT 200;

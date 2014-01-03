@@ -27,6 +27,8 @@ using namespace boost::posix_time;
 using namespace Kompex;
 #define foreach	BOOST_FOREACH
 
+#define CMD_SIZE 8192
+
 int Core::request_processed_ = 0;
 int Core::offer_processed_ = 0;
 int Core::social_processed_ = 0;
@@ -37,8 +39,21 @@ Core::Core(DataBase *_pDb) :
 {
     tid = pthread_self();
 
-    pStmtOfferStr = pDb->getSqlFile("requests/01.sql");
+    cmd = new char[CMD_SIZE];
 
+    pStmtOfferStr = pDb->getSqlFile("requests/01.sql");
+/*
+    try
+    {
+        pStmtOffer = new SQLiteStatement(pDb->pDatabase);
+        pStmtOffer->Sql(pDb->getSqlFile("requests/01.sql"));
+    }
+    catch(SQLiteException &ex)
+    {
+        Log::err("DB error: pStmtOffer: %s %s", ex.GetString().c_str(), pDb->getSqlFile("requests/01.sql").c_str());
+        exit(1);
+    }
+*/
     try
     {
         pStmtInformer = new SQLiteStatement(pDb->pDatabase);
@@ -70,6 +85,8 @@ Core::Core(DataBase *_pDb) :
 
 Core::~Core()
 {
+    delete []cmd;
+
     pStmtInformer->FreeQuery();
     delete pStmtInformer;
 
@@ -115,21 +132,20 @@ public:
           redirect_script_(redirect_script),
           location_(location) { }
 
-    void operator ()(Offer &item)
+    void operator ()(Offer *offer)
     {
-        item.gen();
+        offer->gen();
 
-        string query = boost::str(
+        offer->redirect_url = redirect_script_ + "?" + base64_encode(boost::str(
                            boost::format("id=%s\ninf=%d\ntoken=%s\nurl=%s\nserver=%s"
                                          "\nloc=%s")
-                           % item.id_int
+                           % offer->id_int
                            % informerId
-                           % item.token
-                           % item.url
+                           % offer->token
+                           % offer->url
                            % server_ip_
                            % location_
-                       );
-        item.redirect_url = redirect_script_ + "?" + base64_encode(query);
+                       ));
     }
 };
 
@@ -137,7 +153,7 @@ public:
 
 /** Обработка запроса на показ рекламы с параметрами ``params``.
 	Изменён RealInvest Soft */
-std::string Core::Process(const Params &params, vector<Offer> &items)
+std::string Core::Process(const Params &params, vector<Offer*> &items)
 {
    // Log::info("[%ld]Core::Process start",tid);
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
@@ -192,7 +208,7 @@ std::string Core::Process(const Params &params, vector<Offer> &items)
 
     ////если полученный вектор пуст, используем старый алгоритм, в противном случае используем наш алгоритм
     getOffers(params, items);
-    Log::gdb("%d offers done",items.size());
+    //Log::gdb("%d offers done",items.size());
     /*
         if (offersIds.size()==0)
         {
@@ -202,6 +218,7 @@ std::string Core::Process(const Params &params, vector<Offer> &items)
         else
         {*/
     //новый алгоритм
+    Log::info("[%ld]get offers: %s %d",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str(), items.size());
     RISAlgorithm(items, params, cleared);
     //Log::info("RISAlgorithm: done",tid);
     //offers = getOffersRIS(offersIds, params, camps, clean, updateShort, updateContext);
@@ -251,11 +268,11 @@ std::string Core::Process(const Params &params, vector<Offer> &items)
     //Log::info("OffersToJson/OffersToHtml: done");
     delete informer;
 
-    Log::info("[%ld]core time: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
+    //Log::info("[%ld]core time: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
     return ret;
 }
 
-void Core::ProcessSaveResults(const Params &params, const vector<Offer> &items)
+void Core::ProcessSaveResults(const Params &params, const vector<Offer*> &items)
 {
 /*
     //Задаем значение очистки истории показов
@@ -281,16 +298,16 @@ void Core::ProcessSaveResults(const Params &params, const vector<Offer> &items)
     {
         Log::err("DBException duriAMQPMessageng markAsShown(): %s", ex.what());
     }
-
+    pStmtInformer->Reset();
+  //  pStmtOffer->Reset();
 }
 
 Informer *Core::getInformer(const Params &params)
 {
-    Informer *result;
     pStmtInformer->BindString(1, params.informer_);
     while(pStmtInformer->FetchRow())
     {
-        result = new Informer(pStmtInformer->GetColumnInt64(0),
+        return new Informer(pStmtInformer->GetColumnInt64(0),
                               pStmtInformer->GetColumnInt(1),
                               pStmtInformer->GetColumnString(2),
                               pStmtInformer->GetColumnString(3),
@@ -298,9 +315,9 @@ Informer *Core::getInformer(const Params &params)
                               pStmtInformer->GetColumnInt64(5)
                              );
     }
-    pStmtInformer->Reset();
+    //pStmtInformer->Reset();
     //pStmtInformer->FreeQuery();
-    return result;
+    return nullptr;
 }
 /**
     Алгоритм работы таков:
@@ -341,36 +358,94 @@ file::memory:?cache=shared
 	-#  Предложения, указанные в \c params.exluded_offers, по возможности
 	    исключаются из просмотра. Это используется в прокрутке информера.
  */
-bool Core::getOffers(const Params &params, std::vector<Offer> &result)
+/*
+ bool Core::getOffers(const Params &params, std::vector<Offer*> &result)
 {
-    Kompex::SQLiteStatement *pStmt;
-
-    //pStmt = pStmtOffer;//new Kompex::SQLiteStatement(pDb->pDatabase);
-
+    boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
+    startTime = microsec_clock::local_time();
 
 //    Log::info("getOffers start");
     std::string depOffers;
     hm->getDeprecatedOffers(depOffers);
-//    Log::info("get history - %s",depOffers.c_str());
+
+    //Log::info("[%ld]get history size: %s %d",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str(), depOffers.size());
+
+    try
+    {
+        teasersCount = 0;
+
+        pStmtOffer->BindInt64(1, informer->domainId);
+        pStmtOffer->BindInt64(2, informer->accountId);
+        pStmtOffer->BindInt64(3, informer->id);
+        pStmtOffer->BindString(4, params.getCountry());
+        pStmtOffer->BindString(5, params.getRegion());
+        pStmtOffer->BindString(6, depOffers);
+
+        while(pStmtOffer->FetchRow())
+        {
+            Offer *off = new Offer(pStmtOffer->GetColumnString(1),
+                              pStmtOffer->GetColumnInt64(0),
+                              pStmtOffer->GetColumnString(2),
+                              pStmtOffer->GetColumnString(3),
+                              pStmtOffer->GetColumnString(4),
+                              pStmtOffer->GetColumnString(5),
+                              pStmtOffer->GetColumnString(6),
+                              pStmtOffer->GetColumnString(7),
+                              pStmtOffer->GetColumnString(8),
+                              true,
+                              pStmtOffer->GetColumnBool(9),
+                              pStmtOffer->GetColumnInt(10),
+                              pStmtOffer->GetColumnDouble(11),
+                              pStmtOffer->GetColumnInt(12),
+                              pStmtOffer->GetColumnInt(13),
+                              pStmtOffer->GetColumnInt(14)
+                             );
+            off->social = pStmtOffer->GetColumnBool(15);
+
+            if(!off->social)
+                all_social = false;
+
+            if(off->type == Offer::Type::teazer) teasersCount++;
+            result.push_back(off);
+        }
+        //pStmtOffer->Reset();
+    }
+    catch(SQLiteException &ex)
+    {
+        Log::err("DB error: %s", ex.GetString().c_str());
+        return false;
+    }
+//    Log::info("[%ld]get getoffer done: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
+
+    return true;
+}
+*/
+
+bool Core::getOffers(const Params &params, std::vector<Offer*> &result)
+{
+    boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
+    startTime = microsec_clock::local_time();
+
+    Kompex::SQLiteStatement *pStmt;
+
+//    Log::info("getOffers start");
+    std::string depOffers;
+    hm->getDeprecatedOffers(depOffers);
+
+    //Log::info("[%ld]get history size: %s %d",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str(), depOffers.size());
 
     try
     {
         pStmt = new SQLiteStatement(pDb->pDatabase);
 
-        char *cmd;// = (char*)malloc(pStmtOfferStr.size()+2048);
-
-        cmd = sqlite3_mprintf(pStmtOfferStr.c_str(),
+        sqlite3_snprintf(CMD_SIZE, cmd, pStmtOfferStr.c_str(),
                               informer->domainId,
                               informer->accountId,
                               informer->id,
                               params.getCountry().c_str(),
                               params.getRegion().c_str(),
                               depOffers.c_str());
-#ifdef DEBUG
-        printf("sql:%s\n",cmd);
-#endif
         pStmt->Sql(cmd);
-        sqlite3_free(cmd);
     }
     catch(SQLiteException &ex)
     {
@@ -378,12 +453,13 @@ bool Core::getOffers(const Params &params, std::vector<Offer> &result)
         delete pStmt;
         return false;
     }
-
+//    Log::info("[%ld]exec: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
     try
     {
+        teasersCount = 0;
         while(pStmt->FetchRow())
         {
-            Offer off = Offer(pStmt->GetColumnString(1),
+            Offer *off = new Offer(pStmt->GetColumnString(1),
                               pStmt->GetColumnInt64(0),
                               pStmt->GetColumnString(2),
                               pStmt->GetColumnString(3),
@@ -394,21 +470,21 @@ bool Core::getOffers(const Params &params, std::vector<Offer> &result)
                               pStmt->GetColumnString(8),
                               true,
                               pStmt->GetColumnBool(9),
-                              pStmt->GetColumnString(10),
+                              pStmt->GetColumnInt(10),
                               pStmt->GetColumnDouble(11),
                               pStmt->GetColumnInt(12),
                               pStmt->GetColumnInt(13),
                               pStmt->GetColumnInt(14)
                              );
-            off.social = pStmt->GetColumnBool(15);
-#ifdef DEBUG
-            printf("%lld ",off.id_int);
-#endif
+            off->social = pStmt->GetColumnBool(15);
+
+            if(!off->social)
+                all_social = false;
+
+            if(off->type == Offer::Type::teazer) teasersCount++;
+
             result.push_back(off);
         }
-#ifdef DEBUG
-        printf("\n");
-#endif
         pStmt->FreeQuery();
     }
     catch(SQLiteException &ex)
@@ -419,19 +495,18 @@ bool Core::getOffers(const Params &params, std::vector<Offer> &result)
     }
 
     delete pStmt;
-//    Log::info("getOffers end");
+    //Log::info("[%ld]get getoffer done: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
+
     return true;
 }
 
-
-
-std::string Core::OffersToHtml(const std::vector<Offer> &items, const std::string &url) const
+std::string Core::OffersToHtml(const std::vector<Offer*> &items, const std::string &url) const
 {
     //Benchmark bench("OffersToHtml закончил свою работу");
     std::string informer_html;
 
     //для отображения передаётся или один баннер, или вектор тизеров. это и проверяем
-    if (!items.empty() && items[0].isBanner)
+    if (!items.empty() && items[0]->isBanner)
     {
         // Получаем HTML-код информера для отображение баннера
         informer_html =
@@ -455,17 +530,19 @@ std::string Core::OffersToHtml(const std::vector<Offer> &items, const std::strin
 }
 
 
-std::string Core::OffersToJson(const vector<Offer> &items) const
+std::string Core::OffersToJson(const vector<Offer*> &items) const
 {
+
     if(items.empty()) Log::warn("No impressions items to show");
+
     std::stringstream json;
     json << "[";
-    for (auto it = items.begin(); it != items.end(); it++)
+    for (auto it = items.begin(); it != items.end(); ++it)
     {
         if (it != items.begin())
             json << ",";
 
-        json << it->toJson();
+        json << (*it)->toJson();
     }
 
     json << "]";
@@ -487,9 +564,11 @@ std::string Core::RequestDebugInfo(const Params &params) const
 
 
 /**Формирование списка РП с учетом их рейтинга для конкретного рекламного блока*/
-vector<Offer> Core::getOffersRIS(const list<pair<pair<string, float>, pair<string, pair<string, string>>>> &offersIds, const Params &params, const list<Campaign> &camps, bool &clean, bool &updateShort, bool &updateContext)
+vector<Offer*> Core::getOffersRIS(const list<pair<pair<string, float>, pair<string,
+                                 pair<string, string>>>> &offersIds, const Params &params,
+                                 const list<Campaign> &camps, bool &clean, bool &updateShort, bool &updateContext)
 {
-    vector<Offer> result;
+    vector<Offer*> result;
     createVectorOffersByIds(offersIds, result, camps, params, updateShort, updateContext);
 //    RISAlgorithm(result, params, clean);
     return result;
@@ -549,7 +628,7 @@ vector<Offer> Core::getOffersRIS(const list<pair<pair<string, float>, pair<strin
  */
 void Core::createVectorOffersByIds(const list<pair<pair<string, float>,
                                    pair<string, pair<string, string>>>> &offersIds,
-                                   vector<Offer> &result,
+                                   vector<Offer*> &result,
                                    const list<Campaign> &camps,
                                    const Params& params, bool &updateShort, bool &updateContext)
 {
@@ -606,18 +685,18 @@ void Core::createVectorOffersByIds(const list<pair<pair<string, float>,
 }
 
 
-void Core::filterOffersSize(vector<Offer> &result, const string& informerId)
+void Core::filterOffersSize(vector<Offer*> &result, const string& informerId)
 {
     //LOG(INFO) << "filterOffersSize start\n";
 //    filterOffersSize(result, Informer(informerId));
     //LOG(INFO) << "filterOffersSize end\n";
 }
 
-void Core::filterOffersSize(vector<Offer> &result, const Informer& informer)
+void Core::filterOffersSize(vector<Offer*> &result, const Informer& informer)
 {
     //LOG(INFO) << "filterOffersSize start\n";
     //размеры баннеров
-    vector<Offer>::iterator p = result.begin();
+    vector<Offer*>::iterator p = result.begin();
     while(p != result.end())
     {
         if (checkBannerSize(*p, informer))
@@ -637,11 +716,11 @@ void Core::filterOffersSize(vector<Offer> &result, const Informer& informer)
 /**
  * Проверяет соответствие размера баннера и размера банероместа РБ
  */
-bool Core::checkBannerSize(const Offer& offer, const Informer& informer)
+bool Core::checkBannerSize(const Offer *offer, const Informer& informer)
 {
-    if (offer.isBanner)
+    if (offer->isBanner)
     {
-        if (offer.width != informer.width_banner || offer.height != informer.height_banner)
+        if (offer->width != informer.width_banner || offer->height != informer.height_banner)
         {
             return false;
         }
@@ -667,24 +746,13 @@ bool Core::checkBannerSize(const Offer& offer, const Informer& informer)
 	если выбранных тизеров достаточно для РБ, показываем.
 	если нет - добираем из исходного массива стоящие слева тизеры.
  */
-void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean)
+void Core::RISAlgorithm(vector<Offer*> &result, const Params &params, bool &clean)
 {
     if(result.size() < 5)
         return;
 
-    vector<Offer>::iterator p;
-    p = result.begin();
+    Offer::it p;
 
-    bool all_social = true;
-    while(p!=result.end())
-    {
-        if(!(*p).social)
-        {
-            all_social = false;
-            break;
-        }
-        p++;
-    }
     //Удаляем социалку
     if (!all_social)
     {
@@ -692,7 +760,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         p = result.begin();
         while(p!=result.end())
         {
-            if ((*p).social)
+            if ((*p)->social)
                 result.erase(p);
             else p++;
         }
@@ -705,7 +773,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         clean = true;
     }
     //если первый элемент баннер, возвращаем баннер.
-    if ( result[0].isBanner && !result[0].social)
+    if ( result[0]->isBanner && !result[0]->social)
     {
         //NON social banner
         p = result.begin();
@@ -713,7 +781,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         result.erase(p, result.end());
         return;
     }
-    if ( result[0].isBanner && result[0].social && result.size()==1)
+    if ( result[0]->isBanner && result[0]->social && result.size()==1)
     {
         //social banner
         p = result.begin();
@@ -723,8 +791,8 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
     }
     //Первый элемент не баннер
     //посчитать тизеры.
-    int teasersCount = std::count_if(result.begin(),result.end(),CExistElementFunctorByType("teaser", EOD_TYPE));
-    //LOG(INFO) << "teasersCount " << teasersCount;
+    //int teasersCount = std::count_if(result.begin(),result.end(),CExistElementFunctorByType(Offer::Type::teazer, EOD_TYPE));
+    //Log::info("result: %d teasersCount %d informer->capacity: %d", result.size(), teasersCount, informer->capacity);
     //кол-во тизеров < кол-ва мест на РБ -> шаг 12.
     //нет -> шаг 14.
 
@@ -733,11 +801,11 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         //LOG(INFO) << "teasersCount <= informer.capacity";
         //шаг 12
         //вычислить средний рейтинг РП типа тизер в последовательности.
-        double avgTR = mediumRating(result, "teaser");
+        double avgTR = mediumRating(result, Offer::Type::teazer);//"teaser"
         //найти первый баннер
-        p = std::find_if(result.begin(),result.end(), CExistElementFunctorByType("banner", EOD_TYPE));
+        p = std::find_if(result.begin(),result.end(), OfferExistByType(Offer::Type::banner));
         //если баннер есть и его рейтинг > среднего рейтинга по тизерам - отобразить баннер
-        if (p!=result.end() && (*p).rating > avgTR)
+        if (p!=result.end() && (*p)->rating > avgTR)
         {
             result.erase(result.begin(), p);
             p++;
@@ -747,7 +815,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         //баннер не найден или его рейтинг <= среднего рейтинга тизеров
         //иначе - выбрать все тизеры с дублированием
         //т.е. удалить все баннеры и добавлять в конец вектора существующие элементы
-        p = std::remove_if(result.begin(), result.end(), CExistElementFunctorByType("banner", EOD_TYPE));
+        p = std::remove_if(result.begin(), result.end(), OfferExistByType(Offer::Type::banner));
         result.erase(p, result.end());
         int c=0;
         while ((int)result.size() < informer->capacity)
@@ -761,11 +829,11 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         }
         clean = true;
     }
-    else
+    else//teasersCount > informer->capacity
     {
         //шаг 14
         //удаляем все баннеры, т.к. с ними больше не работаем
-        p = std::remove_if(result.begin(), result.end(), CExistElementFunctorByType("banner", EOD_TYPE));
+        p = std::remove_if(result.begin(), result.end(), OfferExistByType(Offer::Type::banner));
         result.erase(p, result.end());
 
         //выбрать самый левый тизер.
@@ -776,7 +844,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         //если нет - добираем из исходного массива стоящие слева тизеры.
 
         list<string> camps;
-        vector<Offer> newResult;
+        vector<Offer*> newResult;
 
         p = result.begin();
         //LOG(INFO) << "first";
@@ -784,11 +852,11 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         {
             //если кампания тизера не занесена в список, выбираем тизер, выбираем кампанию
             //LOG(INFO) << !isStrInList((*p).campaign_id(), camps) << ((*p).rating() > 0.0);
-            if(!isStrInList((*p).campaign_id, camps) && ((*p).rating > 0.0))
+            if(!isStrInList((*p)->campaign_id, camps) && ((*p)->rating > 0.0))
             {
                 //LOG(INFO) << "add";
                 newResult.push_back((*p));
-                camps.push_back((*p).campaign_id);
+                camps.push_back((*p)->campaign_id);
             }
             p++;
         }
@@ -807,11 +875,11 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
                 //пробуем сначала добрать без повторений.
                 if(!isOfferInVector((*p), newResult))
                 {
-                    if(!isStrInList((*p).campaign_id, camps) && (((*p).rating > 0.0) || (*p).branch != "L30") )
+                    if(!isStrInList((*p)->campaign_id, camps) && (((*p)->rating > 0.0) || (*p)->branch != "L30") )
                     {
                         //LOG(INFO) << "add";
                         newResult.push_back((*p));
-                        camps.push_back((*p).campaign_id);
+                        camps.push_back((*p)->campaign_id);
                     }
                 }
                 //LOG(INFO) << "second + count " << (int)newResult.size() ;
@@ -826,7 +894,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         {
             //доберём всё за один проход, т.к. result.size > informer.capacity
             //пробуем сначала добрать без повторений.
-            if ((*p).rating > 0.0 || (*p).branch != "L30" )
+            if ((*p)->rating > 0.0 || (*p)->branch != "L30" )
             {
                 newResult.push_back((*p));
             }
@@ -845,11 +913,11 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
                 //пробуем сначала добрать без повторений.
                 if(!isOfferInVector((*p), newResult))
                 {
-                    if(!isStrInList((*p).campaign_id, camps) && ((*p).rating <= 0.0))
+                    if(!isStrInList((*p)->campaign_id, camps) && ((*p)->rating <= 0.0))
                     {
                         //LOG(INFO) << "add";
                         newResult.push_back((*p));
-                        camps.push_back((*p).campaign_id);
+                        camps.push_back((*p)->campaign_id);
                     }
                 }
                 //LOG(INFO) << "second - count " << (int)newResult.size() ;
@@ -861,7 +929,7 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         {
             //доберём всё за один проход, т.к. result.size > informer.capacity
             //пробуем сначала добрать без повторений.
-            if ((*p).rating <= 0.0)
+            if ((*p)->rating <= 0.0)
             {
                 newResult.push_back((*p));
             }
@@ -869,11 +937,10 @@ void Core::RISAlgorithm(vector<Offer> &result, const Params &params, bool &clean
         }
         result.assign(newResult.begin(), newResult.begin()+informer->capacity);
     }
-
 }
 
 
-float Core::mediumRating(const vector<Offer>& vectorOffers, const string &typeOfferStr)
+float Core::mediumRating(const vector<Offer*>& vectorOffers, Offer::Type typeOffer)
 {
     float summRating=0;
     int countElements = 0;
@@ -881,9 +948,9 @@ float Core::mediumRating(const vector<Offer>& vectorOffers, const string &typeOf
 
     for(i=0; i < vectorOffers.size(); i++)
     {
-        if(vectorOffers[i].type == typeOfferStr)
+        if(vectorOffers[i]->type == typeOffer)
         {
-            summRating += vectorOffers[i].rating;
+            summRating += vectorOffers[i]->rating;
             countElements++;
         }
     }
@@ -896,7 +963,7 @@ float Core::mediumRating(const vector<Offer>& vectorOffers, const string &typeOf
 
     Внимание: Используется база данных, зарегистрированная под именем 'log'.
  */
-void Core::markAsShown(const vector<Offer> &items, const Params &params,
+void Core::markAsShown(const vector<Offer*> &items, const Params &params,
                        list<string> &shortTerm, list<string> &longTerm, list<string> &contextTerm )
 {
     if (params.test_mode_)
@@ -918,7 +985,7 @@ void Core::markAsShown(const vector<Offer> &items, const Params &params,
 		b3.append(*it);
 	mongo::BSONArray contextTermArray = b3.arr();
 
-    BOOST_FOREACH (const Offer &i, items) {
+    BOOST_FOREACH (const Offer *i, items) {
 
 	std::tm dt_tm;
 	dt_tm = boost::posix_time::to_tm(params.time_);
@@ -937,34 +1004,34 @@ void Core::markAsShown(const vector<Offer> &items, const Params &params,
 
 	mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
 								append("dt", dt).
-								append("id", i.id).
-								append("id_int", i.id_int).
-								append("title", i.title).
+								append("id", i->id).
+								append("id_int", i->id_int).
+								append("title", i->title).
 								append("inf", params.informer_).
 								append("inf_int", informer->id).
 								append("ip", params.ip_).
 								append("cookie", params.cookie_id_).
-								append("social", i.social).
-								append("token", i.token).
-								append("type", i.type).
-								append("isOnClick", i.isOnClick).
-								append("campaignId", i.campaign_id).
-								append("campaignId_int", i.campaign_id).
+								append("social", i->social).
+								append("token", i->token).
+								append("type", i->type).
+								append("isOnClick", i->isOnClick).
+								append("campaignId", i->campaign_id).
+								append("campaignId_int", i->campaign_id).
 								append("campaignTitle", "").
 								append("project", "").
 								append("country", (country.empty()?"NOT FOUND":country)).
 								append("region", (region.empty()?"NOT FOUND":region)).
 								append("keywords", keywords).
-								append("branch", i.branch).
-								append("conformity", i.conformity).
-                                append("matching", i.matching).
+								append("branch", i->branch).
+								append("conformity", i->conformity).
+                                append("matching", i->matching).
 								obj();
 
 	db.insert("log.impressions", record, true);
 	count++;
 
 	offer_processed_ ++;
-	if (i.social) social_processed_ ++;
+	if (i->social) social_processed_ ++;
     }
     //LOG_IF(WARNING, count == 0 ) << "No items was added to log.impressions!";
 }
