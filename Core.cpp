@@ -216,15 +216,16 @@ std::string Core::Process(const Params &params, vector<Offer*> &items)
 void Core::ProcessSaveResults(const Params &params, const vector<Offer*> &items)
 {
 // Сохраняем выданные ссылки в базе данных
-    try
-    {
-        hm->setDeprecatedOffers(items);
 //        list<string> shortTerm = HistoryManager::instance()->getShortHistoryByUser(params);
 //        list<string> longTerm = HistoryManager::instance()->getLongHistoryByUser(params);
 //        list<string> contextTerm = HistoryManager::instance()->getContextHistoryByUser(params);
-//        markAsShown(items, params, shortTerm, longTerm, contextTerm);
+
+    try
+    {
         //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
-//        HistoryManager::instance()->updateUserHistory(items, params, clean, updateShort, updateContext);
+        hm->updateUserHistory(items, params);
+
+//        markAsShown(items, params, shortTerm, longTerm, contextTerm);
     }
     catch (mongo::DBException &ex)
     {

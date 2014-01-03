@@ -53,7 +53,6 @@ public:
 
     void ProcessSaveResults(const Params &params, const std::vector<Offer*> &items);
 
-
     bool getOffers(const Params &params, std::vector<Offer*> &result);
 
     Informer *getInformer(const Params &params);
@@ -97,6 +96,7 @@ public:
     {
         return server_ip_;
     }
+
     void set_server_ip(const std::string &ip)
     {
         server_ip_ = ip;
@@ -117,6 +117,7 @@ public:
     {
         return redirect_script_;
     }
+
     void set_redirect_script(const std::string &url)
     {
         redirect_script_ = url;
@@ -176,9 +177,6 @@ private:
                                   const Params& params,
                                   bool &updateShort, bool &updateContext);
 
-
-
-
     /** \brief Удаление из вектора result баннеров, не подходящих по размеру для информера с идентификатором informer.
      *
      * @param result Вектор РП, которые нужно проверить на совместимость по размерам с инфомером informer.
@@ -228,15 +226,25 @@ private:
      Добавлено RealInvest Soft.
      */
     float mediumRating(const std::vector<Offer*>& vectorOffers, Offer::Type);
+
     bool isSocial (Offer& i);
+
     DataBase *pDb;
+
     SQLiteStatement *pStmtInformer, *pStmtOffer, *pStmtOfferDefault;
+
     pthread_t tid;
+
     Informer *informer;
+
     HistoryManager *hm;
+
     std::string pStmtOfferStr;
+
     bool all_social;
+
     int teasersCount;
+
     char *cmd;
 };
 

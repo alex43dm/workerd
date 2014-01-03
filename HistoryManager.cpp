@@ -114,53 +114,70 @@ bool HistoryManager::initDB()
         return true;
     }
 
-    /** \brief Получение краткосрочной истории пользователя.
+    /** \brief Получение истории пользователя.
      *
      * \param params - параметры запроса.
      */
-  /*  list<std::string> getHistory(const Params& params)
+    bool HistoryManager::getUserHistory(HistoryType type, std::list<std::string> &rr)
     {
 
-        UserHistory * uh = accessor.getUserHistoryById(params.getUserKey());
-        list <std::string> temp = uh->getShortHistory();
-        delete uh;
-        return temp;
+        if(!history_archive[type]->getRange(key , 0, -1, rr))
+        {
+            Log::err("HistoryManager::getUserHistory error: %s", Module_last_error(module));
+            return false;
+        }
 
+        return true;
     }
-*/
 
     /** Обновление short и deprecated историй пользователя. */
     /** \brief  Обновление краткосрочной истории пользователя и истории его показов.
-
     	\param offers     		вектор рекламных предложений, выбранных к показу
     	\param params			параметры, переданный ядру процесса
     */
-  /*  bool updateUserHistory(const vector<Offer>& offers, const Params& params, bool clean, bool updateShort, bool updateContext)
+    bool HistoryManager::updateUserHistory(const std::vector<Offer*> &items, const Params& params)
     {
-        if (clean)
-        {
-            accessor.cutDeprecatedUserHistory(params.getUserKey());
-            //LOG(INFO) << "Очистка уникальности";
-        }
-        //Benchmark bench("\nвремя обновления историй пользователя (HistoryManager::updateUserHistory) ");
-        //LOG(INFO) << "updateUserHistory start\n";
-        accessor.updateDeprecatedUserHistory(params.getUserKey(), offers);
-        //LOG(INFO) << "updateUserHistory middle\n";
-        if (updateShort)
-        {
-            //LOG(INFO) << "updateShort";
-            accessor.updateShortHistory(params.getUserKey(), params.getSearch());
-        }
-        if (updateContext)
-        {
-            //LOG(INFO) << "updateContext";
-            accessor.updateContextHistory(params.getUserKey(), params.getContext());
-        }
-        //LOG(INFO) << "updateUserHistory end\n";
+        setDeprecatedOffers(items);
+        updateShortHistory(params.getSearch());
+        updateContextHistory(params.getContext());
         return true;
     }
-*/
 
+    void HistoryManager::updateShortHistory(const std::string & query)
+    {
+        if(query.empty() && !updateShort)
+            return;
+
+        history_archive[ShortTerm]->zadd(key, currentDateToInt(), query);
+        history_archive[ShortTerm]->expire(key, Config::Instance()->shortterm_expire_);
+        if (history_archive[ShortTerm]->zcount(key) >= 3)
+        {
+            history_archive[ShortTerm]->zremrangebyrank(key, 0, 0);
+        }
+    }
+
+    void HistoryManager::updateContextHistory(const std::string & query)
+    {
+        if(query.empty() && !updateContext)
+            return;
+
+        history_archive[PageKeywords]->zadd(key, currentDateToInt(), query);
+        history_archive[PageKeywords]->expire(key, Config::Instance()->context_expire_);
+        if (history_archive[PageKeywords]->zcount(key) >= 3)
+        {
+            history_archive[PageKeywords]->zremrangebyrank(key, 0, 0);
+        }
+    }
+
+    boost::int64_t HistoryManager::currentDateToInt()
+    {
+        boost::gregorian::date d(1970,boost::gregorian::Jan,1);
+        boost::posix_time::ptime myTime = boost::posix_time::microsec_clock::local_time();
+        boost::posix_time::ptime myEpoch(d);
+        boost::posix_time::time_duration myTimeFromEpoch = myTime - myEpoch;
+        boost::int64_t myTimeAsInt = myTimeFromEpoch.ticks();
+        return (myTimeAsInt%10000000000) ;
+    }
 
     /** \brief  Инициализация весов для задания приоритететов групп рекламных предложений при формировании списка предложений к показу
 

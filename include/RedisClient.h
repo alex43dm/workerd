@@ -3,10 +3,9 @@
 
 #include <string>
 #include <vector>
+#include <list>
 
 #include <libredis/redis.h>
-#include <boost/date_time.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
 
 class RedisClient
 {
@@ -19,25 +18,34 @@ class RedisClient
         bool connect();
 
         bool isConnected() const;
-
+/*
         bool addVal(const std::string &key, const std::string &member)
         {
             return _addVal(key, currentDateToInt(), member );
         }
-
+*/
         bool getRange(const std::string &key,
               int start,
               int stop,
               std::string &ret);
 
+        bool getRange(const std::string &key,
+              int start,
+              int stop,
+              std::list<std::string> &ret);
+
         bool exists(const std::string &key);
         long int zrank(const std::string &key, long id);
-        bool zadd(const std::string &key, int score, long id);
+        bool zadd(const std::string &key, int64_t score, long id);
+        bool zadd(const std::string &key, int64_t score, const std::string &q);
         int zscore(const std::string &key, long id);
         bool zincrby(const std::string &key, long id, int inc);
         bool expire(const std::string &key, int time);
         bool expire(const std::string &key, const std::string &time);
         bool del(const std::string &key);
+        int zcount(const std::string &key) const;
+        int zcount(const std::string &key, long Min, long Max) const;
+        bool zremrangebyrank(const std::string &key, int start, int stop);
 
     protected:
     private:
@@ -48,7 +56,6 @@ class RedisClient
         Connection *connection;
 
         bool _addVal(const std::string &key, double score, const std::string &member);
-        boost::int64_t currentDateToInt();
         bool execCmd(const std::string &cmd);
 };
 
