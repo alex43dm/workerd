@@ -215,10 +215,10 @@ private:
       *
       * Если РП offer является баннером и его размеры не равны размерам РБ informer, возвращает false. Иначе - true.
       */
-    bool checkBannerSize(const Offer *offer, const Informer& informer);
+    bool checkBannerSize(const Offer *offer);
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(std::vector<Offer*> &result, const Params &params, bool &clean);
+    void RISAlgorithm(std::vector<Offer*> &result, const Params &params);
 
     /** \brief  Вычисление среднего рейтинга у РП типа typeOfferStr.
 

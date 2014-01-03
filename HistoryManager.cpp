@@ -24,6 +24,18 @@ bool HistoryManager::initDB()
     history_archive[Category] = new RedisClient(cfg->redis_category_host_, cfg->redis_category_port_);
     history_archive[Category]->connect();
 
+    history_archive[ShortTerm] = new RedisClient(cfg->redis_short_term_history_host_, cfg->redis_short_term_history_port_);
+    history_archive[ShortTerm]->connect();
+
+    history_archive[LongTerm] = new RedisClient(cfg->redis_long_term_history_host_, cfg->redis_long_term_history_port_);
+    history_archive[LongTerm]->connect();
+
+    history_archive[PageKeywords] = new RedisClient(cfg->redis_page_keywords_host_, cfg->redis_page_keywords_port_);
+    history_archive[PageKeywords]->connect();
+
+    history_archive[Retargeting] = new RedisClient(cfg->redis_retargeting_host_, cfg->redis_retargeting_port_);
+    history_archive[Retargeting]->connect();
+
     return true;
 }
 
@@ -51,6 +63,11 @@ bool HistoryManager::initDB()
 
     bool HistoryManager::setDeprecatedOffers(const std::vector<Offer*> &items)
     {
+        if(clean)
+        {
+            return history_archive[ViewHistory]->del(key);
+        }
+
         for (auto it = items.begin(); it != items.end(); ++it)
         {
             if ((*it)->uniqueHits != -1)
@@ -72,12 +89,13 @@ bool HistoryManager::initDB()
                 else//if not exists
                 {
                     history_archive[ViewHistory]->zadd(key,(*it)->uniqueHits - 1, (*it)->id_int);
-                    history_archive[ViewHistory]->expire(key, 60);
+                    history_archive[ViewHistory]->expire(key, Config::Instance()->views_expire_);
                 }
             }
         }
         return true;
     }
+
     /** \brief Получение идентификаторов РП от индекса lucene.
      *
      * Возвращает список пар (идентификатор,вес), отсортированный по убыванию веса.

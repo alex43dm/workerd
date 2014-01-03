@@ -36,6 +36,8 @@ class RedisClient
         int zscore(const std::string &key, long id);
         bool zincrby(const std::string &key, long id, int inc);
         bool expire(const std::string &key, int time);
+        bool expire(const std::string &key, const std::string &time);
+        bool del(const std::string &key);
 
     protected:
     private:

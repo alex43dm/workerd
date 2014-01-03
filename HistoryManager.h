@@ -22,6 +22,12 @@ typedef enum
 class HistoryManager
 {
 public:
+    //Задаем значение очистки истории показов
+    bool clean;
+    //Задаем обнавление краткосрочной истории
+    bool updateShort;
+    //Задаём обнавление долгосрочной истории
+    bool updateContext;
 
     HistoryManager();
     virtual ~HistoryManager();
@@ -32,6 +38,9 @@ public:
     void setKey(const std::string _key)
     {
         key = _key;
+        clean = false;
+        updateShort = false;
+        updateContext = false;
     }
     bool getDBStatus(HistoryType t);
     bool setDeprecatedOffers(const std::vector<Offer*> &items);
@@ -41,7 +50,5 @@ private:
     std::string key;
     Module *module;
     std::map<HistoryType, RedisClient *> history_archive;
-    //RedisClient *vh;
-
 };
 #endif

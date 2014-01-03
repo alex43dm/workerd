@@ -94,41 +94,40 @@ public:
         m_EOfferData = eOfferData;
     }
 
-    bool operator()(Offer temp)
+    bool operator()(Offer *temp)
     {
         switch(m_EOfferData)
         {
         case EOD_ID:
-            return temp.id == m_str;
+            return temp->id == m_str;
 
         case EOD_TITLE:
-            return temp.title == m_str;
+            return temp->title == m_str;
 
         case EOD_PRICE:
-            return temp.price == m_str;
+            return temp->price == m_str;
 
         case EOD_DESCRIPTION:
-            return temp.description == m_str;
+            return temp->description == m_str;
 
         case EOD_URL:
-            return temp.url == m_str;
+            return temp->url == m_str;
 
         case EOD_IMAGE_URL:
-            return temp.image_url == m_str;
+            return temp->image_url == m_str;
 
         case EOD_CAMPAIGN_ID:
-            return temp.campaign_id == m_str;
+            return temp->campaign_id == m_str;
 
         case EOD_TYPE:
-            return temp.type == type;
+            return temp->type == type;
 
         case EOD_RATING:
-            return temp.rating == atof(m_str.c_str());
+            return temp->rating == atof(m_str.c_str());
 
         default:
             return true;
         }
-
     }
 };
 

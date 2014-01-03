@@ -267,6 +267,12 @@ bool RedisClient::expire(const std::string &key, int time)
     return execCmd(cmd);
 }
 
+bool RedisClient::expire(const std::string &key, const std::string &time)
+{
+    bzero(cmd,CMD_SIZE);
+    snprintf(cmd, CMD_SIZE, "EXPIRE %s %s\r\n", key.c_str(), time.c_str());
+    return execCmd(cmd);
+}
 
 bool RedisClient::execCmd(const std::string &cmd)
 {
@@ -306,4 +312,11 @@ bool RedisClient::execCmd(const std::string &cmd)
 
     Batch_free(batch);
     return true;
+}
+
+bool RedisClient::del(const std::string &key)
+{
+    bzero(cmd,CMD_SIZE);
+    snprintf(cmd, CMD_SIZE, "DEL %s\r\n", key.c_str());
+    return execCmd(cmd);
 }

@@ -137,8 +137,7 @@ public:
         offer->gen();
 
         offer->redirect_url = redirect_script_ + "?" + base64_encode(boost::str(
-                           boost::format("id=%s\ninf=%d\ntoken=%s\nurl=%s\nserver=%s"
-                                         "\nloc=%s")
+                           boost::format("id=%s\ninf=%d\ntoken=%s\nurl=%s\nserver=%s\nloc=%s")
                            % offer->id_int
                            % informerId
                            % offer->token
@@ -163,72 +162,16 @@ std::string Core::Process(const Params &params, vector<Offer*> &items)
 
     informer = getInformer(params);
     //Log::info("[%ld]getInformer done",tid);
-    /*
-        request_processed_++;
-        time_request_started_ = microsec_clock::local_time();
-
-        Log::gdb("start Core");
-        startTime = microsec_clock::local_time();
-        Informer informer(params.informer_);
-        if (!informer.valid())
-        {
-            Log::warn("Invalid informer, returning void");
-            RequestDebugInfo(params);
-            return std::string();
-        }
-        Log::gdb("got informer: %s", to_simple_string(microsec_clock::local_time() - startTime).c_str());
-    */
-    //Создаем хранилише РП
-   bool cleared;
-
-    //получаем список кампаний.
-    /*
-    list<Campaign> camps;
-    list<Campaign> campsSoc;
-    list<Campaign> allGeoCamps;
-    getCampaigns(params, camps);
-    getSocCampaigns(params, campsSoc);
-    getAllGeoCampaigns(params, allGeoCamps);
-    //получаем вектор идентификаторов допустимых для данного пользователя предложений
-    list<pair<pair<string, float>, pair<string, pair<string, string>>>> offersIds;
-    */
-    /*
-        try
-        {
-            //Запрос к индексу на получение РП
-            offersIds = HistoryManager::instance()->getOffersByUser1(params, camps, campsSoc, allGeoCamps);
-        }
-        catch (std::exception const &ex)
-        {
-            Log::err("exception %s : %s", typeid(ex).name(), ex.what());
-        }*/
-    //endTime = microsec_clock::local_time();
-
-    //LOG(INFO) << "время получения РП = " << (endTime - startTime) << "\n";
-
-    ////если полученный вектор пуст, используем старый алгоритм, в противном случае используем наш алгоритм
     getOffers(params, items);
-    //Log::gdb("%d offers done",items.size());
-    /*
-        if (offersIds.size()==0)
-        {
-            Log::warn("Сработала старая ветка алгоритма");
-        //    offers = getOffers(params);
-        }
-        else
-        {*/
     //новый алгоритм
-    Log::info("[%ld]get offers: %s %d",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str(), items.size());
-    RISAlgorithm(items, params, cleared);
+    RISAlgorithm(items, params);
     //Log::info("RISAlgorithm: done",tid);
     //offers = getOffersRIS(offersIds, params, camps, clean, updateShort, updateContext);
     if (!items.size())
     {
         Log::warn("offers empty");
-        //offers.assign(informer.capacity(), Offer(""));
+        hm->clean = true;
     }
-    //  }
-
 
     // Если нужно показать только социальную рекламу, а настройках стоит
     // опция "В случае отсутствия релевантной рекламы показывать
@@ -250,40 +193,29 @@ std::string Core::Process(const Params &params, vector<Offer*> &items)
         }
     */
 
-   /// Log::info("[%ld]token_generator transform done",tid);
     // Составляем ссылку перенаправления для каждого элемента
-
     GenerateRedirectLink redirect_generator(informer->id_int,
                                             server_ip(),
                                             redirect_script(),
                                             params.location_);
-    //Log::info("[%ld]GenerateRedirectLink: done",tid);
+
     std::for_each(items.begin(), items.end(), redirect_generator);
-   // Log::info("[%ld]redirect_generator: done size:%d",tid,items.size());
     std::string ret;
     if (params.json_)
         ret = OffersToJson(items);
     else
         ret = OffersToHtml(items, params.getUrl());
-    //Log::info("OffersToJson/OffersToHtml: done");
+
     delete informer;
 
-    //Log::info("[%ld]core time: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
+    Log::info("[%ld]core time: %s %d",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str(), items.size());
+
     return ret;
 }
 
 void Core::ProcessSaveResults(const Params &params, const vector<Offer*> &items)
 {
-/*
-    //Задаем значение очистки истории показов
-    bool clean = false;
-    //Задаем обнавление краткосрочной истории
-    bool updateShort = false;
-    //Задаём обнавление долгосрочной истории
-    bool updateContext = false;
-*/
 // Сохраняем выданные ссылки в базе данных
-
     try
     {
         hm->setDeprecatedOffers(items);
@@ -632,8 +564,6 @@ void Core::createVectorOffersByIds(const list<pair<pair<string, float>,
                                    const list<Campaign> &camps,
                                    const Params& params, bool &updateShort, bool &updateContext)
 {
-    /*
-    Informer informer(params.getInformer());
     list<pair<pair<string, float>, pair<string, pair<string, string>>>>::const_iterator p = offersIds.begin();
     Offer *curOffer;
     string branch;
@@ -645,9 +575,9 @@ void Core::createVectorOffersByIds(const list<pair<pair<string, float>,
         curOffer = new Offer();
         curOffer->id = p->first.first;
         curOffer->rating = p->first.second;
-        curOffer->setNewBranch(branch);
-        curOffer->setNewConformity(p->second.second.first);
-        curOffer->setNewMatching(p->second.second.second);
+        curOffer->branch = branch;
+        curOffer->conformity = p->second.second.first;
+        curOffer->matching = p->second.second.second;
         //проверяем нашли ли чтото по поисковому запросу, стоит ли
         //обнавлять краткосрочную историю
         if (branch == "L2" or branch == "L7" or branch == "L12" or branch == "L17")
@@ -661,10 +591,10 @@ void Core::createVectorOffersByIds(const list<pair<pair<string, float>,
             updateContext = true;
         }
         //проверка на размер.
-        if (curOffer->valid() && checkBannerSize(*curOffer, informer))
+        if (curOffer->valid && checkBannerSize(curOffer))
         {
             //если подходит по размеру, добавляем.
-            result.push_back(*curOffer);
+            result.push_back(curOffer);
         }
         delete curOffer;
         p++;
@@ -675,13 +605,12 @@ void Core::createVectorOffersByIds(const list<pair<pair<string, float>,
 
     if (params.json_)
     {
-        vector<Offer>::iterator p;
+        vector<Offer*>::iterator p;
         p = std::remove_if(result.begin(), result.end(), CExistElementFunctorByType("banner", EOD_TYPE));
         result.erase(p, result.end());
     }
     //LOG(INFO) << "result.size()=" << result.size();
     //LOG(INFO) << "createVectorOffersByIds end";
-    */
 }
 
 
@@ -699,7 +628,7 @@ void Core::filterOffersSize(vector<Offer*> &result, const Informer& informer)
     vector<Offer*>::iterator p = result.begin();
     while(p != result.end())
     {
-        if (checkBannerSize(*p, informer))
+        if (checkBannerSize(*p))
         {
             p++;
         }
@@ -716,11 +645,11 @@ void Core::filterOffersSize(vector<Offer*> &result, const Informer& informer)
 /**
  * Проверяет соответствие размера баннера и размера банероместа РБ
  */
-bool Core::checkBannerSize(const Offer *offer, const Informer& informer)
+bool Core::checkBannerSize(const Offer *offer)
 {
     if (offer->isBanner)
     {
-        if (offer->width != informer.width_banner || offer->height != informer.height_banner)
+        if (offer->width != informer->width_banner || offer->height != informer->height_banner)
         {
             return false;
         }
@@ -746,7 +675,7 @@ bool Core::checkBannerSize(const Offer *offer, const Informer& informer)
 	если выбранных тизеров достаточно для РБ, показываем.
 	если нет - добираем из исходного массива стоящие слева тизеры.
  */
-void Core::RISAlgorithm(vector<Offer*> &result, const Params &params, bool &clean)
+void Core::RISAlgorithm(vector<Offer*> &result, const Params &params)
 {
     if(result.size() < 5)
         return;
@@ -770,10 +699,11 @@ void Core::RISAlgorithm(vector<Offer*> &result, const Params &params, bool &clea
         //Так как у нас осталась одна социалка
         //заставляем очиститься историю показов пользователей
         //если товаров будет хватать, то происходить это будет редко
-        clean = true;
+        hm->clean = true;
     }
+
     //если первый элемент баннер, возвращаем баннер.
-    if ( result[0]->isBanner && !result[0]->social)
+    if(result[0]->isBanner && !result[0]->social)
     {
         //NON social banner
         p = result.begin();
@@ -781,7 +711,8 @@ void Core::RISAlgorithm(vector<Offer*> &result, const Params &params, bool &clea
         result.erase(p, result.end());
         return;
     }
-    if ( result[0]->isBanner && result[0]->social && result.size()==1)
+
+    if(result[0]->isBanner && result[0]->social && result.size()==1)
     {
         //social banner
         p = result.begin();
@@ -827,7 +758,7 @@ void Core::RISAlgorithm(vector<Offer*> &result, const Params &params, bool &clea
             result.push_back(result[c]);
             c++;
         }
-        clean = true;
+        hm->clean = true;
     }
     else//teasersCount > informer->capacity
     {
@@ -903,7 +834,7 @@ void Core::RISAlgorithm(vector<Offer*> &result, const Params &params, bool &clea
         passage = 0;
         while ((passage <  informer->capacity) && ((int)newResult.size() < informer->capacity))
         {
-            clean = true;
+            hm->clean = true;
             p = result.begin();
             camps.clear();
             //LOG(INFO) << "second -";
