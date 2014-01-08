@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1388392311 source:/home/alex/Projects/worker/BaseCore.cpp
+1389186277 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -847,6 +847,7 @@
 	"Informer.h"
 	"Campaign.h"
 	"Offer.h"
+	"Config.h"
 
 1386588626 /home/alex/Projects/worker/DB.h
 	<mongo/client/connpool.h>
@@ -860,7 +861,7 @@
 	<stdarg.h>
 	<pthread.h>
 
-1386588626 /home/alex/Projects/worker/BaseCore.h
+1389185998 /home/alex/Projects/worker/BaseCore.h
 	<list>
 	<vector>
 	<map>
@@ -939,7 +940,7 @@
 	"Campaign.h"
 	"Informer.h"
 
-1386588626 /home/alex/Projects/worker/KompexSQLiteException.h
+1389182040 /home/alex/Projects/worker/KompexSQLiteException.h
 	<map>
 	<string>
 	<sstream>
@@ -950,7 +951,7 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1388749334 source:/home/alex/Projects/worker/CgiService.cpp
+1389186299 source:/home/alex/Projects/worker/CgiService.cpp
 	"DB.h"
 	<boost/algorithm/string.hpp>
 	"Log.h"
@@ -972,10 +973,11 @@
 	"BaseCore.h"
 	"Config.h"
 
-1386837411 /home/alex/Projects/worker/Config.h
+1389186524 /home/alex/Projects/worker/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
+	"DataBase.h"
 
 1386588626 /home/alex/Projects/worker/utils/UrlParser.h
 	<map>
@@ -988,7 +990,7 @@
 	<GeoIPCity.h>
 	<string>
 
-1388762746 /home/alex/Projects/worker/Core.h
+1389186336 /home/alex/Projects/worker/Core.h
 	<list>
 	<vector>
 	<map>
@@ -1032,7 +1034,7 @@
 	<cstring>
 	<iostream>
 
-1388768380 /home/alex/Projects/worker/HistoryManager.h
+1389186583 /home/alex/Projects/worker/HistoryManager.h
 	<string>
 	<vector>
 	<map>
@@ -1041,6 +1043,7 @@
 	"Offer.h"
 	"RedisClient.h"
 	"Params.h"
+	"SQLiteTmpTable.h"
 
 1387195251 /home/alex/Projects/worker/DBAccessor/DBWrapper.h
 	"DBConnectionParams.h"
@@ -1133,7 +1136,7 @@
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 
-1386837437 source:/home/alex/Projects/worker/Config.cpp
+1389186183 source:/home/alex/Projects/worker/Config.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -1142,7 +1145,7 @@
 	"Config.h"
 	<assert.h>
 
-1388767523 source:/home/alex/Projects/worker/Core.cpp
+1389192444 source:/home/alex/Projects/worker/Core.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -1169,7 +1172,7 @@
 	<list>
 	<stdlib.h>
 
-1386924815 source:/home/alex/Projects/worker/DataBase.cpp
+1389182040 source:/home/alex/Projects/worker/DataBase.cpp
 	<iostream>
 	<algorithm>
 	<signal.h>
@@ -1216,7 +1219,7 @@
 	"../Log.h"
 	"XXXSearcher.h"
 
-1388767691 source:/home/alex/Projects/worker/HistoryManager.cpp
+1389187238 source:/home/alex/Projects/worker/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -1338,7 +1341,7 @@
 	"Config.h"
 	"Log.h"
 
-1388767941 /home/alex/Projects/worker/include/RedisClient.h
+1389186616 /home/alex/Projects/worker/include/RedisClient.h
 	<string>
 	<vector>
 	<list>
@@ -1346,9 +1349,22 @@
 
 1387810444 /home/alex/Projects/libredis//libredis/redis.h
 
-1388767827 source:/home/alex/Projects/worker/src/RedisClient.cpp
+1389192328 source:/home/alex/Projects/worker/src/RedisClient.cpp
 	<strings.h>
 	<string.h>
 	"RedisClient.h"
+	"Log.h"
+	"Config.h"
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+
+1389015971 /home/alex/Projects/worker/include/SQLiteTmpTable.h
+	<string>
+	"KompexSQLiteStatement.h"
+
+1389185130 source:/home/alex/Projects/worker/src/SQLiteTmpTable.cpp
+	<boost/lexical_cast.hpp>
+	"SQLiteTmpTable.h"
+	"KompexSQLiteException.h"
 	"Log.h"
 

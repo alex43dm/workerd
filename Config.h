@@ -6,6 +6,8 @@
 
 #include <tinyxml.h>
 
+#include "DataBase.h"
+
 class Config
 {
 public:
@@ -55,6 +57,7 @@ public:
     std::string db_dump_path_;
     std::string db_geo_csv_;
 
+    DataBase *pDb;
 
     static Config* Instance();
     bool LoadConfig(const std::string fName);

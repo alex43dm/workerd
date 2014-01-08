@@ -254,7 +254,7 @@ void *CgiService::Serve(void *data)
 {
     CgiService *csrv = (CgiService*)data;
 
-    Core *core = new Core(csrv->bcore->pDb);
+    Core *core = new Core();
     core->set_server_ip(csrv->server_ip_);
     core->set_redirect_script(csrv->redirect_script_);
 

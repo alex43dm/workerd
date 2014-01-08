@@ -34,7 +34,8 @@ INNER JOIN (
             SELECT geo.id_cam AS id
             FROM geoTargeting AS geo
             INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND (reg.cid='%s' OR reg.rid='%s')
-) AS c ON ca.id=c.id
-WHERE ofrs.id NOT IN(%s)
-ORDER BY ofrs.rating
+) AS c ON ca.id=c.id 
+LEFT JOIN tmp%ld AS deph ON ofrs.id=deph.id 
+WHERE deph.id IS NULL 
+ORDER BY ofrs.rating 
 LIMIT 200;

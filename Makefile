@@ -44,7 +44,7 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/utils/Cookie.o $(OBJDIR_DEBUG)/utils/base64.o $(OBJD
 
 OBJ_RELEASE = $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/SearchEngines.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/src/json.o $(OBJDIR_RELEASE)/src/RedisClient.o $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/Offer.o $(OBJDIR_RELEASE)/UserHistory.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o
 
-all: release
+all: debug release
 
 clean: clean_debug clean_release
 

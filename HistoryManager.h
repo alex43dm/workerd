@@ -11,6 +11,7 @@
 #include "Offer.h"
 #include "RedisClient.h"
 #include "Params.h"
+#include "SQLiteTmpTable.h"
 
 typedef enum
 {
@@ -51,6 +52,7 @@ public:
 
     bool setDeprecatedOffers(const std::vector<Offer*> &items);
     bool getDeprecatedOffers(std::string &);
+    bool getDeprecatedOffers();
 
     bool getShortTerm(std::list<std::string> &r)
     {
@@ -81,6 +83,7 @@ private:
     std::string key;
     Module *module;
     std::map<HistoryType, RedisClient *> history_archive;
+    SQLiteTmpTable *tmpTable;
 
     void updateShortHistory(const std::string & query);
     void updateContextHistory(const std::string & query);

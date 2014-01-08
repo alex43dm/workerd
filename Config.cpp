@@ -258,6 +258,8 @@ bool Config::LoadConfig(const std::string fName)
         }
     }
 
+    pDb = new DataBase(true);
+
     mIsInited = true;
     return mIsInited;
 }
@@ -270,6 +272,8 @@ Config::~Config()
         delete mDoc;
         mDoc = NULL;
     }
+
+    delete pDb;
 
     mInstance = NULL;
 }

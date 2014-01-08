@@ -14,7 +14,6 @@
 class BaseCore
 {
 public:
-    DataBase *pDb;
     /** \brief  Создаёт ядро.
      *
      * Производит все необходимые инициализации:

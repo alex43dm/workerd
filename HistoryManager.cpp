@@ -114,6 +114,18 @@ bool HistoryManager::initDB()
         return true;
     }
 
+    bool HistoryManager::getDeprecatedOffers()
+    {
+
+        if(!history_archive[ViewHistory]->getRange(key))
+        {
+            Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
+            return false;
+        }
+
+        return true;
+    }
+
     /** \brief Получение истории пользователя.
      *
      * \param params - параметры запроса.

@@ -16,6 +16,7 @@
 #include "Informer.h"
 #include "Campaign.h"
 #include "Offer.h"
+#include "Config.h"
 
 using std::list;
 using std::vector;
@@ -30,7 +31,6 @@ using namespace Kompex;
 BaseCore::BaseCore()
     : amqp_initialized_(false), amqp_down_(true), amqp_(0)
 {
-    pDb = new DataBase(true);
     LoadAllEntities();
     InitMessageQueue();
     InitMongoDB();
@@ -40,7 +40,6 @@ BaseCore::BaseCore()
 BaseCore::~BaseCore()
 {
     delete amqp_;
-    delete pDb;
 }
 
 bool BaseCore::ProcessMQ()
@@ -170,24 +169,24 @@ void BaseCore::LoadAllEntities()
     Benchmark bench("All entities reloaded");
 
 
-    Informer::loadAll(pDb->pDatabase);
+    Informer::loadAll(Config::Instance()->pDb->pDatabase);
     //LOG(INFO) << "Загрузили все информеры.\n";
-    Campaign::loadAll(pDb->pDatabase);
+    Campaign::loadAll(Config::Instance()->pDb->pDatabase);
     //LOG(INFO) << "Загрузили все кампании.\n";
-    Offer::loadAll(pDb->pDatabase);
+    Offer::loadAll(Config::Instance()->pDb->pDatabase);
     //LOG(INFO) << "Загрузили все предложения.\n";
     //pDb->pDatabase->MoveDatabaseToMemory();
     // Проверяем, нет ли кампаний с 0 предложений
     // Сбрасываем кеш
-    pDb->postDataLoad();
+    Config::Instance()->pDb->postDataLoad();
 
-    pDb->indexRebuild();
+    Config::Instance()->pDb->indexRebuild();
 }
 
 
 void BaseCore::ReloadAllEntities()
 {
-    pDb->postDataLoad();
+    Config::Instance()->pDb->postDataLoad();
 }
 
 /** \brief  Инициализация очереди сообщений (AMQP).

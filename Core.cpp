@@ -33,13 +33,14 @@ int Core::request_processed_ = 0;
 int Core::offer_processed_ = 0;
 int Core::social_processed_ = 0;
 
-Core::Core(DataBase *_pDb) :
-    redirect_script_("/redirect"),
-    pDb(_pDb)
+Core::Core() :
+    redirect_script_("/redirect")
 {
     tid = pthread_self();
 
     cmd = new char[CMD_SIZE];
+
+    pDb = Config::Instance()->pDb;
 
     pStmtOfferStr = pDb->getSqlFile("requests/01.sql");
 /*
@@ -61,21 +62,26 @@ Core::Core(DataBase *_pDb) :
     }
     catch(SQLiteException &ex)
     {
-        Log::err("DB error: pStmtInformer: %s %s", ex.GetString().c_str(), pDb->getSqlFile("requests/02.sql").c_str());
+        Log::err("DB error: pStmtInformer: %s %s", ex.GetString().c_str(),
+                 pDb->getSqlFile("requests/02.sql").c_str());
         exit(1);
     }
 
-
+    Kompex::SQLiteStatement *p;
     try
     {
-        pStmtOfferDefault = new SQLiteStatement(pDb->pDatabase);
-        pStmtOfferDefault->Sql(pDb->getSqlFile("requests/default.sql"));
+        p = new SQLiteStatement(pDb->pDatabase);
+        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE TABLE IF NOT EXISTS tmp%ld(id INT8 NOT NULL);",tid);
+        p->SqlStatement(cmd);
+        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE INDEX IF NOT EXISTS idx_tmp%ld_id ON tmp%ld(id);",tid,tid);
+        p->SqlStatement(cmd);
     }
     catch(SQLiteException &ex)
     {
-        Log::err("DB error: pStmtOfferDefault: %s: %s", ex.GetString().c_str(), pDb->getSqlFile("requests/default.sql").c_str());
+        Log::err("DB error: create tmp table: %s", ex.GetString().c_str());
         exit(1);
     }
+    delete p;
 
     hm = new HistoryManager();
     hm->initDB();
@@ -93,10 +99,6 @@ Core::~Core()
     pStmtOffer->FreeQuery();
     delete pStmtOffer;
 
-    pStmtOfferDefault->FreeQuery();
-    delete pStmtOfferDefault;
-
-    delete pDb;
     delete hm;
 }
 
@@ -224,6 +226,20 @@ void Core::ProcessSaveResults(const Params &params, const vector<Offer*> &items)
     {
         //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
         hm->updateUserHistory(items, params);
+
+        Kompex::SQLiteStatement *p;
+        try
+        {
+            p = new SQLiteStatement(pDb->pDatabase);
+            std::string sql("DELETE FROM tmp" + boost::lexical_cast<std::string>(tid) + ";");
+            p->SqlStatement(sql);
+        }
+        catch(SQLiteException &ex)
+        {
+            Log::err("DB error: create tmp table: %s", ex.GetString().c_str());
+            exit(1);
+        }
+        delete p;
 
 //        markAsShown(items, params, shortTerm, longTerm, contextTerm);
     }
@@ -362,10 +378,9 @@ bool Core::getOffers(const Params &params, std::vector<Offer*> &result)
     Kompex::SQLiteStatement *pStmt;
 
 //    Log::info("getOffers start");
-    std::string depOffers;
-    hm->getDeprecatedOffers(depOffers);
+    hm->getDeprecatedOffers();
 
-    //Log::info("[%ld]get history size: %s %d",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str(), depOffers.size());
+    //Log::info("[%ld]get history size: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
 
     try
     {
@@ -377,7 +392,7 @@ bool Core::getOffers(const Params &params, std::vector<Offer*> &result)
                               informer->id,
                               params.getCountry().c_str(),
                               params.getRegion().c_str(),
-                              depOffers.c_str());
+                              tid);
         pStmt->Sql(cmd);
     }
     catch(SQLiteException &ex)
