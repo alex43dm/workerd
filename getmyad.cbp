@@ -77,9 +77,6 @@
 		<Unit filename="Core.h" />
 		<Unit filename="DB.cpp" />
 		<Unit filename="DB.h" />
-		<Unit filename="DBAccessor/DBConnectionParams.h" />
-		<Unit filename="DBAccessor/DBWrapper.h" />
-		<Unit filename="DBAccessor/fmacros.h" />
 		<Unit filename="DataBase.cpp" />
 		<Unit filename="DataBase.h" />
 		<Unit filename="HistoryManager.cpp" />

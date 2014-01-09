@@ -246,6 +246,7 @@ private:
     int teasersCount;
 
     char *cmd;
+    int countDown;//for recursive
 };
 
 

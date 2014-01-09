@@ -160,6 +160,8 @@ std::string Core::Process(const Params &params, vector<Offer*> &items)
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = microsec_clock::local_time();
 
+    countDown = 3;
+
     hm->setKey(params.getUserKey());
 
     informer = getInformer(params);
@@ -264,8 +266,8 @@ Informer *Core::getInformer(const Params &params)
                               pStmtInformer->GetColumnInt64(5)
                              );
     }
+    //reset moved to after response function
     //pStmtInformer->Reset();
-    //pStmtInformer->FreeQuery();
     return nullptr;
 }
 /**
@@ -444,7 +446,12 @@ bool Core::getOffers(const Params &params, std::vector<Offer*> &result)
 
     delete pStmt;
     //Log::info("[%ld]get getoffer done: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
-
+    if(result.size() < 3 && countDown-- > 0)
+    {
+        hm->clearDeprecatedOffers();
+        Core::getOffers(params, result);
+        Log::info("clear view history: %d", countDown);
+    }
     return true;
 }
 

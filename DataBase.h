@@ -28,6 +28,7 @@ public:
     void indexRebuild();
     bool runSqlFile(const std::string &file);
     std::string getSqlFile(const std::string &file);
+    void exec(const std::string &sql);
 protected:
 
 private:

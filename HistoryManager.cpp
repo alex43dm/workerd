@@ -61,6 +61,11 @@ bool HistoryManager::initDB()
         return true;
     }
 
+    bool HistoryManager::clearDeprecatedOffers()
+    {
+        return history_archive[ViewHistory]->del(key);
+    }
+
     bool HistoryManager::setDeprecatedOffers(const std::vector<Offer*> &items)
     {
         if(clean)

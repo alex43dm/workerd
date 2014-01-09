@@ -75,33 +75,7 @@ bool DataBase::openDb()
 
     return true;
 }
-/*
-bool DataBase::insCampaing(CampaignData *data)
-{
-    char buf[8192];
 
-    try
-    {
-        pStmt->BeginTransaction();
-
-        for(unsigned long i = 0; i < len; i++)
-        {
-            bzero(buf,sizeof(buf));
-            snprintf(buf,sizeof(buf),
-                     "INSERT INTO Campaign(id,guid,title,project,social,valid) VALUES(%lu,'%s','%s','%s',%d,%d)",
-                     );
-            pStmt->SqlStatement(buf);
-        }
-
-        pStmt->CommitTransaction();
-    }
-    catch(SQLiteException &ex)
-    {
-        printf("DataBase DB error: %s", ex.GetString().c_str());
-    }
-    return true;
-}
-*/
 bool DataBase::gen(int from, unsigned int len)
 {
     char buf[2048];
@@ -276,4 +250,16 @@ std::string DataBase::getSqlFile(const std::string &file)
     free(buf);
 
     return retString;
+}
+
+void DataBase::exec(const std::string &sql)
+{
+   try
+    {
+        pStmt->SqlStatement(sql);
+    }
+    catch(SQLiteException &ex)
+    {
+        Log::err("DB error: cmd: %s msg: %s", sql.c_str(), ex.GetString().c_str());
+    }
 }

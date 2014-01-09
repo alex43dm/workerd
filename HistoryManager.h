@@ -53,6 +53,7 @@ public:
     bool setDeprecatedOffers(const std::vector<Offer*> &items);
     bool getDeprecatedOffers(std::string &);
     bool getDeprecatedOffers();
+    bool clearDeprecatedOffers();
 
     bool getShortTerm(std::list<std::string> &r)
     {

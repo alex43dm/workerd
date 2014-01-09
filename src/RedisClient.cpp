@@ -3,6 +3,9 @@
 
 #include "RedisClient.h"
 #include "Log.h"
+#include "Config.h"
+#include "KompexSQLiteStatement.h"
+#include "KompexSQLiteException.h"
 
 #define CMD_SIZE 4096
 
@@ -119,6 +122,73 @@ bool RedisClient::getRange(const std::string &key,
 
     Batch_free(batch);
 
+    return true;
+}
+
+bool RedisClient::getRange(const std::string &key)
+{
+    int cnt = 0;
+    Batch *batch;
+    Executor *executor;
+    pthread_t tid;
+    Kompex::SQLiteStatement *pStmt;
+
+    tid = pthread_self();
+
+    bzero(cmd,CMD_SIZE);
+    snprintf(cmd, CMD_SIZE, "ZREVRANGE %s 0 -1\r\n", key.c_str());
+
+    batch = Batch_new();
+    Batch_write(batch, cmd, strlen(cmd), 1);
+
+    executor = Executor_new();
+    Executor_add(executor, connection, batch);
+    int rr = Executor_execute(executor, timeOutMSec);
+    Executor_free(executor);
+    if(rr <= 0)
+    {
+        Log::err("redis cmd false: %s",cmd);
+        Batch_free(batch);
+        return false;
+    }
+    else
+    {
+        ReplyType reply_type;
+        char *reply_data;
+        size_t reply_len;
+        int level;
+
+        pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+        sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO tmp%ld(id) VALUES(@id);",tid);
+        pStmt->Sql(cmd);
+
+        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        {
+            if(RT_BULK == reply_type)
+            {
+                    try
+                    {
+                        pStmt->BindInt64(1, strtol(reply_data,NULL,10));
+                        pStmt->Execute();
+                        pStmt->Reset();
+                        cnt++;
+                    }
+                    catch(Kompex::SQLiteException &ex)
+                    {
+                        Log::err("SQLiteTmpTable::insert(%s) error: %s", ex.GetString().c_str());
+                    }
+
+            }
+        }
+    }
+
+    Batch_free(batch);
+    delete pStmt;
+
+    sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_tmp%ld_id;",tid);
+    Config::Instance()->pDb->exec(cmd);
+
+//    Log::gdb("loaded %d", cnt);
     return true;
 }
 

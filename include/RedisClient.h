@@ -34,6 +34,8 @@ class RedisClient
               int stop,
               std::list<std::string> &ret);
 
+        bool getRange(const std::string &key);
+
         bool exists(const std::string &key);
         long int zrank(const std::string &key, long id);
         bool zadd(const std::string &key, int64_t score, long id);
