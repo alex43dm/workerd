@@ -49,11 +49,11 @@ public:
      *
      * \param params    Параметры запроса.
      */
-    std::string Process(const Params &params, std::vector<Offer*>&);
+    std::string Process(const Params &params, Offer::Map&);
 
-    void ProcessSaveResults(const Params &params, const std::vector<Offer*> &items);
+    void ProcessSaveResults(const Params &params, const Offer::Map &items);
 
-    bool getOffers(const Params &params, std::vector<Offer*> &result);
+    bool getOffers(const Params &params, Offer::Map &result);
 
     Informer *getInformer(const Params &params);
 
@@ -69,7 +69,7 @@ public:
      * \see RISAlgorithm
      * \see createVectorOffersByIds
      */
-    std::vector<Offer*> getOffersRIS(const std::list<std::pair<std::pair<std::string, float>,
+    Offer::Map getOffersRIS(const std::list<std::pair<std::pair<std::string, float>,
                                     std::pair<std::string, std::pair<std::string, std::string>>>> &offersIds,
                                     const Params &params, const std::list<Campaign> &camps,
                                     bool &clean, bool &updateShort, bool &updateContext);
@@ -78,15 +78,14 @@ public:
 
 
     /** \brief  Увеличивает счётчики показов предложений ``items`` */
-    void markAsShown(const std::vector<Offer*> &items,
-                     const Params &params, std::list<std::string> &shortTerm,
+    void markAsShown(const Offer::Map &,const Params &params, std::list<std::string> &shortTerm,
                      std::list<std::string> &longTerm, std::list<std::string> &contextTerm);
 
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
-    std::string OffersToHtml(const std::vector<Offer*> &items, const std::string &url) const;
+    std::string OffersToHtml(const Offer::Map &items, const std::string &url) const;
 
     /** \brief  Возвращает json-представление предложений ``items`` */
-    std::string OffersToJson(const std::vector<Offer*> &items) const;
+    std::string OffersToJson(const Offer::Map &items) const;
 
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
@@ -124,30 +123,6 @@ public:
     }
 
 private:
-    std::string RequestDebugInfo(const Params &params) const;
-
-    /** \brief  Возвращает в параметре \a out_campaigns список кампаний,
-     *          подходящих под параметры \a params.
-     */
-    void getCampaigns(const Params &params,
-                      std::list<Campaign> &out_campaigns) const;
-
-    /** \brief  Возвращает в параметре \a out_campaigns список кампаний,
-     *          подходящих под параметры \a params.
-     */
-    void getSocCampaigns(const Params &params,
-                         std::list<Campaign> &out_campaigns) const;
-
-    /** \brief  Возвращает в параметре \a out_campaigns список кампаний,
-     *          подходящих под параметры \a params без учета привязки к РБ.
-     */
-    void getAllGeoCampaigns(const Params &params,
-                            std::list<Campaign> &out_campaigns) const;
-
-    /** \brief  Возвращает одно предложение, которое можно добавить к
-     *          \a result
-     */
-
     /// Счётчик обработанных запросов
     static int request_processed_;
 
@@ -168,15 +143,6 @@ private:
     ///Скрипт перенаправления запроса при клике на рекламном предложении
     std::string redirect_script_;
 
-
-    /** \brief Создание вектора РП по списку их идентификаторов, полученного в результате обращения к индексу. */
-    void createVectorOffersByIds(const std::list<std::pair<std::pair<std::string, float>,
-                                 std::pair<std::string, std::pair<std::string, std::string>>>> &offersIds,
-                                  std::vector<Offer*> &result,
-                                  const std::list<Campaign> &camps,
-                                  const Params& params,
-                                  bool &updateShort, bool &updateContext);
-
     /** \brief Удаление из вектора result баннеров, не подходящих по размеру для информера с идентификатором informer.
      *
      * @param result Вектор РП, которые нужно проверить на совместимость по размерам с инфомером informer.
@@ -184,7 +150,7 @@ private:
      *
      * Добавлено RealInvest Soft.
      */
-    void filterOffersSize(std::vector<Offer*> &result, const std::string& informerId);
+    //void filterOffersSize(std::map<long,Offer*> &result, const std::string& informerId);
 
     /** \brief Удаление из вектора result баннеров, не подходящих по размеру для информера informer.
      *
@@ -193,16 +159,7 @@ private:
      *
      * Добавлено RealInvest Soft.
      */
-    void filterOffersSize(std::vector<Offer*> &result, const Informer& informer);
-
-    /** \brief Проверка принадлежности РП offer хотя бы одной кампании из списка camps.
-     **
-     * Добавлено RealInvest Soft.
-     * @param offer РП, которое нужно проверить.
-     * @param camps Список кампаний, на принадлежность к которым будет проверяться РП offer.
-     * @return true, если РП offer принадлежит хотя бы одной кампании из списка camps.
-     */
-    bool isOfferInCampaigns(const Offer& offer, const std::list<Campaign>& camps);
+    //void filterOffersSize(std::map<long,Offer*> &result, const Informer& informer);
 
     /** \brief Проверка размеров РП.
       *
@@ -216,16 +173,7 @@ private:
     bool checkBannerSize(const Offer *offer);
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(std::vector<Offer*> &result, const Params &params);
-
-    /** \brief  Вычисление среднего рейтинга у РП типа typeOfferStr.
-
-     \param vectorOffers Вектор РП, среди которых будет поиск тех, у которых нужно подсчитать средний рейтинг.
-     \param typeOfferStr Тип РП, среди которых нужно подсчитать средний рейтинг.
-
-     Добавлено RealInvest Soft.
-     */
-    float mediumRating(const std::vector<Offer*>& vectorOffers, Offer::Type);
+    void RISAlgorithm(Offer::Map &result, const Params &params);
 
     bool isSocial (Offer& i);
 
@@ -247,6 +195,7 @@ private:
 
     char *cmd;
     int countDown;//for recursive
+    float teasersMediumRating;
 };
 
 

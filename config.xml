@@ -113,7 +113,7 @@
     <!--путь к файлу сокета-->
     <socket_path>/tmp/workerd.sock</socket_path>
     <!--количество ниток на обработку-->
-    <children>100</children>
+    <children>90</children>
     <!--путь к фалу базы данных-->
     <!--dbpath>mem.db</dbpath-->
     <dbpath>:memory:</dbpath>

@@ -8,9 +8,6 @@
 #include <vector>
 #include <list>
 #include <stdlib.h>
-using namespace std;
-
-
 
 
 /**
@@ -27,7 +24,6 @@ bool inverseOrderCompare(const Offer &a, const Offer &b)
     return a.rating > b.rating;
 }
 
-
 /**
 	добавлено RealInvest Soft
 	функции поиска строки в списке или векторе
@@ -39,6 +35,7 @@ bool isStrInList(const string& str, const list<string>& l)
     it = std::find(l.begin(),l.end(), str);
     return it != l.end();
 }
+
 bool isStrInVector(const string& str, const vector<string>& v)
 {
     vector<string>::const_iterator it = v.begin();

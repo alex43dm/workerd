@@ -14,11 +14,11 @@ public:
     std::string mongo_main_host_;
     std::string mongo_main_db_;
     std::string mongo_main_set_;
-    std::string mongo_main_slave_ok_;
+    bool mongo_main_slave_ok_;
     std::string mongo_log_host_;
     std::string mongo_log_db_;
     std::string mongo_log_set_;
-    std::string mongo_log_slave_ok_;
+    bool mongo_log_slave_ok_;
     std::string server_ip_;
     std::string redirect_script_;
     std::string geocity_path_;
@@ -34,12 +34,12 @@ public:
     std::string redis_category_port_;
     std::string redis_retargeting_host_;
     std::string redis_retargeting_port_;
-    std::string range_query_;
-    std::string range_short_term_;
-    std::string range_long_term_;
-    std::string range_context_;
-    std::string range_context_term_;
-    std::string range_on_places_;
+    float range_query_;
+    float range_short_term_;
+    float range_long_term_;
+    float range_context_;
+    float range_context_term_;
+    float range_on_places_;
     std::string shortterm_expire_;
     std::string views_expire_;
     std::string context_expire_;
@@ -56,6 +56,8 @@ public:
     std::string cookie_path_;
     std::string db_dump_path_;
     std::string db_geo_csv_;
+    std::string sphinx_host_;
+    int         sphinx_port_;
 
     DataBase *pDb;
 

@@ -185,8 +185,18 @@ bool RedisClient::getRange(const std::string &key)
     Batch_free(batch);
     delete pStmt;
 
-    sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_tmp%ld_id;",tid);
-    Config::Instance()->pDb->exec(cmd);
+    Kompex::SQLiteStatement *p;
+    try
+    {
+        p = new SQLiteStatement(Config::Instance()->pDb->pDatabase);
+        sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_tmp%ld_id;",tid);
+        p->SqlStatement(cmd);
+    }
+    catch(SQLiteException &ex)
+    {
+        Log::err("DB error: REINDEX: %s", ex.GetString().c_str());
+    }
+    delete p;
 
 //    Log::gdb("loaded %d", cnt);
     return true;

@@ -18,18 +18,22 @@ typedef unsigned long long	sphinx_uint64_t;
 class Offer
 {
 public:
-    typedef std::vector<Offer*>::iterator it;
+    typedef std::map <const long,Offer*> Map;
+    typedef std::map <const long,Offer*>::iterator it;
+    typedef std::map <const long,Offer*>::const_iterator cit;
+    typedef std::pair<const long,Offer*> Pair;
+
     typedef enum{ banner, teazer, unknown } Type;
     /// Структура для хранения информации о рекламном предложении.
         std::string id;             ///< ID предложения
-        sphinx_int64_t id_int;                 ///< ID предложения
+        long long id_int;                 ///< ID предложения
         std::string title;          ///< Заголовок
         std::string price;          ///< Цена
         std::string description;    ///< Описание
         std::string url;            ///< URL перехода на предложение
         std::string image_url;      ///< URL картинки
         std::string swf;            ///< URL Flash
-        std::string campaign_id;    ///< ID кампании, к которой относится предложение
+        long long campaign_id;    ///< ID кампании, к которой относится предложение
         bool valid;                 ///< Является ли запись действительной.
         bool isOnClick;             ///< Реклама по кликам или показам
         Type type;			///< тип РП
@@ -37,6 +41,7 @@ public:
         std::string branch;			///< ветка алгоритма по которой было выбрано РП
         std::string matching;       ///< Фраза соответствия
         float rating;				///< рейтинг РП
+        bool retargeting;
         int uniqueHits;				///< максимальное количество показов одному пользователю
         int height;					///< высота РП (имеет значение для баннеров)
         int width;					///< ширина РП (имеет значение для баннеров)
@@ -46,22 +51,22 @@ public:
         std::string token;          ///< Токен для проверки ссылки
         std::string redirect_url;   ///< Cсылка перенаправления
 
-
     Offer(){};
 
     Offer(const std::string &id,
-          long id_int,
+          long long id_int,
           const std::string &title,
           const std::string &price,
           const std::string &description,
           const std::string &url,
           const std::string &image_url,
           const std::string &swf,
-          const std::string &campaign_id,
+          long long campaign_id,
           bool valid,
           bool isOnClick,
           int type,
           float rating,
+          bool retargeting,
           int uniqueHits,
           int height,
           int width);
@@ -95,6 +100,7 @@ public:
     void gen();
 
     std::string toJson() const;
+    bool setBranch(const std::string &qbranch);
 };
 
 class OfferExistByType
@@ -103,9 +109,9 @@ class OfferExistByType
 public:
     OfferExistByType(Offer::Type t):type(t){}
 
-    bool operator()(const Offer *temp)
+    bool operator()(const Offer::Pair &temp)
     {
-            return temp->type == type;
+            return temp.second->type == type;
     }
 };
 

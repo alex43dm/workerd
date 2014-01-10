@@ -6,6 +6,7 @@ categoryId INT8,
 campaignId INT8,
 accountId VARCHAR(35),
 rating DECIMAL(5,2),
+retargeting SMALLINT,
 image VARCHAR(2048),
 height SMALLINT,
 width SMALLINT,
@@ -29,4 +30,3 @@ CREATE INDEX IF NOT EXISTS idx_Offer_guid ON Offer (guid);
 CREATE INDEX IF NOT EXISTS idx_Offer_rating ON Offer (rating);
 CREATE INDEX IF NOT EXISTS idx_Offer_campaignId ON Offer (campaignId);
 CREATE INDEX IF NOT EXISTS idx_Offer_id_rating ON Offer (id,rating);
-

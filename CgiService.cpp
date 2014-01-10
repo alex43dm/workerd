@@ -68,50 +68,8 @@ CgiService::CgiService(int argc, char *argv[])
         cfg->server_socket_path_ = sock_path;
     }
 
-    mongo_main_host_ = cfg->mongo_main_host_;
-    mongo_main_db_ = cfg->mongo_main_db_;
-    mongo_main_set_ = cfg->mongo_main_set_;
-    mongo_main_slave_ok_ = cfg->mongo_main_slave_ok_=="false" ? false : true;
-
-    mongo_log_host_ = cfg->mongo_log_host_;
-    mongo_log_db_ = cfg->mongo_log_db_;
-    mongo_log_set_ = cfg->mongo_log_set_;
-    mongo_log_slave_ok_ = cfg->mongo_log_slave_ok_ == "false" ? false : true;
-
-    server_ip_ = cfg->server_ip_;
-
-    redirect_script_ = cfg->redirect_script_;
-
     if (!GeoCity(cfg->geocity_path_.c_str()))
         Log::err("City database not found! City targeting will be disabled.");
-
-    redis_short_term_history_host_ = cfg->redis_short_term_history_host_;
-    redis_short_term_history_port_ = cfg->redis_short_term_history_port_;
-    redis_long_term_history_host_ = cfg->redis_long_term_history_host_;
-    redis_long_term_history_port_ = cfg->redis_long_term_history_port_;
-    redis_user_view_history_host_ = cfg->redis_user_view_history_host_;
-    redis_user_view_history_port_ = cfg->redis_user_view_history_port_;
-    redis_page_keywords_host_ = cfg->redis_page_keywords_host_;
-    redis_page_keywords_port_ = cfg->redis_page_keywords_port_;
-    redis_category_host_ = cfg->redis_category_host_;
-    redis_category_port_ = cfg->redis_category_port_;
-    redis_retargeting_host_ = cfg->redis_retargeting_host_;
-    redis_retargeting_port_ = cfg->redis_retargeting_port_;
-
-    range_query_ = atof(cfg->range_query_.c_str());
-    range_short_term_ = atof(cfg->range_short_term_.c_str());
-    range_long_term_ = atof(cfg->range_long_term_.c_str());
-    range_context_ = atof(cfg->range_context_.c_str());
-    range_context_term_ = atof(cfg->range_context_term_.c_str());
-    range_on_places_ = atof(cfg->range_on_places_.c_str());
-
-    shortterm_expire_= cfg->shortterm_expire_;//24 hours default
-    views_expire_ = cfg->views_expire_;//24 hours default
-    context_expire_ = cfg->context_expire_;//24 hours default
-
-    folder_offer_ = cfg->folder_offer_;
-    folder_informer_ = cfg->folder_informer_;
-
 
     RISinit();
 
@@ -204,35 +162,37 @@ void CgiService::Response(FCGX_Request *req, const std::string &out, int status,
 
 bool CgiService::ConnectDatabase()
 {
-    Log::info("Connecting to %s / %s", mongo_main_host_.c_str(), mongo_main_db_.c_str());
+    Log::info("Connecting to %s / %s",
+              Config::Instance()->mongo_main_host_.c_str(),
+              Config::Instance()->mongo_main_db_.c_str());
 
     try
     {
-        if (mongo_main_set_.empty())
+        if (Config::Instance()->mongo_main_set_.empty())
             mongo::DB::addDatabase(
-                mongo_main_host_,
-                mongo_main_db_,
-                mongo_main_slave_ok_);
+                Config::Instance()->mongo_main_host_,
+                Config::Instance()->mongo_main_db_,
+                Config::Instance()->mongo_main_slave_ok_);
         else
             mongo::DB::addDatabase(
                 mongo::DB::ReplicaSetConnection(
-                    mongo_main_set_,
-                    mongo_main_host_),
-                mongo_main_db_,
-                mongo_main_slave_ok_);
+                    Config::Instance()->mongo_main_set_,
+                    Config::Instance()->mongo_main_host_),
+                    Config::Instance()->mongo_main_db_,
+                    Config::Instance()->mongo_main_slave_ok_);
 
-        if (mongo_log_set_.empty())
+        if (Config::Instance()->mongo_log_set_.empty())
             mongo::DB::addDatabase( "log",
-                                    mongo_log_host_,
-                                    mongo_log_db_,
-                                    mongo_log_slave_ok_);
+                                    Config::Instance()->mongo_log_host_,
+                                    Config::Instance()->mongo_log_db_,
+                                    Config::Instance()->mongo_log_slave_ok_);
         else
             mongo::DB::addDatabase( "log",
                                     mongo::DB::ReplicaSetConnection(
-                                        mongo_log_set_,
-                                        mongo_log_host_),
-                                    mongo_log_db_,
-                                    mongo_log_slave_ok_);
+                                        Config::Instance()->mongo_log_set_,
+                                        Config::Instance()->mongo_log_host_),
+                                    Config::Instance()->mongo_log_db_,
+                                    Config::Instance()->mongo_log_slave_ok_);
 
         // Проверяем доступность базы данных
         mongo::DB db;
@@ -255,8 +215,8 @@ void *CgiService::Serve(void *data)
     CgiService *csrv = (CgiService*)data;
 
     Core *core = new Core();
-    core->set_server_ip(csrv->server_ip_);
-    core->set_redirect_script(csrv->redirect_script_);
+    core->set_server_ip(Config::Instance()->server_ip_);
+    core->set_redirect_script(Config::Instance()->redirect_script_);
 
     FCGX_Request request;
 
@@ -393,12 +353,13 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
                      .search(url.param("search"))
                      .context(url.param("context"));
 
-        vector<Offer*> items;
-        string result = core->Process(prm, items);
-        Response(req, result, c.to_string());
+        Offer::Map items;
+        std::string result;
 
+        result = core->Process(prm, items);
+        Response(req, result, c.to_string());
         core->ProcessSaveResults(prm, items);
-        items.clear();
+        //items.clear();
     }
     catch (std::exception const &ex)
     {

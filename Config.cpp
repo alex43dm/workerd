@@ -108,7 +108,7 @@ bool Config::LoadConfig(const std::string fName)
                 mongo_main_set_ = mElem->GetText();
 
             if( (mElem = mel->FirstChildElement("slave")) && (mElem->GetText()) )
-                mongo_main_slave_ok_ = mElem->GetText();
+                mongo_main_slave_ok_ = strncmp(mElem->GetText(),"false", 5) > 0 ? false : true;
         }
 
         if( (mel = mels->FirstChildElement("log")) )
@@ -123,7 +123,7 @@ bool Config::LoadConfig(const std::string fName)
                 mongo_log_set_ = mElem->GetText();
 
             if( (mElem = mel->FirstChildElement("slave")) && (mElem->GetText()) )
-                mongo_log_slave_ok_ = mElem->GetText();
+                mongo_log_slave_ok_ = strncmp(mElem->GetText(),"false", 5) > 0 ? false : true;
         }
 
     }
@@ -184,17 +184,17 @@ bool Config::LoadConfig(const std::string fName)
     if( (mElem = mRoot->FirstChildElement("range")) )
     {
         if( (mel = mElem->FirstChildElement("query")) && (mel->GetText()) )
-            range_query_ = mel->GetText();
+            range_query_ = ::atof(mel->GetText());
         if( (mel = mElem->FirstChildElement("short_term")) && (mel->GetText()) )
-            range_short_term_ = mel->GetText();
+            range_short_term_ = ::atof(mel->GetText());
         if( (mel = mElem->FirstChildElement("long_term")) && (mel->GetText()) )
-            range_long_term_ = mel->GetText();
+            range_long_term_ = ::atof(mel->GetText());
         if( (mel = mElem->FirstChildElement("context")) && (mel->GetText()) )
-            range_context_ = mel->GetText();
+            range_context_ = ::atof(mel->GetText());
         if( (mel = mElem->FirstChildElement("context_term")) && (mel->GetText()) )
-            range_context_term_ = mel->GetText();
+            range_context_term_ = ::atof(mel->GetText());
         if( (mel = mElem->FirstChildElement("on_places")) && (mel->GetText()) )
-            range_on_places_ = mel->GetText();
+            range_on_places_ = ::atof(mel->GetText());
 
     }
 

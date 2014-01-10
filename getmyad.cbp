@@ -95,6 +95,7 @@
 		<Unit filename="Log.h" />
 		<Unit filename="Offer.cpp" />
 		<Unit filename="Offer.h" />
+		<Unit filename="Params.cpp" />
 		<Unit filename="Params.h" />
 		<Unit filename="UserHistory.cpp" />
 		<Unit filename="UserHistory.h" />
@@ -129,11 +130,13 @@
 		<Unit filename="db_dump/view/05_01Offers.sql" />
 		<Unit filename="include/GeoRerions.h" />
 		<Unit filename="include/RedisClient.h" />
+		<Unit filename="include/XXXSearcher.h" />
 		<Unit filename="include/json.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="pch.h" />
 		<Unit filename="src/GeoRerions.cpp" />
 		<Unit filename="src/RedisClient.cpp" />
+		<Unit filename="src/XXXSearcher.cpp" />
 		<Unit filename="src/json.cpp" />
 		<Unit filename="utils/Comparators.h" />
 		<Unit filename="utils/Cookie.cpp" />

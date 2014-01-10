@@ -6,18 +6,19 @@
 #include "json.h"
 
 Offer::Offer(const std::string &id,
-             long id_int,
+             long long id_int,
              const std::string &title,
              const std::string &price,
              const std::string &description,
              const std::string &url,
              const std::string &image_url,
              const std::string &swf,
-             const std::string &campaign_id,
+             long long campaign_id,
              bool valid,
              bool isOnClick,
              int type,
              float rating,
+             bool retargeting,
              int uniqueHits,
              int height,
              int width):
@@ -33,6 +34,7 @@ Offer::Offer(const std::string &id,
     isOnClick(isOnClick),
     type(typeFromInt(type)),
     rating(rating),
+    retargeting(retargeting),
     uniqueHits(uniqueHits),
     height(height),
     width(width),
@@ -58,7 +60,7 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
 
 
     bzero(buf,sizeof(buf));
-    snprintf(buf,sizeof(buf),"INSERT INTO Offer(id,guid,campaignId,categoryId,accountId,rating,image,height,width,isOnClick,cost\
+    snprintf(buf,sizeof(buf),"INSERT INTO Offer(id,guid,campaignId,categoryId,accountId,rating,retargeting,image,height,width,isOnClick,cost\
              ,uniqueHits,swf,description,price,url,title,type) VALUES(");
     sz = strlen(buf);
     pData = buf + sz;
@@ -88,13 +90,14 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
 
         bzero(pData,sz);
         sqlite3_snprintf(sz,pData,
-                         "%lli,'%q',%lli,%lli,'%q',%f,'%q',%d,%d,%d,%f,%d,'%q','%q','%q','%q','%q', %d)",
+                         "%lli,'%q',%lli,%lli,'%q',%f,%d,'%q',%d,%d,%d,%f,%d,'%q','%q','%q','%q','%q',%d);",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getField("campaignId_int").numberLong(),
                          x.getField("category").numberLong(),
                          x.getStringField("accountId"),
                          mongo::DB::toFloat(x.getField("rating")),
+                         x.getBoolField("retargeting") ? 1 : 0,
                          x.getStringField("image"),
                          x.getIntField("height"),
                          x.getIntField("width"),
@@ -107,7 +110,7 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
                          x.getStringField("url"),
                          x.getStringField("title"),
                          Offer::typeFromString(x.getStringField("type"))
-                         );
+                        );
 
         try
         {
@@ -136,8 +139,9 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
 std::string Offer::toJson() const
 {
     std::stringstream json;
+
     json << "{" <<
-         "\"id\": \"" << Json::Utils::Escape(id) << "\"," <<
+         "\"id\": \"" << id_int << "\"," <<
          "\"title\": \"" << Json::Utils::Escape(title) << "\"," <<
          "\"description\": \"" << Json::Utils::Escape(description) << "\"," <<
          "\"price\": \"" << Json::Utils::Escape(price) << "\"," <<
@@ -158,4 +162,99 @@ void Offer::gen()
     std::ostringstream s;
     s << std::hex << rand(); // Cлучайное число в шестнадцатиричном
     token = s.str();  // исчислении
+}
+
+
+bool Offer::setBranch(const std::string &qbranch)
+{
+    if (type == Type::banner and isOnClick == false and qbranch == "T1")
+    {
+        branch = "L2";
+        rating = 1000 * rating;
+    }
+    else if (type == Type::banner and isOnClick == false and qbranch == "T2")
+    {
+        branch = "L3";
+        rating = 1000 * rating;
+    }
+    else if (type == Type::banner and isOnClick == false and qbranch == "T3")
+    {
+        branch = "L4";
+        rating = 1000 * rating;
+    }
+    else if (type == Type::banner and isOnClick == false and qbranch == "T4")
+    {
+        branch = "L5";
+        rating = 1000 * rating;
+    }
+    else if (type == Type::banner and isOnClick == false and qbranch == "T5")
+    {
+        branch = "L6";
+        rating = 1000 * rating;
+    }
+    else if (type == Type::banner and isOnClick == true and qbranch == "T1")
+    {
+        branch = "L7";
+    }
+    else if (type == Type::banner and isOnClick == true and qbranch == "T2")
+    {
+        branch = "L8";
+    }
+    else if (type == Type::banner and isOnClick == true and qbranch == "T3")
+    {
+        branch = "L9";
+    }
+    else if (type == Type::banner and isOnClick == true and qbranch == "T4")
+    {
+        branch = "L10";
+    }
+    else if (type == Type::banner and isOnClick == true and qbranch == "T5")
+    {
+        branch = "L11";
+    }
+    else if (type == Type::teazer and isOnClick == false and qbranch == "T1")
+    {
+        branch = "L12";
+    }
+    else if (type == Type::teazer and isOnClick == false and qbranch == "T2")
+    {
+        branch = "L13";
+    }
+    else if (type == Type::teazer and isOnClick == false and qbranch == "T3")
+    {
+        branch = "L14";
+    }
+    else if (type == Type::teazer and isOnClick == false and qbranch == "T4")
+    {
+        branch = "L15";
+    }
+    else if (type == Type::teazer and isOnClick == false and qbranch == "T5")
+    {
+        branch = "L16";
+    }
+    else if (type == Type::teazer and isOnClick == true and qbranch == "T1")
+    {
+        branch = "L17";
+    }
+    else if (type == Type::teazer and isOnClick == true and qbranch == "T2")
+    {
+        branch = "L18";
+    }
+    else if (type == Type::teazer and isOnClick == true and qbranch == "T3")
+    {
+        branch = "L19";
+    }
+    else if (type == Type::teazer and isOnClick == true and qbranch == "T4")
+    {
+        branch = "L20";
+    }
+    else if (type == Type::teazer and isOnClick == true and qbranch == "T5")
+    {
+        branch = "L21";
+    }
+    else
+    {
+        return false;
+    }
+    return true;
 }

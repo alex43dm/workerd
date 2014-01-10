@@ -855,7 +855,7 @@
 	<string>
 	<utility>
 
-1388392311 /home/alex/Projects/worker/Log.h
+1389259410 /home/alex/Projects/worker/Log.h
 	<stdio.h>
 	<syslog.h>
 	<stdarg.h>
@@ -914,7 +914,7 @@
 	<list>
 	"KompexSQLiteDatabase.h"
 
-1388751522 /home/alex/Projects/worker/Offer.h
+1389352850 /home/alex/Projects/worker/Offer.h
 	<string>
 	<list>
 	<map>
@@ -951,7 +951,7 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1389186299 source:/home/alex/Projects/worker/CgiService.cpp
+1389349354 source:/home/alex/Projects/worker/CgiService.cpp
 	"DB.h"
 	<boost/algorithm/string.hpp>
 	"Log.h"
@@ -967,13 +967,13 @@
 	"utils/Cookie.h"
 	"DataBase.h"
 
-1386922452 /home/alex/Projects/worker/CgiService.h
+1389278309 /home/alex/Projects/worker/CgiService.h
 	<string>
 	<fcgiapp.h>
 	"BaseCore.h"
 	"Config.h"
 
-1389186524 /home/alex/Projects/worker/Config.h
+1389337056 /home/alex/Projects/worker/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
@@ -990,7 +990,7 @@
 	<GeoIPCity.h>
 	<string>
 
-1389250826 /home/alex/Projects/worker/Core.h
+1389349581 /home/alex/Projects/worker/Core.h
 	<list>
 	<vector>
 	<map>
@@ -1020,11 +1020,10 @@
 	<ctime>
 	<algorithm>
 
-1388392311 /home/alex/Projects/worker/Params.h
+1389280462 /home/alex/Projects/worker/Params.h
 	<sstream>
-	<boost/date_time.hpp>
 	<string>
-	"utils/GeoIPTools.h"
+	<boost/date_time.hpp>
 
 1386588626 /home/alex/Projects/worker/utils/SearchEngines.h
 	<map>
@@ -1034,9 +1033,9 @@
 	<cstring>
 	<iostream>
 
-1389250641 /home/alex/Projects/worker/HistoryManager.h
+1389349603 /home/alex/Projects/worker/HistoryManager.h
 	<string>
-	<vector>
+	<list>
 	<map>
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
@@ -1136,7 +1135,7 @@
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 
-1389186183 source:/home/alex/Projects/worker/Config.cpp
+1389279046 source:/home/alex/Projects/worker/Config.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -1145,7 +1144,7 @@
 	"Config.h"
 	<assert.h>
 
-1389193067 source:/home/alex/Projects/worker/Core.cpp
+1389352491 source:/home/alex/Projects/worker/Core.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -1160,12 +1159,11 @@
 	"Log.h"
 	"Core.h"
 	"InformerTemplate.h"
-	"utils/Comparators.h"
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 	"utils/base64.h"
 
-1388759127 /home/alex/Projects/worker/utils/Comparators.h
+1389351504 /home/alex/Projects/worker/utils/Comparators.h
 	<iostream>
 	<string>
 	<vector>
@@ -1219,7 +1217,7 @@
 	"../Log.h"
 	"XXXSearcher.h"
 
-1389250620 source:/home/alex/Projects/worker/HistoryManager.cpp
+1389350605 source:/home/alex/Projects/worker/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -1261,7 +1259,7 @@
 	"CgiService.h"
 	"Log.h"
 
-1388412160 source:/home/alex/Projects/worker/Offer.cpp
+1389350225 source:/home/alex/Projects/worker/Offer.cpp
 	"Offer.h"
 	"DB.h"
 	"Log.h"
@@ -1318,7 +1316,7 @@
 1386588626 source:/home/alex/Projects/worker/utils/SearchEngines.cpp
 	"SearchEngines.h"
 
-1386588626 source:/home/alex/Projects/worker/utils/UrlParser.cpp
+1389276989 source:/home/alex/Projects/worker/utils/UrlParser.cpp
 	<iostream>
 	<sstream>
 	"UrlParser.h"
@@ -1349,7 +1347,7 @@
 
 1387810444 /home/alex/Projects/libredis//libredis/redis.h
 
-1389249583 source:/home/alex/Projects/worker/src/RedisClient.cpp
+1389351137 source:/home/alex/Projects/worker/src/RedisClient.cpp
 	<strings.h>
 	<string.h>
 	"RedisClient.h"
@@ -1366,5 +1364,34 @@
 	<boost/lexical_cast.hpp>
 	"SQLiteTmpTable.h"
 	"KompexSQLiteException.h"
+	"Log.h"
+
+1389347527 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+	"Log.h"
+	"Config.h"
+	"XXXSearcher.h"
+
+1389349652 /home/alex/Projects/worker/include/XXXSearcher.h
+	<string>
+	<list>
+	<set>
+	<map>
+	<stdlib.h>
+	<boost/crc.hpp>
+	<sphinxclient.h>
+	<stdarg.h>
+	<stdlib.h>
+	<typeinfo>
+	"Offer.h"
+
+1389280303 source:/home/alex/Projects/worker/Params.cpp
+	<sstream>
+	<boost/algorithm/string/trim.hpp>
+	<boost/regex/icu.hpp>
+	<boost/date_time.hpp>
+	<boost/algorithm/string.hpp>
+	<string>
+	"Params.h"
+	"utils/GeoIPTools.h"
 	"Log.h"
 
