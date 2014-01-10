@@ -34,6 +34,10 @@ public:
     //Задаём обнавление долгосрочной истории
     bool updateContext;
 
+    std::list<std::string> vshortTerm;
+    std::list<std::string> vlongTerm;
+    std::list<std::string> vcontextTerm;
+
     HistoryManager();
     virtual ~HistoryManager();
 

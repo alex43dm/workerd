@@ -1,17 +1,16 @@
-#include "DB.h"
 #include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+
 #include <ctime>
 #include <cstdlib>
-#include <mongo/util/version.h>
-#include <mongo/bson/bsonobjbuilder.h>
 
 #include "Config.h"
 #include "Log.h"
 #include "Core.h"
+#include "DB.h"
 #include "InformerTemplate.h"
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
@@ -33,18 +32,18 @@ Core::Core() :
     pDb = Config::Instance()->pDb;
 
     pStmtOfferStr = pDb->getSqlFile("requests/01.sql");
-/*
-    try
-    {
-        pStmtOffer = new SQLiteStatement(pDb->pDatabase);
-        pStmtOffer->Sql(pDb->getSqlFile("requests/01.sql"));
-    }
-    catch(SQLiteException &ex)
-    {
-        Log::err("DB error: pStmtOffer: %s %s", ex.GetString().c_str(), pDb->getSqlFile("requests/01.sql").c_str());
-        exit(1);
-    }
-*/
+    /*
+        try
+        {
+            pStmtOffer = new SQLiteStatement(pDb->pDatabase);
+            pStmtOffer->Sql(pDb->getSqlFile("requests/01.sql"));
+        }
+        catch(SQLiteException &ex)
+        {
+            Log::err("DB error: pStmtOffer: %s %s", ex.GetString().c_str(), pDb->getSqlFile("requests/01.sql").c_str());
+            exit(1);
+        }
+    */
     try
     {
         pStmtInformer = new Kompex::SQLiteStatement(pDb->pDatabase);
@@ -61,9 +60,11 @@ Core::Core() :
     try
     {
         p = new Kompex::SQLiteStatement(pDb->pDatabase);
-        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE TABLE IF NOT EXISTS tmp%ld(id INT8 NOT NULL);",tid);
+        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE TABLE IF NOT EXISTS tmp%d%ld(id INT8 NOT NULL);",
+                         getpid(), tid);
         p->SqlStatement(cmd);
-        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE INDEX IF NOT EXISTS idx_tmp%ld_id ON tmp%ld(id);",tid,tid);
+        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE INDEX IF NOT EXISTS idx_tmp%d%ld_id ON tmp%d%ld(id);",
+                         getpid(),tid, getpid(),tid);
         p->SqlStatement(cmd);
     }
     catch(Kompex::SQLiteException &ex)
@@ -117,9 +118,9 @@ class GenerateRedirectLink
     std::string location_;
 public:
     GenerateRedirectLink( long long &informerId,
-                         const std::string &server_ip,
-                         const std::string &redirect_script,
-                         const std::string &location)
+                          const std::string &server_ip,
+                          const std::string &redirect_script,
+                          const std::string &location)
         : informerId(informerId), server_ip_(server_ip),
           redirect_script_(redirect_script),
           location_(location) { }
@@ -129,14 +130,14 @@ public:
         p.second->gen();
 
         p.second->redirect_url = redirect_script_ + "?" + base64_encode(boost::str(
-                           boost::format("id=%s\ninf=%d\ntoken=%s\nurl=%s\nserver=%s\nloc=%s")
-                           % p.second->id_int
-                           % informerId
-                           % p.second->token
-                           % p.second->url
-                           % server_ip_
-                           % location_
-                       ));
+                                     boost::format("id=%s\ninf=%d\ntoken=%s\nurl=%s\nserver=%s\nloc=%s")
+                                     % p.second->id_int
+                                     % informerId
+                                     % p.second->token
+                                     % p.second->url
+                                     % server_ip_
+                                     % location_
+                                 ));
     }
 };
 
@@ -146,7 +147,7 @@ public:
 	Изменён RealInvest Soft */
 std::string Core::Process(const Params &params, Offer::Map &items)
 {
-   // Log::info("[%ld]Core::Process start",tid);
+    // Log::info("[%ld]Core::Process start",tid);
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = boost::posix_time::microsec_clock::local_time();
 
@@ -209,38 +210,28 @@ std::string Core::Process(const Params &params, Offer::Map &items)
 
 void Core::ProcessSaveResults(const Params &params, const Offer::Map &items)
 {
-// Сохраняем выданные ссылки в базе данных
-//        list<string> shortTerm = HistoryManager::instance()->getShortHistoryByUser(params);
-//        list<string> longTerm = HistoryManager::instance()->getLongHistoryByUser(params);
-//        list<string> contextTerm = HistoryManager::instance()->getContextHistoryByUser(params);
+    // Сохраняем выданные ссылки в базе данных
+    markAsShown(items, params);
 
+    //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
+    hm->updateUserHistory(items, params);
+
+    Kompex::SQLiteStatement *p;
     try
     {
-        //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
-        hm->updateUserHistory(items, params);
-
-        Kompex::SQLiteStatement *p;
-        try
-        {
-            p = new Kompex::SQLiteStatement(pDb->pDatabase);
-            std::string sql("DELETE FROM tmp" + boost::lexical_cast<std::string>(tid) + ";");
-            p->SqlStatement(sql);
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            Log::err("DB error: create tmp table: %s", ex.GetString().c_str());
-            exit(1);
-        }
-        delete p;
-
-//        markAsShown(items, params, shortTerm, longTerm, contextTerm);
+        p = new Kompex::SQLiteStatement(pDb->pDatabase);
+        std::string sql("DELETE FROM tmp"+ boost::lexical_cast<std::string>(getpid()) + boost::lexical_cast<std::string>(tid) + ";");
+        p->SqlStatement(sql);
     }
-    catch (mongo::DBException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DBException duriAMQPMessageng markAsShown(): %s", ex.what());
+        Log::err("DB error: create tmp table: %s", ex.GetString().c_str());
+        exit(1);
     }
+    delete p;
+
     pStmtInformer->Reset();
-  //  pStmtOffer->Reset();
+    //  pStmtOffer->Reset();
 }
 
 Informer *Core::getInformer(const Params &params)
@@ -249,12 +240,12 @@ Informer *Core::getInformer(const Params &params)
     while(pStmtInformer->FetchRow())
     {
         return new Informer(pStmtInformer->GetColumnInt64(0),
-                              pStmtInformer->GetColumnInt(1),
-                              pStmtInformer->GetColumnString(2),
-                              pStmtInformer->GetColumnString(3),
-                              pStmtInformer->GetColumnInt64(4),
-                              pStmtInformer->GetColumnInt64(5)
-                             );
+                            pStmtInformer->GetColumnInt(1),
+                            pStmtInformer->GetColumnString(2),
+                            pStmtInformer->GetColumnString(3),
+                            pStmtInformer->GetColumnInt64(4),
+                            pStmtInformer->GetColumnInt64(5)
+                           );
     }
     //reset moved to after response function
     //pStmtInformer->Reset();
@@ -316,12 +307,13 @@ bool Core::getOffers(const Params &params, Offer::Map &result)
         pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
 
         sqlite3_snprintf(CMD_SIZE, cmd, pStmtOfferStr.c_str(),
-                              informer->domainId,
-                              informer->accountId,
-                              informer->id,
-                              params.getCountry().c_str(),
-                              params.getRegion().c_str(),
-                              tid);
+                         informer->domainId,
+                         informer->accountId,
+                         informer->id,
+                         params.getCountry().c_str(),
+                         params.getRegion().c_str(),
+                         getpid(),
+                         tid);
         pStmt->Sql(cmd);
     }
     catch(Kompex::SQLiteException &ex)
@@ -338,23 +330,23 @@ bool Core::getOffers(const Params &params, Offer::Map &result)
         while(pStmt->FetchRow())
         {
             Offer *off = new Offer(pStmt->GetColumnString(1),
-                              pStmt->GetColumnInt64(0),
-                              pStmt->GetColumnString(2),
-                              pStmt->GetColumnString(3),
-                              pStmt->GetColumnString(4),
-                              pStmt->GetColumnString(5),
-                              pStmt->GetColumnString(6),
-                              pStmt->GetColumnString(7),
-                              pStmt->GetColumnInt64(8),
-                              true,
-                              pStmt->GetColumnBool(9),
-                              pStmt->GetColumnInt(10),
-                              pStmt->GetColumnDouble(11),
-                              pStmt->GetColumnBool(12),
-                              pStmt->GetColumnInt(13),
-                              pStmt->GetColumnInt(14),
-                              pStmt->GetColumnInt(15)
-                             );
+                                   pStmt->GetColumnInt64(0),
+                                   pStmt->GetColumnString(2),
+                                   pStmt->GetColumnString(3),
+                                   pStmt->GetColumnString(4),
+                                   pStmt->GetColumnString(5),
+                                   pStmt->GetColumnString(6),
+                                   pStmt->GetColumnString(7),
+                                   pStmt->GetColumnInt64(8),
+                                   true,
+                                   pStmt->GetColumnBool(9),
+                                   pStmt->GetColumnInt(10),
+                                   pStmt->GetColumnDouble(11),
+                                   pStmt->GetColumnBool(12),
+                                   pStmt->GetColumnInt(13),
+                                   pStmt->GetColumnInt(14),
+                                   pStmt->GetColumnInt(15)
+                                  );
             off->social = pStmt->GetColumnBool(16);
 
             if(!off->social)
@@ -491,58 +483,58 @@ std::string Core::OffersToJson(const Offer::Map &items) const
  *
  * Если список offersIds пуст, то метод в качестве результата выберет все РП из всех РК, находящихся в списке camps, и отсортирует результат по убыванию рейтинга. Поэтому в методе Process если список offersIds пуст, вызывается старая ветка.
  */
- /*
+/*
 void Core::createVectorOffersByIds(const list<pair<pair<string, float>,
-                                   std::map<long, Offer*> &result,
-                                   const Params& params)
+                                  std::map<long, Offer*> &result,
+                                  const Params& params)
 {
-    list<pair<pair<string, float>, pair<string, pair<string, string>>>>::const_iterator p = offersIds.begin();
-    Offer *curOffer;
-    string branch;
-    //LOG(INFO) << "Список выбранных РП:\n";
-    while(p!=offersIds.end())
-    {
-        //добавляем оффер к результату.
-        branch = p->second.first;
-        curOffer = new Offer();
-        curOffer->id = p->first.first;
-        curOffer->rating = p->first.second;
-        curOffer->branch = branch;
-        curOffer->conformity = p->second.second.first;
-        curOffer->matching = p->second.second.second;
-        //проверяем нашли ли чтото по поисковому запросу, стоит ли
-        //обнавлять краткосрочную историю
-        if (branch == "L2" or branch == "L7" or branch == "L12" or branch == "L17")
-        {
-            updateShort = true;
-        }
-        //проверяем нашли ли чтото по контексту, стоит ли
-        //обнавлять контекстную историю
-        if (branch == "L3" or branch == "L8" or branch == "L13" or branch == "L18")
-        {
-            updateContext = true;
-        }
-        //проверка на размер.
-        if (curOffer->valid && checkBannerSize(curOffer))
-        {
-            //если подходит по размеру, добавляем.
-            result.push_back(curOffer);
-        }
-        delete curOffer;
-        p++;
-    }
-    //LOG(INFO) << "после цикла.\n";
-    //LOG(INFO) << "result.size()=" << result.size();
-    if(result.empty())return;
+   list<pair<pair<string, float>, pair<string, pair<string, string>>>>::const_iterator p = offersIds.begin();
+   Offer *curOffer;
+   string branch;
+   //LOG(INFO) << "Список выбранных РП:\n";
+   while(p!=offersIds.end())
+   {
+       //добавляем оффер к результату.
+       branch = p->second.first;
+       curOffer = new Offer();
+       curOffer->id = p->first.first;
+       curOffer->rating = p->first.second;
+       curOffer->branch = branch;
+       curOffer->conformity = p->second.second.first;
+       curOffer->matching = p->second.second.second;
+       //проверяем нашли ли чтото по поисковому запросу, стоит ли
+       //обнавлять краткосрочную историю
+       if (branch == "L2" or branch == "L7" or branch == "L12" or branch == "L17")
+       {
+           updateShort = true;
+       }
+       //проверяем нашли ли чтото по контексту, стоит ли
+       //обнавлять контекстную историю
+       if (branch == "L3" or branch == "L8" or branch == "L13" or branch == "L18")
+       {
+           updateContext = true;
+       }
+       //проверка на размер.
+       if (curOffer->valid && checkBannerSize(curOffer))
+       {
+           //если подходит по размеру, добавляем.
+           result.push_back(curOffer);
+       }
+       delete curOffer;
+       p++;
+   }
+   //LOG(INFO) << "после цикла.\n";
+   //LOG(INFO) << "result.size()=" << result.size();
+   if(result.empty())return;
 
-    if (params.json_)
-    {
-        Offer::it p;
-        p = std::remove_if(result.begin(), result.end(), CExistElementFunctorByType("banner", EOD_TYPE));
-        result.erase(p, result.end());
-    }
-    //LOG(INFO) << "result.size()=" << result.size();
-    //LOG(INFO) << "createVectorOffersByIds end";
+   if (params.json_)
+   {
+       Offer::it p;
+       p = std::remove_if(result.begin(), result.end(), CExistElementFunctorByType("banner", EOD_TYPE));
+       result.erase(p, result.end());
+   }
+   //LOG(INFO) << "result.size()=" << result.size();
+   //LOG(INFO) << "createVectorOffersByIds end";
 }
 */
 /**
@@ -729,7 +721,7 @@ void Core::RISAlgorithm(Offer::Map &result, const Params &params)
                 if(newResult.count(p->first))
                 {
                     if(!camps.count(p->second->campaign_id) && (
-                            (p->second->rating > 0.0) || p->second->branch != "L30") )
+                                (p->second->rating > 0.0) || p->second->branch != "L30") )
                     {
                         //LOG(INFO) << "add";
                         newResult.insert(Offer::Pair(p->first,p->second));
@@ -803,76 +795,81 @@ void Core::RISAlgorithm(Offer::Map &result, const Params &params)
 
     Внимание: Используется база данных, зарегистрированная под именем 'log'.
  */
-void Core::markAsShown(const Offer::Map &items,
-                       const Params &params,
-                       std::list<std::string> &shortTerm,
-                       std::list<std::string> &longTerm,
-                       std::list<std::string> &contextTerm )
+void Core::markAsShown(const Offer::Map &items, const Params &params)
 {
     if (params.test_mode_)
-	return;
-    mongo::DB db("log");
-	//LOG(INFO) << "writing to log...";
+        return;
 
-    int count = 0;
-	std::list<std::string>::iterator it;
-
-	mongo::BSONArrayBuilder b1,b2,b3;
-	for (it=shortTerm.begin() ; it != shortTerm.end(); ++it )
-		b1.append(*it);
-	mongo::BSONArray shortTermArray = b1.arr();
-	for (it=longTerm.begin() ; it != longTerm.end(); ++it )
-		b2.append(*it);
-	mongo::BSONArray longTermArray = b2.arr();
-	for (it=contextTerm.begin() ; it != contextTerm.end(); ++it )
-		b3.append(*it);
-	mongo::BSONArray contextTermArray = b3.arr();
-
-    for(Offer::cit i = items.begin(); i != items.end(); ++i)
+    try
     {
+        mongo::DB db("log");
+        //LOG(INFO) << "writing to log...";
 
-	std::tm dt_tm;
-	dt_tm = boost::posix_time::to_tm(params.time_);
-	mongo::Date_t dt( (mktime(&dt_tm)) * 1000LLU);
+        int count = 0;
+        std::list<std::string>::iterator it;
 
-	mongo::BSONObj keywords = mongo::BSONObjBuilder().
-								append("search", params.getSearch()).
-								append("context", params.getContext()).
-								append("ShortTermHistory", shortTermArray).
-								append("longtermhistory", longTermArray).
-								append("contexttermhistory", contextTermArray).
-								obj();
+        mongo::BSONArrayBuilder b1,b2,b3;
+        for (it=hm->vshortTerm.begin() ; it != hm->vshortTerm.end(); ++it )
+            b1.append(*it);
+        mongo::BSONArray shortTermArray = b1.arr();
+        for (it=hm->vlongTerm.begin() ; it != hm->vlongTerm.end(); ++it )
+            b2.append(*it);
+        mongo::BSONArray longTermArray = b2.arr();
+        for (it=hm->vcontextTerm.begin() ; it != hm->vcontextTerm.end(); ++it )
+            b3.append(*it);
+        mongo::BSONArray contextTermArray = b3.arr();
 
-	mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
-								append("dt", dt).
-								append("id", i->second->id).
-								append("id_int", i->second->id_int).
-								append("title", i->second->title).
-								append("inf", params.informer_).
-								append("inf_int", informer->id).
-								append("ip", params.ip_).
-								append("cookie", params.cookie_id_).
-								append("social", i->second->social).
-								append("token", i->second->token).
-								append("type", i->second->type).
-								append("isOnClick", i->second->isOnClick).
-								//append("campaignId", i->second->campaign_id).
-								append("campaignId_int", i->second->campaign_id).
-								append("campaignTitle", "").
-								append("project", "").
-								append("country", (params.getCountry().empty()?"NOT FOUND":params.getCountry().c_str())).
-								append("region", (params.getRegion().empty()?"NOT FOUND":params.getRegion().c_str())).
-								append("keywords", keywords).
-								append("branch", i->second->branch).
-								append("conformity", i->second->conformity).
-                                append("matching", i->second->matching).
-								obj();
+        for(Offer::cit i = items.begin(); i != items.end(); ++i)
+        {
 
-	db.insert("log.impressions", record, true);
-	count++;
+            std::tm dt_tm;
+            dt_tm = boost::posix_time::to_tm(params.time_);
+            mongo::Date_t dt( (mktime(&dt_tm)) * 1000LLU);
 
-	offer_processed_ ++;
-	if (i->second->social) social_processed_ ++;
+            mongo::BSONObj keywords = mongo::BSONObjBuilder().
+                                      append("search", params.getSearch()).
+                                      append("context", params.getContext()).
+                                      append("ShortTermHistory", shortTermArray).
+                                      append("longtermhistory", longTermArray).
+                                      append("contexttermhistory", contextTermArray).
+                                      obj();
+
+            mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
+                                    append("dt", dt).
+                                    append("id", i->second->id).
+                                    append("id_int", i->second->id_int).
+                                    append("title", i->second->title).
+                                    append("inf", params.informer_).
+                                    append("inf_int", informer->id).
+                                    append("ip", params.ip_).
+                                    append("cookie", params.cookie_id_).
+                                    append("social", i->second->social).
+                                    append("token", i->second->token).
+                                    append("type", i->second->type).
+                                    append("isOnClick", i->second->isOnClick).
+                                    //append("campaignId", i->second->campaign_id).
+                                    append("campaignId_int", i->second->campaign_id).
+                                    append("campaignTitle", "").
+                                    append("project", "").
+                                    append("country", (params.getCountry().empty()?"NOT FOUND":params.getCountry().c_str())).
+                                    append("region", (params.getRegion().empty()?"NOT FOUND":params.getRegion().c_str())).
+                                    append("keywords", keywords).
+                                    append("branch", i->second->branch).
+                                    append("conformity", i->second->conformity).
+                                    append("matching", i->second->matching).
+                                    obj();
+
+            db.insert("log.impressions", record, true);
+            count++;
+
+            offer_processed_ ++;
+            if (i->second->social) social_processed_ ++;
+        }
     }
+    catch (mongo::DBException &ex)
+    {
+        Log::err("DBException duriAMQPMessageng markAsShown(): %s", ex.what());
+    }
+
     //LOG_IF(WARNING, count == 0 ) << "No items was added to log.impressions!";
 }

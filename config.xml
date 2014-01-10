@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root>
+<root id="0">
 <!--IP сервера. Ссылка на редирект по рекламному предложению содержит в себе адрес сервера, который её создал-->
 <server_ip>127.0.0.1</server_ip>
 <!--Название скрипта обработки редиректа-->
@@ -113,9 +113,9 @@
     <!--путь к файлу сокета-->
     <socket_path>/tmp/workerd.sock</socket_path>
     <!--количество ниток на обработку-->
-    <children>90</children>
+    <children>80</children>
     <!--путь к фалу базы данных-->
-    <!--dbpath>mem.db</dbpath-->
+    <!--dbpath>/run/db/mem.db</dbpath-->
     <dbpath>:memory:</dbpath>
     <!--путь к каталогу дампа sqlite базы-->
     <db_dump_path>db_dump</db_dump_path>

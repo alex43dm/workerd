@@ -355,6 +355,13 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
         result = core->Process(prm, items);
         Response(req, result, c.to_string());
         core->ProcessSaveResults(prm, items);
+
+        for (Offer::it o = items.begin(); o != items.end(); ++o)
+        {
+            delete o->second;
+            items.erase(o);
+        }
+
         //items.clear();
     }
     catch (std::exception const &ex)

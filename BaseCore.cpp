@@ -156,8 +156,8 @@ void BaseCore::LogToAmqp(const std::string &message)
 */
 void BaseCore::LoadAllEntities()
 {
-    Benchmark bench("All entities reloaded");
-
+    if(Config::Instance()->pDb->reopen)
+        return;
 
     Informer::loadAll(Config::Instance()->pDb->pDatabase);
     //LOG(INFO) << "Загрузили все информеры.\n";
@@ -165,9 +165,7 @@ void BaseCore::LoadAllEntities()
     //LOG(INFO) << "Загрузили все кампании.\n";
     Offer::loadAll(Config::Instance()->pDb->pDatabase);
     //LOG(INFO) << "Загрузили все предложения.\n";
-    //pDb->pDatabase->MoveDatabaseToMemory();
-    // Проверяем, нет ли кампаний с 0 предложений
-    // Сбрасываем кеш
+
     Config::Instance()->pDb->postDataLoad();
 
     Config::Instance()->pDb->indexRebuild();

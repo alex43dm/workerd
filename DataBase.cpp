@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <fstream>
 
 #include <signal.h>
 #include <time.h>
@@ -17,7 +18,14 @@
 
 #define INSERTSTATMENT "INSERT INTO Offer (id) VALUES (%lu)"
 
+bool is_file_exist(const std::string &fileName)
+{
+    std::ifstream infile(fileName);
+    return infile.good();
+}
+
 DataBase::DataBase(bool create) :
+    reopen(false),
     dbFileName(Config::Instance()->dbpath_),
     dirName(Config::Instance()->db_dump_path_),
     geoCsv(Config::Instance()->db_geo_csv_),
@@ -39,25 +47,44 @@ DataBase::~DataBase()
 
 bool DataBase::openDb()
 {
+    int flags;
+
     try
     {
+        if(pStmt)
+        {
+            delete pStmt;
+        }
+
         if(!create)
         {
             pDatabase = new Kompex::SQLiteDatabase(dbFileName,
                                            SQLITE_OPEN_READONLY, NULL);//SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | | SQLITE_OPEN_FULLMUTEX
+
+            pStmt = new Kompex::SQLiteStatement(pDatabase);
+
             return true;
         }
 
         Log::gdb("open and create db");
 
-        pDatabase = new Kompex::SQLiteDatabase(dbFileName,
-                                       SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);//SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | | SQLITE_OPEN_FULLMUTEX
+        flags = SQLITE_OPEN_READWRITE;
 
-        if(pStmt)
+        reopen = is_file_exist(dbFileName);
+
+        if(!reopen)
         {
-            delete pStmt;
+            flags |= SQLITE_OPEN_CREATE;
         }
+
+        pDatabase = new Kompex::SQLiteDatabase(dbFileName, flags, NULL);//SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | | SQLITE_OPEN_FULLMUTEX
+
         pStmt = new Kompex::SQLiteStatement(pDatabase);
+
+        if(reopen)
+        {
+            return true;
+        }
 
         //load db dump from directory
 

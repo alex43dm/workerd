@@ -58,6 +58,7 @@ public:
     std::string db_geo_csv_;
     std::string sphinx_host_;
     int         sphinx_port_;
+    int         instanceId;
 
     DataBase *pDb;
 

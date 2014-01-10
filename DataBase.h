@@ -18,6 +18,7 @@ class DataBase
 {
 public:
     Kompex::SQLiteDatabase *pDatabase;
+    bool reopen;
 
     DataBase(bool create = false);
     virtual ~DataBase();

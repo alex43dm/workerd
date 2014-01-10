@@ -78,8 +78,7 @@ public:
 
 
     /** \brief  Увеличивает счётчики показов предложений ``items`` */
-    void markAsShown(const Offer::Map &,const Params &params, std::list<std::string> &shortTerm,
-                     std::list<std::string> &longTerm, std::list<std::string> &contextTerm);
+    void markAsShown(const Offer::Map &,const Params &params);
 
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
     std::string OffersToHtml(const Offer::Map &items, const std::string &url) const;

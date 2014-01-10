@@ -159,7 +159,7 @@ bool RedisClient::getRange(const std::string &key)
         int level;
 
         pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-        sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO tmp%ld(id) VALUES(@id);",tid);
+        sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO tmp%d%ld(id) VALUES(@id);",getpid(),tid);
         pStmt->Sql(cmd);
 
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
@@ -189,7 +189,7 @@ bool RedisClient::getRange(const std::string &key)
     try
     {
         p = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-        sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_tmp%ld_id;",tid);
+        sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_tmp%d%ld_id;",getpid(),tid);
         p->SqlStatement(cmd);
     }
     catch(Kompex::SQLiteException &ex)

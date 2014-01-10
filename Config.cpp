@@ -53,6 +53,8 @@ bool Config::LoadConfig(const std::string fName)
         return mIsInited;
     }
 
+    instanceId = atoi(mRoot->Attribute("id"));
+
     //main config
     if( (mElem = mRoot->FirstChildElement("server_ip")) && (mElem->GetText()) )
     {

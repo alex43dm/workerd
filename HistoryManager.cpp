@@ -45,7 +45,6 @@ void HistoryManager::setParams(const Params& params)
     clean = false;
     updateShort = false;
     updateContext = false;
-
 /*
     //Запрос по П/З query
     std::string q = Params::getKeywordsString(params.getSearch());
@@ -62,11 +61,9 @@ void HistoryManager::setParams(const Params& params)
             q, std::pair<float,std::string>(Config::Instance()->range_context_,"T2")));
     }
 
-    std::list<std::string> vList;
+    getUserHistory(HistoryType::ShortTerm, vshortTerm);
 
-    getUserHistory(HistoryType::ShortTerm, vList);
-
-    for (auto i=vList.begin(); i != vList.end(); ++i)
+    for (auto i=vshortTerm.begin(); i != vshortTerm.end(); ++i)
     {
         std::string strSH = *i;
         if (!strSH.empty())
@@ -80,11 +77,9 @@ void HistoryManager::setParams(const Params& params)
         }
     }
 
-    vList.clear();
+    getUserHistory(HistoryType::PageKeywords, vcontextTerm);
 
-    getUserHistory(HistoryType::PageKeywords, vList);
-
-    for (auto i=vList.begin(); i != vList.end(); ++i)
+    for (auto i=vcontextTerm.begin(); i != vcontextTerm.end(); ++i)
     {
         std::string strSH = *i;
         if (!strSH.empty())
@@ -98,11 +93,9 @@ void HistoryManager::setParams(const Params& params)
         }
     }
 
-    vList.clear();
+    getUserHistory(HistoryType::LongTerm, vlongTerm);
 
-    getUserHistory(HistoryType::LongTerm, vList);
-
-    for (auto i=vList.begin(); i != vList.end(); ++i)
+    for (auto i=vlongTerm.begin(); i != vlongTerm.end(); ++i)
     {
         std::string strSH = *i;
         if (!strSH.empty())
@@ -115,9 +108,7 @@ void HistoryManager::setParams(const Params& params)
             }
         }
     }
-
-    vList.clear();
-*/
+    */
 }
 
 /** \brief  Возвращает статус подключения к одной из баз данных Redis.
@@ -237,6 +228,11 @@ bool HistoryManager::updateUserHistory(const Offer::Map &items, const Params& pa
     setDeprecatedOffers(items);
     updateShortHistory(params.getSearch());
     updateContextHistory(params.getContext());
+
+    vshortTerm.clear();
+    vlongTerm.clear();
+    vcontextTerm.clear();
+
     return true;
 }
 
