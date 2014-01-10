@@ -179,7 +179,7 @@ private:
 
     DataBase *pDb;
 
-    SQLiteStatement *pStmtInformer, *pStmtOffer, *pStmtOfferDefault;
+    Kompex::SQLiteStatement *pStmtInformer, *pStmtOffer, *pStmtOfferDefault;
 
     pthread_t tid;
 

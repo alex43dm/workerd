@@ -40,11 +40,9 @@
 #include <string.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-using namespace std;
-using namespace boost;
 using namespace ClearSilver;
 
-static string convert (const posix_time::ptime& t);
+static std::string convert (const boost::posix_time::ptime& t);
 
 // constructors
 Cookie::Cookie () : name_(),
@@ -72,22 +70,22 @@ Cookie::Cookie (const char * name, const char * value, const Credentials& creden
     credentials_(credentials)
 {}
 
-Cookie::Cookie (const string& name) : name_(name),
+Cookie::Cookie (const std::string& name) : name_(name),
     value_(),
     credentials_()
 {}
 
-Cookie::Cookie (const string& name, const Credentials& credentials) : name_(name),
+Cookie::Cookie (const std::string& name, const Credentials& credentials) : name_(name),
     value_(),
     credentials_(credentials_)
 {}
 
-Cookie::Cookie (const string& name, const string& value) : name_(name),
+Cookie::Cookie (const std::string& name, const std::string& value) : name_(name),
     value_(value),
     credentials_()
 {}
 
-Cookie::Cookie (const string& name, const string& value, const Credentials& credentials) : name_(name),
+Cookie::Cookie (const std::string& name, const std::string& value, const Credentials& credentials) : name_(name),
     value_(value),
     credentials_(credentials)
 {}
@@ -111,19 +109,19 @@ Cookie::operator = (const Cookie& c)
 void
 Cookie::swap (Cookie& c) throw()
 {
-    ::swap(name_, c.name_);
-    ::swap(value_, c.value_);
-    ::swap(credentials_, c.credentials_);
+    std::swap(name_, c.name_);
+    std::swap(value_, c.value_);
+    std::swap(credentials_, c.credentials_);
 }
 
 // data access
-string
+std::string
 Cookie::name () const
 {
     return name_;
 }
 
-string
+std::string
 Cookie::value () const
 {
     return value_;
@@ -141,7 +139,7 @@ Cookie::credentials ()
     return credentials_;
 }
 
-string
+std::string
 Cookie::to_string() const
 {
     return name_ + "=" + value_ + "; " + credentials_.to_string();
@@ -213,11 +211,11 @@ Cookie::Credentials::operator = (const Credentials& c)
 void
 Cookie::Credentials::swap (Credentials& c) throw()
 {
-    ::swap (authority_, c.authority_);
-    ::swap (path_, c.path_);
-    ::swap (expires_, c.expires_);
-    ::swap (persist_, c.persist_);
-    ::swap (secure_, c.secure_);
+    std::swap (authority_, c.authority_);
+    std::swap (path_, c.path_);
+    std::swap (expires_, c.expires_);
+    std::swap (persist_, c.persist_);
+    std::swap (secure_, c.secure_);
 }
 
 
@@ -277,7 +275,7 @@ Cookie::Credentials::secure ()
     return secure_;
 }
 
-string
+std::string
 Cookie::Credentials::to_string () const
 {
     return "expires=" + expires_() + "; path=" + path_() + "; domain=" + authority_();
@@ -286,8 +284,8 @@ Cookie::Credentials::to_string () const
 
 // constructors
 Cookie::Authority::Authority () : authority_() {}
-Cookie::Authority::Authority (const char * a) : authority_(a?string(a):"") {}
-Cookie::Authority::Authority (const string& a) : authority_(a) {}
+Cookie::Authority::Authority (const char * a) : authority_(a?std::string(a):"") {}
+Cookie::Authority::Authority (const std::string& a) : authority_(a) {}
 Cookie::Authority::Authority (const Authority& a) : authority_(a.authority_) {}
 Cookie::Authority::~Authority () throw() {}
 
@@ -304,7 +302,7 @@ Cookie::Authority::operator = (const Authority& a)
 void
 Cookie::Authority::swap (Authority& a) throw()
 {
-    ::swap(authority_, a.authority_);
+    std::swap(authority_, a.authority_);
 }
 
 // inspectors
@@ -315,7 +313,7 @@ Cookie::Authority::empty () const
 }
 
 // conversions
-string
+std::string
 Cookie::Authority::operator () () const
 {
     return authority_;
@@ -324,8 +322,8 @@ Cookie::Authority::operator () () const
 
 // constructors
 Cookie::Path::Path () : path_() {}
-Cookie::Path::Path (const char * p) : path_(p?string(p):"") {}
-Cookie::Path::Path (const string& p) : path_(p) {}
+Cookie::Path::Path (const char * p) : path_(p?std::string(p):"") {}
+Cookie::Path::Path (const std::string& p) : path_(p) {}
 Cookie::Path::Path (const Path& p) : path_(p.path_) {}
 Cookie::Path::~Path () throw() {}
 
@@ -342,7 +340,7 @@ Cookie::Path::operator = (const Path& p)
 void
 Cookie::Path::swap (Path& p) throw()
 {
-    ::swap(path_, p.path_);
+    std::swap(path_, p.path_);
 }
 // inspectors
 bool
@@ -352,7 +350,7 @@ Cookie::Path::empty () const
 }
 
 // conversions
-string
+std::string
 Cookie::Path::operator () () const
 {
     return path_;
@@ -363,16 +361,18 @@ Cookie::Path::operator () () const
 Cookie::Expires::Expires () : expires_()
 {}
 
-Cookie::Expires::Expires (const char* e) : expires_(convert(posix_time::time_from_string(e)))
+Cookie::Expires::Expires (const char* e) : expires_(convert(boost::posix_time::time_from_string(e)))
 {}
 
-Cookie::Expires::Expires (const string& e) : expires_(convert(posix_time::time_from_string(e)))
+Cookie::Expires::Expires (const std::string& e) : expires_(convert(boost::posix_time::time_from_string(e)))
 {}
 
-Cookie::Expires::Expires (time_t t) : expires_(convert(posix_time::from_time_t(t)))
+Cookie::Expires::Expires (time_t t) : expires_(convert(boost::posix_time::from_time_t(t)))
 {}
 
-Cookie::Expires::Expires (struct tm tm) : expires_(convert (posix_time::ptime (gregorian::date(tm.tm_year, tm.tm_mon, tm.tm_mday), posix_time::time_duration(tm.tm_hour, tm.tm_min, tm.tm_sec))))
+Cookie::Expires::Expires (struct tm tm) : expires_(convert
+        (boost::posix_time::ptime (boost::gregorian::date(tm.tm_year, tm.tm_mon, tm.tm_mday),
+            boost::posix_time::time_duration(tm.tm_hour, tm.tm_min, tm.tm_sec))))
 {}
 
 Cookie::Expires::Expires (const boost::posix_time::ptime& expires) : expires_(convert(expires))
@@ -411,21 +411,21 @@ Cookie::Expires::empty () const
 }
 
 // conversions
-string
+std::string
 Cookie::Expires::operator () () const
 {
     return expires_;
 }
 
-string
-convert (const posix_time::ptime& t)
+std::string
+convert (const boost::posix_time::ptime& t)
 {
-    ostringstream ss;
-    ss.exceptions(ios_base::failbit);
+    std::ostringstream ss;
+    ss.exceptions(std::ios_base::failbit);
 
-    date_time::time_facet<posix_time::ptime, char>* facet
-        = new date_time::time_facet<posix_time::ptime, char>;
-    ss.imbue(locale(locale::classic(), facet));
+    boost::date_time::time_facet<boost::posix_time::ptime, char>* facet
+        = new boost::date_time::time_facet<boost::posix_time::ptime, char>;
+    ss.imbue(std::locale(std::locale::classic(), facet));
 
     facet->format("%a, %d-%b-%Y %T GMT");
     ss.str("");

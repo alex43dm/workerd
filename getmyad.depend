@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1389186277 source:/home/alex/Projects/worker/BaseCore.cpp
+1389355752 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -870,7 +870,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1389249509 /home/alex/Projects/worker/DataBase.h
+1389354317 /home/alex/Projects/worker/DataBase.h
 	<string>
 	<vector>
 	<stdio.h>
@@ -951,9 +951,10 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1389349354 source:/home/alex/Projects/worker/CgiService.cpp
-	"DB.h"
+1389356938 source:/home/alex/Projects/worker/CgiService.cpp
 	<boost/algorithm/string.hpp>
+	<fcgi_stdio.h>
+	"DB.h"
 	"Log.h"
 	"CgiService.h"
 	"utils/UrlParser.h"
@@ -963,7 +964,6 @@
 	"Informer.h"
 	"utils/SearchEngines.h"
 	"InformerTemplate.h"
-	<fcgi_stdio.h>
 	"utils/Cookie.h"
 	"DataBase.h"
 
@@ -979,18 +979,16 @@
 	<tinyxml.h>
 	"DataBase.h"
 
-1386588626 /home/alex/Projects/worker/utils/UrlParser.h
+1389354901 /home/alex/Projects/worker/utils/UrlParser.h
 	<map>
 	<string>
-	<vector>
-	<boost/algorithm/string.hpp>
 
 1388392311 /home/alex/Projects/worker/utils/GeoIPTools.h
 	<GeoIP.h>
 	<GeoIPCity.h>
 	<string>
 
-1389349581 /home/alex/Projects/worker/Core.h
+1389354582 /home/alex/Projects/worker/Core.h
 	<list>
 	<vector>
 	<map>
@@ -1025,13 +1023,10 @@
 	<string>
 	<boost/date_time.hpp>
 
-1386588626 /home/alex/Projects/worker/utils/SearchEngines.h
+1389355235 /home/alex/Projects/worker/utils/SearchEngines.h
 	<map>
 	<vector>
 	<string>
-	<fstream>
-	<cstring>
-	<iostream>
 
 1389349603 /home/alex/Projects/worker/HistoryManager.h
 	<string>
@@ -1118,10 +1113,8 @@
 	<stdlib.h>
 	<typeinfo>
 
-1386588626 /home/alex/Projects/worker/InformerTemplate.h
+1389354451 /home/alex/Projects/worker/InformerTemplate.h
 	<string>
-	<iostream>
-	<fstream>
 
 1386588626 /home/alex/Projects/worker/utils/Cookie.h
 	<string>
@@ -1144,7 +1137,7 @@
 	"Config.h"
 	<assert.h>
 
-1389352491 source:/home/alex/Projects/worker/Core.cpp
+1389356391 source:/home/alex/Projects/worker/Core.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -1170,7 +1163,7 @@
 	<list>
 	<stdlib.h>
 
-1389249789 source:/home/alex/Projects/worker/DataBase.cpp
+1389354334 source:/home/alex/Projects/worker/DataBase.cpp
 	<iostream>
 	<algorithm>
 	<signal.h>
@@ -1231,7 +1224,8 @@
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 
-1386588626 source:/home/alex/Projects/worker/InformerTemplate.cpp
+1389354740 source:/home/alex/Projects/worker/InformerTemplate.cpp
+	<fstream>
 	"Config.h"
 	"InformerTemplate.h"
 
@@ -1259,7 +1253,7 @@
 	"CgiService.h"
 	"Log.h"
 
-1389350225 source:/home/alex/Projects/worker/Offer.cpp
+1389352962 source:/home/alex/Projects/worker/Offer.cpp
 	"Offer.h"
 	"DB.h"
 	"Log.h"
@@ -1305,7 +1299,7 @@
 	"base64.h"
 	<iostream>
 
-1386588626 source:/home/alex/Projects/worker/utils/Cookie.cpp
+1389356833 source:/home/alex/Projects/worker/utils/Cookie.cpp
 	"Cookie.h"
 	<string.h>
 	<boost/date_time/posix_time/posix_time.hpp>
@@ -1313,11 +1307,13 @@
 1388392311 source:/home/alex/Projects/worker/utils/GeoIPTools.cpp
 	"GeoIPTools.h"
 
-1386588626 source:/home/alex/Projects/worker/utils/SearchEngines.cpp
+1389355305 source:/home/alex/Projects/worker/utils/SearchEngines.cpp
+	<fstream>
+	<cstring>
+	<iostream>
 	"SearchEngines.h"
 
-1389276989 source:/home/alex/Projects/worker/utils/UrlParser.cpp
-	<iostream>
+1389355415 source:/home/alex/Projects/worker/utils/UrlParser.cpp
 	<sstream>
 	"UrlParser.h"
 	"SearchEngines.h"
@@ -1347,7 +1343,7 @@
 
 1387810444 /home/alex/Projects/libredis//libredis/redis.h
 
-1389351137 source:/home/alex/Projects/worker/src/RedisClient.cpp
+1389354784 source:/home/alex/Projects/worker/src/RedisClient.cpp
 	<strings.h>
 	<string.h>
 	"RedisClient.h"

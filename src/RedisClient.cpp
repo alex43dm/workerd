@@ -188,11 +188,11 @@ bool RedisClient::getRange(const std::string &key)
     Kompex::SQLiteStatement *p;
     try
     {
-        p = new SQLiteStatement(Config::Instance()->pDb->pDatabase);
+        p = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
         sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_tmp%ld_id;",tid);
         p->SqlStatement(cmd);
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         Log::err("DB error: REINDEX: %s", ex.GetString().c_str());
     }

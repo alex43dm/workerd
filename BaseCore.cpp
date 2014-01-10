@@ -18,23 +18,13 @@
 #include "Offer.h"
 #include "Config.h"
 
-using std::list;
-using std::vector;
-using std::map;
-using std::unique_ptr;
-using std::string;
-using namespace boost::posix_time;
-using namespace Kompex;
-#define foreach	BOOST_FOREACH
-
-
 BaseCore::BaseCore()
     : amqp_initialized_(false), amqp_down_(true), amqp_(0)
 {
     LoadAllEntities();
     InitMessageQueue();
     InitMongoDB();
-    time_service_started_ = second_clock::local_time();
+    time_service_started_ = boost::posix_time::second_clock::local_time();
 }
 
 BaseCore::~BaseCore()
@@ -55,10 +45,10 @@ bool BaseCore::ProcessMQ()
     if (!amqp_initialized_)
         return false;
     if (!time_last_mq_check_.is_not_a_date_time() &&
-            ((second_clock::local_time() - time_last_mq_check_) <
-             seconds(check_interval)))
+            ((boost::posix_time::second_clock::local_time() - time_last_mq_check_) <
+             boost::posix_time::seconds(check_interval)))
         return false;
-    time_last_mq_check_ = second_clock::local_time();
+    time_last_mq_check_ = boost::posix_time::second_clock::local_time();
     if (amqp_down_)
         InitMessageQueue();
 
@@ -81,7 +71,7 @@ bool BaseCore::ProcessMQ()
                                      % campaign.title());
                 LogToAmqp(logline);
                 //ReloadCampaign(campaign);*/
-                time_last_mq_check_ = second_clock::local_time();
+                time_last_mq_check_ = boost::posix_time::second_clock::local_time();
                 check_interval = 2;
                 return true;
             }
@@ -125,7 +115,7 @@ bool BaseCore::ProcessMQ()
                                      % m->getMessage(nullptr));
                 LogToAmqp(logline);
                 LoadAllEntities();
-                time_last_mq_check_ = second_clock::local_time();
+                time_last_mq_check_ = boost::posix_time::second_clock::local_time();
                 check_interval = 2;
                 return true;
             }
@@ -150,7 +140,7 @@ void BaseCore::LogToAmqp(const std::string &message)
 {
     string logline = boost::str(
 	    boost::format("%1% \t %2%")
-	    % second_clock::local_time()
+	    % boost::posix_time::second_clock::local_time()
 	    % message);
     mq_log_.push_back(logline);
 }
@@ -206,7 +196,7 @@ void BaseCore::InitMessageQueue()
         LogToAmqp("AMQP is up");
 
         // Составляем уникальные имена для очередей
-        ptime now = microsec_clock::local_time();
+        boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
         std::string postfix = to_iso_string(now);
         boost::replace_first(postfix, ".", ",");
         std::string mq_advertise_name( "getmyad.advertise." + postfix );
@@ -266,9 +256,9 @@ std::string BaseCore::Status()
 //    static int last_time_request_processed = 0;
 
     // Время последнего обращения к статистике
-    static ptime last_time_accessed;
+    static boost::posix_time::ptime last_time_accessed;
 
-    time_duration d;
+    boost::posix_time::time_duration d;
 
     // Вычисляем количество запросов в секунду
     if (last_time_accessed.is_not_a_date_time())
@@ -325,7 +315,7 @@ std::string BaseCore::Status()
         "</td></tr>\n";
         */
     out << "<tr><td>Текущее время: </td> <td>" <<
-        second_clock::local_time() <<
+        boost::posix_time::second_clock::local_time() <<
         "</td></tr>\n";
 
     try

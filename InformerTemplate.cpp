@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include "Config.h"
 #include "InformerTemplate.h"
 
@@ -261,15 +263,15 @@ bool InformerTemplate::initTeasersTemplate()
             что приводит к ошибке во время выполнения программы). swfobject можно получить у InformerTemplate с помощью метода getSwfobjectLibStr().
 	%3%	    JSON для initads (баннер)
 */
-bool InformerTemplate::initBannersTemplate(const string& filename)
+bool InformerTemplate::initBannersTemplate(const std::string& filename)
 {
     if (bannersTemplate!="")
     {
         return true;
     }
 
-    string str;
-    ifstream input (filename);
+    std::string str;
+    std::ifstream input (filename);
     if(input.fail())
     {
         return false;
@@ -366,6 +368,5 @@ bool InformerTemplate::initBannersTemplate(const string& filename)
 
 bool InformerTemplate::init()
 {
-    Config *cfg = Config::Instance();
-    return (initTeasersTemplate() && initBannersTemplate(cfg->swfobject_js_.c_str()));//"swfobject.js"
+    return (initTeasersTemplate() && initBannersTemplate(Config::Instance()->swfobject_js_.c_str()));//"swfobject.js"
 }

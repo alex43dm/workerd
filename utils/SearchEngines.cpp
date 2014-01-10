@@ -1,15 +1,19 @@
+#include <fstream>
+/*
+#include <cstring>
+#include <iostream>
+*/
 #include "SearchEngines.h"
 
-
-bool SearchEngineMapContainer::setSearchEnginesMap(const string& filename)
+bool SearchEngineMapContainer::setSearchEnginesMap(const std::string& filename)
 {
-    string str;
-    string name;
-    string::iterator it;
-    string::size_type i;
-    vector<string> v;
+    std::string str;
+    std::string name;
+    std::string::iterator it;
+    std::string::size_type i;
+    std::vector<std::string> v;
 
-    ifstream input (filename);
+    std::ifstream input (filename);
     if(input.fail())
     {
         return false;
@@ -41,7 +45,7 @@ bool SearchEngineMapContainer::setSearchEnginesMap(const string& filename)
             i = str.find(",");
             while(true)
             {
-                if(i==string::npos)
+                if(i==std::string::npos)
                 {
                     if(!str.empty())
                         v.push_back(str);

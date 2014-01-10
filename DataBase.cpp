@@ -43,21 +43,21 @@ bool DataBase::openDb()
     {
         if(!create)
         {
-            pDatabase = new SQLiteDatabase(dbFileName,
+            pDatabase = new Kompex::SQLiteDatabase(dbFileName,
                                            SQLITE_OPEN_READONLY, NULL);//SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | | SQLITE_OPEN_FULLMUTEX
             return true;
         }
 
         Log::gdb("open and create db");
 
-        pDatabase = new SQLiteDatabase(dbFileName,
+        pDatabase = new Kompex::SQLiteDatabase(dbFileName,
                                        SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);//SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | | SQLITE_OPEN_FULLMUTEX
 
         if(pStmt)
         {
             delete pStmt;
         }
-        pStmt = new SQLiteStatement(pDatabase);
+        pStmt = new Kompex::SQLiteStatement(pDatabase);
 
         //load db dump from directory
 
@@ -67,7 +67,7 @@ bool DataBase::openDb()
         //geo table fill
         GeoRerions::load(pDatabase,geoCsv);
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         Log::err("DB error: %s", ex.GetString().c_str());
         exit(1);
@@ -93,7 +93,7 @@ bool DataBase::gen(int from, unsigned int len)
 
         pStmt->CommitTransaction();
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         printf("DataBase DB error: %s", ex.GetString().c_str());
     }
@@ -151,7 +151,7 @@ void DataBase::postDataLoad()
 
         pStmt->CommitTransaction();
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         Log::err("DataBase DB error: postDataLoad: %s", ex.GetString().c_str());
     }
@@ -166,7 +166,7 @@ void DataBase::indexRebuild()
         pStmt->SqlStatement("REINDEX");
         pStmt->CommitTransaction();
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         Log::err("DataBase DB error: indexRebuild: %s", ex.GetString().c_str());
     }
@@ -199,7 +199,7 @@ bool DataBase::runSqlFile(const std::string &file)
     {
         pStmt->SqlStatement(buf);
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         printf("error in file: %s: %s\n", file.c_str(), ex.GetString().c_str());
         ::exit(1);
@@ -258,7 +258,7 @@ void DataBase::exec(const std::string &sql)
     {
         pStmt->SqlStatement(sql);
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         Log::err("DB error: cmd: %s msg: %s", sql.c_str(), ex.GetString().c_str());
     }

@@ -1,6 +1,8 @@
-#include "DB.h"
 #include <boost/algorithm/string.hpp>
 
+#include <fcgi_stdio.h>
+
+#include "DB.h"
 #include "Log.h"
 #include "CgiService.h"
 #include "utils/UrlParser.h"
@@ -10,26 +12,20 @@
 #include "Informer.h"
 #include "utils/SearchEngines.h"
 #include "InformerTemplate.h"
-#include <fcgi_stdio.h>
 #include "utils/Cookie.h"
 #include "DataBase.h"
 
 #define THREAD_STACK_SIZE PTHREAD_STACK_MIN + 10 * 1024
 
-using namespace std;
-using namespace ClearSilver;
-using namespace boost;
-
 std::string time_t_to_string(time_t t);
 
-string
-convert (const posix_time::ptime& t)
+std::string convert (const boost::posix_time::ptime& t)
 {
     ostringstream ss;
     ss.exceptions(ios_base::failbit);
 
-    date_time::time_facet<posix_time::ptime, char>* facet
-        = new date_time::time_facet<posix_time::ptime, char>;
+    boost::date_time::time_facet<boost::posix_time::ptime, char>* facet
+        = new boost::date_time::time_facet<boost::posix_time::ptime, char>;
     ss.imbue(locale(locale::classic(), facet));
 
     facet->format("%a, %d-%b-%Y %T GMT");
@@ -307,7 +303,6 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
         return;
     }
 
-    using namespace boost::algorithm;
     std::vector<std::string> excluded_offers;
     std::string exclude = url.param("exclude");
     boost::split(excluded_offers, exclude, boost::is_any_of("_"));
@@ -330,11 +325,12 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
         }
     }
 
-    Cookie c = Cookie(cookie_name,
+    ClearSilver::Cookie c = ClearSilver::Cookie(cookie_name,
                       cookie_value,
-                      Cookie::Credentials(Cookie::Authority(cfg->cookie_domain_),
-                                          Cookie::Path(cfg->cookie_path_),
-                                          Cookie::Expires(posix_time::second_clock::local_time() + boost::gregorian::years(1))));
+                      ClearSilver::Cookie::Credentials(
+                                ClearSilver::Cookie::Authority(cfg->cookie_domain_),
+                                ClearSilver::Cookie::Path(cfg->cookie_path_),
+                            ClearSilver::Cookie::Expires(boost::posix_time::second_clock::local_time() + boost::gregorian::years(1))));
     try
     {
         Params prm = Params()

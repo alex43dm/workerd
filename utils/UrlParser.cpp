@@ -1,10 +1,11 @@
-#include <iostream>
+//#include <iostream>
 #include <sstream>
+
 #include "UrlParser.h"
 #include "SearchEngines.h"
 
 
-UrlParser::UrlParser(const string &url)
+UrlParser::UrlParser(const std::string &url)
     : url_(url)
 {
     parse();
@@ -12,13 +13,13 @@ UrlParser::UrlParser(const string &url)
 }
 
 /** Возвращает параметр par или пустую строку, если параметр не найден */
-string UrlParser::param(const string &par) const
+std::string UrlParser::param(const std::string &par) const
 {
-    map<string, string>::const_iterator it = params_.find(par);
+    std::map<std::string,std::string>::const_iterator it = params_.find(par);
     if (it != params_.end())
         return it->second;
     else
-        return string();
+        return std::string();
 }
 
 
@@ -26,23 +27,23 @@ string UrlParser::param(const string &par) const
 void UrlParser::parse()
 {
     // Ищем первый вопросительный знак
-    string::size_type pos = url_.find_first_of('?');
-    if (pos == string::npos)
+    std::string::size_type pos = url_.find_first_of('?');
+    if (pos == std::string::npos)
         pos = -1;
 
-    while (pos < url_.size() || pos == (string::size_type)-1)
+    while (pos < url_.size() || pos == (std::string::size_type)-1)
     {
         // Выделяем название параметра
-        string::size_type end = url_.find_first_of('=', ++pos);
-        if (end == string::npos) return;
-        string param_name = url_.substr(pos, end - pos);
+        std::string::size_type end = url_.find_first_of('=', ++pos);
+        if (end == std::string::npos) return;
+        std::string param_name = url_.substr(pos, end - pos);
         pos = end;
 
         // Выделяем значение параметра
         end = url_.find_first_of('&', ++pos);
-        if (end == string::npos)
+        if (end == std::string::npos)
             end = url_.size();
-        string param_value = url_.substr(pos, end - pos);
+        std::string param_value = url_.substr(pos, end - pos);
         pos = end;
         params_[param_name] = percent_decode(param_value);
     }

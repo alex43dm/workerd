@@ -1,11 +1,7 @@
 #ifndef INFORMERTEMPLATE_H
 #define INFORMERTEMPLATE_H
-#pragma once
 
 #include <string>
-#include <iostream>
-#include <fstream>
-using namespace std;
 
 /**
 
@@ -21,13 +17,13 @@ class InformerTemplate
 private:
     InformerTemplate() {}
 protected:
-    string teasersTemplate;
-    string bannersTemplate;
-    string swfobjectLibStr;
+    std::string teasersTemplate;
+    std::string bannersTemplate;
+    std::string swfobjectLibStr;
 
     bool initTeasersTemplate();
     /** filename - имя файла с библиотекой swfobject */
-    bool initBannersTemplate(const string& filename);
+    bool initBannersTemplate(const std::string& filename);
 public:
     static InformerTemplate* instance()
     {
@@ -46,7 +42,7 @@ public:
     %4%	    ссылка на скрипт получения следующей порции предложений в json,
             к ней будут добавляться дополнительные параметры.
     */
-    const string& getTeasersTemplate()
+    const std::string& getTeasersTemplate()
     {
         return teasersTemplate;
     }
@@ -57,12 +53,12 @@ public:
             что приводит к ошибке во время выполнения программы). swfobject можно получить у InformerTemplate с помощью метода getSwfobjectLibStr().
     %3%	    JSON для initads (баннер)
     */
-    const string& getBannersTemplate()
+    const std::string& getBannersTemplate()
     {
         return bannersTemplate;
     }
     /** строка с библиотекой swfobject */
-    const string& getSwfobjectLibStr()
+    const std::string& getSwfobjectLibStr()
     {
         return swfobjectLibStr;
     }

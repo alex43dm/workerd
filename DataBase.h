@@ -14,12 +14,10 @@
 #include "KompexSQLiteDatabase.h"
 #include "KompexSQLiteStatement.h"
 
-using namespace Kompex;
-
 class DataBase
 {
 public:
-    SQLiteDatabase *pDatabase;
+    Kompex::SQLiteDatabase *pDatabase;
 
     DataBase(bool create = false);
     virtual ~DataBase();
@@ -36,7 +34,7 @@ private:
     std::string dirName;
     std::string geoCsv;
     bool create;
-    SQLiteStatement *pStmt;
+    Kompex::SQLiteStatement *pStmt;
 
     bool openDb();
     long fileSize(int fd);

@@ -13,19 +13,9 @@
 #include "Log.h"
 #include "Core.h"
 #include "InformerTemplate.h"
-//#include "utils/Comparators.h"
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
 #include "utils/base64.h"
-
-using std::list;
-using std::vector;
-using std::map;
-using std::unique_ptr;
-using std::string;
-using namespace boost::posix_time;
-using namespace Kompex;
-#define foreach	BOOST_FOREACH
 
 #define CMD_SIZE 8192
 
@@ -57,10 +47,10 @@ Core::Core() :
 */
     try
     {
-        pStmtInformer = new SQLiteStatement(pDb->pDatabase);
+        pStmtInformer = new Kompex::SQLiteStatement(pDb->pDatabase);
         pStmtInformer->Sql(pDb->getSqlFile("requests/02.sql"));
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         Log::err("DB error: pStmtInformer: %s %s", ex.GetString().c_str(),
                  pDb->getSqlFile("requests/02.sql").c_str());
@@ -70,13 +60,13 @@ Core::Core() :
     Kompex::SQLiteStatement *p;
     try
     {
-        p = new SQLiteStatement(pDb->pDatabase);
+        p = new Kompex::SQLiteStatement(pDb->pDatabase);
         sqlite3_snprintf(CMD_SIZE, cmd, "CREATE TABLE IF NOT EXISTS tmp%ld(id INT8 NOT NULL);",tid);
         p->SqlStatement(cmd);
         sqlite3_snprintf(CMD_SIZE, cmd, "CREATE INDEX IF NOT EXISTS idx_tmp%ld_id ON tmp%ld(id);",tid,tid);
         p->SqlStatement(cmd);
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         Log::err("DB error: create tmp table: %s", ex.GetString().c_str());
         exit(1);
@@ -122,14 +112,14 @@ Core::~Core()
 class GenerateRedirectLink
 {
     long long informerId;
-    string server_ip_;
-    string redirect_script_;
-    string location_;
+    std::string server_ip_;
+    std::string redirect_script_;
+    std::string location_;
 public:
     GenerateRedirectLink( long long &informerId,
-                         const string &server_ip,
-                         const string &redirect_script,
-                         const string &location)
+                         const std::string &server_ip,
+                         const std::string &redirect_script,
+                         const std::string &location)
         : informerId(informerId), server_ip_(server_ip),
           redirect_script_(redirect_script),
           location_(location) { }
@@ -158,7 +148,7 @@ std::string Core::Process(const Params &params, Offer::Map &items)
 {
    // Log::info("[%ld]Core::Process start",tid);
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
-    startTime = microsec_clock::local_time();
+    startTime = boost::posix_time::microsec_clock::local_time();
 
     countDown = 3;
 
@@ -212,7 +202,7 @@ std::string Core::Process(const Params &params, Offer::Map &items)
 
     delete informer;
 
-    Log::info("[%ld]core time: %s %d",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str(), items.size());
+    Log::info("[%ld]core time: %s %d",tid, boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime).c_str(), items.size());
 
     return ret;
 }
@@ -232,11 +222,11 @@ void Core::ProcessSaveResults(const Params &params, const Offer::Map &items)
         Kompex::SQLiteStatement *p;
         try
         {
-            p = new SQLiteStatement(pDb->pDatabase);
+            p = new Kompex::SQLiteStatement(pDb->pDatabase);
             std::string sql("DELETE FROM tmp" + boost::lexical_cast<std::string>(tid) + ";");
             p->SqlStatement(sql);
         }
-        catch(SQLiteException &ex)
+        catch(Kompex::SQLiteException &ex)
         {
             Log::err("DB error: create tmp table: %s", ex.GetString().c_str());
             exit(1);
@@ -313,7 +303,7 @@ file::memory:?cache=shared
 bool Core::getOffers(const Params &params, Offer::Map &result)
 {
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
-    startTime = microsec_clock::local_time();
+    startTime = boost::posix_time::microsec_clock::local_time();
 
     Kompex::SQLiteStatement *pStmt;
 
@@ -323,7 +313,7 @@ bool Core::getOffers(const Params &params, Offer::Map &result)
 
     try
     {
-        pStmt = new SQLiteStatement(pDb->pDatabase);
+        pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
 
         sqlite3_snprintf(CMD_SIZE, cmd, pStmtOfferStr.c_str(),
                               informer->domainId,
@@ -334,7 +324,7 @@ bool Core::getOffers(const Params &params, Offer::Map &result)
                               tid);
         pStmt->Sql(cmd);
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         Log::err("DB error: pStmtOffer: %s: %s", ex.GetString().c_str(), pDb->getSqlFile("requests/01.sql").c_str());
         delete pStmt;
@@ -382,7 +372,7 @@ bool Core::getOffers(const Params &params, Offer::Map &result)
 
         teasersMediumRating /= teasersCount;
     }
-    catch(SQLiteException &ex)
+    catch(Kompex::SQLiteException &ex)
     {
         Log::err("DB error: %s", ex.GetString().c_str());
         delete pStmt;
@@ -815,9 +805,9 @@ void Core::RISAlgorithm(Offer::Map &result, const Params &params)
  */
 void Core::markAsShown(const Offer::Map &items,
                        const Params &params,
-                       list<string> &shortTerm,
-                       list<string> &longTerm,
-                       list<string> &contextTerm )
+                       std::list<std::string> &shortTerm,
+                       std::list<std::string> &longTerm,
+                       std::list<std::string> &contextTerm )
 {
     if (params.test_mode_)
 	return;
@@ -825,7 +815,7 @@ void Core::markAsShown(const Offer::Map &items,
 	//LOG(INFO) << "writing to log...";
 
     int count = 0;
-	list<string>::iterator it;
+	std::list<std::string>::iterator it;
 
 	mongo::BSONArrayBuilder b1,b2,b3;
 	for (it=shortTerm.begin() ; it != shortTerm.end(); ++it )

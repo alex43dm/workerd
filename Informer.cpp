@@ -1,13 +1,11 @@
 #include "DB.h"
-#include <map>
+
 #include <boost/algorithm/string.hpp>
+
 #include "Informer.h"
 #include "Log.h"
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
-
-using namespace std;
-using namespace mongo;
 
 /** Ищет данные информера по id, если не находит, то вставляет пустой элемент,
     у которого valid = false
@@ -37,7 +35,7 @@ Informer::~Informer()
 bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
 {
     mongo::DB db;
-    unique_ptr<mongo::DBClientCursor> cursor = db.query("informer", mongo::Query());
+    std::unique_ptr<mongo::DBClientCursor> cursor = db.query("informer", mongo::Query());
     //std::set<std::string> blocked_accounts = GetBlockedAccounts();
     int skipped = 0;
     Kompex::SQLiteStatement *pStmt;
@@ -59,7 +57,7 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
     while (cursor->more())
     {
         mongo::BSONObj x = cursor->next();
-        string id = x.getStringField("guid");
+        std::string id = x.getStringField("guid");
         boost::to_lower(id);
         if (id.empty())
         {

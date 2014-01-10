@@ -97,8 +97,6 @@
 		<Unit filename="Offer.h" />
 		<Unit filename="Params.cpp" />
 		<Unit filename="Params.h" />
-		<Unit filename="UserHistory.cpp" />
-		<Unit filename="UserHistory.h" />
 		<Unit filename="config.xml" />
 		<Unit filename="db_dump/post/01.sql" />
 		<Unit filename="db_dump/requests/01.sql" />

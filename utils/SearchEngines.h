@@ -1,10 +1,6 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <fstream>
-#include <cstring>
-#include <iostream>
-using namespace std;
 
 /** \brief Добавлено RealInvest Soft. Структура, хранящая соответствия поисковиков и названий параметров, с которых начинается строка запроса пользователя.
 
@@ -17,7 +13,7 @@ private:
     /** \brief Закрытый конструктор. */
     SearchEngineMapContainer() {}
 
-    map<string, vector<string> > m_listSSearchEngines;///< map, хранящий соответствие между поисковиком и значением параметра, за которым следует строка запроса пользователя
+    std::map<std::string, std::vector<std::string> > m_listSSearchEngines;///< map, хранящий соответствие между поисковиком и значением параметра, за которым следует строка запроса пользователя
 public:
     /** \brief Метод получения экземпляра класса. */
     static SearchEngineMapContainer* instance()
@@ -51,10 +47,10 @@ public:
     yandex.ru: text=
     \endcode
     */
-    bool setSearchEnginesMap(const string &filename);
+    bool setSearchEnginesMap(const std::string &filename);
 
     /** \brief Возвращает map m_listSSearchEngines. */
-    map<string, vector<string> >& getMap()
+    std::map<std::string, std::vector<std::string> >& getMap()
     {
         return m_listSSearchEngines;
     }
