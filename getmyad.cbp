@@ -64,6 +64,7 @@
 			<Add library="tinyxml" />
 			<Add library="sqlite3" />
 			<Add library="boost_system" />
+			<Add library="pthread" />
 		</Linker>
 		<Unit filename="BaseCore.cpp" />
 		<Unit filename="BaseCore.h" />

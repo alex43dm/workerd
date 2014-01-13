@@ -56,6 +56,22 @@ public:
     bool getDeprecatedOffersAsync();
     bool getDeprecatedOffersAsyncWait();
 
+    bool getLongTermAsync();
+    bool getLongTermAsyncWait();
+
+    bool getShortTermAsync();
+    bool getShortTermAsyncWait();
+
+    bool getPageKeywordsAsync();
+    bool getPageKeywordsAsyncWait();
+
+    void waitAsyncHistory()
+    {
+        getLongTermAsyncWait();
+        getShortTermAsyncWait();
+        getPageKeywordsAsyncWait();
+    }
+
     bool clearDeprecatedOffers();
     void getHistory();
 protected:
@@ -65,17 +81,28 @@ private:
     std::map<HistoryType, RedisClient *> history_archive;
     std::string tmpTable;
     std::list <std::pair<std::string,std::pair<float,std::string>>> stringQuery;
-    pthread_t thrGetDeprecatedOffersAsync;
+    pthread_mutex_t *m_pPrivate;
+
+    pthread_t   thrGetDeprecatedOffersAsync,
+                thrGetLongTermAsync,
+                thrGetShortTermAsync,
+                thrGetPageKeywordsAsync;
+
 
     void updateShortHistory(const std::string & query);
     void updateContextHistory(const std::string & query);
     bool getUserHistory(HistoryType type, std::list<std::string> &rr);
 
     boost::int64_t currentDateToInt();
+    void lock();
+    void unlock();
     void getLongTerm();
     void getShortTermHistory();
     void getPageKeywordsHistory();
 
     static void *getDeprecatedOffersEnv(void *);
+    static void *getLongTermEnv(void *);
+    static void *getShortTermEnv(void *data);
+    static void *getPageKeywordsEnv(void *data);
 };
 #endif

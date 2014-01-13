@@ -153,14 +153,16 @@ std::string Core::Process(const Params &params, Offer::Map &items)
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = boost::posix_time::microsec_clock::local_time();
 
-    countDown = 3;
-
+    //load all history async
     hm->setParams(params);
-    hm->getDeprecatedOffersAsync();
 
     informer = getInformer(params);
     //Log::info("[%ld]getInformer done",tid);
     getOffers(params, items);
+
+    //wait all history load
+    hm->waitAsyncHistory();
+
     //новый алгоритм
     RISAlgorithm(items, params);
     //Log::info("RISAlgorithm: done",tid);
@@ -301,7 +303,6 @@ bool Core::getOffers(const Params &params, Offer::Map &result)
     Kompex::SQLiteStatement *pStmt;
 
 //    Log::info("getOffers start");
-    //hm->getDeprecatedOffers();
     hm->getDeprecatedOffersAsyncWait();
     //Log::info("[%ld]get history size: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
 
@@ -376,12 +377,14 @@ bool Core::getOffers(const Params &params, Offer::Map &result)
 
     delete pStmt;
     //Log::info("[%ld]get getoffer done: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
+    /*
     if(result.size() < 3 && countDown-- > 0)
     {
         hm->clearDeprecatedOffers();
         Core::getOffers(params, result);
         Log::info("clear view history: %d", countDown);
     }
+    */
     return true;
 }
 

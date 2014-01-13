@@ -193,7 +193,6 @@ private:
     int teasersCount;
 
     char *cmd;
-    int countDown;//for recursive
     float teasersMediumRating;
     std::string tmpTableName;
 };

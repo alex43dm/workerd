@@ -7,10 +7,18 @@ HistoryManager::HistoryManager(const std::string &tmpTableName):
 {
     module = Module_new();
     Module_init(module);
+
+        m_pPrivate = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
+        pthread_mutexattr_t attr;
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutex_init((pthread_mutex_t*)m_pPrivate, &attr);
+        pthread_mutexattr_destroy(&attr);
 }
 
 HistoryManager::~HistoryManager()
 {
+    pthread_mutex_destroy((pthread_mutex_t*)m_pPrivate);
     Module_free(module);
 }
 
@@ -39,6 +47,16 @@ bool HistoryManager::initDB()
 
     return true;
 }
+//------------------------------------------sync functions----------------------------------------
+void HistoryManager::lock()
+{
+        pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
+}
+
+void HistoryManager::unlock()
+{
+        pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
+}
 
 void HistoryManager::setParams(const Params &params)
 {
@@ -48,19 +66,31 @@ void HistoryManager::setParams(const Params &params)
 
     key = params.getUserKey();
 
+    getDeprecatedOffersAsync();
+
+    getLongTermAsync();
+
+    getShortTermAsync();
+
+    getPageKeywordsAsync();
+
      //Запрос по П/З query
     std::string q = Params::getKeywordsString(params.getSearch());
     if (!q.empty())
     {
+        lock();
         stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
             q, std::pair<float,std::string>(Config::Instance()->range_query_,"T1")));
+        unlock();
     }
     //Запрос по контексту страницы context
     q = Params::getContextKeywordsString(params.getContext());
     if (!q.empty())
     {
+        lock();
         stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
             q, std::pair<float,std::string>(Config::Instance()->range_context_,"T2")));
+        unlock();
     }
 }
 
@@ -265,8 +295,10 @@ void HistoryManager::getLongTerm()
             std::string q = Params::getKeywordsString(strSH);
             if (!q.empty())
             {
+                lock();
                 stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
                     q, std::pair<float,std::string>(Config::Instance()->range_long_term_,"T5")));
+                unlock();
             }
         }
     }
@@ -284,8 +316,10 @@ void HistoryManager::getShortTermHistory()
             std::string q = Params::getKeywordsString(strSH);
             if (!q.empty())
             {
+                lock();
                 stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
                     q, std::pair<float,std::string>(Config::Instance()->range_short_term_,"T3")));
+                unlock();
             }
         }
     }
@@ -303,9 +337,103 @@ void HistoryManager::getPageKeywordsHistory()
             std::string q = Params::getContextKeywordsString(strSH);
             if (!q.empty())
             {
+                lock();
                 stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
                     q, std::pair<float,std::string>(Config::Instance()->range_context_term_,"T4")));
+                unlock();
             }
         }
     }
+}
+
+
+//----------------------------long term---------------------------------------
+
+void *HistoryManager::getLongTermEnv(void *data)
+{
+    HistoryManager *h = (HistoryManager*)data;
+    h->getLongTerm();
+    return NULL;
+}
+bool HistoryManager::getLongTermAsync()
+{
+    pthread_attr_t attributes, *pAttr = &attributes;
+    pthread_attr_init(pAttr);
+    //pthread_attr_setstacksize(pAttr, THREAD_STACK_SIZE);
+
+    if(pthread_create(&thrGetLongTermAsync, pAttr, &this->getLongTermEnv, this))
+    {
+        Log::err("creating thread failed");
+    }
+
+    pthread_attr_destroy(pAttr);
+
+    return true;
+}
+
+bool HistoryManager::getLongTermAsyncWait()
+{
+    pthread_join(thrGetLongTermAsync, 0);
+    return true;
+}
+//----------------------------page keywords---------------------------------------
+void *HistoryManager::getPageKeywordsEnv(void *data)
+{
+    HistoryManager *h = (HistoryManager*)data;
+    h->getPageKeywordsHistory();
+    return NULL;
+}
+
+bool HistoryManager::getPageKeywordsAsync()
+{
+    pthread_attr_t attributes, *pAttr = &attributes;
+    pthread_attr_init(pAttr);
+    //pthread_attr_setstacksize(pAttr, THREAD_STACK_SIZE);
+
+    if(pthread_create(&thrGetPageKeywordsAsync, pAttr, &this->getPageKeywordsEnv, this))
+    {
+        Log::err("creating thread failed");
+    }
+
+    pthread_attr_destroy(pAttr);
+
+    return true;
+}
+
+bool HistoryManager::getPageKeywordsAsyncWait()
+{
+    pthread_join(thrGetPageKeywordsAsync, 0);
+    return true;
+}
+
+
+//----------------------------short term---------------------------------------
+
+void *HistoryManager::getShortTermEnv(void *data)
+{
+    HistoryManager *h = (HistoryManager*)data;
+    h->getShortTermHistory();
+    return NULL;
+}
+
+bool HistoryManager::getShortTermAsync()
+{
+    pthread_attr_t attributes, *pAttr = &attributes;
+    pthread_attr_init(pAttr);
+    //pthread_attr_setstacksize(pAttr, THREAD_STACK_SIZE);
+
+    if(pthread_create(&thrGetShortTermAsync, pAttr, &this->getShortTermEnv, this))
+    {
+        Log::err("creating thread failed");
+    }
+
+    pthread_attr_destroy(pAttr);
+
+    return true;
+}
+
+bool HistoryManager::getShortTermAsyncWait()
+{
+    pthread_join(thrGetShortTermAsync, 0);
+    return true;
 }
