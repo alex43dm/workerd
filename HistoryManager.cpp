@@ -2,7 +2,8 @@
 #include "Config.h"
 #include "Log.h"
 
-HistoryManager::HistoryManager()
+HistoryManager::HistoryManager(const std::string &tmpTableName):
+    tmpTable(tmpTableName)
 {
     module = Module_new();
     Module_init(module);
@@ -39,14 +40,15 @@ bool HistoryManager::initDB()
     return true;
 }
 
-void HistoryManager::setParams(const Params& params)
+void HistoryManager::setParams(const Params &params)
 {
-    key = params.getUserKey();
     clean = false;
     updateShort = false;
     updateContext = false;
-/*
-    //Запрос по П/З query
+
+    key = params.getUserKey();
+
+     //Запрос по П/З query
     std::string q = Params::getKeywordsString(params.getSearch());
     if (!q.empty())
     {
@@ -60,55 +62,6 @@ void HistoryManager::setParams(const Params& params)
         stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
             q, std::pair<float,std::string>(Config::Instance()->range_context_,"T2")));
     }
-
-    getUserHistory(HistoryType::ShortTerm, vshortTerm);
-
-    for (auto i=vshortTerm.begin(); i != vshortTerm.end(); ++i)
-    {
-        std::string strSH = *i;
-        if (!strSH.empty())
-        {
-            q = Params::getKeywordsString(strSH);
-            if (!q.empty())
-            {
-                stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
-                    q, std::pair<float,std::string>(Config::Instance()->range_short_term_,"T3")));
-            }
-        }
-    }
-
-    getUserHistory(HistoryType::PageKeywords, vcontextTerm);
-
-    for (auto i=vcontextTerm.begin(); i != vcontextTerm.end(); ++i)
-    {
-        std::string strSH = *i;
-        if (!strSH.empty())
-        {
-            q = Params::getContextKeywordsString(strSH);
-            if (!q.empty())
-            {
-                stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
-                    q, std::pair<float,std::string>(Config::Instance()->range_context_term_,"T4")));
-            }
-        }
-    }
-
-    getUserHistory(HistoryType::LongTerm, vlongTerm);
-
-    for (auto i=vlongTerm.begin(); i != vlongTerm.end(); ++i)
-    {
-        std::string strSH = *i;
-        if (!strSH.empty())
-        {
-            q = Params::getKeywordsString(strSH);
-            if (!q.empty())
-            {
-                stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
-                    q, std::pair<float,std::string>(Config::Instance()->range_long_term_,"T5")));
-            }
-        }
-    }
-    */
 }
 
 /** \brief  Возвращает статус подключения к одной из баз данных Redis.
@@ -192,13 +145,41 @@ bool HistoryManager::getDeprecatedOffers(std::string &rr)
 
 bool HistoryManager::getDeprecatedOffers()
 {
-
-    if(!history_archive[ViewHistory]->getRange(key))
+    if(!history_archive[ViewHistory]->getRange(key, tmpTable))
     {
         Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
         return false;
     }
 
+    return true;
+}
+
+void *HistoryManager::getDeprecatedOffersEnv(void *data)
+{
+    HistoryManager *h = (HistoryManager*)data;
+    h->getDeprecatedOffers();
+    return NULL;
+}
+
+bool HistoryManager::getDeprecatedOffersAsync()
+{
+    pthread_attr_t* attributes = (pthread_attr_t*) malloc(sizeof(pthread_attr_t));
+    pthread_attr_init(attributes);
+    //pthread_attr_setstacksize(attributes, THREAD_STACK_SIZE);
+
+    if(pthread_create(&thrGetDeprecatedOffersAsync, attributes, &this->getDeprecatedOffersEnv, this))
+    {
+        Log::err("creating thread failed");
+    }
+
+    pthread_attr_destroy(attributes);
+
+    return true;
+}
+
+bool HistoryManager::getDeprecatedOffersAsyncWait()
+{
+    pthread_join(thrGetDeprecatedOffersAsync, 0);
     return true;
 }
 
@@ -270,4 +251,61 @@ boost::int64_t HistoryManager::currentDateToInt()
     boost::posix_time::time_duration myTimeFromEpoch = myTime - myEpoch;
     boost::int64_t myTimeAsInt = myTimeFromEpoch.ticks();
     return (myTimeAsInt%10000000000) ;
+}
+
+void HistoryManager::getLongTerm()
+{
+    getUserHistory(HistoryType::LongTerm, vlongTerm);
+
+    for (auto i=vlongTerm.begin(); i != vlongTerm.end(); ++i)
+    {
+        std::string strSH = *i;
+        if (!strSH.empty())
+        {
+            std::string q = Params::getKeywordsString(strSH);
+            if (!q.empty())
+            {
+                stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
+                    q, std::pair<float,std::string>(Config::Instance()->range_long_term_,"T5")));
+            }
+        }
+    }
+}
+
+void HistoryManager::getShortTermHistory()
+{
+    getUserHistory(HistoryType::ShortTerm, vshortTerm);
+
+    for (auto i=vshortTerm.begin(); i != vshortTerm.end(); ++i)
+    {
+        std::string strSH = *i;
+        if (!strSH.empty())
+        {
+            std::string q = Params::getKeywordsString(strSH);
+            if (!q.empty())
+            {
+                stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
+                    q, std::pair<float,std::string>(Config::Instance()->range_short_term_,"T3")));
+            }
+        }
+    }
+}
+
+void HistoryManager::getPageKeywordsHistory()
+{
+    getUserHistory(HistoryType::PageKeywords, vcontextTerm);
+
+    for (auto i=vcontextTerm.begin(); i != vcontextTerm.end(); ++i)
+    {
+        std::string strSH = *i;
+        if (!strSH.empty())
+        {
+            std::string q = Params::getContextKeywordsString(strSH);
+            if (!q.empty())
+            {
+                stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
+                    q, std::pair<float,std::string>(Config::Instance()->range_context_term_,"T4")));
+            }
+        }
+    }
 }

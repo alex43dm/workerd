@@ -125,15 +125,12 @@ bool RedisClient::getRange(const std::string &key,
     return true;
 }
 
-bool RedisClient::getRange(const std::string &key)
+bool RedisClient::getRange(const std::string &key, const std::string &tableName)
 {
     int cnt = 0;
     Batch *batch;
     Executor *executor;
-    pthread_t tid;
     Kompex::SQLiteStatement *pStmt;
-
-    tid = pthread_self();
 
     bzero(cmd,CMD_SIZE);
     snprintf(cmd, CMD_SIZE, "ZREVRANGE %s 0 -1\r\n", key.c_str());
@@ -159,7 +156,7 @@ bool RedisClient::getRange(const std::string &key)
         int level;
 
         pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-        sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO tmp%d%ld(id) VALUES(@id);",getpid(),tid);
+        sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO %s(id) VALUES(@id);",tableName.c_str());
         pStmt->Sql(cmd);
 
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
@@ -189,12 +186,12 @@ bool RedisClient::getRange(const std::string &key)
     try
     {
         p = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-        sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_tmp%d%ld_id;",getpid(),tid);
+        sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_%s_id;",tableName.c_str());
         p->SqlStatement(cmd);
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DB error: REINDEX: %s", ex.GetString().c_str());
+        Log::err("DB error: REINDEX table: %s: %s",tableName.c_str(), ex.GetString().c_str());
     }
     delete p;
 

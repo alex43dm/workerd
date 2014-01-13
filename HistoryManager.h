@@ -11,7 +11,6 @@
 #include "Offer.h"
 #include "RedisClient.h"
 #include "Params.h"
-#include "SQLiteTmpTable.h"
 
 typedef enum
 {
@@ -38,59 +37,45 @@ public:
     std::list<std::string> vlongTerm;
     std::list<std::string> vcontextTerm;
 
-    HistoryManager();
+    HistoryManager(const std::string &tmpTableName);
     virtual ~HistoryManager();
 
     /** \brief  Инициализация подключения к базам данных Redis
     */
     bool initDB();
 
-    void setParams(const Params& params);
+    void setParams(const Params &params);
 
     bool getDBStatus(HistoryType t);
     bool updateUserHistory(const Offer::Map &items, const Params& params);
 
     bool setDeprecatedOffers(const Offer::Map &items);
+
     bool getDeprecatedOffers(std::string &);
     bool getDeprecatedOffers();
+    bool getDeprecatedOffersAsync();
+    bool getDeprecatedOffersAsyncWait();
+
     bool clearDeprecatedOffers();
-/*
-    bool getShortTerm(std::list<std::string> &r)
-    {
-        return getUserHistory(ShortTerm, r);
-    }
-
-    bool getLongTerm(std::list<std::string> &r)
-    {
-        return getUserHistory(LongTerm, r);
-    }
-
-    bool getPageKeywords(std::list<std::string> &r)
-    {
-        return getUserHistory(PageKeywords, r);
-    }
-
-    bool getCategory(std::list<std::string> &r)
-    {
-        return getUserHistory(Category, r);
-    }
-
-    bool getRetargeting(std::list<std::string> &r)
-    {
-        return getUserHistory(Retargeting, r);
-    }
-*/
+    void getHistory();
+protected:
 private:
     std::string key;
     Module *module;
     std::map<HistoryType, RedisClient *> history_archive;
-    SQLiteTmpTable *tmpTable;
+    std::string tmpTable;
     std::list <std::pair<std::string,std::pair<float,std::string>>> stringQuery;
+    pthread_t thrGetDeprecatedOffersAsync;
 
     void updateShortHistory(const std::string & query);
     void updateContextHistory(const std::string & query);
     bool getUserHistory(HistoryType type, std::list<std::string> &rr);
 
     boost::int64_t currentDateToInt();
+    void getLongTerm();
+    void getShortTermHistory();
+    void getPageKeywordsHistory();
+
+    static void *getDeprecatedOffersEnv(void *);
 };
 #endif

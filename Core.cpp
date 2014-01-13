@@ -55,16 +55,18 @@ Core::Core() :
                  pDb->getSqlFile("requests/02.sql").c_str());
         exit(1);
     }
+//+ boost::lexical_cast<std::string>(getpid()) + boost::lexical_cast<std::string>(tid)
+    tmpTableName = "tmp" + std::to_string(getpid()) + std::to_string(tid);
 
     Kompex::SQLiteStatement *p;
     try
     {
         p = new Kompex::SQLiteStatement(pDb->pDatabase);
-        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE TABLE IF NOT EXISTS tmp%d%ld(id INT8 NOT NULL);",
-                         getpid(), tid);
+        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE TABLE IF NOT EXISTS %s(id INT8 NOT NULL);",
+                         tmpTableName.c_str());
         p->SqlStatement(cmd);
-        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE INDEX IF NOT EXISTS idx_tmp%d%ld_id ON tmp%d%ld(id);",
-                         getpid(),tid, getpid(),tid);
+        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE INDEX IF NOT EXISTS idx_%s_id ON %s(id);",
+                         tmpTableName.c_str(), tmpTableName.c_str());
         p->SqlStatement(cmd);
     }
     catch(Kompex::SQLiteException &ex)
@@ -74,7 +76,7 @@ Core::Core() :
     }
     delete p;
 
-    hm = new HistoryManager();
+    hm = new HistoryManager(tmpTableName);
     hm->initDB();
 
     Log::info("[%ld]core start",tid);
@@ -154,6 +156,7 @@ std::string Core::Process(const Params &params, Offer::Map &items)
     countDown = 3;
 
     hm->setParams(params);
+    hm->getDeprecatedOffersAsync();
 
     informer = getInformer(params);
     //Log::info("[%ld]getInformer done",tid);
@@ -220,13 +223,12 @@ void Core::ProcessSaveResults(const Params &params, const Offer::Map &items)
     try
     {
         p = new Kompex::SQLiteStatement(pDb->pDatabase);
-        std::string sql("DELETE FROM tmp"+ boost::lexical_cast<std::string>(getpid()) + boost::lexical_cast<std::string>(tid) + ";");
+        std::string sql("DELETE FROM " + tmpTableName + ";");
         p->SqlStatement(sql);
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DB error: create tmp table: %s", ex.GetString().c_str());
-        exit(1);
+        Log::err("DB error: delete from %s table: %s", tmpTableName.c_str(), ex.GetString().c_str());
     }
     delete p;
 
@@ -299,7 +301,8 @@ bool Core::getOffers(const Params &params, Offer::Map &result)
     Kompex::SQLiteStatement *pStmt;
 
 //    Log::info("getOffers start");
-    hm->getDeprecatedOffers();
+    //hm->getDeprecatedOffers();
+    hm->getDeprecatedOffersAsyncWait();
     //Log::info("[%ld]get history size: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
 
     try
