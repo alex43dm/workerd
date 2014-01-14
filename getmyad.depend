@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1389705973 source:/home/alex/Projects/worker/BaseCore.cpp
+1389709113 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -902,7 +902,7 @@
 	<boost/date_time/posix_time/ptime.hpp>
 	"../Log.h"
 
-1388392311 /home/alex/Projects/worker/Informer.h
+1389708241 /home/alex/Projects/worker/Informer.h
 	<string>
 	<map>
 	<set>
@@ -923,7 +923,7 @@
 	"Campaign.h"
 	"KompexSQLiteDatabase.h"
 
-1389705959 source:/home/alex/Projects/worker/Campaign.cpp
+1389706827 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"DB.h"
@@ -1214,7 +1214,7 @@
 	"Config.h"
 	"Log.h"
 
-1389357019 source:/home/alex/Projects/worker/Informer.cpp
+1389709071 source:/home/alex/Projects/worker/Informer.cpp
 	"DB.h"
 	<boost/algorithm/string.hpp>
 	"Informer.h"

@@ -55,6 +55,7 @@ public:
 
     /** Загружает информацию обо всех информерах */
     static bool loadAll(Kompex::SQLiteDatabase *pdb);
+    static bool update(Kompex::SQLiteDatabase *pdb, std::string aInformerId);
 
     bool is_null() const
     {

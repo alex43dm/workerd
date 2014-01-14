@@ -64,7 +64,7 @@ bool BaseCore::ProcessMQ()
     try
     {
         {
-            // Проверка сообщений advertise.#
+            // Проверка сообщений campaign.#
             mq_campaign_->Get(AMQP_NOACK);
             AMQPMessage *m = mq_campaign_->getMessage();
             if (m->getMessageCount() > -1)
@@ -93,22 +93,13 @@ bool BaseCore::ProcessMQ()
             AMQPMessage *m = mq_informer_->getMessage();
             if (m->getMessageCount() > -1)
             {
-                Log::info("Message retrieved:\nbody: %s\nrouting key:%sexchange:%s\n",
-                m->getMessage(nullptr),m->getRoutingKey().c_str(),m->getExchange().c_str());
-                /*
-                Informer informer(m->getMessage(nullptr));
-                string logline = boost::str(
-                                     boost::format("Message (key=%1%, body=%2%, "
-                                                   "informer=%3%)")
-                                     % m->getRoutingKey()
-                                     % m->getMessage(nullptr)
-                                     % informer.title);
-                LogToAmqp(logline);
-                Benchmark bench("Informer reloaded");
-//                Informer::loadInformer(informer, pDb->pDatabase);
-                time_last_mq_check_ = second_clock::local_time();
+                if(m->getRoutingKey() == "informer.update")
+                {
+                    Informer::update(Config::Instance()->pDb->pDatabase, toString(m));
+                }
+
+                time_last_mq_check_ = boost::posix_time::second_clock::local_time();
                 check_interval = 2;
-                */
                 return true;
             }
         }
