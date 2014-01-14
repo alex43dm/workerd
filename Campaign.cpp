@@ -418,7 +418,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb)
     Log::info("Loaded %d campaigns",i);
 }
 
-/** \brief  Закгрузка всех рекламных кампаний из базы данных  Mongo
+/** \brief  Обновление кампании из базы данных  Mongo
 
  */
 void Campaign::update(Kompex::SQLiteDatabase *pdb, std::string aCampaignId)
@@ -900,4 +900,45 @@ void Campaign::update(Kompex::SQLiteDatabase *pdb, std::string aCampaignId)
     delete pStmt;
 
     Log::info("campaign %lld updated",long_id);
+}
+
+/** \brief  Обновление кампании из базы данных  Mongo
+
+ */
+void Campaign::startStop(Kompex::SQLiteDatabase *pdb,
+        std::string aCampaignId,
+        int StartStop)
+{
+    Kompex::SQLiteStatement *pStmt;
+    char buf[8192];
+
+    if(aCampaignId.empty())
+    {
+        return;
+    }
+
+    pStmt = new Kompex::SQLiteStatement(pdb);
+    pStmt->BeginTransaction();
+
+    // Дни недели, в которые осуществляется показ
+
+    bzero(buf,sizeof(buf));
+    sqlite3_snprintf(sizeof(buf),buf,"UPDATE CronCampaign \
+                     SET startStop=%d \
+                     WHERE id_cam IN (SELECT id FROM Campaign WHERE guid='%q');",StartStop,aCampaignId.c_str());
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        Log::err("Campaign::start update(%s) error: %s", buf, ex.GetString().c_str());
+    }
+
+    pStmt->CommitTransaction();
+    pStmt->FreeQuery();
+
+    delete pStmt;
+
+    Log::info("campaign %s updated",aCampaignId.c_str());
 }

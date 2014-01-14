@@ -69,7 +69,18 @@ bool BaseCore::ProcessMQ()
             AMQPMessage *m = mq_campaign_->getMessage();
             if (m->getMessageCount() > -1)
             {
-                Campaign::update(Config::Instance()->pDb->pDatabase, toString(m));
+                if(m->getRoutingKey() == "campaign.update")
+                {
+                    Campaign::update(Config::Instance()->pDb->pDatabase, toString(m));
+                }
+                else if(m->getRoutingKey() == "campaign.start")
+                {
+                    Campaign::startStop(Config::Instance()->pDb->pDatabase, toString(m), 1);
+                }
+                else if(m->getRoutingKey() == "campaign.stop")
+                {
+                    Campaign::startStop(Config::Instance()->pDb->pDatabase, toString(m), 0);
+                }
 
                 time_last_mq_check_ = boost::posix_time::second_clock::local_time();
                 check_interval = 2;

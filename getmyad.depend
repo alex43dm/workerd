@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1389703654 source:/home/alex/Projects/worker/BaseCore.cpp
+1389705973 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -908,7 +908,7 @@
 	<set>
 	"KompexSQLiteDatabase.h"
 
-1389701190 /home/alex/Projects/worker/Campaign.h
+1389705921 /home/alex/Projects/worker/Campaign.h
 	<string>
 	<map>
 	<list>
@@ -923,7 +923,7 @@
 	"Campaign.h"
 	"KompexSQLiteDatabase.h"
 
-1389701322 source:/home/alex/Projects/worker/Campaign.cpp
+1389705959 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"DB.h"
