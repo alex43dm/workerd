@@ -59,6 +59,9 @@ public:
     std::string sphinx_host_;
     int         sphinx_port_;
     int         instanceId;
+    std::string lock_file_;
+    std::string pid_file_;
+    std::string user_;
 
     DataBase *pDb;
 

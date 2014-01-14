@@ -19,7 +19,7 @@ LIB =  -lmongoclient -lfcgi -lsphinxclient -lGeoIP -lrabbitmq -lboost_date_time 
 LDFLAGS =  /usr/lib/libamqpcpp.a
 
 INC_DEBUG =  $(INC) -Iinclude -I../libredis/
-CFLAGS_DEBUG =  $(CFLAGS) -g
+CFLAGS_DEBUG =  $(CFLAGS) -g -DDEBUG
 RESINC_DEBUG =  $(RESINC)
 RCFLAGS_DEBUG =  $(RCFLAGS)
 LIBDIR_DEBUG =  $(LIBDIR)
@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = bin/Release/getmyad
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/utils/Cookie.o $(OBJDIR_DEBUG)/utils/base64.o $(OBJDIR_DEBUG)/utils/UrlParser.o $(OBJDIR_DEBUG)/utils/SearchEngines.o $(OBJDIR_DEBUG)/utils/GeoIPTools.o $(OBJDIR_DEBUG)/src/json.o $(OBJDIR_DEBUG)/src/XXXSearcher.o $(OBJDIR_DEBUG)/src/RedisClient.o $(OBJDIR_DEBUG)/src/GeoRerions.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/DB.o $(OBJDIR_DEBUG)/KompexSQLiteDatabase.o $(OBJDIR_DEBUG)/InformerTemplate.o $(OBJDIR_DEBUG)/Informer.o $(OBJDIR_DEBUG)/HistoryManager.o $(OBJDIR_DEBUG)/DataBase.o $(OBJDIR_DEBUG)/Core.o $(OBJDIR_DEBUG)/Config.o $(OBJDIR_DEBUG)/CgiService.o $(OBJDIR_DEBUG)/Campaign.o $(OBJDIR_DEBUG)/BaseCore.o $(OBJDIR_DEBUG)/Params.o $(OBJDIR_DEBUG)/Offer.o $(OBJDIR_DEBUG)/Log.o $(OBJDIR_DEBUG)/KompexSQLiteStatement.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/utils/Cookie.o $(OBJDIR_DEBUG)/utils/base64.o $(OBJDIR_DEBUG)/utils/UrlParser.o $(OBJDIR_DEBUG)/utils/SearchEngines.o $(OBJDIR_DEBUG)/utils/GeoIPTools.o $(OBJDIR_DEBUG)/src/json.o $(OBJDIR_DEBUG)/src/XXXSearcher.o $(OBJDIR_DEBUG)/src/Server.o $(OBJDIR_DEBUG)/src/RedisClient.o $(OBJDIR_DEBUG)/src/GeoRerions.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/DB.o $(OBJDIR_DEBUG)/KompexSQLiteDatabase.o $(OBJDIR_DEBUG)/InformerTemplate.o $(OBJDIR_DEBUG)/Informer.o $(OBJDIR_DEBUG)/HistoryManager.o $(OBJDIR_DEBUG)/DataBase.o $(OBJDIR_DEBUG)/Core.o $(OBJDIR_DEBUG)/Config.o $(OBJDIR_DEBUG)/CgiService.o $(OBJDIR_DEBUG)/Campaign.o $(OBJDIR_DEBUG)/BaseCore.o $(OBJDIR_DEBUG)/Params.o $(OBJDIR_DEBUG)/Offer.o $(OBJDIR_DEBUG)/Log.o $(OBJDIR_DEBUG)/KompexSQLiteStatement.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/SearchEngines.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/src/json.o $(OBJDIR_RELEASE)/src/XXXSearcher.o $(OBJDIR_RELEASE)/src/RedisClient.o $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/Params.o $(OBJDIR_RELEASE)/Offer.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/SearchEngines.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/src/json.o $(OBJDIR_RELEASE)/src/XXXSearcher.o $(OBJDIR_RELEASE)/src/Server.o $(OBJDIR_RELEASE)/src/RedisClient.o $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/Params.o $(OBJDIR_RELEASE)/Offer.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o
 
 all: debug release
 
@@ -81,6 +81,9 @@ $(OBJDIR_DEBUG)/src/json.o: src/json.cpp
 
 $(OBJDIR_DEBUG)/src/XXXSearcher.o: src/XXXSearcher.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/XXXSearcher.cpp -o $(OBJDIR_DEBUG)/src/XXXSearcher.o
+
+$(OBJDIR_DEBUG)/src/Server.o: src/Server.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Server.cpp -o $(OBJDIR_DEBUG)/src/Server.o
 
 $(OBJDIR_DEBUG)/src/RedisClient.o: src/RedisClient.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/RedisClient.cpp -o $(OBJDIR_DEBUG)/src/RedisClient.o
@@ -176,6 +179,9 @@ $(OBJDIR_RELEASE)/src/json.o: src/json.cpp
 
 $(OBJDIR_RELEASE)/src/XXXSearcher.o: src/XXXSearcher.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/XXXSearcher.cpp -o $(OBJDIR_RELEASE)/src/XXXSearcher.o
+
+$(OBJDIR_RELEASE)/src/Server.o: src/Server.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Server.cpp -o $(OBJDIR_RELEASE)/src/Server.o
 
 $(OBJDIR_RELEASE)/src/RedisClient.o: src/RedisClient.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/RedisClient.cpp -o $(OBJDIR_RELEASE)/src/RedisClient.o

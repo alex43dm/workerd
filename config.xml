@@ -69,14 +69,14 @@
         <!--IP-адрес-->
         <host>127.0.0.1</host>
         <!--порт-->
-        <port>6380</port>
+        <port>6379</port>
     </short_term_history>
     <!--Redis-сервер с БД о долгосрочной истории пользователя-->
     <long_term_history>
         <!--IP-адрес-->
         <host>127.0.0.1</host>
         <!--порт-->
-        <port>6380</port>
+        <port>6379</port>
     </long_term_history>
     <!--Redis-сервер с БД о истории показов пользователя-->
     <user_view_history>
@@ -90,21 +90,21 @@
         <!--IP-адрес-->
         <host>127.0.0.1</host>
         <!--порт-->
-        <port>6380</port>
+        <port>6379</port>
     </page_keywords>
     <!--Redis-сервер с БД о категориях-->
     <category>
         <!--IP-адрес-->
         <host>127.0.0.1</host>
         <!--порт-->
-        <port>6380</port>
+        <port>6379</port>
     </category>
     <!--Redis-сервер с БД о Ретаргетинге-->
     <retargeting>
         <!--IP-адрес-->
         <host>127.0.0.1</host>
         <!--порт-->
-        <port>6380</port>
+        <port>6379</port>
     </retargeting>
 </redis>
 
@@ -118,9 +118,9 @@
     <!--dbpath>/run/db/mem.db</dbpath-->
     <dbpath>:memory:</dbpath>
     <!--путь к каталогу дампа sqlite базы-->
-    <db_dump_path>db_dump</db_dump_path>
+    <db_dump_path>/home/alex/Projects/worker/db_dump</db_dump_path>
     <!--путь к csv файлу содержимого таблицы GeoRerions-->
-    <db_geo_csv>db_dump/region.csv</db_geo_csv>
+    <db_geo_csv>/home/alex/Projects/worker/db_dump/region.csv</db_geo_csv>
 
     <!--Шаблон информера с баннером-->
     <swfobject_js>/home/alex/Projects/getmyad/js/swfobject.js</swfobject_js>
@@ -128,6 +128,13 @@
     <cookie_name>yottos_unique_id</cookie_name>
     <cookie_domain>.yottos.com</cookie_domain>
     <cookie_path>/</cookie_path>
+<!--
+    <lock_file>/var/run/worker.lock</lock_file>
+    <pid_file>/var/run/worker.pid</pid_file>
+-->
+    <lock_file>/tmp/worker.lock</lock_file>
+    <pid_file>/tmp/worker.pid</pid_file>
+    <user>alex</user>
 </server>
 
 </root>

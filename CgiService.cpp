@@ -14,6 +14,7 @@
 #include "InformerTemplate.h"
 #include "utils/Cookie.h"
 #include "DataBase.h"
+#include "Server.h"
 
 #define THREAD_STACK_SIZE PTHREAD_STACK_MIN + 10 * 1024
 
@@ -58,6 +59,12 @@ CgiService::CgiService(int argc, char *argv[])
 
     cfg = Config::Instance();
     cfg->LoadConfig(config);
+
+#ifndef DEBUG
+    new Server(cfg->lock_file_, cfg->pid_file_);
+#endif
+
+    Log::info("start: %s",argv);
 
     if( sock_path.size() > 8 )
     {

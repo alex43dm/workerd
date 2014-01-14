@@ -951,7 +951,7 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1389367259 source:/home/alex/Projects/worker/CgiService.cpp
+1389683824 source:/home/alex/Projects/worker/CgiService.cpp
 	<boost/algorithm/string.hpp>
 	<fcgi_stdio.h>
 	"DB.h"
@@ -966,6 +966,7 @@
 	"InformerTemplate.h"
 	"utils/Cookie.h"
 	"DataBase.h"
+	"Server.h"
 
 1389278309 /home/alex/Projects/worker/CgiService.h
 	<string>
@@ -973,7 +974,7 @@
 	"BaseCore.h"
 	"Config.h"
 
-1389363335 /home/alex/Projects/worker/Config.h
+1389683544 /home/alex/Projects/worker/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
@@ -1127,7 +1128,7 @@
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 
-1389363525 source:/home/alex/Projects/worker/Config.cpp
+1389683508 source:/home/alex/Projects/worker/Config.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -1136,7 +1137,7 @@
 	"Config.h"
 	<assert.h>
 
-1389608699 source:/home/alex/Projects/worker/Core.cpp
+1389623374 source:/home/alex/Projects/worker/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -1246,7 +1247,7 @@
 1386588626 source:/home/alex/Projects/worker/Log.cpp
 	"Log.h"
 
-1388392311 source:/home/alex/Projects/worker/main.cpp
+1389682566 source:/home/alex/Projects/worker/main.cpp
 	"CgiService.h"
 	"Log.h"
 
@@ -1340,7 +1341,7 @@
 
 1387810444 /home/alex/Projects/libredis//libredis/redis.h
 
-1389621882 source:/home/alex/Projects/worker/src/RedisClient.cpp
+1389622489 source:/home/alex/Projects/worker/src/RedisClient.cpp
 	<strings.h>
 	<string.h>
 	"RedisClient.h"
@@ -1386,5 +1387,25 @@
 	<string>
 	"Params.h"
 	"utils/GeoIPTools.h"
+	"Log.h"
+
+1387450434 /home/alex/Projects/worker/include/Server.h
+	<string>
+
+1389683994 source:/home/alex/Projects/worker/src/Server.cpp
+	<fstream>
+	<signal.h>
+	<pwd.h>
+	<syslog.h>
+	<fcntl.h>
+	<dirent.h>
+	<sys/types.h>
+	<unistd.h>
+	<string.h>
+	<sys/stat.h>
+	<math.h>
+	<sys/mman.h>
+	"Server.h"
+	"Config.h"
 	"Log.h"
 

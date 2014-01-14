@@ -15,6 +15,7 @@
 				<Option parameters="-c /home/alex/Projects/worker/config.xml" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-DDEBUG" />
 					<Add directory="include" />
 					<Add directory="../libredis/" />
 				</Compiler>
@@ -129,12 +130,14 @@
 		<Unit filename="db_dump/view/05_01Offers.sql" />
 		<Unit filename="include/GeoRerions.h" />
 		<Unit filename="include/RedisClient.h" />
+		<Unit filename="include/Server.h" />
 		<Unit filename="include/XXXSearcher.h" />
 		<Unit filename="include/json.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="pch.h" />
 		<Unit filename="src/GeoRerions.cpp" />
 		<Unit filename="src/RedisClient.cpp" />
+		<Unit filename="src/Server.cpp" />
 		<Unit filename="src/XXXSearcher.cpp" />
 		<Unit filename="src/json.cpp" />
 		<Unit filename="utils/Comparators.h" />

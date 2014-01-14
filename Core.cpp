@@ -161,7 +161,7 @@ std::string Core::Process(const Params &params, Offer::Map &items)
     getOffers(params, items);
 
     //wait all history load
-    hm->waitAsyncHistory();
+    //hm->waitAsyncHistory();
 
     //новый алгоритм
     RISAlgorithm(items, params);
