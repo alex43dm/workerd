@@ -84,6 +84,7 @@ private:
 
     /// История полученных сообщений MQ
     std::vector<std::string> mq_log_;
+    std::string toString(AMQPMessage *m);
 };
 
 

@@ -114,7 +114,7 @@ void CgiService::run()
     for(int i=0;;i++)
     {
         //todo make lock on mq read
-//        core->ProcessMQ();
+        bcore->ProcessMQ();
         sleep(1);
         if( i >= 15*60 )
         {

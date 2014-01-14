@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1389361550 source:/home/alex/Projects/worker/BaseCore.cpp
+1389703654 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -861,7 +861,7 @@
 	<stdarg.h>
 	<pthread.h>
 
-1389185998 /home/alex/Projects/worker/BaseCore.h
+1389704635 /home/alex/Projects/worker/BaseCore.h
 	<list>
 	<vector>
 	<map>
@@ -908,7 +908,7 @@
 	<set>
 	"KompexSQLiteDatabase.h"
 
-1388392311 /home/alex/Projects/worker/Campaign.h
+1389701190 /home/alex/Projects/worker/Campaign.h
 	<string>
 	<map>
 	<list>
@@ -923,7 +923,7 @@
 	"Campaign.h"
 	"KompexSQLiteDatabase.h"
 
-1388392311 source:/home/alex/Projects/worker/Campaign.cpp
+1389701322 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"DB.h"
@@ -951,7 +951,7 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1389683824 source:/home/alex/Projects/worker/CgiService.cpp
+1389703313 source:/home/alex/Projects/worker/CgiService.cpp
 	<boost/algorithm/string.hpp>
 	<fcgi_stdio.h>
 	"DB.h"
@@ -1392,7 +1392,7 @@
 1387450434 /home/alex/Projects/worker/include/Server.h
 	<string>
 
-1389683994 source:/home/alex/Projects/worker/src/Server.cpp
+1389684136 source:/home/alex/Projects/worker/src/Server.cpp
 	<fstream>
 	<signal.h>
 	<pwd.h>
