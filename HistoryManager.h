@@ -11,6 +11,7 @@
 #include "Offer.h"
 #include "RedisClient.h"
 #include "Params.h"
+#include "XXXSearcher.h"
 
 typedef enum
 {
@@ -65,12 +66,7 @@ public:
     bool getPageKeywordsAsync();
     bool getPageKeywordsAsyncWait();
 
-    void waitAsyncHistory()
-    {
-        getLongTermAsyncWait();
-        getShortTermAsyncWait();
-        getPageKeywordsAsyncWait();
-    }
+    void waitAsyncHistory(Offer::Map &items);
 
     bool clearDeprecatedOffers();
     void getHistory();
@@ -80,7 +76,8 @@ private:
     Module *module;
     std::map<HistoryType, RedisClient *> history_archive;
     std::string tmpTable;
-    std::list <std::pair<std::string,std::pair<float,std::string>>> stringQuery;
+    std::vector<sphinxRequests> stringQuery;
+    XXXSearcher *sphinx;
     pthread_mutex_t *m_pPrivate;
 
     pthread_t   thrGetDeprecatedOffersAsync,

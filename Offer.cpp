@@ -47,21 +47,22 @@ Offer::~Offer()
 
 }
 /** Загружает все товарные предложения из MongoDb */
-void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
+void Offer::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
 {
     mongo::DB db;
-    auto cursor = db.query("offer", mongo::Query());
-    int skipped = 0;
     Kompex::SQLiteStatement *pStmt;
     char buf[8192], *pData;
     int sz, i = 0;
+    int skipped = 0;
+
+    auto cursor = db.query("offer", q_correct);
 
     pStmt = new Kompex::SQLiteStatement(pdb);
 
 
     bzero(buf,sizeof(buf));
     snprintf(buf,sizeof(buf),"INSERT INTO Offer(id,guid,campaignId,categoryId,accountId,rating,retargeting,image,height,width,isOnClick,cost\
-             ,uniqueHits,swf,description,price,url,title,type) VALUES(");
+             ,uniqueHits,swf,description,price,url,title,type,valid) VALUES(");
     sz = strlen(buf);
     pData = buf + sz;
     sz = sizeof(buf) - sz;
@@ -90,7 +91,7 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
 
         bzero(pData,sz);
         sqlite3_snprintf(sz,pData,
-                         "%lli,'%q',%lli,%lli,'%q',%f,%d,'%q',%d,%d,%d,%f,%d,'%q','%q','%q','%q','%q',%d);",
+                         "%lli,'%q',%lli,%lli,'%q',%f,%d,'%q',%d,%d,%d,%f,%d,'%q','%q','%q','%q','%q',%d,%d);",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getField("campaignId_int").numberLong(),
@@ -109,7 +110,8 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb)
                          x.getStringField("price"),
                          x.getStringField("url"),
                          x.getStringField("title"),
-                         Offer::typeFromString(x.getStringField("type"))
+                         Offer::typeFromString(x.getStringField("type")),
+                         1
                         );
 
         try

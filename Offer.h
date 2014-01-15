@@ -73,7 +73,7 @@ public:
 
     virtual ~Offer();
 
-    static void loadAll(Kompex::SQLiteDatabase *pdb);
+    static void loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query=mongo::Query());
 
     bool operator==(const Offer &other) const { return this->id_int == other.id_int; }
     bool operator<(const Offer &other) const { return rating < other.rating; }

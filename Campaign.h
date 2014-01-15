@@ -5,6 +5,7 @@
 #include <map>
 #include <list>
 
+#include <mongo/client/dbclientinterface.h>
 #include "KompexSQLiteDatabase.h"
 
 typedef long long			sphinx_int64_t;
@@ -26,7 +27,7 @@ public:
     Campaign(long id);
 
     /** \brief Загружает информацию обо всех кампаниях */
-    static void loadAll(Kompex::SQLiteDatabase *pdb);
+    static void loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query=mongo::Query());
     static void update(Kompex::SQLiteDatabase *pdb, std::string aCampaignId);
     static void startStop(Kompex::SQLiteDatabase *pdb, std::string aCampaignId, int);
 

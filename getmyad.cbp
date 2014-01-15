@@ -133,6 +133,7 @@
 		<Unit filename="include/Server.h" />
 		<Unit filename="include/XXXSearcher.h" />
 		<Unit filename="include/json.h" />
+		<Unit filename="include/sphinxRequests.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="pch.h" />
 		<Unit filename="src/GeoRerions.cpp" />
@@ -140,6 +141,7 @@
 		<Unit filename="src/Server.cpp" />
 		<Unit filename="src/XXXSearcher.cpp" />
 		<Unit filename="src/json.cpp" />
+		<Unit filename="src/sphinxRequests.cpp" />
 		<Unit filename="utils/Comparators.h" />
 		<Unit filename="utils/Cookie.cpp" />
 		<Unit filename="utils/Cookie.h" />

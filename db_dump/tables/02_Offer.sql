@@ -19,6 +19,7 @@ description VARCHAR(70),
 price VARCHAR(35),
 url VARCHAR(2048),
 title  VARCHAR(70),
+valid SMALLINT DEFAULT 1,
 UNIQUE (id) ON CONFLICT REPLACE,
 UNIQUE (guid) ON CONFLICT REPLACE
 FOREIGN KEY(campaignId) REFERENCES Campaign(id),
@@ -30,3 +31,4 @@ CREATE INDEX IF NOT EXISTS idx_Offer_guid ON Offer (guid);
 CREATE INDEX IF NOT EXISTS idx_Offer_rating ON Offer (rating);
 CREATE INDEX IF NOT EXISTS idx_Offer_campaignId ON Offer (campaignId);
 CREATE INDEX IF NOT EXISTS idx_Offer_id_rating ON Offer (id,rating);
+CREATE INDEX IF NOT EXISTS idx_Offer_valid ON Offer (valid);

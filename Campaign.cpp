@@ -19,7 +19,7 @@ Campaign::Campaign(long id) :
 
  */
 #define CAMINS
-void Campaign::loadAll(Kompex::SQLiteDatabase *pdb)
+void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
 {
     mongo::DB db;
     Kompex::SQLiteStatement *pStmt;
@@ -28,9 +28,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb)
 
     pStmt = new Kompex::SQLiteStatement(pdb);
 
-
-
-    auto cursor = db.query("campaign", mongo::Query());
+    auto cursor = db.query("campaign", q_correct);
 
     pStmt->BeginTransaction();
     while (cursor->more())
@@ -940,5 +938,5 @@ void Campaign::startStop(Kompex::SQLiteDatabase *pdb,
 
     delete pStmt;
 
-    Log::info("campaign %s updated",aCampaignId.c_str());
+    Log::info("campaign %s %sed",aCampaignId.c_str(), StartStop ? "start":"stop");
 }

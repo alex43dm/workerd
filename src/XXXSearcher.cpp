@@ -27,28 +27,27 @@ XXXSearcher::~XXXSearcher()
     sphinx_destroy ( client );
 }
 
-void XXXSearcher::makeFilter(const std::set<std::string>& keywords_guid)
+void XXXSearcher::makeFilter(Offer::Map &items)
 {
     const char * attr_filter = "fguid";
-    sphinx_int64_t *filter = new sphinx_int64_t[(int)keywords_guid.size()];
+    sphinx_int64_t *filter = new sphinx_int64_t[(int)items.size()];
     int counts = 0;
 
-    for(std::set<std::string>::const_iterator it = keywords_guid.begin(); it != keywords_guid.end(); ++it, counts++)
+    for(auto it = items.begin(); it != items.end(); ++it, counts++)
     {
         boost::crc_32_type  result;
-        result.process_bytes((*it).data(), (*it).length());
+        result.process_bytes((*it).second->id.c_str(), (*it).second->id.size());
         filter[counts] = result.checksum();
     }
-    sphinx_add_filter( client, attr_filter, (int)keywords_guid.size(), filter, SPH_FALSE);
+    sphinx_add_filter( client, attr_filter, (int)items.size(), filter, SPH_FALSE);
     delete [] filter;
 }
 
 void XXXSearcher::processKeywords(
-    const std::vector<sphinxRequests> *sr,
-    const std::set<std::string>& keywords_guid,
+    const std::vector<sphinxRequests> &sr,
     Offer::Map &items)
 {
-    int i, tt, weight;
+    int weight;
     //float startRating;
     float oldRating;
     std::string guid, match;
@@ -58,10 +57,10 @@ void XXXSearcher::processKeywords(
     {
         sphinx_result * res;
         //Создаем фильтр
-        makeFilter(keywords_guid);
+        makeFilter(items);
 
         //Создаем запросы
-        for (auto it = sr->begin(); it != sr->end(); ++it)
+        for (auto it = sr.begin(); it != sr.end(); ++it)
         {
             sphinx_add_query( client, (*it).query.c_str(), "worker", NULL );
         }
@@ -72,9 +71,10 @@ void XXXSearcher::processKeywords(
             sphinx_reset_filters ( client );
             return;
         }
-        for (tt=0; tt<sphinx_get_num_results(client); tt++)
+
+        for (int tt=0; tt<sphinx_get_num_results(client); tt++)
         {
-            for ( i=0; i<res->num_matches; i++ )
+            for ( int i=0; i<res->num_matches; i++ )
             {
                 if (res->num_attrs == 8)
                 {
@@ -103,14 +103,14 @@ void XXXSearcher::processKeywords(
                     */
                     oldRating = pOffer->rating;
                     weight = sphinx_get_weight ( res, i );
-                    pOffer->rating = weight * (*sr)[tt].rate;// * startRating;
+                    pOffer->rating = weight * (int)sr.size() > tt ? sr[tt].rate : 1;// * startRating;
                     if (pOffer->rating > oldRating)
                     {
 //                            isOnClick = I->second.first.second.second.second;
 //                            type = I->second.first.second.second.first;
                         match = (std::string) sphinx_get_string( res, i, 6 );
 
-                        if(!pOffer->setBranch((*sr)[tt].branches))
+                        if((int)sr.size() > tt && !pOffer->setBranch(sr[tt].branches))
                         {
                             Log::warn("Результат лишний: %s", guid.c_str());
                         }

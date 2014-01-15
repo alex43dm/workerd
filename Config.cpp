@@ -272,6 +272,19 @@ bool Config::LoadConfig(const std::string fName)
         }
     }
 
+    if( (mElem = mRoot->FirstChildElement("sphinx")) )
+    {
+        if( (mel = mElem->FirstChildElement("host")) && (mel->GetText()) )
+        {
+            sphinx_host_ = mel->GetText();
+        }
+        else if( (mel = mElem->FirstChildElement("port")) && (mel->GetText()) )
+        {
+            sphinx_port_ = atoi(mel->GetText());
+        }
+    }
+
+
     pDb = new DataBase(true);
 
     mIsInited = true;

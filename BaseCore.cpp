@@ -3,6 +3,7 @@
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <boost/format.hpp>
+#include <boost/regex.hpp>
 #include <ctime>
 #include <cstdlib>
 #include <sstream>
@@ -19,12 +20,12 @@
 #include "Config.h"
 
 BaseCore::BaseCore()
-    : amqp_initialized_(false), amqp_down_(true), amqp_(0)
 {
+    time_service_started_ = boost::posix_time::second_clock::local_time();
+
     LoadAllEntities();
     InitMessageQueue();
     InitMongoDB();
-    time_service_started_ = boost::posix_time::second_clock::local_time();
 }
 
 BaseCore::~BaseCore()
@@ -41,26 +42,6 @@ std::string BaseCore::toString(AMQPMessage *m)
 
 bool BaseCore::ProcessMQ()
 {
-    // Интервал (в секундах) между проверками MQ
-    static int check_interval = 0;
-
-    // При возникновении ошибки check_interval постепенно увеличивается до
-    // max_check_interval с шагом interval_delta
-    const int max_check_interval = 5 * 60;
-    const int interval_delta = 5;
-
-    if (!amqp_initialized_)
-        return false;
-    if (!time_last_mq_check_.is_not_a_date_time() &&
-            ((boost::posix_time::second_clock::local_time() - time_last_mq_check_) <
-             boost::posix_time::seconds(check_interval)))
-        return false;
-
-    time_last_mq_check_ = boost::posix_time::second_clock::local_time();
-
-    if (amqp_down_)
-        InitMessageQueue();
-
     try
     {
         {
@@ -81,9 +62,39 @@ bool BaseCore::ProcessMQ()
                 {
                     Campaign::startStop(Config::Instance()->pDb->pDatabase, toString(m), 0);
                 }
+                return true;
+            }
+        }
+        {
+            // Проверка сообщений advertise.#
+            std::string m1, ofrId, cmgId;
+            mq_advertise_->Get(AMQP_NOACK);
+            AMQPMessage *m = mq_advertise_->getMessage();
+            if (m->getMessageCount() > -1)
+            {
+                m1 = toString(m);
+                if(m->getRoutingKey() == "advertise.start")
+                {
+                    if(cmdParser(m1,ofrId,cmgId))
+                    {
+                        Offer::loadAll(Config::Instance()->pDb->pDatabase, QUERY("guid" << ofrId));
+                    }
+                }
+                else if(m->getRoutingKey() == "advertise.update")
+                {
+                    if(cmdParser(m1,ofrId,cmgId))
+                    {
+                        Offer::loadAll(Config::Instance()->pDb->pDatabase, QUERY("guid" << ofrId));
+                    }
+                }
+                else if(m->getRoutingKey() == "advertise.delete")
+                {
+                    if(cmdParser(m1,ofrId,cmgId))
+                    {
+                        Offer::loadAll(Config::Instance()->pDb->pDatabase, QUERY("guid" << ofrId));
+                    }
+                }
 
-                time_last_mq_check_ = boost::posix_time::second_clock::local_time();
-                check_interval = 2;
                 return true;
             }
         }
@@ -98,8 +109,6 @@ bool BaseCore::ProcessMQ()
                     Informer::update(Config::Instance()->pDb->pDatabase, toString(m));
                 }
 
-                time_last_mq_check_ = boost::posix_time::second_clock::local_time();
-                check_interval = 2;
                 return true;
             }
         }
@@ -109,29 +118,17 @@ bool BaseCore::ProcessMQ()
             AMQPMessage *m = mq_account_->getMessage();
             if (m->getMessageCount() > -1)
             {
-                Log::info("Message retrieved:\nbody: %s\nrouting key:%sexchange:%s\n",
-                m->getMessage(nullptr),m->getRoutingKey().c_str(),m->getExchange().c_str());
-                string logline = boost::str(
-                                     boost::format("Message (key=%1%, body=%2%")
-                                     % m->getRoutingKey()
-                                     % m->getMessage(nullptr));
-                LogToAmqp(logline);
-                LoadAllEntities();
-                time_last_mq_check_ = boost::posix_time::second_clock::local_time();
-                check_interval = 2;
+                if(m->getRoutingKey() == "account.update")
+                {
+//                LoadAllEntities();
+                }
+
                 return true;
             }
         }
-        check_interval = 2;
-        amqp_down_ = false;
     }
     catch (AMQPException &ex)
     {
-        if (!amqp_down_)
-            LogToAmqp("AMQP is down");
-        amqp_down_ = true;
-        if (check_interval + interval_delta < max_check_interval)
-            check_interval += interval_delta;
         Log::err("AMQPException: %s", ex.getMessage().c_str());
     }
     return false;
@@ -200,39 +197,35 @@ void BaseCore::InitMessageQueue()
         std::string postfix = to_iso_string(now);
         boost::replace_first(postfix, ".", ",");
         std::string mq_advertise_name( "getmyad.advertise." + postfix );
+        std::string mq_campaign_name( "getmyad.campaign." + postfix );
         std::string mq_informer_name( "getmyad.informer." + postfix );
         std::string mq_account_name( "getmyad.account." + postfix );
 
         // Объявляем очереди
         mq_campaign_ = amqp_->createQueue();
-        mq_campaign_->Declare(mq_advertise_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
+        mq_campaign_->Declare(mq_campaign_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
         mq_informer_ = amqp_->createQueue();
         mq_informer_->Declare(mq_informer_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
         mq_account_ = amqp_->createQueue();
         mq_account_->Declare(mq_account_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
+        mq_advertise_ = amqp_->createQueue();
+        mq_advertise_->Declare(mq_advertise_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
 
         // Привязываем очереди
-        exchange_->Bind(mq_advertise_name, "campaign.#");
+        exchange_->Bind(mq_advertise_name, "advertise.#");
+        exchange_->Bind(mq_campaign_name, "campaign.#");
         exchange_->Bind(mq_informer_name, "informer.#");
         exchange_->Bind(mq_account_name, "account.#");
 
-        amqp_initialized_ = true;
-        amqp_down_ = false;
-
-        Log::info("Created ampq queues: %s, %s, %s",
-                  mq_advertise_name.c_str(),
+       Log::info("Created ampq queues: %s, %s, %s, %s",
+                  mq_campaign_name.c_str(),
                   mq_informer_name.c_str(),
-                  mq_account_name.c_str());
-        LogToAmqp("Created amqp queue " + mq_advertise_name);
-        LogToAmqp("Created amqp queue " + mq_informer_name);
-        LogToAmqp("Created amqp queue " + mq_account_name);
-
+                  mq_account_name.c_str(),
+                  mq_advertise_name.c_str());
     }
     catch (AMQPException &ex)
     {
         Log::err("Error in AMPQ init: %s, Feature will be disabled.", ex.getMessage().c_str());
-        amqp_initialized_ = false;
-        amqp_down_ = true;
     }
 }
 
@@ -395,7 +388,7 @@ std::string BaseCore::Status()
     out << "<tr><td>Время запуска:</td> <td>" << time_service_started_ <<
         "</td></tr>" <<
         "<tr><td>AMQP:</td><td>" <<
-        (amqp_initialized_ && !amqp_down_? "активен" : "не активен") <<
+        (amqp_? "активен" : "не активен") <<
         "</td></tr>\n";
     out <<  "<tr><td>Сборка: </td><td>" << __DATE__ << " " << __TIME__ <<
         "</td></tr>";
@@ -432,11 +425,24 @@ std::string BaseCore::Status()
     for (auto it = mq_log_.begin(); it != mq_log_.end(); it++)
         out << "<tr><td>" << ++i << "</td>"
             "<td>" << *it << "</td></tr>\n";
-    out << "<tr><td></td><td>Последняя проверка сообщений: " <<
-        time_last_mq_check_ << "</td><tr>\n"
+    out << "<tr><td></td><td>Последняя проверка сообщений: 1 </td><tr>\n"
         "</table>\n";
 
     out << "</body>\n</html>\n";
 
     return out.str();
+}
+
+bool BaseCore::cmdParser(const std::string &cmd, std::string &offerId, std::string &campaignId)
+{
+    boost::regex exp("Offer:(.*),Campaign:(.*)");
+    boost::cmatch pMatch;
+
+    if(boost::regex_match(cmd.c_str(), pMatch, exp))
+    {
+        offerId = pMatch[1];
+        campaignId = pMatch[2];
+        return true;
+    }
+    return false;
 }

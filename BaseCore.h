@@ -64,11 +64,7 @@ private:
 
  /// Время запуска службы
     boost::posix_time::ptime time_service_started_;
- /// Время последней проверки MQ
-    boost::posix_time::ptime time_last_mq_check_;
 
-    bool amqp_initialized_;
-    bool amqp_down_;
     AMQP *amqp_;
 
     /// Точка обмена
@@ -82,9 +78,13 @@ private:
     /// Очередь сообщений об изменениях в аккаунтах
     AMQPQueue *mq_account_;
 
+    /// Очередь сообщений об изменениях в offer
+    AMQPQueue *mq_advertise_;
+
     /// История полученных сообщений MQ
     std::vector<std::string> mq_log_;
     std::string toString(AMQPMessage *m);
+    bool cmdParser(const std::string &cmd, std::string &offerId, std::string &campaignId);
 };
 
 

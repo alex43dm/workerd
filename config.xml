@@ -108,6 +108,11 @@
     </retargeting>
 </redis>
 
+<sphinx>
+    <host>localhost</host>
+    <port>2342</port>
+</sphinx>
+
 <!--настройки сервера-->
 <server>
     <!--путь к файлу сокета-->

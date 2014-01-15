@@ -8,18 +8,21 @@ HistoryManager::HistoryManager(const std::string &tmpTableName):
     module = Module_new();
     Module_init(module);
 
-        m_pPrivate = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
-        pthread_mutexattr_t attr;
-        pthread_mutexattr_init(&attr);
-        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-        pthread_mutex_init((pthread_mutex_t*)m_pPrivate, &attr);
-        pthread_mutexattr_destroy(&attr);
+    m_pPrivate = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init((pthread_mutex_t*)m_pPrivate, &attr);
+    pthread_mutexattr_destroy(&attr);
+
+    sphinx = new XXXSearcher();
 }
 
 HistoryManager::~HistoryManager()
 {
     pthread_mutex_destroy((pthread_mutex_t*)m_pPrivate);
     Module_free(module);
+    delete sphinx;
 }
 
 bool HistoryManager::initDB()
@@ -50,12 +53,12 @@ bool HistoryManager::initDB()
 //------------------------------------------sync functions----------------------------------------
 void HistoryManager::lock()
 {
-        pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
+    pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
 }
 
 void HistoryManager::unlock()
 {
-        pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
+    pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
 }
 
 void HistoryManager::setParams(const Params &params)
@@ -74,13 +77,12 @@ void HistoryManager::setParams(const Params &params)
 
     getPageKeywordsAsync();
 
-     //Запрос по П/З query
+    //Запрос по П/З query
     std::string q = Params::getKeywordsString(params.getSearch());
     if (!q.empty())
     {
         lock();
-        stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
-            q, std::pair<float,std::string>(Config::Instance()->range_query_,"T1")));
+        stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_query_,"T1"));
         unlock();
     }
     //Запрос по контексту страницы context
@@ -88,10 +90,19 @@ void HistoryManager::setParams(const Params &params)
     if (!q.empty())
     {
         lock();
-        stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
-            q, std::pair<float,std::string>(Config::Instance()->range_context_,"T2")));
+        stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_,"T2"));
         unlock();
     }
+}
+
+
+void HistoryManager::waitAsyncHistory(Offer::Map &items)
+{
+    getLongTermAsyncWait();
+    getShortTermAsyncWait();
+    getPageKeywordsAsyncWait();
+
+    sphinx->processKeywords(stringQuery, items);
 }
 
 /** \brief  Возвращает статус подключения к одной из баз данных Redis.
@@ -229,6 +240,7 @@ bool HistoryManager::getUserHistory(HistoryType type, std::list<std::string> &rr
     return true;
 }
 
+
 /** Обновление short и deprecated историй пользователя. */
 /** \brief  Обновление краткосрочной истории пользователя и истории его показов.
 	\param offers     		вектор рекламных предложений, выбранных к показу
@@ -243,6 +255,8 @@ bool HistoryManager::updateUserHistory(const Offer::Map &items, const Params& pa
     vshortTerm.clear();
     vlongTerm.clear();
     vcontextTerm.clear();
+
+    stringQuery.clear();
 
     return true;
 }
@@ -296,8 +310,7 @@ void HistoryManager::getLongTerm()
             if (!q.empty())
             {
                 lock();
-                stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
-                    q, std::pair<float,std::string>(Config::Instance()->range_long_term_,"T5")));
+                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_long_term_,"T5"));
                 unlock();
             }
         }
@@ -317,8 +330,7 @@ void HistoryManager::getShortTermHistory()
             if (!q.empty())
             {
                 lock();
-                stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
-                    q, std::pair<float,std::string>(Config::Instance()->range_short_term_,"T3")));
+                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_short_term_,"T3"));
                 unlock();
             }
         }
@@ -338,8 +350,7 @@ void HistoryManager::getPageKeywordsHistory()
             if (!q.empty())
             {
                 lock();
-                stringQuery.push_back(std::pair<std::string,std::pair<float,std::string>>(
-                    q, std::pair<float,std::string>(Config::Instance()->range_context_term_,"T4")));
+                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_term_,"T4"));
                 unlock();
             }
         }

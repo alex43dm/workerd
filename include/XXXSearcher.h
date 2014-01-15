@@ -13,14 +13,7 @@
 #include <typeinfo>
 
 #include "Offer.h"
-
-class sphinxRequests
-{
-public:
-    std::string query;
-    float rate;
-    std::string branches;
-};
+#include "sphinxRequests.h"
 
 class XXXSearcher
 {
@@ -31,12 +24,10 @@ public:
 	/** \brief Метод обработки запроса к индексу.
      *
 	 */
-    void processKeywords(const std::vector<sphinxRequests> *sr,
-                         const std::set<std::string> &keywords_guid,
-                         Offer::Map &items);
+    void processKeywords(const std::vector<sphinxRequests> &sr, Offer::Map &items);
 protected:
 private:
     sphinx_client* client;
 
-    void makeFilter(const std::set<std::string>& keywords_guid);
+    void makeFilter(Offer::Map &items);
 };
