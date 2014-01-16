@@ -10,9 +10,33 @@
 
     \param id        Идентификатор рекламной кампании
 */
-Campaign::Campaign(long id) :
-    id(id)
+Campaign::Campaign(long long _id) :
+    id(_id)
 {
+    mongo::DB db;
+
+    auto cursor = db.query("campaign", QUERY("guid_int" << _id));
+
+    while (cursor->more())
+    {
+        mongo::BSONObj x = cursor->next();
+
+        guid = x.getStringField("guid");
+        if (guid.empty())
+        {
+            Log::warn("Campaign with empty guid");
+        }
+
+        mongo::BSONObj o = x.getObjectField("showConditions");
+
+        id = x.getField("guid_int").numberLong();
+        title = x.getStringField("title");
+        project = x.getStringField("project");
+        social = x.getBoolField("social") ? 1 : 0;
+        valid = o.isValid();
+        //o.getStringField("showCoverage");
+        //x.getField("impressionsPerDayLimit").numberInt()
+    }
 }
 
 /** \brief  Закгрузка всех рекламных кампаний из базы данных  Mongo

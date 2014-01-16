@@ -18,13 +18,14 @@ typedef unsigned long long	sphinx_uint64_t;
 class Campaign
 {
 public:
-    long id;
+    long long id;
+    std::string guid;
     std::string title;
     std::string project;
     bool social;
     bool valid;
 
-    Campaign(long id);
+    Campaign(long long id);
 
     /** \brief Загружает информацию обо всех кампаниях */
     static void loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query=mongo::Query());

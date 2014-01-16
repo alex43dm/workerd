@@ -909,7 +909,7 @@
 	<set>
 	"KompexSQLiteDatabase.h"
 
-1389865663 /home/alex/Projects/worker/Campaign.h
+1389866224 /home/alex/Projects/worker/Campaign.h
 	<string>
 	<map>
 	<list>
@@ -926,7 +926,7 @@
 	"KompexSQLiteDatabase.h"
 	"EBranch.h"
 
-1389711233 source:/home/alex/Projects/worker/Campaign.cpp
+1389866209 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"DB.h"
@@ -1141,7 +1141,7 @@
 	"Config.h"
 	<assert.h>
 
-1389859559 source:/home/alex/Projects/worker/Core.cpp
+1389865626 source:/home/alex/Projects/worker/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -1365,7 +1365,7 @@
 	"KompexSQLiteException.h"
 	"Log.h"
 
-1389856376 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+1389865006 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
 	"Log.h"
 	"Config.h"
 	"XXXSearcher.h"

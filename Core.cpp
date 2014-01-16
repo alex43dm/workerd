@@ -841,6 +841,7 @@ void Core::markAsShown(const Offer::Map &items, const Params &params)
                                       append("contexttermhistory", contextTermArray).
                                       obj();
 
+            Campaign *c = new Campaign(i->second->campaign_id);
             mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
                                     append("dt", dt).
                                     append("id", i->second->id).
@@ -854,10 +855,10 @@ void Core::markAsShown(const Offer::Map &items, const Params &params)
                                     append("token", i->second->token).
                                     append("type", i->second->type).
                                     append("isOnClick", i->second->isOnClick).
-                                    append("campaignId", Campaign::getName(i->second->campaign_id)).
+                                    append("campaignId", c->id).
                                     append("campaignId_int", i->second->campaign_id).
-                                    append("campaignTitle", "").
-                                    append("project", "").
+                                    append("campaignTitle", c->title).
+                                    append("project", c->project).
                                     append("country", (params.getCountry().empty()?"NOT FOUND":params.getCountry().c_str())).
                                     append("region", (params.getRegion().empty()?"NOT FOUND":params.getRegion().c_str())).
                                     append("keywords", keywords).
