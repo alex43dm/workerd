@@ -854,7 +854,7 @@ void Core::markAsShown(const Offer::Map &items, const Params &params)
                                     append("token", i->second->token).
                                     append("type", i->second->type).
                                     append("isOnClick", i->second->isOnClick).
-                                    //append("campaignId", i->second->campaign_id).
+                                    append("campaignId", Campaign::getName(i->second->campaign_id)).
                                     append("campaignId_int", i->second->campaign_id).
                                     append("campaignTitle", "").
                                     append("project", "").

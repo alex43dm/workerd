@@ -95,26 +95,12 @@ void XXXSearcher::processKeywords(
                     }
 
                     Offer *pOffer = p->second;
-                    /*
-                    std::map<std::string, float>::iterator Ir = mapOldGuidRating.find(guid);
-                    if ( Ir != mapOldGuidRating.end())
-                    {
-                        startRating = Ir->second;
-                        oldRating = (*it)->rating;
-                    }
-                    else
-                    {
-                        startRating = oldRating = I->second.first.first;
-                        mapOldGuidRating.insert(std::pair<std::string,float>(guid,startRating));
-                    }
-                    */
+
                     oldRating = pOffer->rating;
                     weight = sphinx_get_weight ( res, i );
                     pOffer->rating = weight * (int)sr.size() > tt ? sr[tt].rate : 1;// * startRating;
                     if (pOffer->rating > oldRating)
                     {
-//                            isOnClick = I->second.first.second.second.second;
-//                            type = I->second.first.second.second.first;
                         match = (std::string) sphinx_get_string( res, i, 6 );
 
                         if((int)sr.size() > tt && !pOffer->setBranch(sr[tt].branches))
@@ -143,7 +129,6 @@ void XXXSearcher::processKeywords(
                             Log::warn("Результат лишний: %s", guid.c_str());
                             break;
                         }
-
                     }
                 }
             }

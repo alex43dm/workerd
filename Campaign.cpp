@@ -18,7 +18,8 @@ Campaign::Campaign(long id) :
 /** \brief  Закгрузка всех рекламных кампаний из базы данных  Mongo
 
  */
-#define CAMINS
+//#define CAMINS
+//==================================================================================
 void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
 {
     mongo::DB db;
@@ -416,6 +417,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
     Log::info("Loaded %d campaigns",i);
 }
 
+//==================================================================================
 /** \brief  Обновление кампании из базы данных  Mongo
 
  */
@@ -940,3 +942,19 @@ void Campaign::startStop(Kompex::SQLiteDatabase *pdb,
 
     Log::info("campaign %s %sed",aCampaignId.c_str(), StartStop ? "start":"stop");
 }
+
+//==================================================================================
+std::string Campaign::getName(long long campaign_id)
+{
+    mongo::DB db;
+
+    auto cursor = db.query("campaign", QUERY("guid_int" << campaign_id));
+
+    while (cursor->more())
+    {
+        mongo::BSONObj x = cursor->next();
+        return x.getStringField("guid");
+    }
+    return "";
+}
+
