@@ -842,6 +842,7 @@ void Core::markAsShown(const Offer::Map &items, const Params &params)
                                       obj();
 
             Campaign *c = new Campaign(i->second->campaign_id);
+
             mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
                                     append("dt", dt).
                                     append("id", i->second->id).
@@ -866,6 +867,7 @@ void Core::markAsShown(const Offer::Map &items, const Params &params)
                                     append("conformity", i->second->conformity).
                                     append("matching", i->second->matching).
                                     obj();
+            delete c;
 
             db.insert("log.impressions", record, true);
             count++;
