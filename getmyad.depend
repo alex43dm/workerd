@@ -916,7 +916,7 @@
 	<mongo/client/dbclientinterface.h>
 	"KompexSQLiteDatabase.h"
 
-1389710855 /home/alex/Projects/worker/Offer.h
+1389864516 /home/alex/Projects/worker/Offer.h
 	<string>
 	<list>
 	<map>
@@ -924,6 +924,7 @@
 	<mongo/client/dbclientinterface.h>
 	"Campaign.h"
 	"KompexSQLiteDatabase.h"
+	"EBranch.h"
 
 1389711233 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
@@ -1140,7 +1141,7 @@
 	"Config.h"
 	<assert.h>
 
-1389795629 source:/home/alex/Projects/worker/Core.cpp
+1389859559 source:/home/alex/Projects/worker/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -1156,6 +1157,7 @@
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 	"utils/base64.h"
+	"EBranch.h"
 
 1389351504 /home/alex/Projects/worker/utils/Comparators.h
 	<iostream>
@@ -1212,7 +1214,7 @@
 	"../Log.h"
 	"XXXSearcher.h"
 
-1389795799 source:/home/alex/Projects/worker/HistoryManager.cpp
+1389863519 source:/home/alex/Projects/worker/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -1254,7 +1256,7 @@
 	"CgiService.h"
 	"Log.h"
 
-1389772901 source:/home/alex/Projects/worker/Offer.cpp
+1389864321 source:/home/alex/Projects/worker/Offer.cpp
 	"Offer.h"
 	"DB.h"
 	"Log.h"
@@ -1363,12 +1365,12 @@
 	"KompexSQLiteException.h"
 	"Log.h"
 
-1389793819 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+1389856376 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
 	"Log.h"
 	"Config.h"
 	"XXXSearcher.h"
 
-1389795575 /home/alex/Projects/worker/include/XXXSearcher.h
+1389856281 /home/alex/Projects/worker/include/XXXSearcher.h
 	<string>
 	<list>
 	<set>
@@ -1413,9 +1415,16 @@
 	"Config.h"
 	"Log.h"
 
-1389794866 /home/alex/Projects/worker/include/sphinxRequests.h
+1389863407 /home/alex/Projects/worker/include/sphinxRequests.h
+	<string>
+	"EBranch.h"
+
+1389863417 source:/home/alex/Projects/worker/src/sphinxRequests.cpp
+	"sphinxRequests.h"
+
+1389859433 /home/alex/Projects/worker/include/EBranch.h
 	<string>
 
-1389794855 source:/home/alex/Projects/worker/src/sphinxRequests.cpp
-	"sphinxRequests.h"
+1389859479 source:/home/alex/Projects/worker/src/EBranch.cpp
+	"EBranch.h"
 

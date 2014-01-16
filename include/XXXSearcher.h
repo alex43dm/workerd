@@ -25,9 +25,10 @@ public:
      *
 	 */
     void processKeywords(const std::vector<sphinxRequests> &sr, Offer::Map &items);
+    void makeFilter(Offer::Map &items);
+
 protected:
 private:
     sphinx_client* client;
-
-    void makeFilter(Offer::Map &items);
+    bool makeFilterOn;
 };

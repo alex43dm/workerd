@@ -128,6 +128,7 @@
 		<Unit filename="db_dump/view/03_Campaign2Acnts.sql" />
 		<Unit filename="db_dump/view/04_Campaign2Infs.sql" />
 		<Unit filename="db_dump/view/05_01Offers.sql" />
+		<Unit filename="include/EBranch.h" />
 		<Unit filename="include/GeoRerions.h" />
 		<Unit filename="include/RedisClient.h" />
 		<Unit filename="include/Server.h" />
@@ -136,6 +137,7 @@
 		<Unit filename="include/sphinxRequests.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="pch.h" />
+		<Unit filename="src/EBranch.cpp" />
 		<Unit filename="src/GeoRerions.cpp" />
 		<Unit filename="src/RedisClient.cpp" />
 		<Unit filename="src/Server.cpp" />

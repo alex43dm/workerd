@@ -2,16 +2,17 @@
 #define SPHINXREQUESTS_H
 
 #include <string>
+#include "EBranch.h"
 
 class sphinxRequests
 {
     public:
         std::string query;
         float rate;
-        std::string branches;
+        EBranchT branches;
 
         sphinxRequests();
-        sphinxRequests(const std::string &q, float r, const std::string &b);
+        sphinxRequests(const std::string &q, float r, const EBranchT b);
         virtual ~sphinxRequests();
     protected:
     private:

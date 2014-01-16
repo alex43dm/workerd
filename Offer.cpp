@@ -33,6 +33,7 @@ Offer::Offer(const std::string &id,
     valid(valid),
     isOnClick(isOnClick),
     type(typeFromInt(type)),
+    branch(EBranchL::LMAX),
     rating(rating),
     retargeting(retargeting),
     uniqueHits(uniqueHits),
@@ -167,96 +168,165 @@ void Offer::gen()
 }
 
 
-bool Offer::setBranch(const std::string &qbranch)
+bool Offer::setBranch(const EBranchT tbranch)
 {
-    if (type == Type::banner and isOnClick == false and qbranch == "T1")
+    switch(tbranch)
     {
-        branch = "L2";
-        rating = 1000 * rating;
+        case EBranchT::T1:
+            switch(type)
+            {
+                case Type::banner:
+                    switch(isOnClick)
+                    {
+                        case true:
+                            branch = EBranchL::L7;
+                            return true;
+                        case false:
+                            branch = EBranchL::L2;
+                            rating = 1000 * rating;
+                            return true;
+                    }
+                    break;
+                case Type::teazer:
+                    switch(isOnClick)
+                    {
+                        case true:
+                            branch = EBranchL::L17;
+                            return true;
+                        case false:
+                            branch = EBranchL::L12;
+                            rating = 1000 * rating;
+                            return true;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+            break;
+        case EBranchT::T2:
+            switch(type)
+            {
+                case Type::banner:
+                    switch(isOnClick)
+                    {
+                        case true:
+                            branch = EBranchL::L8;
+                            return true;
+                        case false:
+                            branch = EBranchL::L3;
+                            rating = 1000 * rating;
+                            return true;
+                    }
+                    break;
+                case Type::teazer:
+                    switch(isOnClick)
+                    {
+                        case true:
+                            branch = EBranchL::L18;
+                            return true;
+                        case false:
+                            branch = EBranchL::L13;
+                            return true;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+            break;
+        case EBranchT::T3:
+            switch(type)
+            {
+                case Type::banner:
+                    switch(isOnClick)
+                    {
+                        case true:
+                            branch = EBranchL::L4;
+                            rating = 1000 * rating;
+                            return true;
+                        case false:
+                            branch = EBranchL::L3;
+                            rating = 1000 * rating;
+                            return true;
+                    }
+                    break;
+                case Type::teazer:
+                    switch(isOnClick)
+                    {
+                        case true:
+                            branch = EBranchL::L19;
+                            return true;
+                        case false:
+                            branch = EBranchL::L14;
+                            return true;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+            break;
+        case EBranchT::T4:
+            switch(type)
+            {
+                case Type::banner:
+                    switch(isOnClick)
+                    {
+                        case true:
+                            branch = EBranchL::L10;
+                            return true;
+                        case false:
+                            branch = EBranchL::L5;
+                            rating = 1000 * rating;
+                            return true;
+                    }
+                    break;
+                case Type::teazer:
+                    switch(isOnClick)
+                    {
+                        case true:
+                            branch = EBranchL::L20;
+                            return true;
+                        case false:
+                            branch = EBranchL::L15;
+                            return true;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+            break;
+        case EBranchT::T5:
+            switch(type)
+            {
+                case Type::banner:
+                    switch(isOnClick)
+                    {
+                        case true:
+                            branch = EBranchL::L11;
+                            return true;
+                        case false:
+                            branch = EBranchL::L6;
+                            rating = 1000 * rating;
+                            return true;
+                    }
+                    break;
+                case Type::teazer:
+                    switch(isOnClick)
+                    {
+                        case true:
+                            branch = EBranchL::L21;
+                            return true;
+                        case false:
+                            branch = EBranchL::L16;
+                            return true;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+            break;
+        case EBranchT::TMAX:
+            return false;
     }
-    else if (type == Type::banner and isOnClick == false and qbranch == "T2")
-    {
-        branch = "L3";
-        rating = 1000 * rating;
-    }
-    else if (type == Type::banner and isOnClick == false and qbranch == "T3")
-    {
-        branch = "L4";
-        rating = 1000 * rating;
-    }
-    else if (type == Type::banner and isOnClick == false and qbranch == "T4")
-    {
-        branch = "L5";
-        rating = 1000 * rating;
-    }
-    else if (type == Type::banner and isOnClick == false and qbranch == "T5")
-    {
-        branch = "L6";
-        rating = 1000 * rating;
-    }
-    else if (type == Type::banner and isOnClick == true and qbranch == "T1")
-    {
-        branch = "L7";
-    }
-    else if (type == Type::banner and isOnClick == true and qbranch == "T2")
-    {
-        branch = "L8";
-    }
-    else if (type == Type::banner and isOnClick == true and qbranch == "T3")
-    {
-        branch = "L9";
-    }
-    else if (type == Type::banner and isOnClick == true and qbranch == "T4")
-    {
-        branch = "L10";
-    }
-    else if (type == Type::banner and isOnClick == true and qbranch == "T5")
-    {
-        branch = "L11";
-    }
-    else if (type == Type::teazer and isOnClick == false and qbranch == "T1")
-    {
-        branch = "L12";
-    }
-    else if (type == Type::teazer and isOnClick == false and qbranch == "T2")
-    {
-        branch = "L13";
-    }
-    else if (type == Type::teazer and isOnClick == false and qbranch == "T3")
-    {
-        branch = "L14";
-    }
-    else if (type == Type::teazer and isOnClick == false and qbranch == "T4")
-    {
-        branch = "L15";
-    }
-    else if (type == Type::teazer and isOnClick == false and qbranch == "T5")
-    {
-        branch = "L16";
-    }
-    else if (type == Type::teazer and isOnClick == true and qbranch == "T1")
-    {
-        branch = "L17";
-    }
-    else if (type == Type::teazer and isOnClick == true and qbranch == "T2")
-    {
-        branch = "L18";
-    }
-    else if (type == Type::teazer and isOnClick == true and qbranch == "T3")
-    {
-        branch = "L19";
-    }
-    else if (type == Type::teazer and isOnClick == true and qbranch == "T4")
-    {
-        branch = "L20";
-    }
-    else if (type == Type::teazer and isOnClick == true and qbranch == "T5")
-    {
-        branch = "L21";
-    }
-    else
-    {
-        return false;
-    }
-    return true;
+
+    return false;
 }

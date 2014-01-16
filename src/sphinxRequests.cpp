@@ -5,7 +5,7 @@ sphinxRequests::sphinxRequests()
     //ctor
 }
 
-sphinxRequests::sphinxRequests(const std::string &q, float r, const std::string &b):
+sphinxRequests::sphinxRequests(const std::string &q, float r, const EBranchT b):
     query(q),
     rate(r),
     branches(b)

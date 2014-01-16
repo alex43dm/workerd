@@ -10,6 +10,7 @@
 
 #include "Campaign.h"
 #include "KompexSQLiteDatabase.h"
+#include "EBranch.h"
 
 typedef long long			sphinx_int64_t;
 typedef unsigned long long	sphinx_uint64_t;
@@ -38,7 +39,7 @@ public:
         bool isOnClick;             ///< Реклама по кликам или показам
         Type type;			///< тип РП
         std::string conformity;		///< тип соответствия РП и запроса, изменяеться после выбора РП из индекса
-        std::string branch;			///< ветка алгоритма по которой было выбрано РП
+        EBranchL branch;			///< ветка алгоритма по которой было выбрано РП
         std::string matching;       ///< Фраза соответствия
         float rating;				///< рейтинг РП
         bool retargeting;
@@ -51,7 +52,7 @@ public:
         std::string token;          ///< Токен для проверки ссылки
         std::string redirect_url;   ///< Cсылка перенаправления
 
-    Offer(){};
+    //Offer(){};
 
     Offer(const std::string &id,
           long long id_int,
@@ -100,7 +101,8 @@ public:
     void gen();
 
     std::string toJson() const;
-    bool setBranch(const std::string &qbranch);
+    bool setBranch(const  EBranchT tbranch);
+    std::string getBranch(){ return branch < EBranchL::LMAX ? EBranchL2String[(int)branch] : ""; };
 };
 
 class OfferExistByType

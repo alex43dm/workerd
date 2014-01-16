@@ -82,7 +82,7 @@ void HistoryManager::setParams(const Params &params)
     if (!q.empty())
     {
         lock();
-        stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_query_,"T1"));
+        stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_query_,EBranchT::T1));
         unlock();
     }
     //Запрос по контексту страницы context
@@ -90,7 +90,7 @@ void HistoryManager::setParams(const Params &params)
     if (!q.empty())
     {
         lock();
-        stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_,"T2"));
+        stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_,EBranchT::T2));
         unlock();
     }
 }
@@ -98,6 +98,8 @@ void HistoryManager::setParams(const Params &params)
 
 void HistoryManager::waitAsyncHistory(Offer::Map &items)
 {
+    sphinx->makeFilter(items);
+
     getLongTermAsyncWait();
     getShortTermAsyncWait();
     getPageKeywordsAsyncWait();
@@ -310,7 +312,7 @@ void HistoryManager::getLongTerm()
             if (!q.empty())
             {
                 lock();
-                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_long_term_,"T5"));
+                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_long_term_,EBranchT::T5));
                 unlock();
             }
         }
@@ -330,7 +332,7 @@ void HistoryManager::getShortTermHistory()
             if (!q.empty())
             {
                 lock();
-                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_short_term_,"T3"));
+                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_short_term_,EBranchT::T3));
                 unlock();
             }
         }
@@ -350,7 +352,7 @@ void HistoryManager::getPageKeywordsHistory()
             if (!q.empty())
             {
                 lock();
-                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_term_,"T4"));
+                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_term_,EBranchT::T4));
                 unlock();
             }
         }

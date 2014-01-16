@@ -15,6 +15,7 @@
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
 #include "utils/base64.h"
+#include "EBranch.h"
 
 #define CMD_SIZE 8192
 
@@ -727,7 +728,7 @@ void Core::RISAlgorithm(Offer::Map &result, const Params &params)
                 if(newResult.count(p->first))
                 {
                     if(!camps.count(p->second->campaign_id) && (
-                                (p->second->rating > 0.0) || p->second->branch != "L30") )
+                                (p->second->rating > 0.0) || p->second->branch != EBranchL::L30) )//???never assign L30
                     {
                         //LOG(INFO) << "add";
                         newResult.insert(Offer::Pair(p->first,p->second));
@@ -746,7 +747,7 @@ void Core::RISAlgorithm(Offer::Map &result, const Params &params)
         {
             //доберём всё за один проход, т.к. result.size > informer.capacity
             //пробуем сначала добрать без повторений.
-            if (p->second->rating > 0.0 || p->second->branch != "L30" )
+            if (p->second->rating > 0.0 || p->second->branch != EBranchL::L30 )
             {
                 newResult.insert(Offer::Pair(p->first,p->second));
             }
@@ -860,7 +861,7 @@ void Core::markAsShown(const Offer::Map &items, const Params &params)
                                     append("country", (params.getCountry().empty()?"NOT FOUND":params.getCountry().c_str())).
                                     append("region", (params.getRegion().empty()?"NOT FOUND":params.getRegion().c_str())).
                                     append("keywords", keywords).
-                                    append("branch", i->second->branch).
+                                    append("branch", i->second->getBranch()).
                                     append("conformity", i->second->conformity).
                                     append("matching", i->second->matching).
                                     obj();

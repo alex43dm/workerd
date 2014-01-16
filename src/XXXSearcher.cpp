@@ -19,6 +19,8 @@ XXXSearcher::XXXSearcher()
     int field_weights[FIELDS_LEN] =  {50, 30, 70, 90 ,100};
 
     sphinx_set_field_weights( client, FIELDS_LEN, field_names, field_weights);
+
+    makeFilterOn = false;
 }
 
 XXXSearcher::~XXXSearcher()
@@ -41,6 +43,7 @@ void XXXSearcher::makeFilter(Offer::Map &items)
     }
     sphinx_add_filter( client, attr_filter, (int)items.size(), filter, SPH_FALSE);
     delete [] filter;
+    makeFilterOn = true;
 }
 
 void XXXSearcher::processKeywords(
@@ -57,7 +60,10 @@ void XXXSearcher::processKeywords(
     {
         sphinx_result * res;
         //Создаем фильтр
-        makeFilter(items);
+        if(!makeFilterOn)
+        {
+            makeFilter(items);
+        }
 
         //Создаем запросы
         for (auto it = sr.begin(); it != sr.end(); ++it)
@@ -69,6 +75,7 @@ void XXXSearcher::processKeywords(
         if ( !res )
         {
             sphinx_reset_filters ( client );
+            makeFilterOn = false;
             return;
         }
 
@@ -150,6 +157,6 @@ void XXXSearcher::processKeywords(
         Log::warn("Непонятная sphinx ошибка: %s: %s", typeid(ex).name(), ex.what());
     }
     //LOG(INFO) << "Выход из обработки";
-
-    return ;
+    makeFilterOn = false;
+    return;
 }
