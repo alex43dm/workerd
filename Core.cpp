@@ -155,14 +155,14 @@ std::string Core::Process(const Params &params, Offer::Map &items)
     startTime = boost::posix_time::microsec_clock::local_time();
 
     //load all history async
-    hm->setParams(params);
+    hm->getUserHistory(params);
 
     informer = getInformer(params);
     //Log::info("[%ld]getInformer done",tid);
     getOffers(params, items);
 
     //wait all history load
-    hm->waitAsyncHistory(items);
+    hm->sphinxProcess(items);
 
     //новый алгоритм
     RISAlgorithm(items, params);
@@ -604,6 +604,8 @@ void Core::RISAlgorithm(Offer::Map &result, const Params &params)
         hm->clean = true;
     }
 
+    hm->getRetargetingAsyncWait();
+
     //если первый элемент баннер, возвращаем баннер.
     if(result.begin()->second->isBanner && !result.begin()->second->social)
     {
@@ -822,7 +824,7 @@ void Core::markAsShown(const Offer::Map &items, const Params &params)
         for (it=hm->vlongTerm.begin() ; it != hm->vlongTerm.end(); ++it )
             b2.append(*it);
         mongo::BSONArray longTermArray = b2.arr();
-        for (it=hm->vcontextTerm.begin() ; it != hm->vcontextTerm.end(); ++it )
+        for (it=hm->vkeywords.begin() ; it != hm->vkeywords.end(); ++it )
             b3.append(*it);
         mongo::BSONArray contextTermArray = b3.arr();
 

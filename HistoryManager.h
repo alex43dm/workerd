@@ -36,7 +36,8 @@ public:
 
     std::list<std::string> vshortTerm;
     std::list<std::string> vlongTerm;
-    std::list<std::string> vcontextTerm;
+    std::list<std::string> vkeywords;
+    std::list<std::string> vretageting;
 
     HistoryManager(const std::string &tmpTableName);
     virtual ~HistoryManager();
@@ -44,18 +45,19 @@ public:
     /** \brief  Инициализация подключения к базам данных Redis
     */
     bool initDB();
-
-    void setParams(const Params &params);
-
     bool getDBStatus(HistoryType t);
+
+    //main methods
+    void getUserHistory(const Params &params);
+    void sphinxProcess(Offer::Map &items);
     bool updateUserHistory(const Offer::Map &items, const Params& params);
 
     bool setDeprecatedOffers(const Offer::Map &items);
-
     bool getDeprecatedOffers(std::string &);
     bool getDeprecatedOffers();
     bool getDeprecatedOffersAsync();
     bool getDeprecatedOffersAsyncWait();
+    bool clearDeprecatedOffers();
 
     bool getLongTermAsync();
     bool getLongTermAsyncWait();
@@ -66,10 +68,11 @@ public:
     bool getPageKeywordsAsync();
     bool getPageKeywordsAsyncWait();
 
-    void waitAsyncHistory(Offer::Map &items);
+    bool getRetargetingAsync();
+    bool getRetargetingAsyncWait();
 
-    bool clearDeprecatedOffers();
-    void getHistory();
+
+//    void getHistory();
 protected:
 private:
     std::string key;
@@ -83,23 +86,25 @@ private:
     pthread_t   thrGetDeprecatedOffersAsync,
                 thrGetLongTermAsync,
                 thrGetShortTermAsync,
-                thrGetPageKeywordsAsync;
+                thrGetPageKeywordsAsync,
+                thrGetRetargetingAsync;
 
-
-    void updateShortHistory(const std::string & query);
-    void updateContextHistory(const std::string & query);
-    bool getUserHistory(HistoryType type, std::list<std::string> &rr);
-
+    bool getHistoryByType(HistoryType type, std::list<std::string> &rr);
     boost::int64_t currentDateToInt();
     void lock();
     void unlock();
     void getLongTerm();
-    void getShortTermHistory();
+    void getShortTerm();
     void getPageKeywordsHistory();
+    void getRetargeting();
+
+    void updateShortHistory(const std::string & query);
+    void updatePageKeywordsHistory(const std::string & query);
 
     static void *getDeprecatedOffersEnv(void *);
     static void *getLongTermEnv(void *);
-    static void *getShortTermEnv(void *data);
-    static void *getPageKeywordsEnv(void *data);
+    static void *getShortTermEnv(void *);
+    static void *getPageKeywordsEnv(void *);
+    static void *getRetargetingEnv(void *);
 };
 #endif
