@@ -191,7 +191,7 @@ bool Informer::update(Kompex::SQLiteDatabase *pdb, std::string aInformerId)
     mongo::DB db;
     std::unique_ptr<mongo::DBClientCursor> cursor = db.query("informer", QUERY("guid" << aInformerId));
     int skipped = 0;
-    long long long_id;
+    long long long_id = 0;
     Kompex::SQLiteStatement *pStmt;
     char buf[8192], *buf1;
     int i = 0;

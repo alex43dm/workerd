@@ -199,9 +199,9 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
     delete pStmt;
 
     Kompex::SQLiteStatement *p;
+    p = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
     try
     {
-        p = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
         sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_%s_id;",tableName.c_str());
         p->SqlStatement(cmd);
     }

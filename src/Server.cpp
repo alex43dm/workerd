@@ -66,7 +66,10 @@ Server::Server(const std::string &lockFileName, const std::string &pidFileName) 
 		if(pw)
 		{
 			syslog(LOG_NOTICE, "setting user to %s", Config::Instance()->user_.c_str());
-			setuid(pw->pw_uid);
+			if(setuid(pw->pw_uid)!=0)
+            {
+                syslog(LOG_ERR,"error setuid to: %s",Config::Instance()->user_.c_str());
+            }
 		}
 	}
 
@@ -118,9 +121,13 @@ Server::Server(const std::string &lockFileName, const std::string &pidFileName) 
 		//exit(EXIT_FAILURE);
 	}
 
-	freopen("/dev/null", "r", stdin);
-	freopen("/dev/null", "w", stdout);
-	freopen("/dev/null", "w", stderr);
+	if(!freopen("/dev/null", "r", stdin))
+        syslog(LOG_ERR,"freopen error: stdin");
+	if(!freopen("/dev/null", "w", stdout))
+        syslog(LOG_ERR,"freopen error: stdin");
+	if(!freopen("/dev/null", "w", stderr))
+        syslog(LOG_ERR,"freopen error: stdin");
+
 	kill(parent, SIGUSR1);
 
     struct sched_param param;
@@ -186,7 +193,10 @@ bool Server::writePid(const std::string &pidFileName)
 
         bzero(buf,len);
         snprintf(buf,len,"%d",p);
-        write(fd, buf, len);
+        if(write(fd, buf, len) != len)
+        {
+            syslog(LOG_ERR,"error write pid");
+        }
 
         free(buf);
 

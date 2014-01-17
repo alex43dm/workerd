@@ -449,7 +449,7 @@ void Campaign::update(Kompex::SQLiteDatabase *pdb, std::string aCampaignId)
 {
     mongo::DB db;
     mongo::Query query;
-    long long long_id;
+    long long long_id = 0;
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
     int i = 0;

@@ -147,7 +147,7 @@ void SQLiteStatement::CheckDatabase() const
 
 float SQLiteStatement::SqlAggregateFuncResult(const std::string &countSql)
 {
-	float result;
+	float result = 0;
 
 	Sql(countSql);
 	while(FetchRow())
@@ -159,7 +159,7 @@ float SQLiteStatement::SqlAggregateFuncResult(const std::string &countSql)
 
 float SQLiteStatement::SqlAggregateFuncResult(wchar_t *countSql)
 {
-	float result;
+	float result = 0;
 
 	Sql(countSql);
 	while(FetchRow())
@@ -171,7 +171,7 @@ float SQLiteStatement::SqlAggregateFuncResult(wchar_t *countSql)
 
 float SQLiteStatement::SqlAggregateFuncResult(const char *countSql)
 {
-	float result;
+	float result = 0;
 
 	Sql(countSql);
 	while(FetchRow())
