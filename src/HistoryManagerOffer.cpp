@@ -7,34 +7,34 @@ bool HistoryManager::clearDeprecatedOffers()
     return history_archive[ViewHistory]->del(key);
 }
 
-bool HistoryManager::setDeprecatedOffers(const Offer::Map &items)
+bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
 {
     if(clean)
     {
         return history_archive[ViewHistory]->del(key);
     }
 
-    for (Offer::cit it = items.begin(); it != items.end(); ++it)
+    for(auto it = items.begin(); it != items.end(); ++it)
     {
-        if (it->second->uniqueHits != -1)
+        if ((*it)->uniqueHits != -1)
         {
             if (history_archive[ViewHistory]->exists(key))
             {
-                if (history_archive[ViewHistory]->zrank(key,it->second->id_int) == -1)
+                if (history_archive[ViewHistory]->zrank(key,(*it)->id_int) == -1)
                 {
-                    history_archive[ViewHistory]->zadd(key,it->second->uniqueHits - 1, it->second->id_int);
+                    history_archive[ViewHistory]->zadd(key,(*it)->uniqueHits - 1, (*it)->id_int);
                 }
                 else//if rank == -1
                 {
-                    if (history_archive[ViewHistory]->zscore(key,it->second->id_int) > 0)
+                    if (history_archive[ViewHistory]->zscore(key,(*it)->id_int) > 0)
                     {
-                        history_archive[ViewHistory]->zincrby(key, it->second->id_int, -1);
+                        history_archive[ViewHistory]->zincrby(key, (*it)->id_int, -1);
                     }
                 }
             }
             else//if not exists
             {
-                history_archive[ViewHistory]->zadd(key,it->second->uniqueHits - 1, it->second->id_int);
+                history_archive[ViewHistory]->zadd(key,(*it)->uniqueHits - 1, (*it)->id_int);
                 history_archive[ViewHistory]->expire(key, Config::Instance()->views_expire_);
             }
         }

@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+
 #include <boost/date_time.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -49,42 +50,19 @@ public:
      *
      * \param params    Параметры запроса.
      */
-    std::string Process(const Params &params, Offer::Map&);
+    std::string Process(const Params &params);
 
-    void ProcessSaveResults(const Params &params, const Offer::Map &items);
+    void ProcessSaveResults(const Params &params);
 
     bool getOffers(const Params &params, Offer::Map &result);
 
     Informer *getInformer(const Params &params);
 
-
-    /** \brief  Новый алгоритм. Добавлен RealInvest Soft.
-     *
-     * Возвращает РП, отобранные для показа по новому алгоритму RISAlgorithm с учетом рейтингов РП внутри рекламных блоков
-     *
-     * \param offersIds    Список пар (идентификатор, вес), где идентификатор - это идентификатор РП, отобранного поиском по индексу, вес - значение соответствия РП с данным идентификатором запросу (в алгоритме при вычислении веса вес, который вернула CLucene умножается на вес, задаваемый в настройках).
-     * \param params    Параметры запроса.
-     * \param camps    Список кампаний, по которым шёл выбор offersIds.
-     *
-     * \see RISAlgorithm
-     * \see createVectorOffersByIds
-     */
-    Offer::Map getOffersRIS(const std::list<std::pair<std::pair<std::string, float>,
-                                    std::pair<std::string, std::pair<std::string, std::string>>>> &offersIds,
-                                    const Params &params, const std::list<Campaign> &camps,
-                                    bool &clean, bool &updateShort, bool &updateContext);
-
-
-
-
-    /** \brief  Увеличивает счётчики показов предложений ``items`` */
-    void markAsShown(const Offer::Map &,const Params &params);
-
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
-    std::string OffersToHtml(const Offer::Map &items, const std::string &url) const;
+    std::string OffersToHtml(const Offer::Vector &items, const std::string &url) const;
 
     /** \brief  Возвращает json-представление предложений ``items`` */
-    std::string OffersToJson(const Offer::Map &items) const;
+    std::string OffersToJson(const Offer::Vector &items) const;
 
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
@@ -122,13 +100,6 @@ public:
     }
 
 private:
-    /// Счётчик обработанных запросов
-    static int request_processed_;
-
-    static int offer_processed_;
-
-    static int social_processed_;
-
     /// Время запуска службы
     boost::posix_time::ptime time_service_started_;
 
@@ -172,7 +143,7 @@ private:
     bool checkBannerSize(const Offer *offer);
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(Offer::Map &result, const Params &params);
+    void RISAlgorithm(Offer::Vector &result, const Params &params);
 
     bool isSocial (Offer& i);
 
@@ -195,6 +166,9 @@ private:
     char *cmd;
     float teasersMediumRating;
     std::string tmpTableName;
+    Offer::Vector result;
+    Offer::Map items;
+    Offer::Vector RISResult;
 };
 
 

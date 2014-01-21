@@ -186,7 +186,7 @@ bool Informer::operator<(const Informer &other) const
 }
 
 
-bool Informer::update(Kompex::SQLiteDatabase *pdb, std::string aInformerId)
+bool Informer::update(Kompex::SQLiteDatabase *pdb, const std::string &aInformerId)
 {
     mongo::DB db;
     std::unique_ptr<mongo::DBClientCursor> cursor = db.query("informer", QUERY("guid" << aInformerId));
@@ -337,4 +337,34 @@ bool Informer::update(Kompex::SQLiteDatabase *pdb, std::string aInformerId)
     if (skipped)
         Log::warn("Informers with empty id skipped: %d", skipped);
     return true;
+}
+
+
+void Informer::remove(Kompex::SQLiteDatabase *pdb, const std::string &id)
+{
+    Kompex::SQLiteStatement *pStmt;
+    char buf[8192];
+
+    if(id.empty())
+    {
+        return;
+    }
+
+    pStmt = new Kompex::SQLiteStatement(pdb);
+    pStmt->BeginTransaction();
+    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Informer WHERE id=%s;",id.c_str());
+        try
+        {
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("Informer::remove(%s) error: %s", buf, ex.GetString().c_str());
+        }
+    pStmt->CommitTransaction();
+    pStmt->FreeQuery();
+
+    delete pStmt;
+
+    Log::info("informer %s removed",id.c_str());
 }

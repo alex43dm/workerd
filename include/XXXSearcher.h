@@ -24,7 +24,7 @@ public:
 	/** \brief Метод обработки запроса к индексу.
      *
 	 */
-    void processKeywords(const std::vector<sphinxRequests> &sr, Offer::Map &items);
+    void processKeywords(const std::vector<sphinxRequests> &sr, Offer::Map &items, Offer::Vector &result);
     void makeFilter(Offer::Map &items);
 
 protected:

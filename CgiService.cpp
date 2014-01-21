@@ -356,20 +356,11 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
                      .search(url.param("search"))
                      .context(url.param("context"));
 
-        Offer::Map items;
         std::string result;
 
-        result = core->Process(prm, items);
+        result = core->Process(prm);
         Response(req, result, c.to_string());
-        core->ProcessSaveResults(prm, items);
-
-        for (Offer::it o = items.begin(); o != items.end(); ++o)
-        {
-            delete o->second;
-            items.erase(o);
-        }
-
-        //items.clear();
+        core->ProcessSaveResults(prm);
     }
     catch (std::exception const &ex)
     {

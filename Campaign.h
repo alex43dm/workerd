@@ -30,6 +30,7 @@ public:
     /** \brief Загружает информацию обо всех кампаниях */
     static void loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query=mongo::Query());
     static void update(Kompex::SQLiteDatabase *pdb, std::string aCampaignId);
+    static void remove(Kompex::SQLiteDatabase *pdb, std::string aCampaignId);
     static void startStop(Kompex::SQLiteDatabase *pdb, std::string aCampaignId, int);
     static std::string getName(long long campaign_id);
 private:

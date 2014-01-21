@@ -9,6 +9,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 
 #include "Offer.h"
+#include "Informer.h"
 #include "RedisClient.h"
 #include "Params.h"
 #include "XXXSearcher.h"
@@ -27,17 +28,16 @@ typedef enum
 class HistoryManager
 {
 public:
+    /// Счётчик обработанных запросов
+    static int request_processed_;
+    static int offer_processed_;
+    static int social_processed_;
     //Задаем значение очистки истории показов
     bool clean;
     //Задаем обнавление краткосрочной истории
     bool updateShort;
     //Задаём обнавление долгосрочной истории
     bool updateContext;
-
-    std::list<std::string> vshortTerm;
-    std::list<std::string> vlongTerm;
-    std::list<std::string> vkeywords;
-    std::list<std::string> vretageting;
 
     HistoryManager(const std::string &tmpTableName);
     virtual ~HistoryManager();
@@ -49,10 +49,10 @@ public:
 
     //main methods
     void getUserHistory(const Params &params);
-    void sphinxProcess(Offer::Map &items);
-    bool updateUserHistory(const Offer::Map &items, const Params& params);
+    void sphinxProcess(Offer::Map &items, Offer::Vector &result);
+    bool updateUserHistory(const Offer::Vector &items, const Params& params, const Informer *informer);
 
-    bool setDeprecatedOffers(const Offer::Map &items);
+    bool setDeprecatedOffers(const Offer::Vector &items);
     bool getDeprecatedOffers(std::string &);
     bool getDeprecatedOffers();
     bool getDeprecatedOffersAsync();
@@ -88,6 +88,11 @@ private:
                 thrGetShortTermAsync,
                 thrGetPageKeywordsAsync,
                 thrGetRetargetingAsync;
+
+    std::list<std::string> vshortTerm;
+    std::list<std::string> vlongTerm;
+    std::list<std::string> vkeywords;
+    std::list<std::string> vretageting;
 
     bool getHistoryByType(HistoryType type, std::list<std::string> &rr);
     boost::int64_t currentDateToInt();

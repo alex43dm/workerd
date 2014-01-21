@@ -76,41 +76,41 @@
         <!--IP-адрес-->
         <host>127.0.0.1</host>
         <!--порт-->
-        <port>6379</port>
+        <port>6378</port>
     </long_term_history>
     <!--Redis-сервер с БД о истории показов пользователя-->
     <user_view_history>
         <!--IP-адрес-->
         <host>127.0.0.1</host>
         <!--порт-->
-        <port>6380</port>
+        <port>6377</port>
     </user_view_history>
     <!--Redis-сервер с БД о контексте страниц-->
     <page_keywords>
         <!--IP-адрес-->
         <host>127.0.0.1</host>
         <!--порт-->
-        <port>6379</port>
+        <port>6376</port>
     </page_keywords>
     <!--Redis-сервер с БД о категориях-->
     <category>
         <!--IP-адрес-->
         <host>127.0.0.1</host>
         <!--порт-->
-        <port>6379</port>
+        <port>6375</port>
     </category>
     <!--Redis-сервер с БД о Ретаргетинге-->
     <retargeting>
         <!--IP-адрес-->
         <host>127.0.0.1</host>
         <!--порт-->
-        <port>6379</port>
+        <port>6380</port>
     </retargeting>
 </redis>
 
 <sphinx>
     <host>localhost</host>
-    <port>2342</port>
+    <port>9312</port>
 </sphinx>
 
 <!--настройки сервера-->
@@ -118,7 +118,7 @@
     <!--путь к файлу сокета-->
     <socket_path>/tmp/workerd.sock</socket_path>
     <!--количество ниток на обработку-->
-    <children>80</children>
+    <children>20</children>
     <!--путь к фалу базы данных-->
     <!--dbpath>/run/db/mem.db</dbpath-->
     <dbpath>:memory:</dbpath>

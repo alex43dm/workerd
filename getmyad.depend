@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1389774153 source:/home/alex/Projects/worker/BaseCore.cpp
+1390208072 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -862,7 +862,7 @@
 	<stdarg.h>
 	<pthread.h>
 
-1389774028 /home/alex/Projects/worker/BaseCore.h
+1390207541 /home/alex/Projects/worker/BaseCore.h
 	<list>
 	<vector>
 	<map>
@@ -903,20 +903,20 @@
 	<boost/date_time/posix_time/ptime.hpp>
 	"../Log.h"
 
-1389708241 /home/alex/Projects/worker/Informer.h
+1390208781 /home/alex/Projects/worker/Informer.h
 	<string>
 	<map>
 	<set>
 	"KompexSQLiteDatabase.h"
 
-1389866224 /home/alex/Projects/worker/Campaign.h
+1390207673 /home/alex/Projects/worker/Campaign.h
 	<string>
 	<map>
 	<list>
 	<mongo/client/dbclientinterface.h>
 	"KompexSQLiteDatabase.h"
 
-1389864516 /home/alex/Projects/worker/Offer.h
+1390257646 /home/alex/Projects/worker/Offer.h
 	<string>
 	<list>
 	<map>
@@ -926,7 +926,7 @@
 	"KompexSQLiteDatabase.h"
 	"EBranch.h"
 
-1389943376 source:/home/alex/Projects/worker/Campaign.cpp
+1390208208 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"DB.h"
@@ -954,7 +954,7 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1389703313 source:/home/alex/Projects/worker/CgiService.cpp
+1390295032 source:/home/alex/Projects/worker/CgiService.cpp
 	<boost/algorithm/string.hpp>
 	<fcgi_stdio.h>
 	"DB.h"
@@ -992,7 +992,7 @@
 	<GeoIPCity.h>
 	<string>
 
-1389606982 /home/alex/Projects/worker/Core.h
+1390301273 /home/alex/Projects/worker/Core.h
 	<list>
 	<vector>
 	<map>
@@ -1032,13 +1032,14 @@
 	<vector>
 	<string>
 
-1389947555 /home/alex/Projects/worker/HistoryManager.h
+1390295780 /home/alex/Projects/worker/HistoryManager.h
 	<string>
 	<list>
 	<map>
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 	"Offer.h"
+	"Informer.h"
 	"RedisClient.h"
 	"Params.h"
 	"XXXSearcher.h"
@@ -1132,7 +1133,7 @@
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 
-1389778224 source:/home/alex/Projects/worker/Config.cpp
+1390213399 source:/home/alex/Projects/worker/Config.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -1141,7 +1142,7 @@
 	"Config.h"
 	<assert.h>
 
-1389947681 source:/home/alex/Projects/worker/Core.cpp
+1390302003 source:/home/alex/Projects/worker/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -1214,12 +1215,13 @@
 	"../Log.h"
 	"XXXSearcher.h"
 
-1389947928 source:/home/alex/Projects/worker/HistoryManager.cpp
+1390295678 source:/home/alex/Projects/worker/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
+	"DB.h"
 
-1389943485 source:/home/alex/Projects/worker/Informer.cpp
+1390208628 source:/home/alex/Projects/worker/Informer.cpp
 	"DB.h"
 	<boost/algorithm/string.hpp>
 	"Informer.h"
@@ -1256,7 +1258,7 @@
 	"CgiService.h"
 	"Log.h"
 
-1389864321 source:/home/alex/Projects/worker/Offer.cpp
+1390304107 source:/home/alex/Projects/worker/Offer.cpp
 	"Offer.h"
 	"DB.h"
 	"Log.h"
@@ -1365,12 +1367,12 @@
 	"KompexSQLiteException.h"
 	"Log.h"
 
-1389865006 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+1390263449 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
 	"Log.h"
 	"Config.h"
 	"XXXSearcher.h"
 
-1389856281 /home/alex/Projects/worker/include/XXXSearcher.h
+1390246877 /home/alex/Projects/worker/include/XXXSearcher.h
 	<string>
 	<list>
 	<set>
@@ -1415,20 +1417,20 @@
 	"Config.h"
 	"Log.h"
 
-1389863407 /home/alex/Projects/worker/include/sphinxRequests.h
+1390207157 /home/alex/Projects/worker/include/sphinxRequests.h
 	<string>
 	"EBranch.h"
 
 1389863417 source:/home/alex/Projects/worker/src/sphinxRequests.cpp
 	"sphinxRequests.h"
 
-1389859433 /home/alex/Projects/worker/include/EBranch.h
+1390229563 /home/alex/Projects/worker/include/EBranch.h
 	<string>
 
 1389859479 source:/home/alex/Projects/worker/src/EBranch.cpp
 	"EBranch.h"
 
-1389948542 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
+1390294691 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -1443,22 +1445,22 @@
 	"Config.h"
 	"Log.h"
 
-1389948493 source:/home/alex/Projects/worker/src/HistoryManagerLongTerm.cpp
+1390207157 source:/home/alex/Projects/worker/src/HistoryManagerLongTerm.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 
-1389948463 source:/home/alex/Projects/worker/src/HistoryManagerPageKeyWords.cpp
+1390207157 source:/home/alex/Projects/worker/src/HistoryManagerPageKeyWords.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 
-1389948396 source:/home/alex/Projects/worker/src/HistoryManagerShortTerm.cpp
+1390207157 source:/home/alex/Projects/worker/src/HistoryManagerShortTerm.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 
-1389948447 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
+1390207157 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"

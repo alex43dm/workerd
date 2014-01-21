@@ -278,7 +278,8 @@ bool Config::LoadConfig(const std::string fName)
         {
             sphinx_host_ = mel->GetText();
         }
-        else if( (mel = mElem->FirstChildElement("port")) && (mel->GetText()) )
+
+        if( (mel = mElem->FirstChildElement("port")) && (mel->GetText()) )
         {
             sphinx_port_ = atoi(mel->GetText());
         }

@@ -982,3 +982,32 @@ std::string Campaign::getName(long long campaign_id)
     return "";
 }
 
+void Campaign::remove(Kompex::SQLiteDatabase *pdb, std::string aCampaignId)
+{
+    Kompex::SQLiteStatement *pStmt;
+    char buf[8192];
+
+    if(aCampaignId.empty())
+    {
+        return;
+    }
+
+    pStmt = new Kompex::SQLiteStatement(pdb);
+    pStmt->BeginTransaction();
+    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign WHERE id=%s;",aCampaignId.c_str());
+        try
+        {
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("Campaign::remove(%s) error: %s", buf, ex.GetString().c_str());
+        }
+    pStmt->CommitTransaction();
+    pStmt->FreeQuery();
+
+    delete pStmt;
+
+    Log::info("campaign %s removed",aCampaignId.c_str());
+}
+

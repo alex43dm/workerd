@@ -54,6 +54,10 @@ bool BaseCore::ProcessMQ()
                 {
                     Campaign::update(Config::Instance()->pDb->pDatabase, toString(m));
                 }
+                else if(m->getRoutingKey() == "campaign.delete")
+                {
+                    Campaign::remove(Config::Instance()->pDb->pDatabase, toString(m));
+                }
                 else if(m->getRoutingKey() == "campaign.start")
                 {
                     Campaign::startStop(Config::Instance()->pDb->pDatabase, toString(m), 1);
@@ -73,14 +77,7 @@ bool BaseCore::ProcessMQ()
             if (m->getMessageCount() > -1)
             {
                 m1 = toString(m);
-                if(m->getRoutingKey() == "advertise.start")
-                {
-                    if(cmdParser(m1,ofrId,cmgId))
-                    {
-                        Offer::loadAll(Config::Instance()->pDb->pDatabase, QUERY("guid" << ofrId));
-                    }
-                }
-                else if(m->getRoutingKey() == "advertise.update")
+                if(m->getRoutingKey() == "advertise.update")
                 {
                     if(cmdParser(m1,ofrId,cmgId))
                     {
@@ -91,7 +88,7 @@ bool BaseCore::ProcessMQ()
                 {
                     if(cmdParser(m1,ofrId,cmgId))
                     {
-                        Offer::loadAll(Config::Instance()->pDb->pDatabase, QUERY("guid" << ofrId));
+                        Offer::remove(Config::Instance()->pDb->pDatabase, ofrId);
                     }
                 }
 
@@ -108,19 +105,9 @@ bool BaseCore::ProcessMQ()
                 {
                     Informer::update(Config::Instance()->pDb->pDatabase, toString(m));
                 }
-
-                return true;
-            }
-        }
-        {
-            // Проверка сообщений account.#
-            mq_account_->Get(AMQP_NOACK);
-            AMQPMessage *m = mq_account_->getMessage();
-            if (m->getMessageCount() > -1)
-            {
-                if(m->getRoutingKey() == "account.update")
+                else if(m->getRoutingKey() == "informer.delete")
                 {
-//                LoadAllEntities();
+                    Informer::remove(Config::Instance()->pDb->pDatabase, toString(m));
                 }
 
                 return true;
@@ -199,15 +186,12 @@ void BaseCore::InitMessageQueue()
         std::string mq_advertise_name( "getmyad.advertise." + postfix );
         std::string mq_campaign_name( "getmyad.campaign." + postfix );
         std::string mq_informer_name( "getmyad.informer." + postfix );
-        std::string mq_account_name( "getmyad.account." + postfix );
 
         // Объявляем очереди
         mq_campaign_ = amqp_->createQueue();
         mq_campaign_->Declare(mq_campaign_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
         mq_informer_ = amqp_->createQueue();
         mq_informer_->Declare(mq_informer_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
-        mq_account_ = amqp_->createQueue();
-        mq_account_->Declare(mq_account_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
         mq_advertise_ = amqp_->createQueue();
         mq_advertise_->Declare(mq_advertise_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
 
@@ -215,12 +199,10 @@ void BaseCore::InitMessageQueue()
         exchange_->Bind(mq_advertise_name, "advertise.#");
         exchange_->Bind(mq_campaign_name, "campaign.#");
         exchange_->Bind(mq_informer_name, "informer.#");
-        exchange_->Bind(mq_account_name, "account.#");
 
        Log::info("Created ampq queues: %s, %s, %s, %s",
                   mq_campaign_name.c_str(),
                   mq_informer_name.c_str(),
-                  mq_account_name.c_str(),
                   mq_advertise_name.c_str());
     }
     catch (AMQPException &ex)

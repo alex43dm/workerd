@@ -162,9 +162,12 @@ std::string Offer::toJson() const
 
 void Offer::gen()
 {
+    /*
     std::ostringstream s;
     s << std::hex << rand(); // Cлучайное число в шестнадцатиричном
     token = s.str();  // исчислении
+    */
+    token = std::to_string(rand());
 }
 
 
@@ -329,4 +332,33 @@ bool Offer::setBranch(const EBranchT tbranch)
     }
 
     return false;
+}
+
+void Offer::remove(Kompex::SQLiteDatabase *pdb, const std::string &id)
+{
+    Kompex::SQLiteStatement *pStmt;
+    char buf[8192];
+
+    if(id.empty())
+    {
+        return;
+    }
+
+    pStmt = new Kompex::SQLiteStatement(pdb);
+    pStmt->BeginTransaction();
+    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Offer WHERE id=%s;",id.c_str());
+        try
+        {
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("Offer::remove(%s) error: %s", buf, ex.GetString().c_str());
+        }
+    pStmt->CommitTransaction();
+    pStmt->FreeQuery();
+
+    delete pStmt;
+
+    Log::info("offer %s removed",id.c_str());
 }

@@ -20,9 +20,12 @@ class Offer
 {
 public:
     typedef std::map <const long,Offer*> Map;
+    typedef std::map <const float,Offer*, std::greater<float>> MapRate;
     typedef std::map <const long,Offer*>::iterator it;
     typedef std::map <const long,Offer*>::const_iterator cit;
     typedef std::pair<const long,Offer*> Pair;
+    typedef std::vector <Offer*> Vector;
+    typedef std::vector <Offer*>::iterator itV;
 
     typedef enum{ banner, teazer, unknown } Type;
     /// Структура для хранения информации о рекламном предложении.
@@ -75,10 +78,16 @@ public:
     virtual ~Offer();
 
     static void loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query=mongo::Query());
+    static void remove(Kompex::SQLiteDatabase *pdb, const std::string &id);
 
-    bool operator==(const Offer &other) const { return this->id_int == other.id_int; }
-    bool operator<(const Offer &other) const { return rating < other.rating; }
-
+    //bool operator==(const Offer &other) const { return this->id_int == other.id_int; }
+    //bool operator<(const Offer &other) const { return rating < other.rating; }
+/*
+    bool operator<(const Offer *x1, const Offer *x2)
+    {
+        return x1->rating > x2->rating;
+    }
+*/
     static Type typeFromString(const std::string stype)
     {
         if(stype == "banner")
@@ -111,9 +120,9 @@ class OfferExistByType
 public:
     OfferExistByType(Offer::Type t):type(t){}
 
-    bool operator()(const Offer::Pair &temp)
+    bool operator()(const Offer *temp)
     {
-            return temp.second->type == type;
+            return temp->type == type;
     }
 };
 

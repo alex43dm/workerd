@@ -1,6 +1,7 @@
 #include "HistoryManager.h"
 #include "Config.h"
 #include "Log.h"
+#include "DB.h"
 
 HistoryManager::HistoryManager(const std::string &tmpTableName):
     tmpTable(tmpTableName)
@@ -87,8 +88,7 @@ void HistoryManager::getUserHistory(const Params &params)
     }
 }
 
-
-void HistoryManager::sphinxProcess(Offer::Map &items)
+void HistoryManager::sphinxProcess(Offer::Map &items, Offer::Vector &result)
 {
     sphinx->makeFilter(items);
 
@@ -96,7 +96,7 @@ void HistoryManager::sphinxProcess(Offer::Map &items)
     getShortTermAsyncWait();
     getPageKeywordsAsyncWait();
 
-    sphinx->processKeywords(stringQuery, items);
+    sphinx->processKeywords(stringQuery, items, result);
 }
 
 
@@ -105,12 +105,87 @@ void HistoryManager::sphinxProcess(Offer::Map &items)
 	\param offers     		вектор рекламных предложений, выбранных к показу
 	\param params			параметры, переданный ядру процесса
 */
-bool HistoryManager::updateUserHistory(const Offer::Map &items, const Params& params)
+bool HistoryManager::updateUserHistory(
+        const Offer::Vector &items,
+        const Params& params,
+        const Informer *informer)
 {
     setDeprecatedOffers(items);
 
-    updateShortHistory(params.getSearch());
-    updatePageKeywordsHistory(params.getContext());
+    try
+    {
+        mongo::DB db("log");
+        //LOG(INFO) << "writing to log...";
+
+        int count = 0;
+        std::list<std::string>::iterator it;
+
+        mongo::BSONArrayBuilder b1,b2,b3;
+        for (it=vshortTerm.begin() ; it != vshortTerm.end(); ++it )
+            b1.append(*it);
+        mongo::BSONArray shortTermArray = b1.arr();
+        for (it=vlongTerm.begin() ; it != vlongTerm.end(); ++it )
+            b2.append(*it);
+        mongo::BSONArray longTermArray = b2.arr();
+        for (it=vkeywords.begin() ; it != vkeywords.end(); ++it )
+            b3.append(*it);
+        mongo::BSONArray contextTermArray = b3.arr();
+
+        for(auto i = items.begin(); i != items.end(); ++i)
+        {
+
+            std::tm dt_tm;
+            dt_tm = boost::posix_time::to_tm(params.time_);
+            mongo::Date_t dt( (mktime(&dt_tm)) * 1000LLU);
+
+            mongo::BSONObj keywords = mongo::BSONObjBuilder().
+                                      append("search", params.getSearch()).
+                                      append("context", params.getContext()).
+                                      append("ShortTermHistory", shortTermArray).
+                                      append("longtermhistory", longTermArray).
+                                      append("contexttermhistory", contextTermArray).
+                                      obj();
+
+            Campaign *c = new Campaign((*i)->campaign_id);
+
+            mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
+                                    append("dt", dt).
+                                    append("id", (*i)->id).
+                                    append("id_int", (*i)->id_int).
+                                    append("title", (*i)->title).
+                                    append("inf", params.informer_).
+                                    append("inf_int", informer->id).
+                                    append("ip", params.ip_).
+                                    append("cookie", params.cookie_id_).
+                                    append("social", (*i)->social).
+                                    append("token", (*i)->token).
+                                    append("type", (*i)->type).
+                                    append("isOnClick", (*i)->isOnClick).
+                                    append("campaignId", c->id).
+                                    append("campaignId_int", (*i)->campaign_id).
+                                    append("campaignTitle", c->title).
+                                    append("project", c->project).
+                                    append("country", (params.getCountry().empty()?"NOT FOUND":params.getCountry().c_str())).
+                                    append("region", (params.getRegion().empty()?"NOT FOUND":params.getRegion().c_str())).
+                                    append("keywords", keywords).
+                                    append("branch", (*i)->getBranch()).
+                                    append("conformity", (*i)->conformity).
+                                    append("matching", (*i)->matching).
+                                    obj();
+            delete c;
+
+            db.insert("log.impressions", record, true);
+            count++;
+
+            offer_processed_ ++;
+            if ((*i)->social) social_processed_ ++;
+        }
+    }
+    catch (mongo::DBException &ex)
+    {
+        Log::err("DBException duriAMQPMessageng markAsShown(): %s", ex.what());
+    }
+
 
     vshortTerm.clear();
     vlongTerm.clear();
