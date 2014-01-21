@@ -48,9 +48,9 @@ public:
     bool getDBStatus(HistoryType t);
 
     //main methods
-    void getUserHistory(const Params &params);
+    void getUserHistory(const Params *params);
     void sphinxProcess(Offer::Map &items, Offer::Vector &result);
-    bool updateUserHistory(const Offer::Vector &items, const Params& params, const Informer *informer);
+    bool updateUserHistory(const Offer::Vector &items, const Params *params, const Informer *informer);
 
     bool setDeprecatedOffers(const Offer::Vector &items);
     bool getDeprecatedOffers(std::string &);
@@ -83,7 +83,7 @@ private:
     XXXSearcher *sphinx;
     pthread_mutex_t *m_pPrivate;
 
-    pthread_t   thrGetDeprecatedOffersAsync,
+    pthread_t   tid, thrGetDeprecatedOffersAsync,
                 thrGetLongTermAsync,
                 thrGetShortTermAsync,
                 thrGetPageKeywordsAsync,

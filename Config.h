@@ -62,6 +62,7 @@ public:
     std::string lock_file_;
     std::string pid_file_;
     std::string user_;
+    int retargeting_by_persents_;
 
     DataBase *pDb;
 

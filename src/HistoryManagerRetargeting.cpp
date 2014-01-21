@@ -6,6 +6,7 @@
 void HistoryManager::getRetargeting()
 {
     getHistoryByType(HistoryType::Retargeting, vretageting);
+    Log::info("[%ld]HistoryManager::getRetargeting : done",tid);
 }
 
 void *HistoryManager::getRetargetingEnv(void *data)
@@ -33,6 +34,6 @@ bool HistoryManager::getRetargetingAsync()
 bool HistoryManager::getRetargetingAsyncWait()
 {
     pthread_join(thrGetRetargetingAsync, 0);
-    Log::gdb("HistoryManager::getRetargetingAsyncWait return");
+//    Log::gdb("HistoryManager::getRetargetingAsyncWait return");
     return true;
 }

@@ -16,6 +16,8 @@ HistoryManager::HistoryManager(const std::string &tmpTableName):
     pthread_mutex_init((pthread_mutex_t*)m_pPrivate, &attr);
     pthread_mutexattr_destroy(&attr);
 
+    tid = pthread_self();
+
     sphinx = new XXXSearcher();
 }
 
@@ -52,13 +54,13 @@ bool HistoryManager::initDB()
     return true;
 }
 
-void HistoryManager::getUserHistory(const Params &params)
+void HistoryManager::getUserHistory(const Params *params)
 {
     clean = false;
     updateShort = false;
     updateContext = false;
 
-    key = params.getUserKey();
+    key = params->getUserKey();
 
     getDeprecatedOffersAsync();
 
@@ -71,7 +73,7 @@ void HistoryManager::getUserHistory(const Params &params)
     getRetargetingAsync();
 
     //Запрос по П/З query
-    std::string q = Params::getKeywordsString(params.getSearch());
+    std::string q = Params::getKeywordsString(params->getSearch());
     if (!q.empty())
     {
         lock();
@@ -79,7 +81,7 @@ void HistoryManager::getUserHistory(const Params &params)
         unlock();
     }
     //Запрос по контексту страницы context
-    q = Params::getContextKeywordsString(params.getContext());
+    q = Params::getContextKeywordsString(params->getContext());
     if (!q.empty())
     {
         lock();
@@ -92,9 +94,11 @@ void HistoryManager::sphinxProcess(Offer::Map &items, Offer::Vector &result)
 {
     sphinx->makeFilter(items);
 
-    getLongTermAsyncWait();
     getShortTermAsyncWait();
     getPageKeywordsAsyncWait();
+    getLongTermAsyncWait();
+
+    Log::info("[%ld]sphinx get history: done",tid);
 
     sphinx->processKeywords(stringQuery, items, result);
 }
@@ -107,7 +111,7 @@ void HistoryManager::sphinxProcess(Offer::Map &items, Offer::Vector &result)
 */
 bool HistoryManager::updateUserHistory(
         const Offer::Vector &items,
-        const Params& params,
+        const Params *params,
         const Informer *informer)
 {
     setDeprecatedOffers(items);
@@ -135,12 +139,12 @@ bool HistoryManager::updateUserHistory(
         {
 
             std::tm dt_tm;
-            dt_tm = boost::posix_time::to_tm(params.time_);
+            dt_tm = boost::posix_time::to_tm(params->time_);
             mongo::Date_t dt( (mktime(&dt_tm)) * 1000LLU);
 
             mongo::BSONObj keywords = mongo::BSONObjBuilder().
-                                      append("search", params.getSearch()).
-                                      append("context", params.getContext()).
+                                      append("search", params->getSearch()).
+                                      append("context", params->getContext()).
                                       append("ShortTermHistory", shortTermArray).
                                       append("longtermhistory", longTermArray).
                                       append("contexttermhistory", contextTermArray).
@@ -153,10 +157,10 @@ bool HistoryManager::updateUserHistory(
                                     append("id", (*i)->id).
                                     append("id_int", (*i)->id_int).
                                     append("title", (*i)->title).
-                                    append("inf", params.informer_).
+                                    append("inf", params->informer_).
                                     append("inf_int", informer->id).
-                                    append("ip", params.ip_).
-                                    append("cookie", params.cookie_id_).
+                                    append("ip", params->ip_).
+                                    append("cookie", params->cookie_id_).
                                     append("social", (*i)->social).
                                     append("token", (*i)->token).
                                     append("type", (*i)->type).
@@ -165,8 +169,8 @@ bool HistoryManager::updateUserHistory(
                                     append("campaignId_int", (*i)->campaign_id).
                                     append("campaignTitle", c->title).
                                     append("project", c->project).
-                                    append("country", (params.getCountry().empty()?"NOT FOUND":params.getCountry().c_str())).
-                                    append("region", (params.getRegion().empty()?"NOT FOUND":params.getRegion().c_str())).
+                                    append("country", (params->getCountry().empty()?"NOT FOUND":params->getCountry().c_str())).
+                                    append("region", (params->getRegion().empty()?"NOT FOUND":params->getRegion().c_str())).
                                     append("keywords", keywords).
                                     append("branch", (*i)->getBranch()).
                                     append("conformity", (*i)->conformity).

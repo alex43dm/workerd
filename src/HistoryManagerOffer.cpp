@@ -68,6 +68,8 @@ bool HistoryManager::getDeprecatedOffers()
         return false;
     }
 
+    Log::info("[%ld]HistoryManager::getDeprecatedOffers: done",tid);
+
     return true;
 }
 
@@ -97,7 +99,7 @@ bool HistoryManager::getDeprecatedOffersAsync()
 bool HistoryManager::getDeprecatedOffersAsyncWait()
 {
     pthread_join(thrGetDeprecatedOffersAsync, 0);
-    Log::gdb("HistoryManager::getDeprecatedOffersAsyncWait return");
+//    Log::gdb("HistoryManager::getDeprecatedOffersAsyncWait return");
     return true;
 }
 

@@ -21,6 +21,7 @@ void HistoryManager::getLongTerm()
             }
         }
     }
+    Log::info("[%ld]HistoryManager::getLongTerm : done",tid);
 }
 
 void *HistoryManager::getLongTermEnv(void *data)
@@ -48,6 +49,6 @@ bool HistoryManager::getLongTermAsync()
 bool HistoryManager::getLongTermAsyncWait()
 {
     pthread_join(thrGetLongTermAsync, 0);
-    Log::gdb("HistoryManager::getLongTermAsyncWait return");
+//    Log::gdb("HistoryManager::getLongTermAsyncWait return");
     return true;
 }

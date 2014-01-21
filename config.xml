@@ -16,6 +16,9 @@
 <folder_offer>/var/www/indexOffer</folder_offer>
 <!--Название папки, в которой находится индекс по информерам и рейтингам РП внутри этих информеров-->
 <folder_informer>/var/www/indexInformer</folder_informer>
+<!-- -->
+<retargeting_by_persents>50</retargeting_by_persents>
+
 <!--Весовые коэффициенты-->
 <range>
     <!--соответствующих ключевым словам-->
@@ -118,7 +121,7 @@
     <!--путь к файлу сокета-->
     <socket_path>/tmp/workerd.sock</socket_path>
     <!--количество ниток на обработку-->
-    <children>20</children>
+    <children>80</children>
     <!--путь к фалу базы данных-->
     <!--dbpath>/run/db/mem.db</dbpath-->
     <dbpath>:memory:</dbpath>

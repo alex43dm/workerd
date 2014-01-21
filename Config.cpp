@@ -96,6 +96,11 @@ bool Config::LoadConfig(const std::string fName)
         folder_informer_ = mElem->GetText();
     }
 
+    if( (mElem = mRoot->FirstChildElement("retargeting_by_persents")) && (mElem->GetText()) )
+    {
+        retargeting_by_persents_ = strtol(mElem->GetText(),NULL,10);
+    }
+
     if( (mels = mRoot->FirstChildElement("mongo")) )
     {
         if( (mel = mels->FirstChildElement("main")) )

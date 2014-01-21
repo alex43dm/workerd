@@ -218,8 +218,8 @@ void *CgiService::Serve(void *data)
     CgiService *csrv = (CgiService*)data;
 
     Core *core = new Core();
-    core->set_server_ip(Config::Instance()->server_ip_);
-    core->set_redirect_script(Config::Instance()->redirect_script_);
+//    core->set_server_ip(Config::Instance()->server_ip_);
+//    core->set_redirect_script(Config::Instance()->redirect_script_);
 
     FCGX_Request request;
 
@@ -358,9 +358,9 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
 
         std::string result;
 
-        result = core->Process(prm);
+        result = core->Process(&prm);
         Response(req, result, c.to_string());
-        core->ProcessSaveResults(prm);
+        core->ProcessSaveResults();
     }
     catch (std::exception const &ex)
     {

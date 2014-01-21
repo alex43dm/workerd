@@ -36,47 +36,12 @@ public:
     ~Core();
 
     /** \brief  Обработка запроса на показ рекламы.
-     *
      * Самый главный метод. Возвращает HTML-строку, которую нужно вернуть
      * пользователю.
-     *
-     * Пример вызова:
-     *
-     * \Example
-     * \code
-     * Core core(Params().ip("192.168.0.1")
-     *                         .informer("informer#01"));
-     * \endcode
-     *
-     * \param params    Параметры запроса.
      */
-    std::string Process(const Params &params);
+    std::string Process(const Params *params);
 
-    void ProcessSaveResults(const Params &params);
-
-    bool getOffers(const Params &params, Offer::Map &result);
-
-    Informer *getInformer(const Params &params);
-
-    /** \brief  Возвращает HTML для информера, содержащего предложения items */
-    std::string OffersToHtml(const Offer::Vector &items, const std::string &url) const;
-
-    /** \brief  Возвращает json-представление предложений ``items`` */
-    std::string OffersToJson(const Offer::Vector &items) const;
-
-    /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
-    static std::string EscapeJson(const std::string &str);
-
-    /** \brief  IP сервера, на котором запущена служба */
-    std::string server_ip() const
-    {
-        return server_ip_;
-    }
-
-    void set_server_ip(const std::string &ip)
-    {
-        server_ip_ = ip;
-    }
+    void ProcessSaveResults();
 
     /** \brief  Адрес скрипта перехода на рекламное предложение.
      *
@@ -89,6 +54,7 @@ public:
      * - \code http://getmyad.vsrv-1.2.yottos.com/redirect \endcode
      * - \code http://rynok.yottos.com/Redirect.ashx \endcode
     */
+    /*
     std::string redirect_script() const
     {
         return redirect_script_;
@@ -98,21 +64,18 @@ public:
     {
         redirect_script_ = url;
     }
-
+*/
 private:
     /// Время запуска службы
     boost::posix_time::ptime time_service_started_;
-
-
     /// Время начала последнего запроса
     boost::posix_time::ptime time_request_started_;
-
+/*
     ///Адрес сервера
     std::string server_ip_;
-
     ///Скрипт перенаправления запроса при клике на рекламном предложении
     std::string redirect_script_;
-
+*/
     /** \brief Удаление из вектора result баннеров, не подходящих по размеру для информера с идентификатором informer.
      *
      * @param result Вектор РП, которые нужно проверить на совместимость по размерам с инфомером informer.
@@ -143,7 +106,7 @@ private:
     bool checkBannerSize(const Offer *offer);
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(Offer::Vector &result, const Params &params);
+    void RISAlgorithm(Offer::Vector &result);
 
     bool isSocial (Offer& i);
 
@@ -154,6 +117,7 @@ private:
     pthread_t tid;
 
     Informer *informer;
+    const Params *params;
 
     HistoryManager *hm;
 
@@ -169,6 +133,17 @@ private:
     Offer::Vector result;
     Offer::Map items;
     Offer::Vector RISResult;
+
+    bool getOffers( Offer::Map &result);
+    Informer *getInformer();
+    bool getAllOffers();
+
+    /** \brief  Возвращает HTML для информера, содержащего предложения items */
+    std::string OffersToHtml(const Offer::Vector &items, const std::string &url) const;
+    /** \brief  Возвращает json-представление предложений ``items`` */
+    std::string OffersToJson(const Offer::Vector &items) const;
+    /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
+    static std::string EscapeJson(const std::string &str);
 };
 
 

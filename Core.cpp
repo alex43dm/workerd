@@ -23,8 +23,8 @@ int HistoryManager::request_processed_ = 0;
 int HistoryManager::offer_processed_ = 0;
 int HistoryManager::social_processed_ = 0;
 
-Core::Core() :
-    redirect_script_("/redirect")
+Core::Core()
+//    redirect_script_("/redirect")
 {
     tid = pthread_self();
 
@@ -142,25 +142,29 @@ public:
 
 /** Обработка запроса на показ рекламы с параметрами ``params``.
 	Изменён RealInvest Soft */
-std::string Core::Process(const Params &params)
+std::string Core::Process(const Params *prms)
 {
-    // Log::info("[%ld]Core::Process start",tid);
+    Log::info("[%ld]Core::Process start",tid);
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = boost::posix_time::microsec_clock::local_time();
 
+    params = prms;
     //load all history async
     hm->getUserHistory(params);
 
-    informer = getInformer(params);
-    //Log::info("[%ld]getInformer done",tid);
-    getOffers(params, items);
+    informer = getInformer();
+    Log::info("[%ld]getInformer: done",tid);
+
+    getAllOffers();
+    Log::info("[%ld]getOffers: done",tid);
 
     //wait all history load
     hm->sphinxProcess(items, result);
+    Log::info("[%ld]sphinxProcess: done",tid);
 
     //новый алгоритм
-    RISAlgorithm(result, params);
-    //Log::info("RISAlgorithm: done",tid);
+    RISAlgorithm(result);
+    Log::info("[%ld]RISAlgorithm: done",tid);
     if (!RISResult.size())
     {
         Log::warn("offers empty");
@@ -193,10 +197,10 @@ std::string Core::Process(const Params &params)
     //std::for_each(RISResult.begin(), RISResult.end(), redirect_generator);
 
     std::string ret;
-    if (params.json_)
+    if (params->json_)
         ret = OffersToJson(RISResult);
     else
-        ret = OffersToHtml(RISResult, params.getUrl());
+        ret = OffersToHtml(RISResult, params->getUrl());
 
     delete informer;
 
@@ -205,9 +209,9 @@ std::string Core::Process(const Params &params)
     return ret;
 }
 
-void Core::ProcessSaveResults(const Params &params)
+void Core::ProcessSaveResults()
 {
-    if (params.test_mode_)
+    if (params->test_mode_)
         return;
     // Сохраняем выданные ссылки в базе данных
     //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
@@ -242,9 +246,9 @@ void Core::ProcessSaveResults(const Params &params)
     //items.clear();
 }
 
-Informer *Core::getInformer(const Params &params)
+Informer *Core::getInformer()
 {
-    pStmtInformer->BindString(1, params.informer_);
+    pStmtInformer->BindString(1, params->informer_);
     while(pStmtInformer->FetchRow())
     {
         return new Informer(pStmtInformer->GetColumnInt64(0),
@@ -299,7 +303,21 @@ file::memory:?cache=shared
 	    исключаются из просмотра. Это используется в прокрутке информера.
  */
 
-bool Core::getOffers(const Params &params, Offer::Map &result)
+bool Core::getAllOffers()
+{
+    sqlite3_snprintf(CMD_SIZE, cmd, pStmtOfferStr.c_str(),
+                         informer->domainId,
+                         informer->accountId,
+                         informer->id,
+                         params->getCountry().c_str(),
+                         params->getRegion().c_str(),
+                         getpid(),
+                         tid);
+
+    return getOffers(items);
+}
+
+bool Core::getOffers(Offer::Map &result)
 {
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = boost::posix_time::microsec_clock::local_time();
@@ -314,14 +332,6 @@ bool Core::getOffers(const Params &params, Offer::Map &result)
     {
         pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
 
-        sqlite3_snprintf(CMD_SIZE, cmd, pStmtOfferStr.c_str(),
-                         informer->domainId,
-                         informer->accountId,
-                         informer->id,
-                         params.getCountry().c_str(),
-                         params.getRegion().c_str(),
-                         getpid(),
-                         tid);
         pStmt->Sql(cmd);
     }
     catch(Kompex::SQLiteException &ex)
@@ -466,7 +476,7 @@ bool Core::checkBannerSize(const Offer *offer)
 	если выбранных тизеров достаточно для РБ, показываем.
 	если нет - добираем из исходного массива стоящие слева тизеры.
  */
-void Core::RISAlgorithm(Offer::Vector &result, const Params &params)
+void Core::RISAlgorithm(Offer::Vector &result)
 {
     std::map<const long,long> camps;
     Offer::itV p;
@@ -714,7 +724,7 @@ make_return:
                                      % rand()
                                      % (*p)->url
                                      % Config::Instance()->server_ip_
-                                     % params.location_
+                                     % params->location_
                                  ));
         }
 

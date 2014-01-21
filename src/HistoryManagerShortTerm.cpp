@@ -21,6 +21,7 @@ void HistoryManager::getShortTerm()
             }
         }
     }
+    Log::info("[%ld]HistoryManager::getShortTerm : done",tid);
 }
 
 void *HistoryManager::getShortTermEnv(void *data)
@@ -49,7 +50,7 @@ bool HistoryManager::getShortTermAsync()
 bool HistoryManager::getShortTermAsyncWait()
 {
     pthread_join(thrGetShortTermAsync, 0);
-    Log::gdb("HistoryManager::getShortTermAsyncWait return");
+//    Log::gdb("HistoryManager::getShortTermAsyncWait return");
     return true;
 }
 

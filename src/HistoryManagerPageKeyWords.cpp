@@ -28,6 +28,7 @@ void HistoryManager::getPageKeywordsHistory()
             }
         }
     }
+    Log::info("[%ld]HistoryManager::getPageKeywordsHistory : done",tid);
 }
 
 
@@ -51,7 +52,7 @@ bool HistoryManager::getPageKeywordsAsync()
 bool HistoryManager::getPageKeywordsAsyncWait()
 {
     pthread_join(thrGetPageKeywordsAsync, 0);
-    Log::gdb("HistoryManager::getPageKeywordsAsyncWait return");
+//    Log::gdb("HistoryManager::getPageKeywordsAsyncWait return");
     return true;
 }
 
