@@ -33,7 +33,7 @@ Core::Core()
     pDb = Config::Instance()->pDb;
 
     pStmtOfferStr = pDb->getSqlFile("requests/01.sql");
-
+    InformerStr  = pDb->getSqlFile("requests/04.sql");
     RetargetingOfferStr = pDb->getSqlFile("requests/03.sql");
     /*
         try
@@ -154,11 +154,12 @@ std::string Core::Process(const Params *prms)
     startTime = boost::posix_time::microsec_clock::local_time();
 
     params = prms;
+
+    getInformer();
+    Log::info("[%ld]getInformer: done",tid);
+
     //load all history async
     hm->getUserHistory(params);
-
-    informer = getInformer();
-    Log::info("[%ld]getInformer: done",tid);
 
     RetargetingCount = (int)informer->capacity * Config::Instance()->retargeting_by_persents_ / 100;
 
@@ -277,19 +278,43 @@ void Core::ProcessSaveResults()
 
 Informer *Core::getInformer()
 {
-    pStmtInformer->BindString(1, params->informer_);
-    while(pStmtInformer->FetchRow())
+    Kompex::SQLiteStatement *pStmt;
+
+    sqlite3_snprintf(CMD_SIZE, cmd, InformerStr.c_str(), params->informer_.c_str());
+    try
     {
-        return new Informer(pStmtInformer->GetColumnInt64(0),
-                            pStmtInformer->GetColumnInt(1),
-                            pStmtInformer->GetColumnString(2),
-                            pStmtInformer->GetColumnString(3),
-                            pStmtInformer->GetColumnInt64(4),
-                            pStmtInformer->GetColumnInt64(5)
-                           );
+        pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
+        pStmt->Sql(cmd);
     }
-    //reset moved to after response function
-    //pStmtInformer->Reset();
+    catch(Kompex::SQLiteException &ex)
+    {
+        Log::err("DB error: getOffers: %s: %s", ex.GetString().c_str(), cmd);
+        delete pStmt;
+        return nullptr;
+    }
+
+    try
+    {
+        while(pStmt->FetchRow())
+        {
+            informer =  new Informer(pStmt->GetColumnInt64(0),
+                                pStmt->GetColumnInt(1),
+                                pStmt->GetColumnString(2),
+                                pStmt->GetColumnString(3),
+                                pStmt->GetColumnInt64(4),
+                                pStmt->GetColumnInt64(5)
+                               );
+        }
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        Log::err("DB error: %s", ex.GetString().c_str());
+        delete pStmt;
+        return nullptr;
+    }
+
+    delete pStmt;
+
     return nullptr;
 }
 /**

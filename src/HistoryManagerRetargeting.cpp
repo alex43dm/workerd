@@ -41,6 +41,6 @@ std::string HistoryManager::getRetargetingAsyncWait()
             ret += ',';
         ret += (*i);
     }
-    Log::gdb("HistoryManager::getRetargetingAsyncWait return");
+    Log::info("[%ld]HistoryManager::getRetargetingAsyncWait return",tid);
     return ret;
 }

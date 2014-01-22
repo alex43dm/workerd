@@ -64,12 +64,6 @@ void HistoryManager::getUserHistory(const Params *params)
 
     getDeprecatedOffersAsync();
 
-    getLongTermAsync();
-
-    getShortTermAsync();
-
-    getPageKeywordsAsync();
-
     getRetargetingAsync();
 
     //Запрос по П/З query
@@ -88,6 +82,13 @@ void HistoryManager::getUserHistory(const Params *params)
         stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_,EBranchT::T2));
         unlock();
     }
+
+
+    getLongTermAsync();
+
+    getShortTermAsync();
+
+    getPageKeywordsAsync();
 }
 
 void HistoryManager::sphinxProcess(Offer::Map &items, Offer::Vector &result)
