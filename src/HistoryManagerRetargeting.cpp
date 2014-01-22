@@ -31,9 +31,16 @@ bool HistoryManager::getRetargetingAsync()
     return true;
 }
 
-bool HistoryManager::getRetargetingAsyncWait()
+std::string HistoryManager::getRetargetingAsyncWait()
 {
+    std::string ret;
     pthread_join(thrGetRetargetingAsync, 0);
-//    Log::gdb("HistoryManager::getRetargetingAsyncWait return");
-    return true;
+    for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
+    {
+        if(i != vretageting.begin())
+            ret += ',';
+        ret += (*i);
+    }
+    Log::gdb("HistoryManager::getRetargetingAsyncWait return");
+    return ret;
 }

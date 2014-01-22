@@ -69,7 +69,7 @@ public:
     bool getPageKeywordsAsyncWait();
 
     bool getRetargetingAsync();
-    bool getRetargetingAsyncWait();
+    std::string getRetargetingAsyncWait();
 
 
 //    void getHistory();

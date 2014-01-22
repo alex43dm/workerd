@@ -106,7 +106,7 @@ private:
     bool checkBannerSize(const Offer *offer);
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(Offer::Vector &result);
+    void RISAlgorithm(Offer::Vector &result, Offer::Vector &RISresult, unsigned outLen);
 
     bool isSocial (Offer& i);
 
@@ -121,7 +121,8 @@ private:
 
     HistoryManager *hm;
 
-    std::string pStmtOfferStr;
+    std::string pStmtOfferStr,
+                RetargetingOfferStr;
 
     bool all_social;
 
@@ -130,13 +131,14 @@ private:
     char *cmd;
     float teasersMediumRating;
     std::string tmpTableName;
-    Offer::Vector result;
+    Offer::Vector vOutPut;
+    Offer::Vector result, resultRetargeting;
     Offer::Map items;
-    Offer::Vector RISResult;
 
-    bool getOffers( Offer::Map &result);
+    bool getOffers(Offer::Map &result);
     Informer *getInformer();
-    bool getAllOffers();
+    bool getAllOffers(Offer::Map &v);
+    bool getAllRetargeting(Offer::Vector &v);
 
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
     std::string OffersToHtml(const Offer::Vector &items, const std::string &url) const;

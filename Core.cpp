@@ -33,6 +33,8 @@ Core::Core()
     pDb = Config::Instance()->pDb;
 
     pStmtOfferStr = pDb->getSqlFile("requests/01.sql");
+
+    RetargetingOfferStr = pDb->getSqlFile("requests/03.sql");
     /*
         try
         {
@@ -144,6 +146,9 @@ public:
 	Изменён RealInvest Soft */
 std::string Core::Process(const Params *prms)
 {
+    unsigned RetargetingCount;
+    Offer::Vector vRIS;
+
     Log::info("[%ld]Core::Process start",tid);
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = boost::posix_time::microsec_clock::local_time();
@@ -155,7 +160,12 @@ std::string Core::Process(const Params *prms)
     informer = getInformer();
     Log::info("[%ld]getInformer: done",tid);
 
-    getAllOffers();
+    RetargetingCount = (int)informer->capacity * Config::Instance()->retargeting_by_persents_ / 100;
+
+    getAllRetargeting(resultRetargeting);
+    Log::info("[%ld]getAllRetargeting: done",tid);
+
+    getAllOffers(items);
     Log::info("[%ld]getOffers: done",tid);
 
     //wait all history load
@@ -163,9 +173,27 @@ std::string Core::Process(const Params *prms)
     Log::info("[%ld]sphinxProcess: done",tid);
 
     //новый алгоритм
-    RISAlgorithm(result);
-    Log::info("[%ld]RISAlgorithm: done",tid);
-    if (!RISResult.size())
+    RISAlgorithm(result, vRIS, informer->capacity);
+    Log::info("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
+
+    RISAlgorithm(resultRetargeting, vOutPut, RetargetingCount);
+    Log::info("[%ld]RISAlgorithm: vOutPut %ld done",tid, vOutPut.size());
+    //merge
+    Offer::itV last;
+    if( informer->capacity - vOutPut.size() < vRIS.size())
+    {
+        last = vRIS.begin() + (informer->capacity - vOutPut.size());
+    }
+    else
+    {
+        last = vRIS.end();
+    }
+
+    vOutPut.insert(vOutPut.end(),
+                   vRIS.begin(),
+                   last);
+
+    if (!vOutPut.size())
     {
         Log::warn("offers empty");
         hm->clean = true;
@@ -198,13 +226,13 @@ std::string Core::Process(const Params *prms)
 
     std::string ret;
     if (params->json_)
-        ret = OffersToJson(RISResult);
+        ret = OffersToJson(vOutPut);
     else
-        ret = OffersToHtml(RISResult, params->getUrl());
+        ret = OffersToHtml(vOutPut, params->getUrl());
 
     delete informer;
 
-    Log::info("[%ld]core time: %s %d",tid, boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime).c_str(), RISResult.size());
+    Log::info("[%ld]core time: %s %d",tid, boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime).c_str(), vOutPut.size());
 
     return ret;
 }
@@ -215,7 +243,7 @@ void Core::ProcessSaveResults()
         return;
     // Сохраняем выданные ссылки в базе данных
     //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
-    hm->updateUserHistory(RISResult, params, informer);
+    hm->updateUserHistory(vOutPut, params, informer);
 
     Kompex::SQLiteStatement *p;
     try
@@ -234,7 +262,9 @@ void Core::ProcessSaveResults()
     //  pStmtOffer->Reset();
 
     result.clear();
-    RISResult.clear();
+    resultRetargeting.clear();
+
+    vOutPut.clear();
 
     for (auto o = items.begin(); o != items.end(); ++o)
     {
@@ -242,7 +272,6 @@ void Core::ProcessSaveResults()
             delete o->second;
         items.erase(o);
     }
-
     //items.clear();
 }
 
@@ -303,7 +332,7 @@ file::memory:?cache=shared
 	    исключаются из просмотра. Это используется в прокрутке информера.
  */
 
-bool Core::getAllOffers()
+bool Core::getAllOffers(Offer::Map &ret)
 {
     sqlite3_snprintf(CMD_SIZE, cmd, pStmtOfferStr.c_str(),
                          informer->domainId,
@@ -314,7 +343,26 @@ bool Core::getAllOffers()
                          getpid(),
                          tid);
 
-    return getOffers(items);
+    hm->getDeprecatedOffersAsyncWait();
+    return getOffers(ret);
+}
+
+bool Core::getAllRetargeting(Offer::Vector &ret)
+{
+    Offer::Map itemsRetargeting;
+
+    std::string ids = hm->getRetargetingAsyncWait();
+
+    sqlite3_snprintf(CMD_SIZE, cmd, RetargetingOfferStr.c_str(), ids.c_str());
+
+    getOffers(itemsRetargeting);
+
+    for(auto i = itemsRetargeting.begin(); i != itemsRetargeting.end(); ++i)
+    {
+        ret.push_back((*i).second);
+    }
+
+    return true;
 }
 
 bool Core::getOffers(Offer::Map &result)
@@ -325,18 +373,16 @@ bool Core::getOffers(Offer::Map &result)
     Kompex::SQLiteStatement *pStmt;
 
 //    Log::info("getOffers start");
-    hm->getDeprecatedOffersAsyncWait();
     //Log::info("[%ld]get history size: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
 
     try
     {
         pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
-
         pStmt->Sql(cmd);
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DB error: pStmtOffer: %s: %s", ex.GetString().c_str(), pDb->getSqlFile("requests/01.sql").c_str());
+        Log::err("DB error: getOffers: %s: %s", ex.GetString().c_str(), cmd);
         delete pStmt;
         return false;
     }
@@ -382,15 +428,7 @@ bool Core::getOffers(Offer::Map &result)
     }
 
     delete pStmt;
-    //Log::info("[%ld]get getoffer done: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
-    /*
-    if(result.size() < 3 && countDown-- > 0)
-    {
-        hm->clearDeprecatedOffers();
-        Core::getOffers(params, result);
-        Log::info("clear view history: %d", countDown);
-    }
-    */
+
     return true;
 }
 
@@ -476,7 +514,7 @@ bool Core::checkBannerSize(const Offer *offer)
 	если выбранных тизеров достаточно для РБ, показываем.
 	если нет - добираем из исходного массива стоящие слева тизеры.
  */
-void Core::RISAlgorithm(Offer::Vector &result)
+void Core::RISAlgorithm(Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen)
 {
     std::map<const long,long> camps;
     Offer::itV p;
@@ -486,7 +524,7 @@ void Core::RISAlgorithm(Offer::Vector &result)
     if(result.size() < 5)
     {
         Log::warn("result size less then 5, return");
-        for(auto p = result.begin(); p != result.end() && RISResult.size() < (u_int)informer->capacity; ++p)
+        for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
             RISResult.push_back(*p);
         goto make_return;
     }
@@ -527,7 +565,7 @@ void Core::RISAlgorithm(Offer::Vector &result)
         p = result.begin();
         p++;
         result.erase(p, result.end());
-        for(auto p = result.begin(); p != result.end() && RISResult.size() < (u_int)informer->capacity; ++p)
+        for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
             RISResult.push_back(*p);
         goto make_return;
     }
@@ -538,7 +576,7 @@ void Core::RISAlgorithm(Offer::Vector &result)
         p = result.begin();
         p++;
         result.erase(p, result.end());
-        for(auto p = result.begin(); p != result.end() && RISResult.size() < (u_int)informer->capacity; ++p)
+        for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
             RISResult.push_back(*p);
         goto make_return;
     }
@@ -563,7 +601,7 @@ void Core::RISAlgorithm(Offer::Vector &result)
             result.erase(result.begin(), p);
             p++;
             result.erase(p, result.end());
-            for(auto p = result.begin(); p != result.end() && RISResult.size() < (u_int)informer->capacity; ++p)
+            for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
                 RISResult.push_back(*p);
             goto make_return;
         }
@@ -626,7 +664,7 @@ void Core::RISAlgorithm(Offer::Vector &result)
             if(!camps.count((*p)->campaign_id) && ((*p)->rating > 0.0))
             {
                 //LOG(INFO) << "add";
-                if(RISResult.size() < (u_int)informer->capacity) RISResult.push_back(*p); else goto make_return;
+                if(RISResult.size() < outLen) RISResult.push_back(*p); else goto make_return;
                 camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
             }
             p++;
@@ -650,7 +688,7 @@ void Core::RISAlgorithm(Offer::Vector &result)
                                 ((*p)->rating > 0.0) || (*p)->branch != EBranchL::L30) )//???never assign L30
                     {
                         //LOG(INFO) << "add";
-                        if(RISResult.size() < (u_int)informer->capacity) RISResult.push_back(*p); else goto make_return;
+                        if(RISResult.size() < outLen) RISResult.push_back(*p); else goto make_return;
                         camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
                     }
                 }
@@ -668,7 +706,7 @@ void Core::RISAlgorithm(Offer::Vector &result)
             //пробуем сначала добрать без повторений.
             if ((*p)->rating > 0.0 || (*p)->branch != EBranchL::L30 )
             {
-                if(RISResult.size() < (u_int)informer->capacity) RISResult.push_back(*p); else goto make_return;
+                if(RISResult.size() < outLen) RISResult.push_back(*p); else goto make_return;
             }
             p++;
         }
@@ -688,7 +726,7 @@ void Core::RISAlgorithm(Offer::Vector &result)
                     if(!camps.count((*p)->campaign_id) && ((*p)->rating <= 0.0))
                     {
                         //LOG(INFO) << "add";
-                        if(RISResult.size() < (u_int)informer->capacity) RISResult.push_back(*p); else goto make_return;
+                        if(RISResult.size() < outLen) RISResult.push_back(*p); else goto make_return;
                         camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
                     }
                 }
@@ -703,16 +741,22 @@ void Core::RISAlgorithm(Offer::Vector &result)
             //пробуем сначала добрать без повторений.
             if ((*p)->rating <= 0.0)
             {
-                if(RISResult.size() < (u_int)informer->capacity) RISResult.push_back(*p); else goto make_return;
+                if(RISResult.size() < outLen) RISResult.push_back(*p); else goto make_return;
             }
             p++;
         }
 
 make_return:
-        for(p = result.begin(); RISResult.size() <(u_int)informer->capacity && p != result.end(); ++p)
+        for(p = result.begin(); RISResult.size() <outLen && p != result.end(); ++p)
         {
             RISResult.push_back(*p);
         }
+
+        if(RISResult.size() > outLen)
+        {
+            result.erase(RISResult.begin() + outLen + 1, RISResult.end());
+        }
+
 
         for(p = RISResult.begin(); p != RISResult.end(); ++p)
         {
