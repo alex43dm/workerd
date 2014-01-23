@@ -34,12 +34,12 @@ void XXXSearcher::makeFilter(Offer::Map &items)
     const char * attr_filter = "guidint";
     sphinx_int64_t *filter = new sphinx_int64_t[(int)items.size()];
     int counts = 0;
-
+//"index worker-full: no such filter attribute 'guid_int'"
     for(auto it = items.begin(); it != items.end(); ++it, counts++)
     {
         filter[counts] = (*it).second->id_int;
     }
-    sphinx_add_filter( client, attr_filter, (int)items.size(), filter, SPH_FALSE);
+    sphinx_add_filter( client, attr_filter, (int)items.size(), filter, SPH_FALSE);//SPH_MATCH_PHRASE
     delete [] filter;
     makeFilterOn = true;
 }
@@ -74,16 +74,16 @@ void XXXSearcher::processKeywords(
         res = sphinx_run_queries(client);
         if ( !res )
         {
-            sphinx_reset_filters ( client );
-            makeFilterOn = false;
-            return;
+            Log::warn("unligal sphinx result: %s", sphinx_error(client));
+            goto default_return;
         }
+        //process sphinx results
         int numRes = sphinx_get_num_results(client);
         for (int tt=0; tt < numRes; tt++, res++)
         {
-//            Log::warn("id: %s num_attrs: %d", sphinx_get_string( res, i, 13 ),res->num_attrs);
             for ( int i=0; i<res->num_matches; i++ )
             {
+                Log::info("sphinx match");
                 if (res->num_attrs != 15)
                 {
                     Log::warn("num_attrs: %d",res->num_attrs);
@@ -165,12 +165,10 @@ void XXXSearcher::processKeywords(
                 }
             }
         }
-        //LOG(INFO) << "Изменения массива предложений заняло: " << (int32_t)(Misc::currentTimeMillis() - strr) << " мс";
-        sphinx_reset_filters ( client );
     }
     catch (std::exception const &ex)
     {
-        Log::warn("Непонятная sphinx ошибка: %s: %s", typeid(ex).name(), ex.what());
+        Log::warn("Непонятная sphinx ошибка: %s: %s: %s", typeid(ex).name(), ex.what(), sphinx_error(client));
     }
     //LOG(INFO) << "Выход из обработки";
 
@@ -189,11 +187,16 @@ void XXXSearcher::processKeywords(
     for(auto i = resultClick.begin(); i != resultClick.end(); ++i)
         result.push_back((*i).second);
 
+default_return:
+    //copy back map to result vector
     if(result.size() < items.size())
     {
         for(auto i = items.begin(); i != items.end(); ++i)
             result.push_back((*i).second);
     }
+
+    sphinx_reset_filters ( client );
     makeFilterOn = false;
+
     return;
 }
