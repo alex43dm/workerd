@@ -144,19 +144,19 @@ public:
 
 /** Обработка запроса на показ рекламы с параметрами ``params``.
 	Изменён RealInvest Soft */
-std::string Core::Process(const Params *prms)
+std::string Core::Process(Params *prms)
 {
     unsigned RetargetingCount;
     Offer::Vector vRIS;
 
-    Log::info("[%ld]Core::Process start",tid);
+    Log::gdb("[%ld]Core::Process start",tid);
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = boost::posix_time::microsec_clock::local_time();
 
     params = prms;
 
     getInformer();
-    Log::info("[%ld]getInformer: done",tid);
+    Log::gdb("[%ld]getInformer: done",tid);
 
     //load all history async
     hm->getUserHistory(params);
@@ -164,21 +164,21 @@ std::string Core::Process(const Params *prms)
     RetargetingCount = (int)informer->capacity * Config::Instance()->retargeting_by_persents_ / 100;
 
     getAllRetargeting(resultRetargeting);
-    Log::info("[%ld]getAllRetargeting: done",tid);
+    Log::gdb("[%ld]getAllRetargeting: done",tid);
 
     getAllOffers(items);
-    Log::info("[%ld]getOffers: done",tid);
-
+    Log::gdb("[%ld]getOffers: done",tid);
     //wait all history load
     hm->sphinxProcess(items, result);
-    Log::info("[%ld]sphinxProcess: done",tid);
+    Log::gdb("[%ld]sphinxProcess: done",tid);
 
     //новый алгоритм
     RISAlgorithm(result, vRIS, informer->capacity);
-    Log::info("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
+    Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
 
     RISAlgorithm(resultRetargeting, vOutPut, RetargetingCount);
-    Log::info("[%ld]RISAlgorithm: vOutPut %ld done",tid, vOutPut.size());
+    Log::gdb("[%ld]RISAlgorithm: vOutPut %ld done",tid, vOutPut.size());
+
     //merge
     Offer::itV last;
     if( informer->capacity - vOutPut.size() < vRIS.size())
@@ -548,7 +548,9 @@ void Core::RISAlgorithm(Offer::Vector &result, Offer::Vector &RISResult, unsigne
 
     if(result.size() < 5)
     {
+#ifdef DEBUG
         Log::warn("result size less then 5, return");
+#endif // DEBUG
         for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
             RISResult.push_back(*p);
         goto make_return;

@@ -64,8 +64,6 @@ CgiService::CgiService(int argc, char *argv[])
     new Server(cfg->lock_file_, cfg->pid_file_);
 #endif
 
-    Log::info("start: %s",argv);
-
     if( sock_path.size() > 8 )
     {
         cfg->server_socket_path_ = sock_path;

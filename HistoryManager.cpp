@@ -54,12 +54,13 @@ bool HistoryManager::initDB()
     return true;
 }
 
-void HistoryManager::getUserHistory(const Params *params)
+void HistoryManager::getUserHistory(Params *_params)
 {
     clean = false;
     updateShort = false;
     updateContext = false;
 
+    params = _params;
     key = params->getUserKey();
 
     getDeprecatedOffersAsync();
@@ -67,7 +68,7 @@ void HistoryManager::getUserHistory(const Params *params)
     getRetargetingAsync();
 
     //Запрос по П/З query
-    std::string q = Params::getKeywordsString(params->getSearch());
+    std::string q = params->getKeywordsString(params->getSearch());
     if (!q.empty())
     {
         lock();
@@ -75,7 +76,7 @@ void HistoryManager::getUserHistory(const Params *params)
         unlock();
     }
     //Запрос по контексту страницы context
-    q = Params::getContextKeywordsString(params->getContext());
+    q = params->getContextKeywordsString(params->getContext());
     if (!q.empty())
     {
         lock();
@@ -99,7 +100,7 @@ void HistoryManager::sphinxProcess(Offer::Map &items, Offer::Vector &result)
     getPageKeywordsAsyncWait();
     getLongTermAsyncWait();
 
-    Log::info("[%ld]sphinx get history: done",tid);
+    Log::gdb("[%ld]sphinx get history: done",tid);
 
     sphinx->processKeywords(stringQuery, items, result);
 }

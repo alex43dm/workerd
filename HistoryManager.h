@@ -48,7 +48,7 @@ public:
     bool getDBStatus(HistoryType t);
 
     //main methods
-    void getUserHistory(const Params *params);
+    void getUserHistory(Params *params);
     void sphinxProcess(Offer::Map &items, Offer::Vector &result);
     bool updateUserHistory(const Offer::Vector &items, const Params *params, const Informer *informer);
 
@@ -76,6 +76,7 @@ public:
 protected:
 private:
     std::string key;
+    Params *params;
     Module *module;
     std::map<HistoryType, RedisClient *> history_archive;
     std::string tmpTable;

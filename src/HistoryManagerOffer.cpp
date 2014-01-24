@@ -67,9 +67,9 @@ bool HistoryManager::getDeprecatedOffers()
         Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
         return false;
     }
-
+#ifdef DEBUG
     Log::info("[%ld]HistoryManager::getDeprecatedOffers: done",tid);
-
+#endif // DEBUG
     return true;
 }
 

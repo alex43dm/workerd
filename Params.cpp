@@ -15,6 +15,10 @@
 Params::Params() : test_mode_(false), json_(false)
 {
     time_ = boost::posix_time::second_clock::local_time();
+
+    replaceSymbol = boost::make_u32regex("[^а-яА-Яa-zA-Z0-9-]");
+    replaceExtraSpace = boost::make_u32regex("\\s+");
+    replaceNumber = boost::make_u32regex("(\\b)\\d+(\\b)");
 }
 
 /// IP посетителя.
@@ -272,9 +276,6 @@ std::string Params::getUrl() const
   */
 std::string Params::stringWrapper(const std::string &str, bool replaceNumbers)
 {
-    boost::u32regex replaceSymbol = boost::make_u32regex("[^а-яА-Яa-zA-Z0-9-]");
-    boost::u32regex replaceExtraSpace = boost::make_u32regex("\\s+");
-    boost::u32regex replaceNumber = boost::make_u32regex("(\\b)\\d+(\\b)");
     std::string t = str;
     //Заменяю все не буквы, не цифры, не минус на пробел
     t = boost::u32regex_replace(t,replaceSymbol," ");
@@ -290,18 +291,19 @@ std::string Params::stringWrapper(const std::string &str, bool replaceNumbers)
     return t;
 }
 
-std::string Params::getKeywordsString(const std::string &searchKey)
+std::string Params::getKeywordsString(const std::string& str)
 {
     try
     {
-        std::string q = searchKey;
+        std::string q = str;
         boost::algorithm::trim(q);
         if (q.empty())
         {
             return std::string();
         }
-        std::string qs = stringWrapper(q);
+        std::string qs  = stringWrapper(q, false);
         std::string qsn = stringWrapper(q, true);
+
         std::vector<std::string> strs;
         std::string exactly_phrases;
         std::string keywords;

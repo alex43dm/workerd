@@ -12,7 +12,7 @@ void HistoryManager::getShortTerm()
         std::string strSH = *i;
         if (!strSH.empty())
         {
-            std::string q = Params::getKeywordsString(strSH);
+            std::string q = params->getKeywordsString(strSH);
             if (!q.empty())
             {
                 lock();
@@ -21,7 +21,9 @@ void HistoryManager::getShortTerm()
             }
         }
     }
+#ifdef DEBUG
     Log::info("[%ld]HistoryManager::getShortTerm : done",tid);
+#endif // DEBUG
 }
 
 void *HistoryManager::getShortTermEnv(void *data)

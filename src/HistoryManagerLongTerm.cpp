@@ -12,7 +12,7 @@ void HistoryManager::getLongTerm()
         std::string strSH = *i;
         if (!strSH.empty())
         {
-            std::string q = Params::getKeywordsString(strSH);
+            std::string q = params->getKeywordsString(strSH);
             if (!q.empty())
             {
                 lock();
@@ -21,7 +21,9 @@ void HistoryManager::getLongTerm()
             }
         }
     }
+#ifdef DEBUG
     Log::info("[%ld]HistoryManager::getLongTerm : done",tid);
+#endif // DEBUG
 }
 
 void *HistoryManager::getLongTermEnv(void *data)

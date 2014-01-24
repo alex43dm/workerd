@@ -121,9 +121,9 @@
     <!--путь к файлу сокета-->
     <socket_path>/tmp/workerd.sock</socket_path>
     <!--количество ниток на обработку-->
-    <children>1</children>
+    <children>50</children>
     <!--путь к фалу базы данных-->
-    <!--dbpath>/run/db/mem.db</dbpath-->
+    <!--dbpath>/tmp/mem.db</dbpath-->
     <dbpath>:memory:</dbpath>
     <!--путь к каталогу дампа sqlite базы-->
     <db_dump_path>/home/alex/Projects/worker/db_dump</db_dump_path>

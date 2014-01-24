@@ -49,7 +49,9 @@ public:
     };
     static void gdb(const char* fmt, ... )
     {
+        #ifdef DEBUG
         FMTPARCE syslog(LOG_DEBUG, "[%ld] %s", pthread_self(), buffer);
+        #endif // DEBUG
     };
 private:
     int facility_;

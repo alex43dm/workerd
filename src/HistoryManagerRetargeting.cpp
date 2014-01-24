@@ -6,7 +6,9 @@
 void HistoryManager::getRetargeting()
 {
     getHistoryByType(HistoryType::Retargeting, vretageting);
+#ifdef DEBUG
     Log::info("[%ld]HistoryManager::getRetargeting : done",tid);
+#endif // DEBUG
 }
 
 void *HistoryManager::getRetargetingEnv(void *data)
@@ -41,6 +43,8 @@ std::string HistoryManager::getRetargetingAsyncWait()
             ret += ',';
         ret += (*i);
     }
+#ifdef DEBUG
     Log::info("[%ld]HistoryManager::getRetargetingAsyncWait return",tid);
+#endif // DEBUG
     return ret;
 }

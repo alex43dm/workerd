@@ -39,7 +39,7 @@ public:
      * Самый главный метод. Возвращает HTML-строку, которую нужно вернуть
      * пользователю.
      */
-    std::string Process(const Params *params);
+    std::string Process(Params *params);
 
     void ProcessSaveResults();
 
@@ -117,7 +117,7 @@ private:
     pthread_t tid;
 
     Informer *informer;
-    const Params *params;
+    Params *params;
 
     HistoryManager *hm;
 
