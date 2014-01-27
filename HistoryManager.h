@@ -12,6 +12,7 @@
 #include "Informer.h"
 #include "RedisClient.h"
 #include "Params.h"
+#include "ParamParse.h"
 #include "XXXSearcher.h"
 
 typedef enum
@@ -25,7 +26,7 @@ typedef enum
 } HistoryType;
 
 
-class HistoryManager
+class HistoryManager : public ParamParse
 {
 public:
     /// Счётчик обработанных запросов

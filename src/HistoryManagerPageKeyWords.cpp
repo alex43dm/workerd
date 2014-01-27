@@ -19,7 +19,7 @@ void HistoryManager::getPageKeywordsHistory()
         std::string strSH = *i;
         if (!strSH.empty())
         {
-            std::string q = params->getContextKeywordsString(strSH);
+            std::string q = getContextKeywordsString(strSH);
             if (!q.empty())
             {
                 lock();

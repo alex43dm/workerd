@@ -49,7 +49,6 @@ public:
     std::string server_socket_path_;
     int server_children_;
     std::string dbpath_;
-    std::string swfobject_js_;
     std::string geoGity_;
     std::string cookie_name_;
     std::string cookie_domain_;
@@ -63,6 +62,9 @@ public:
     std::string pid_file_;
     std::string user_;
     int retargeting_by_persents_;
+    std::string template_teaser_;
+    std::string template_banner_;
+    std::string swfobject_;
 
     DataBase *pDb;
 

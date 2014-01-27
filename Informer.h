@@ -30,24 +30,25 @@ public:
 
 public:
         long long id;                         //Индентификатор РБ
-        sphinx_int64_t id_int;                             //Индентификатор РБ
-        std::string title;                      //Название РБ
-        std::string teasersCss;                 //Стиль CSS РБ для отображения тизеров
+//        sphinx_int64_t id_int;                             //Индентификатор РБ
+        int capacity;                           //Количество мест под тизер
         std::string bannersCss;                 //Стиль CSS РБ для отображения банеров
+        std::string teasersCss;                 //Стиль CSS РБ для отображения тизеров
+        long domainId;
+        long accountId;
+
         std::string domain;                     //Доменное имя за которым заркеплён РБ
         std::string user;                       //Логин аккаунта Getmyad за которым заркеплён РБ
+        std::string title;                      //Название РБ
         bool blocked;                           //Статус активности РБ
         std::set<std::string> categories;       //Принадлежность РБ к категории
         ShowNonRelevant nonrelevant;            //Что отображать при отсутствии платных РП
         std::string user_code;                  //Строка пользовательского кода
-        int capacity;                           //Количество мест под тизер
         bool valid;                             //Валидность блока
         int height;                             //Высота блока
         int width;                              //Ширина блока
         int height_banner;                      //Высота отображаемых банеров
         int width_banner;                       //Ширина отображаемых банеров
-        long domainId;
-        long accountId;
 
     Informer(long id);
     Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss, long , long);

@@ -244,12 +244,27 @@ bool Config::LoadConfig(const std::string fName)
             dbpath_ = ":memory:";
         }
 
-        if( (mel = mElem->FirstChildElement("swfobject_js")) && (mel->GetText()) )
-            swfobject_js_ = mel->GetText();
+        if( (mel = mElem->FirstChildElement("template_teaser")) && (mel->GetText()) )
+            template_teaser_ = mel->GetText();
         else
         {
-            Log::warn("element swfobject_js is not inited");
+            Log::warn("element template_teaser is not inited");
         }
+
+        if( (mel = mElem->FirstChildElement("template_banner")) && (mel->GetText()) )
+            template_banner_ = mel->GetText();
+        else
+        {
+            Log::warn("element template_banner is not inited");
+        }
+
+        if( (mel = mElem->FirstChildElement("swfobject")) && (mel->GetText()) )
+            swfobject_ = mel->GetText();
+        else
+        {
+            Log::warn("element swfobject is not inited");
+        }
+
         if( (mel = mElem->FirstChildElement("geoGity")) && (mel->GetText()) )
             geoGity_ = mel->GetText();
         else

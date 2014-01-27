@@ -130,6 +130,7 @@
 		<Unit filename="db_dump/view/05_01Offers.sql" />
 		<Unit filename="include/EBranch.h" />
 		<Unit filename="include/GeoRerions.h" />
+		<Unit filename="include/ParamParse.h" />
 		<Unit filename="include/RedisClient.h" />
 		<Unit filename="include/Server.h" />
 		<Unit filename="include/XXXSearcher.h" />
@@ -144,6 +145,7 @@
 		<Unit filename="src/HistoryManagerPageKeyWords.cpp" />
 		<Unit filename="src/HistoryManagerRetargeting.cpp" />
 		<Unit filename="src/HistoryManagerShortTerm.cpp" />
+		<Unit filename="src/ParamParse.cpp" />
 		<Unit filename="src/RedisClient.cpp" />
 		<Unit filename="src/Server.cpp" />
 		<Unit filename="src/XXXSearcher.cpp" />

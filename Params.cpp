@@ -3,7 +3,6 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/regex/icu.hpp>
 #include <boost/date_time.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <string>
 
@@ -15,10 +14,6 @@
 Params::Params() : test_mode_(false), json_(false)
 {
     time_ = boost::posix_time::second_clock::local_time();
-
-    replaceSymbol = boost::make_u32regex("[^а-яА-Яa-zA-Z0-9-]");
-    replaceExtraSpace = boost::make_u32regex("\\s+");
-    replaceNumber = boost::make_u32regex("(\\b)\\d+(\\b)");
 }
 
 /// IP посетителя.
@@ -271,98 +266,3 @@ std::string Params::getUrl() const
     return url.str();
 }
 
-/**
-      \brief Нормализирует строку строку.
-  */
-std::string Params::stringWrapper(const std::string &str, bool replaceNumbers)
-{
-    std::string t = str;
-    //Заменяю все не буквы, не цифры, не минус на пробел
-    t = boost::u32regex_replace(t,replaceSymbol," ");
-    if (replaceNumbers)
-    {
-        //Заменяю отдельностояшие цифры на пробел, тоесть "у 32 п" замениться на
-        //"у    п", а "АТ-23" останеться как "АТ-23"
-        t = boost::u32regex_replace(t,replaceNumber," ");
-    }
-    //Заменяю дублируюшие пробелы на один пробел
-    t = boost::u32regex_replace(t,replaceExtraSpace," ");
-    boost::trim(t);
-    return t;
-}
-
-std::string Params::getKeywordsString(const std::string& str)
-{
-    try
-    {
-        std::string q = str;
-        boost::algorithm::trim(q);
-        if (q.empty())
-        {
-            return std::string();
-        }
-        std::string qs  = stringWrapper(q, false);
-        std::string qsn = stringWrapper(q, true);
-
-        std::vector<std::string> strs;
-        std::string exactly_phrases;
-        std::string keywords;
-        boost::split(strs,qs,boost::is_any_of("\t "),boost::token_compress_on);
-        for (std::vector<std::string>::iterator it = strs.begin(); it != strs.end(); ++it)
-        {
-            exactly_phrases += "<<" + *it + " ";
-            if (it != strs.begin())
-            {
-                keywords += " | " + *it;
-            }
-            else
-            {
-                keywords += " " + *it;
-            }
-        }
-        std::string str = "((@exactly_phrases \"" + exactly_phrases + "\"~1) | (@title \"" + qsn + "\"/3)| (@description \"" + qsn + "\"/3) | (@keywords " + keywords + " ) | (@phrases \"" + qs + "\"~5))";
-        return str;
-    }
-    catch (std::exception const &ex)
-    {
-        Log::err("exception %s: %s", typeid(ex).name(), ex.what());
-        return std::string();
-    }
-}
-std::string Params::getContextKeywordsString(const std::string& query)
-{
-    try
-    {
-        std::string q = query;
-        boost::trim(q);
-        if (q.empty())
-        {
-            return std::string();
-        }
-        std::string qs = stringWrapper(q);
-        std::string qsn = stringWrapper(q, true);
-        std::vector<std::string> strs;
-        std::string exactly_phrases;
-        std::string keywords;
-        boost::split(strs,qs,boost::is_any_of("\t "),boost::token_compress_on);
-        for (std::vector<std::string>::iterator it = strs.begin(); it != strs.end(); ++it)
-        {
-            exactly_phrases += "<<" + *it + " ";
-            if (it != strs.begin())
-            {
-                keywords += " | " + *it;
-            }
-            else
-            {
-                keywords += " " + *it;
-            }
-        }
-        std::string str = "((@exactly_phrases \"" + exactly_phrases + "\"~1) | (@title \"" + qsn + "\"/3)| (@description \"" + qsn + "\"/3) | (@keywords \"" + qs + "\"/3 ) | (@phrases \"" + qs + "\"~5))";
-        return str;
-    }
-    catch (std::exception const &ex)
-    {
-        Log::err("exception %s: %s", typeid(ex).name(), ex.what());
-        return std::string();
-    }
-}

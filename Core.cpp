@@ -230,7 +230,7 @@ std::string Core::Process(Params *prms)
         ret = OffersToJson(vOutPut);
     else
         ret = OffersToHtml(vOutPut, params->getUrl());
-
+//printf("%s\n",ret.c_str());
     delete informer;
 
     Log::info("[%ld]core time: %s %d",tid, boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime).c_str(), vOutPut.size());

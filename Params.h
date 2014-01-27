@@ -4,7 +4,6 @@
 #include <sstream>
 #include <string>
 #include <boost/date_time.hpp>
-#include <boost/regex/icu.hpp>
 
 //#include "utils/GeoIPTools.h"
 
@@ -100,9 +99,6 @@ public:
     std::string getSearch() const;
     std::string getUrl() const;
 
-    std::string getKeywordsString(const std::string&);
-    std::string getContextKeywordsString(const std::string&);
-
     friend class Core;
     friend class GenerateToken;
     friend class HistoryManager;//добавлено RealInvest Soft
@@ -124,10 +120,6 @@ private:
     std::string h_;
     std::string context_;//строка содержашяя контекст страницы
     std::string search_;
-
-    boost::u32regex replaceSymbol,replaceExtraSpace,replaceNumber;
-
-    std::string stringWrapper(const std::string &str, bool replaceNumbers = false);
 };
 
 #endif // PARAMS_H

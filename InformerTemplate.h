@@ -16,6 +16,7 @@ class InformerTemplate
 {
 private:
     InformerTemplate() {}
+    std::string getFileContents(const std::string &fileName);
 protected:
     std::string teasersTemplate;
     std::string bannersTemplate;
@@ -23,7 +24,7 @@ protected:
 
     bool initTeasersTemplate();
     /** filename - имя файла с библиотекой swfobject */
-    bool initBannersTemplate(const std::string& filename);
+    bool initBannersTemplate();
 public:
     static InformerTemplate* instance()
     {

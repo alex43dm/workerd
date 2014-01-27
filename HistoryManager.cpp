@@ -68,7 +68,7 @@ void HistoryManager::getUserHistory(Params *_params)
     getRetargetingAsync();
 
     //Запрос по П/З query
-    std::string q = params->getKeywordsString(params->getSearch());
+    std::string q = getKeywordsString(params->getSearch());
     if (!q.empty())
     {
         lock();
@@ -76,7 +76,7 @@ void HistoryManager::getUserHistory(Params *_params)
         unlock();
     }
     //Запрос по контексту страницы context
-    q = params->getContextKeywordsString(params->getContext());
+    q = getContextKeywordsString(params->getContext());
     if (!q.empty())
     {
         lock();

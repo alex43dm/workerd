@@ -121,7 +121,7 @@
     <!--путь к файлу сокета-->
     <socket_path>/tmp/workerd.sock</socket_path>
     <!--количество ниток на обработку-->
-    <children>50</children>
+    <children>1</children>
     <!--путь к фалу базы данных-->
     <!--dbpath>/tmp/mem.db</dbpath-->
     <dbpath>:memory:</dbpath>
@@ -129,9 +129,19 @@
     <db_dump_path>/home/alex/Projects/worker/db_dump</db_dump_path>
     <!--путь к csv файлу содержимого таблицы GeoRerions-->
     <db_geo_csv>/home/alex/Projects/worker/db_dump/region.csv</db_geo_csv>
+    <!-- Шаблон информера с тизерами со следующими подстановками (существовавший шаблон):
+        %1%	    CSS
+	%2%	    JSON для initads (предложения, которые должны показаться на первой странице)
+	%3%	    количество товаров на с транице
+	%4%	    ссылка на скрипт получения следующей порции предложений в jso-->
+    <template_teaser>/home/alex/Projects/worker/template/teaser.html</template_teaser>
+    <!-- Шаблон информера с баннером со следующими подстановками:
+	 %1%	    CSS
+	 %2%	    swfobject
+	 %3%	    JSON initads-->
+    <template_banner>/home/alex/Projects/worker/template/banner.html</template_banner>
+    <swfobject>/home/alex/Projects/worker/template/swfobject.js</swfobject>
 
-    <!--Шаблон информера с баннером-->
-    <swfobject_js>/home/alex/Projects/getmyad/js/swfobject.js</swfobject_js>
     <geoGity>/usr/share/GeoIP/GeoLiteCity.dat</geoGity>
     <cookie_name>yottos_unique_id</cookie_name>
     <cookie_domain>.yottos.com</cookie_domain>

@@ -18,9 +18,9 @@ Informer::Informer(long id) :
 Informer::Informer(long id, int capacity, const std::string &bannersCss,
                    const std::string &teasersCss, long domainId, long accountId) :
     id(id),
-    teasersCss(teasersCss),
-    bannersCss(bannersCss),
     capacity(capacity),
+    bannersCss(bannersCss),
+    teasersCss(teasersCss),
     domainId(domainId),
     accountId(accountId)
 {
@@ -47,7 +47,7 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
 
 //teasersCss?
     bzero(buf,sizeof(buf));
-    snprintf(buf,sizeof(buf),"INSERT INTO Informer(id,guid,title,bannersCss,domainId,accountId,blocked,\
+    snprintf(buf,sizeof(buf),"INSERT INTO Informer(id,guid,title,bannersCss,teasersCss,domainId,accountId,blocked,\
              nonrelevant,valid,height,width,height_banner,width_banner,capacity) VALUES(");
     sz = strlen(buf);
     pData = buf + sz;
@@ -137,10 +137,11 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
 
         bzero(pData,sz);
         sqlite3_snprintf(sz,pData,
-                         "%lld,'%q','%q','%q',%d,%d,0,'%q',1,%d,%d,%d,%d,%d)",
+                         "%lld,'%q','%q','%q','%q',%d,%d,0,'%q',1,%d,%d,%d,%d,%d)",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getStringField("title"),
+                         x.getStringField("css_banner"),
                          x.getStringField("css"),
                          domainId,
                          accountId,

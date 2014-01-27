@@ -12,7 +12,7 @@ void HistoryManager::getShortTerm()
         std::string strSH = *i;
         if (!strSH.empty())
         {
-            std::string q = params->getKeywordsString(strSH);
+            std::string q = getKeywordsString(strSH);
             if (!q.empty())
             {
                 lock();
