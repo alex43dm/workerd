@@ -16,13 +16,15 @@ Informer::Informer(long id) :
 }
 
 Informer::Informer(long id, int capacity, const std::string &bannersCss,
-                   const std::string &teasersCss, long domainId, long accountId) :
+                   const std::string &teasersCss, long domainId, long accountId, int rtgPercentage) :
     id(id),
     capacity(capacity),
     bannersCss(bannersCss),
     teasersCss(teasersCss),
     domainId(domainId),
-    accountId(accountId)
+    accountId(accountId),
+    rtgPercentage(rtgPercentage),
+    RetargetingCount(0)
 {
 }
 
@@ -36,7 +38,6 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
 {
     mongo::DB db;
     std::unique_ptr<mongo::DBClientCursor> cursor = db.query("informer", mongo::Query());
-    //std::set<std::string> blocked_accounts = GetBlockedAccounts();
     int skipped = 0;
     Kompex::SQLiteStatement *pStmt;
     char buf[8192], *pData, *buf1;
@@ -45,10 +46,9 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
 
     pStmt = new Kompex::SQLiteStatement(pdb);
 
-//teasersCss?
     bzero(buf,sizeof(buf));
     snprintf(buf,sizeof(buf),"INSERT INTO Informer(id,guid,title,bannersCss,teasersCss,domainId,accountId,blocked,\
-             nonrelevant,valid,height,width,height_banner,width_banner,capacity) VALUES(");
+             nonrelevant,valid,height,width,height_banner,width_banner,capacity,rtgPercentage) VALUES(");
     sz = strlen(buf);
     pData = buf + sz;
     sz = sizeof(buf) - sz;
@@ -80,7 +80,7 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
             capacity = 0;
         }
 
-        buf1 = sqlite3_mprintf("INSERT OR IGNORE INTO Domains(name) VALUES('%q')",x.getStringField("domain"));
+        buf1 = sqlite3_mprintf("INSERT OR IGNORE INTO Domains(name) VALUES('%q');",x.getStringField("domain"));
         try
         {
             pStmt->SqlStatement(buf1);
@@ -94,7 +94,7 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
         domainId = 0;
         try
         {
-            buf1 = sqlite3_mprintf("SELECT id FROM Domains WHERE name='%q'",x.getStringField("domain"));
+            buf1 = sqlite3_mprintf("SELECT id FROM Domains WHERE name='%q';",x.getStringField("domain"));
             pStmt->Sql(buf1);
 
             pStmt->FetchRow();
@@ -108,7 +108,7 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
         sqlite3_free((void*)buf1);
 
 
-        buf1 = sqlite3_mprintf("INSERT OR IGNORE INTO Accounts(name) VALUES('%q')",x.getStringField("user"));
+        buf1 = sqlite3_mprintf("INSERT OR IGNORE INTO Accounts(name) VALUES('%q');",x.getStringField("user"));
         try
         {
             pStmt->SqlStatement(buf1);
@@ -122,7 +122,7 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
         accountId = 0;
         try
         {
-            buf1 = sqlite3_mprintf("SELECT id FROM Accounts WHERE name='%q'",x.getStringField("user"));
+            buf1 = sqlite3_mprintf("SELECT id FROM Accounts WHERE name='%q';",x.getStringField("user"));
             pStmt->Sql(buf1);
 
             pStmt->FetchRow();
@@ -137,7 +137,7 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
 
         bzero(pData,sz);
         sqlite3_snprintf(sz,pData,
-                         "%lld,'%q','%q','%q','%q',%d,%d,0,'%q',1,%d,%d,%d,%d,%d)",
+                         "%lld,'%q','%q','%q','%q',%d,%d,0,'%q',1,%d,%d,%d,%d,%d,%d);",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getStringField("title"),
@@ -150,7 +150,8 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
                          x.getIntField("width"),
                          x.getIntField("height_banner"),
                          x.getIntField("width_banner"),
-                         capacity
+                         capacity,
+                         x.getIntField("rtgPercentage") > 0 ? x.getIntField("rtgPercentage") : 0
                          );
         try
         {
@@ -161,9 +162,6 @@ bool Informer::loadAll(Kompex::SQLiteDatabase *pdb)
             Log::err("Informer::_loadFromQuery insert error: %s", ex.GetString().c_str());
             skipped++;
         }
-        // Тематические категории
-        //LoadCategoriesByDomain(data->categories, x.getStringField("domain"));
-
         i++;
     }
     pStmt->CommitTransaction();
@@ -293,6 +291,7 @@ bool Informer::update(Kompex::SQLiteDatabase *pdb, const std::string &aInformerI
                          "UPDATE Informer SET\
                          title='%q',\
                          bannersCss='%q',\
+                         teasersCss='%q',\
                          domainId=%d,\
                          accountId=%d,\
                          blocked=0,\
@@ -303,8 +302,10 @@ bool Informer::update(Kompex::SQLiteDatabase *pdb, const std::string &aInformerI
                          height_banner=%d,\
                          width_banner=%d,\
                          capacity=%d \
+                         rtgPercentage=%d \
                          WHERE id=%lld;",
                          x.getStringField("title"),
+                         x.getStringField("css_banner"),
                          x.getStringField("css"),
                          domainId,
                          accountId,
@@ -314,6 +315,7 @@ bool Informer::update(Kompex::SQLiteDatabase *pdb, const std::string &aInformerI
                          x.getIntField("height_banner"),
                          x.getIntField("width_banner"),
                          capacity,
+                         x.getIntField("rtgPercentage"),
                          long_id
                          );
         try

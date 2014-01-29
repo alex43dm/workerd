@@ -71,6 +71,7 @@ public:
 
     bool getRetargetingAsync();
     std::string getRetargetingAsyncWait();
+    void RetargetingUpdate(const Params *pa, const Offer::Vector &v, unsigned);
 
 
 //    void getHistory();

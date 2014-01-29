@@ -123,8 +123,8 @@
     <!--количество ниток на обработку-->
     <children>1</children>
     <!--путь к фалу базы данных-->
-    <!--dbpath>/tmp/mem.db</dbpath-->
-    <dbpath>:memory:</dbpath>
+    <dbpath>/run/alex/mem.db</dbpath>
+    <!--dbpath>:memory:</dbpath-->
     <!--путь к каталогу дампа sqlite базы-->
     <db_dump_path>/home/alex/Projects/worker/db_dump</db_dump_path>
     <!--путь к csv файлу содержимого таблицы GeoRerions-->

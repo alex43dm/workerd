@@ -117,6 +117,10 @@ bool HistoryManager::updateUserHistory(
         const Informer *informer)
 {
     setDeprecatedOffers(items);
+    if(informer->RetargetingCount)
+    {
+        RetargetingUpdate(params, items, informer->RetargetingCount);
+    }
 
     try
     {

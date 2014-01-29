@@ -3,7 +3,8 @@ SELECT 	inf.id,
 	inf.bannersCss,
 	inf.teasersCss,
 	inf.domainId,
-	inf.accountId
+	inf.accountId,
+	inf.rtgPercentage
 FROM Informer AS inf
 WHERE inf.guid='%s'
 LIMIT 1;

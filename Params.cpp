@@ -19,18 +19,34 @@ Params::Params() : test_mode_(false), json_(false)
 /// IP посетителя.
 Params &Params::ip(const std::string &ip)
 {
+    struct in_addr ipval;
+
     ip_ = ip;
     country_ = country_code_by_addr(ip_);
     region_ = region_code_by_addr(ip_);
+
+    if(inet_pton(AF_INET, ip_.c_str(), &ipval))
+    {
+        key_long = ipval.s_addr;
+    }
+    else
+    {
+        key_long = 0;
+    }
+
     return *this;
 }
 
 /// ID посетителя, взятый из cookie
 Params &Params::cookie_id(const std::string &cookie_id)
 {
+
     cookie_id_ = cookie_id;
+    key_long = key_long << 32;
+    key_long = key_long | strtol(cookie_id_.c_str(),NULL,10);
     return *this;
 }
+
 /// ID информера.
 Params &Params::informer(const std::string &informer)
 {
@@ -184,6 +200,11 @@ std::string Params::getCookieId() const
 std::string Params::getUserKey() const
 {
     return cookie_id_ + "-" + ip_;
+}
+
+unsigned long long Params::getUserKeyLong() const
+{
+    return key_long;
 }
 
 std::string Params::getCountry() const

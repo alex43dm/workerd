@@ -7,7 +7,6 @@
 
 //#include "utils/GeoIPTools.h"
 
-
 /** \brief Параметры, которые определяют показ рекламы */
 class Params
 {
@@ -84,6 +83,7 @@ public:
     std::string getIP() const;
     std::string getCookieId() const;
     std::string getUserKey() const;
+    unsigned long long getUserKeyLong() const;
     std::string getCountry() const;
     std::string getRegion() const;
     std::string getInformer() const;
@@ -104,6 +104,7 @@ public:
     friend class HistoryManager;//добавлено RealInvest Soft
 
 private:
+    unsigned long long key_long;
     std::string ip_;
     std::string cookie_id_;
     std::string country_;
@@ -120,6 +121,9 @@ private:
     std::string h_;
     std::string context_;//строка содержашяя контекст страницы
     std::string search_;
+
+
+
 };
 
 #endif // PARAMS_H

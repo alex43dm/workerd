@@ -36,6 +36,8 @@ public:
         std::string teasersCss;                 //Стиль CSS РБ для отображения тизеров
         long domainId;
         long accountId;
+        unsigned rtgPercentage;
+        unsigned RetargetingCount;
 
         std::string domain;                     //Доменное имя за которым заркеплён РБ
         std::string user;                       //Логин аккаунта Getmyad за которым заркеплён РБ
@@ -51,7 +53,7 @@ public:
         int width_banner;                       //Ширина отображаемых банеров
 
     Informer(long id);
-    Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss, long , long);
+    Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss, long , long, int);
     virtual ~Informer();
 
     /** Загружает информацию обо всех информерах */

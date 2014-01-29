@@ -146,7 +146,6 @@ public:
 	Изменён RealInvest Soft */
 std::string Core::Process(Params *prms)
 {
-    unsigned RetargetingCount;
     Offer::Vector vRIS;
 
     Log::gdb("[%ld]Core::Process start",tid);
@@ -161,8 +160,6 @@ std::string Core::Process(Params *prms)
     //load all history async
     hm->getUserHistory(params);
 
-    RetargetingCount = (int)informer->capacity * Config::Instance()->retargeting_by_persents_ / 100;
-
     getAllRetargeting(resultRetargeting);
     Log::gdb("[%ld]getAllRetargeting: done",tid);
 
@@ -176,8 +173,16 @@ std::string Core::Process(Params *prms)
     RISAlgorithm(result, vRIS, informer->capacity);
     Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
 
-    RISAlgorithm(resultRetargeting, vOutPut, RetargetingCount);
+    if (vRIS.size() < (u_int)informer->capacity)
+    {
+        hm->clean = true;
+    }
+
+
+    RISAlgorithm(resultRetargeting, vOutPut, informer->RetargetingCount);
     Log::gdb("[%ld]RISAlgorithm: vOutPut %ld done",tid, vOutPut.size());
+
+    informer->RetargetingCount = vOutPut.size();
 
     //merge
     Offer::itV last;
@@ -194,11 +199,6 @@ std::string Core::Process(Params *prms)
                    vRIS.begin(),
                    last);
 
-    if (!vOutPut.size())
-    {
-        Log::warn("offers empty");
-        hm->clean = true;
-    }
   // hm->getRetargetingAsyncWait();
 
     // Если нужно показать только социальную рекламу, а настройках стоит
@@ -302,7 +302,8 @@ Informer *Core::getInformer()
                                 pStmt->GetColumnString(2),
                                 pStmt->GetColumnString(3),
                                 pStmt->GetColumnInt64(4),
-                                pStmt->GetColumnInt64(5)
+                                pStmt->GetColumnInt64(5),
+                                pStmt->GetColumnInt(6)
                                );
         }
     }
@@ -314,6 +315,11 @@ Informer *Core::getInformer()
     }
 
     delete pStmt;
+
+    if(!informer->rtgPercentage)
+        informer->RetargetingCount  = informer->capacity * Config::Instance()->retargeting_by_persents_ / 100;
+    else
+        informer->RetargetingCount  = informer->capacity * informer->rtgPercentage / 100;
 
     return nullptr;
 }
@@ -378,7 +384,7 @@ bool Core::getAllRetargeting(Offer::Vector &ret)
 
     std::string ids = hm->getRetargetingAsyncWait();
 
-    sqlite3_snprintf(CMD_SIZE, cmd, RetargetingOfferStr.c_str(), ids.c_str());
+    sqlite3_snprintf(CMD_SIZE, cmd, RetargetingOfferStr.c_str(), params->getUserKeyLong(), ids.c_str());
 
     getOffers(itemsRetargeting);
 
