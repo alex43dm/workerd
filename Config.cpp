@@ -101,6 +101,20 @@ bool Config::LoadConfig(const std::string fName)
         retargeting_by_persents_ = strtol(mElem->GetText(),NULL,10);
     }
 
+    if( (mElem = mRoot->FirstChildElement("retargeting_by_time")) && (mElem->GetText()) )
+    {
+        struct tm t;
+        const char *p = mElem->GetText();
+        strptime(p, "%H:%M:%S", &t);
+        retargeting_by_time_ = t.tm_hour * 3600;
+        retargeting_by_time_ = retargeting_by_time_ + t.tm_min * 60;
+        retargeting_by_time_ = retargeting_by_time_ + t.tm_sec;
+    }
+    else
+    {
+        retargeting_by_time_ = 24*3600;
+    }
+
     if( (mels = mRoot->FirstChildElement("mongo")) )
     {
         if( (mel = mels->FirstChildElement("main")) )

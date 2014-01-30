@@ -62,6 +62,7 @@ public:
     std::string pid_file_;
     std::string user_;
     int retargeting_by_persents_;
+    int retargeting_by_time_;
     std::string template_teaser_;
     std::string template_banner_;
     std::string swfobject_;

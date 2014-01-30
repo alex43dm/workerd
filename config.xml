@@ -18,6 +18,8 @@
 <folder_informer>/var/www/indexInformer</folder_informer>
 <!-- -->
 <retargeting_by_persents>50</retargeting_by_persents>
+<!--период жизни ретаргетинга(ЧЧ:ММ:СС)-->
+<retargeting_by_time>00:03:05</retargeting_by_time>
 
 <!--Весовые коэффициенты-->
 <range>

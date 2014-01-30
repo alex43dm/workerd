@@ -127,7 +127,7 @@ private:
 
     bool all_social;
 
-    int teasersCount;
+    unsigned teasersCount;
 
     char *cmd;
     float teasersMediumRating;
@@ -141,6 +141,7 @@ private:
     Informer *getInformer();
     bool getAllOffers(Offer::Map &v);
     bool getAllRetargeting(Offer::Vector &v);
+    void RISAlgorithmRetagreting(Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen);
 
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
     std::string OffersToHtml(const Offer::Vector &items, const std::string &url) const;

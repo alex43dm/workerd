@@ -76,17 +76,17 @@ void HistoryManager::RetargetingUpdate(const Params *pa, const Offer::Vector &v,
 
             if(viewTime)
             {
-                if(viewTime+24*3600 > std::time(0))
+                if(viewTime + Config::Instance()->retargeting_by_time_ > std::time(0))
                 {
-                sqlite3_snprintf(sizeof(buf),buf,
-                                 "UPDATE Retargeting SET uniqueHits=uniqueHits-1 WHERE id=%lli AND offerId=%lli;",
-                                 pa->getUserKeyLong(), v[i]->id_int);
+                    sqlite3_snprintf(sizeof(buf),buf,
+                                     "UPDATE Retargeting SET uniqueHits=uniqueHits-1 WHERE id=%lli AND offerId=%lli;",
+                                     pa->getUserKeyLong(), v[i]->id_int);
                 }
                 else
                 {
-                sqlite3_snprintf(sizeof(buf),buf,
-                                 "DELETE FROM Retargeting WHERE id=%lli AND offerId=%lli;",
-                                 pa->getUserKeyLong(), v[i]->id_int);
+                    sqlite3_snprintf(sizeof(buf),buf,
+                                     "DELETE FROM Retargeting WHERE id=%lli AND offerId=%lli;",
+                                     pa->getUserKeyLong(), v[i]->id_int);
                 }
             }
             else
@@ -101,7 +101,7 @@ void HistoryManager::RetargetingUpdate(const Params *pa, const Offer::Vector &v,
         {
             Log::err("HistoryManager::RetargetingUpdate select(%s) error: %s", buf, ex.GetString().c_str());
         }
-    }
+    }//for
 
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
@@ -109,5 +109,34 @@ void HistoryManager::RetargetingUpdate(const Params *pa, const Offer::Vector &v,
 
 #ifdef DEBUG
     Log::info("[%ld]HistoryManager::RetargetingUpdate return",tid);
+#endif // DEBUG
+}
+
+void HistoryManager::RetargetingClear(const Params *pa)
+{
+    Kompex::SQLiteStatement *pStmt;
+    char buf[8192];
+
+    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+    pStmt->BeginTransaction();
+
+    try
+    {
+        sqlite3_snprintf(sizeof(buf),buf,
+                         "DELETE FROM Retargeting WHERE id=%lli AND viewTime<%lli;",
+                         pa->getUserKeyLong(), std::time(0) - Config::Instance()->retargeting_by_time_);
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        Log::err("HistoryManager::RetargetingClear(%s) error: %s", buf, ex.GetString().c_str());
+    }
+
+    pStmt->CommitTransaction();
+    pStmt->FreeQuery();
+    delete pStmt;
+
+#ifdef DEBUG
+    Log::info("[%ld]HistoryManager::RetargetingClear return",tid);
 #endif // DEBUG
 }
