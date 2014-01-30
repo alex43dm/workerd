@@ -135,6 +135,7 @@ private:
     Offer::Vector vOutPut;
     Offer::Vector result, resultRetargeting;
     Offer::Map items;
+    Offer::Map itemsRetargeting;
 
     bool getOffers(Offer::Map &result);
     Informer *getInformer();

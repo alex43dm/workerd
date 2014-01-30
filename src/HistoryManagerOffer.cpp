@@ -93,6 +93,8 @@ bool HistoryManager::getDeprecatedOffersAsync()
 
     pthread_attr_destroy(attributes);
 
+    free(attributes);
+
     return true;
 }
 

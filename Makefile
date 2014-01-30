@@ -44,7 +44,7 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/src/HistoryManagerLongTerm.o $(OBJDIR_DEBUG)/src/Geo
 
 OBJ_RELEASE = $(OBJDIR_RELEASE)/src/HistoryManagerLongTerm.o $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/src/EBranch.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/src/HistoryManagerOffer.o $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/SearchEngines.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/src/sphinxRequests.o $(OBJDIR_RELEASE)/src/json.o $(OBJDIR_RELEASE)/src/XXXSearcher.o $(OBJDIR_RELEASE)/src/Server.o $(OBJDIR_RELEASE)/src/RedisClient.o $(OBJDIR_RELEASE)/src/ParamParse.o $(OBJDIR_RELEASE)/src/HistoryManagerShortTerm.o $(OBJDIR_RELEASE)/src/HistoryManagerRetargeting.o $(OBJDIR_RELEASE)/src/HistoryManagerPageKeyWords.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/Params.o $(OBJDIR_RELEASE)/Offer.o
 
-all: debug release
+all: debug
 
 clean: clean_debug clean_release
 

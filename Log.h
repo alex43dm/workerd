@@ -31,28 +31,11 @@ public:
 
     explicit Log(int facility);
     virtual ~Log();
-    static void log(int level, const char* fmt, ... )
-    {
-        FMTPARCE syslog(level, "%s", buffer);
-    };
-    static void err(const char* fmt, ... )
-    {
-        FMTPARCE syslog(LOG_ERR, "%s", buffer);
-    };
-    static void warn(const char* fmt, ... )
-    {
-        FMTPARCE syslog(LOG_WARNING, "%s", buffer);
-    };
-    static void info(const char* fmt, ... )
-    {
-        FMTPARCE syslog(LOG_INFO, "%s", buffer);
-    };
-    static void gdb(const char* fmt, ... )
-    {
-        #ifdef DEBUG
-        FMTPARCE syslog(LOG_DEBUG, "[%ld] %s", pthread_self(), buffer);
-        #endif // DEBUG
-    };
+    static void log(int level, const char* fmt, ... );
+    static void err(const char* fmt, ... );
+    static void warn(const char* fmt, ... );
+    static void info(const char* fmt, ... );
+    static void gdb(const char* fmt, ... );
 private:
     int facility_;
     int priority_;

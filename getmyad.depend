@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1390208072 source:/home/alex/Projects/worker/BaseCore.cpp
+1391030143 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -856,7 +856,7 @@
 	<string>
 	<utility>
 
-1390483588 /home/alex/Projects/worker/Log.h
+1391029722 /home/alex/Projects/worker/Log.h
 	<stdio.h>
 	<syslog.h>
 	<stdarg.h>
@@ -992,7 +992,7 @@
 	<GeoIPCity.h>
 	<string>
 
-1390558331 /home/alex/Projects/worker/Core.h
+1391068721 /home/alex/Projects/worker/Core.h
 	<list>
 	<vector>
 	<map>
@@ -1143,7 +1143,7 @@
 	"Config.h"
 	<assert.h>
 
-1390995270 source:/home/alex/Projects/worker/Core.cpp
+1391032884 source:/home/alex/Projects/worker/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -1168,7 +1168,7 @@
 	<list>
 	<stdlib.h>
 
-1389941487 source:/home/alex/Projects/worker/DataBase.cpp
+1391028366 source:/home/alex/Projects/worker/DataBase.cpp
 	<iostream>
 	<algorithm>
 	<fstream>
@@ -1252,7 +1252,7 @@
 	"KompexSQLiteDatabase.h"
 	"KompexSQLiteException.h"
 
-1386588626 source:/home/alex/Projects/worker/Log.cpp
+1391029678 source:/home/alex/Projects/worker/Log.cpp
 	"Log.h"
 
 1389682566 source:/home/alex/Projects/worker/main.cpp
@@ -1349,7 +1349,7 @@
 
 1387810444 /home/alex/Projects/libredis//libredis/redis.h
 
-1389943294 source:/home/alex/Projects/worker/src/RedisClient.cpp
+1391065498 source:/home/alex/Projects/worker/src/RedisClient.cpp
 	<strings.h>
 	<string.h>
 	"RedisClient.h"
@@ -1430,7 +1430,7 @@
 1389859479 source:/home/alex/Projects/worker/src/EBranch.cpp
 	"EBranch.h"
 
-1390486326 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
+1391065060 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -1460,7 +1460,7 @@
 	"Config.h"
 	"Log.h"
 
-1390994858 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
+1390995529 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"

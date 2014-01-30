@@ -200,7 +200,7 @@ void BaseCore::InitMessageQueue()
         exchange_->Bind(mq_campaign_name, "campaign.#");
         exchange_->Bind(mq_informer_name, "informer.#");
 
-       Log::info("Created ampq queues: %s, %s, %s, %s",
+       Log::info("Created ampq queues: %s, %s, %s",
                   mq_campaign_name.c_str(),
                   mq_informer_name.c_str(),
                   mq_advertise_name.c_str());

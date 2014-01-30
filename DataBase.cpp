@@ -272,7 +272,7 @@ std::string DataBase::getSqlFile(const std::string &file)
     }
     close(fd);
 
-    retString = buf;
+    retString = std::string(buf,ret);
 
     free(buf);
 

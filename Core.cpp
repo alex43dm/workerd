@@ -231,7 +231,6 @@ std::string Core::Process(Params *prms)
     else
         ret = OffersToHtml(vOutPut, params->getUrl());
 //printf("%s\n",ret.c_str());
-    delete informer;
 
     Log::info("[%ld]core time: %s %d",tid, boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime).c_str(), vOutPut.size());
 
@@ -262,18 +261,28 @@ void Core::ProcessSaveResults()
     pStmtInformer->Reset();
     //  pStmtOffer->Reset();
 
-    result.clear();
-    resultRetargeting.clear();
 
-    vOutPut.clear();
-
-    for (auto o = items.begin(); o != items.end(); ++o)
+    for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
         if(o->second)
             delete o->second;
         items.erase(o);
     }
+
+    for (Offer::it o = itemsRetargeting.begin(); o != itemsRetargeting.end(); ++o)
+    {
+        if(o->second)
+            delete o->second;
+        itemsRetargeting.erase(o);
+    }
+
+    result.clear();
+    resultRetargeting.clear();
+
+    vOutPut.clear();
+
     //items.clear();
+    delete informer;
 }
 
 Informer *Core::getInformer()
@@ -380,15 +389,13 @@ bool Core::getAllOffers(Offer::Map &ret)
 
 bool Core::getAllRetargeting(Offer::Vector &ret)
 {
-    Offer::Map itemsRetargeting;
-
     std::string ids = hm->getRetargetingAsyncWait();
 
     sqlite3_snprintf(CMD_SIZE, cmd, RetargetingOfferStr.c_str(), params->getUserKeyLong(), ids.c_str());
 
     getOffers(itemsRetargeting);
 
-    for(auto i = itemsRetargeting.begin(); i != itemsRetargeting.end(); ++i)
+    for(Offer::it i = itemsRetargeting.begin(); i != itemsRetargeting.end(); ++i)
     {
         ret.push_back((*i).second);
     }
