@@ -374,7 +374,8 @@ bool Core::getAllOffers(Offer::Map &ret)
                      params->getCountry().c_str(),
                      params->getRegion().c_str(),
                      getpid(),
-                     tid);
+                     tid,
+                     informer->id);
 
     hm->getDeprecatedOffersAsyncWait();
     return getOffers(ret);
@@ -453,6 +454,7 @@ bool Core::getOffers(Offer::Map &result)
     {
         pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
         pStmt->Sql(cmd);
+        printf("%s\n",cmd);
     }
     catch(Kompex::SQLiteException &ex)
     {

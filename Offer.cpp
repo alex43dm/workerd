@@ -98,7 +98,7 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
                          x.getField("campaignId_int").numberLong(),
                          x.getField("category").numberLong(),
                          x.getStringField("accountId"),
-                         mongo::DB::toFloat(x.getField("rating")),
+                         mongo::DB::toFloat(x.getField("full_rating")),
                          x.getBoolField("retargeting") ? 1 : 0,
                          x.getStringField("image"),
                          x.getIntField("height"),
@@ -138,6 +138,60 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         Log::warn("Offers with empty id or image skipped: %d", skipped);
 }
 
+/** Загружает все товарные предложения из MongoDb */
+void Offer::loadReting(Kompex::SQLiteDatabase *pdb)
+{
+    mongo::DB db;
+    Kompex::SQLiteStatement *pStmt;
+    char buf[8192], *pData;
+    int sz;
+    long long id_inf;
+
+    auto cursor = db.query("informer.rating", mongo::Query());
+
+    pStmt = new Kompex::SQLiteStatement(pdb);
+
+
+    bzero(buf,sizeof(buf));
+    snprintf(buf,sizeof(buf),"INSERT INTO Informer2OfferRating(id_inf,id_ofr,rating) VALUES(");
+    sz = strlen(buf);
+    pData = buf + sz;
+    sz = sizeof(buf) - sz;
+
+    pStmt->BeginTransaction();
+    while (cursor->more())
+    {
+        mongo::BSONObj x = cursor->next();
+        id_inf = x.getField("guid_int").numberLong();
+
+        mongo::BSONObjIterator it = x.getObjectField("rating_int");
+
+        while (it.more())
+        {
+            mongo::BSONElement e = it.next();
+            std::string s = e.toString();
+            s.replace(s.find(":"), 1, ",");
+
+            bzero(pData,sz);
+            sqlite3_snprintf(sz,pData,"%lli,%s);",id_inf,s.c_str());
+            try
+            {
+                pStmt->SqlStatement(buf);
+            }
+            catch(Kompex::SQLiteException &ex)
+            {
+                Log::err("Offers::loadReting insert(%s) error: %s", buf, ex.GetString().c_str());
+            }
+        }
+    }
+
+    pStmt->CommitTransaction();
+    pStmt->FreeQuery();
+    delete pStmt;
+
+    Log::info("Rating loaded");
+}
+
 
 std::string Offer::toJson() const
 {
@@ -175,160 +229,160 @@ bool Offer::setBranch(const EBranchT tbranch)
 {
     switch(tbranch)
     {
-        case EBranchT::T1:
-            switch(type)
+    case EBranchT::T1:
+        switch(type)
+        {
+        case Type::banner:
+            switch(isOnClick)
             {
-                case Type::banner:
-                    switch(isOnClick)
-                    {
-                        case true:
-                            branch = EBranchL::L7;
-                            return true;
-                        case false:
-                            branch = EBranchL::L2;
-                            rating = 1000 * rating;
-                            return true;
-                    }
-                    break;
-                case Type::teazer:
-                    switch(isOnClick)
-                    {
-                        case true:
-                            branch = EBranchL::L17;
-                            return true;
-                        case false:
-                            branch = EBranchL::L12;
-                            rating = 1000 * rating;
-                            return true;
-                    }
-                    break;
-                default:
-                    return false;
+            case true:
+                branch = EBranchL::L7;
+                return true;
+            case false:
+                branch = EBranchL::L2;
+                rating = 1000 * rating;
+                return true;
             }
             break;
-        case EBranchT::T2:
-            switch(type)
+        case Type::teazer:
+            switch(isOnClick)
             {
-                case Type::banner:
-                    switch(isOnClick)
-                    {
-                        case true:
-                            branch = EBranchL::L8;
-                            return true;
-                        case false:
-                            branch = EBranchL::L3;
-                            rating = 1000 * rating;
-                            return true;
-                    }
-                    break;
-                case Type::teazer:
-                    switch(isOnClick)
-                    {
-                        case true:
-                            branch = EBranchL::L18;
-                            return true;
-                        case false:
-                            branch = EBranchL::L13;
-                            return true;
-                    }
-                    break;
-                default:
-                    return false;
+            case true:
+                branch = EBranchL::L17;
+                return true;
+            case false:
+                branch = EBranchL::L12;
+                rating = 1000 * rating;
+                return true;
             }
             break;
-        case EBranchT::T3:
-            switch(type)
-            {
-                case Type::banner:
-                    switch(isOnClick)
-                    {
-                        case true:
-                            branch = EBranchL::L4;
-                            rating = 1000 * rating;
-                            return true;
-                        case false:
-                            branch = EBranchL::L3;
-                            rating = 1000 * rating;
-                            return true;
-                    }
-                    break;
-                case Type::teazer:
-                    switch(isOnClick)
-                    {
-                        case true:
-                            branch = EBranchL::L19;
-                            return true;
-                        case false:
-                            branch = EBranchL::L14;
-                            return true;
-                    }
-                    break;
-                default:
-                    return false;
-            }
-            break;
-        case EBranchT::T4:
-            switch(type)
-            {
-                case Type::banner:
-                    switch(isOnClick)
-                    {
-                        case true:
-                            branch = EBranchL::L10;
-                            return true;
-                        case false:
-                            branch = EBranchL::L5;
-                            rating = 1000 * rating;
-                            return true;
-                    }
-                    break;
-                case Type::teazer:
-                    switch(isOnClick)
-                    {
-                        case true:
-                            branch = EBranchL::L20;
-                            return true;
-                        case false:
-                            branch = EBranchL::L15;
-                            return true;
-                    }
-                    break;
-                default:
-                    return false;
-            }
-            break;
-        case EBranchT::T5:
-            switch(type)
-            {
-                case Type::banner:
-                    switch(isOnClick)
-                    {
-                        case true:
-                            branch = EBranchL::L11;
-                            return true;
-                        case false:
-                            branch = EBranchL::L6;
-                            rating = 1000 * rating;
-                            return true;
-                    }
-                    break;
-                case Type::teazer:
-                    switch(isOnClick)
-                    {
-                        case true:
-                            branch = EBranchL::L21;
-                            return true;
-                        case false:
-                            branch = EBranchL::L16;
-                            return true;
-                    }
-                    break;
-                default:
-                    return false;
-            }
-            break;
-        case EBranchT::TMAX:
+        default:
             return false;
+        }
+        break;
+    case EBranchT::T2:
+        switch(type)
+        {
+        case Type::banner:
+            switch(isOnClick)
+            {
+            case true:
+                branch = EBranchL::L8;
+                return true;
+            case false:
+                branch = EBranchL::L3;
+                rating = 1000 * rating;
+                return true;
+            }
+            break;
+        case Type::teazer:
+            switch(isOnClick)
+            {
+            case true:
+                branch = EBranchL::L18;
+                return true;
+            case false:
+                branch = EBranchL::L13;
+                return true;
+            }
+            break;
+        default:
+            return false;
+        }
+        break;
+    case EBranchT::T3:
+        switch(type)
+        {
+        case Type::banner:
+            switch(isOnClick)
+            {
+            case true:
+                branch = EBranchL::L4;
+                rating = 1000 * rating;
+                return true;
+            case false:
+                branch = EBranchL::L3;
+                rating = 1000 * rating;
+                return true;
+            }
+            break;
+        case Type::teazer:
+            switch(isOnClick)
+            {
+            case true:
+                branch = EBranchL::L19;
+                return true;
+            case false:
+                branch = EBranchL::L14;
+                return true;
+            }
+            break;
+        default:
+            return false;
+        }
+        break;
+    case EBranchT::T4:
+        switch(type)
+        {
+        case Type::banner:
+            switch(isOnClick)
+            {
+            case true:
+                branch = EBranchL::L10;
+                return true;
+            case false:
+                branch = EBranchL::L5;
+                rating = 1000 * rating;
+                return true;
+            }
+            break;
+        case Type::teazer:
+            switch(isOnClick)
+            {
+            case true:
+                branch = EBranchL::L20;
+                return true;
+            case false:
+                branch = EBranchL::L15;
+                return true;
+            }
+            break;
+        default:
+            return false;
+        }
+        break;
+    case EBranchT::T5:
+        switch(type)
+        {
+        case Type::banner:
+            switch(isOnClick)
+            {
+            case true:
+                branch = EBranchL::L11;
+                return true;
+            case false:
+                branch = EBranchL::L6;
+                rating = 1000 * rating;
+                return true;
+            }
+            break;
+        case Type::teazer:
+            switch(isOnClick)
+            {
+            case true:
+                branch = EBranchL::L21;
+                return true;
+            case false:
+                branch = EBranchL::L16;
+                return true;
+            }
+            break;
+        default:
+            return false;
+        }
+        break;
+    case EBranchT::TMAX:
+        return false;
     }
 
     return false;
@@ -347,14 +401,14 @@ void Offer::remove(Kompex::SQLiteDatabase *pdb, const std::string &id)
     pStmt = new Kompex::SQLiteStatement(pdb);
     pStmt->BeginTransaction();
     sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Offer WHERE id=%s;",id.c_str());
-        try
-        {
-            pStmt->SqlStatement(buf);
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            Log::err("Offer::remove(%s) error: %s", buf, ex.GetString().c_str());
-        }
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        Log::err("Offer::remove(%s) error: %s", buf, ex.GetString().c_str());
+    }
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
 

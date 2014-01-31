@@ -54,7 +54,7 @@ void XXXSearcher::processKeywords(
     float oldRating;
     std::string guid, match;
     std::map<std::string, float> mapOldGuidRating;
-    Offer::MapRate resultImpression, resultClick, resultCategory, resultRetargeting, resultContext;
+    Offer::MapRate resultImpression, resultClick, resultCategory, resultRetargeting, resultContext, resultAll;
 
     try
     {
@@ -192,6 +192,9 @@ default_return:
     if(result.size() < items.size())
     {
         for(auto i = items.begin(); i != items.end(); ++i)
+            resultAll.insert(Offer::PairRate((*i).second->rating, (*i).second));
+
+        for(auto i = resultAll.begin(); i != resultAll.end(); ++i)
             result.push_back((*i).second);
     }
 

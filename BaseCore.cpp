@@ -151,6 +151,7 @@ void BaseCore::LoadAllEntities()
     //LOG(INFO) << "Загрузили все кампании.\n";
     Offer::loadAll(Config::Instance()->pDb->pDatabase);
     //LOG(INFO) << "Загрузили все предложения.\n";
+    Offer::loadReting(Config::Instance()->pDb->pDatabase);
 
     Config::Instance()->pDb->postDataLoad();
 

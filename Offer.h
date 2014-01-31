@@ -23,6 +23,7 @@ public:
     typedef std::map <const float,Offer*, std::greater<float>> MapRate;
     typedef std::map <const long,Offer*>::iterator it;
     typedef std::map <const long,Offer*>::const_iterator cit;
+    typedef std::pair<const float,Offer*> PairRate;
     typedef std::pair<const long,Offer*> Pair;
     typedef std::vector <Offer*> Vector;
     typedef std::vector <Offer*>::iterator itV;
@@ -79,7 +80,7 @@ public:
 
     static void loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query=mongo::Query());
     static void remove(Kompex::SQLiteDatabase *pdb, const std::string &id);
-
+    static void loadReting(Kompex::SQLiteDatabase *pdb);
     //bool operator==(const Offer &other) const { return this->id_int == other.id_int; }
     //bool operator<(const Offer &other) const { return rating < other.rating; }
 /*

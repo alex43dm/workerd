@@ -125,6 +125,7 @@
 		<Unit filename="db_dump/tables/15_CampaignNow.sql" />
 		<Unit filename="db_dump/tables/16_Informer.sql" />
 		<Unit filename="db_dump/tables/17_Retargeting.sql" />
+		<Unit filename="db_dump/tables/18_Informer2OfferRating.sql" />
 		<Unit filename="db_dump/view/00_Campaign2GeoRerions.sql" />
 		<Unit filename="db_dump/view/01_Campaign2Time.sql" />
 		<Unit filename="db_dump/view/02_Campaign2Doms.sql" />

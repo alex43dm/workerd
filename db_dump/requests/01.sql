@@ -9,7 +9,10 @@ ofrs.swf,
 ofrs.campaignId,
 ofrs.isOnClick,
 ofrs.type,
-ofrs.rating,
+CASE WHEN iret.rating IS NOT NULL
+THEN iret.rating
+ELSE ofrs.rating
+END AS rating,
 ofrs.retargeting,
 ofrs.uniqueHits,
 ofrs.height,
@@ -22,21 +25,20 @@ INNER JOIN (
 		EXCEPT
             SELECT c2d.id_cam AS id
             FROM Campaign2Domains AS c2d
-            WHERE c2d.id_dom=%ld AND c2d.allowed=0
+            WHERE c2d.id_dom=%lld AND c2d.allowed=0
 		UNION ALL
             SELECT c2a.id_cam AS id
             FROM Campaign2Accounts AS c2a
-            WHERE c2a.id_acc=%ld AND c2a.allowed=1
+            WHERE c2a.id_acc=%lld AND c2a.allowed=1
         UNION ALL
             SELECT c2i.id_cam AS id
             FROM Campaign2Informer AS c2i
-            WHERE c2i.allowed=1 AND c2i.id_inf=%ld
+            WHERE c2i.allowed=1 AND c2i.id_inf=%lld
         UNION ALL
             SELECT geo.id_cam AS id
             FROM geoTargeting AS geo
             INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND (reg.cid='%s' OR reg.rid='%s')
 ) AS c ON ca.id=c.id
-LEFT JOIN tmp%d%ld AS deph ON ofrs.id=deph.id
-WHERE ofrs.valid=1 AND deph.id IS NULL
-ORDER BY ofrs.rating
-LIMIT 200;
+LEFT JOIN tmp%d%lld AS deph ON ofrs.id=deph.id
+LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=%lld AND ofrs.id=iret.id_ofr
+WHERE ofrs.valid=1 AND deph.id IS NULL;

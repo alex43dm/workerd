@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1391030143 source:/home/alex/Projects/worker/BaseCore.cpp
+1391188201 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -916,7 +916,7 @@
 	<mongo/client/dbclientinterface.h>
 	"KompexSQLiteDatabase.h"
 
-1390257646 /home/alex/Projects/worker/Offer.h
+1391172613 /home/alex/Projects/worker/Offer.h
 	<string>
 	<list>
 	<map>
@@ -1260,7 +1260,7 @@
 	"CgiService.h"
 	"Log.h"
 
-1390553103 source:/home/alex/Projects/worker/Offer.cpp
+1391187734 source:/home/alex/Projects/worker/Offer.cpp
 	"Offer.h"
 	"DB.h"
 	"Log.h"
@@ -1369,7 +1369,7 @@
 	"KompexSQLiteException.h"
 	"Log.h"
 
-1390476140 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+1391162958 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
 	"Log.h"
 	"Config.h"
 	"XXXSearcher.h"
