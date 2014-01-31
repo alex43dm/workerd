@@ -95,6 +95,8 @@ private:
     TiXmlDocument *mDoc;
     TiXmlElement* mRoot;
     TiXmlElement* mElem;
+
+    int getTime(const char *p);
 };
 
 extern Config *cfg;

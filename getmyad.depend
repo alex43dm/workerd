@@ -977,7 +977,7 @@
 	"BaseCore.h"
 	"Config.h"
 
-1391088273 /home/alex/Projects/worker/Config.h
+1391153496 /home/alex/Projects/worker/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
@@ -992,11 +992,12 @@
 	<GeoIPCity.h>
 	<string>
 
-1391086487 /home/alex/Projects/worker/Core.h
+1391156855 /home/alex/Projects/worker/Core.h
 	<list>
 	<vector>
 	<map>
 	<utility>
+	<algorithm>
 	<boost/date_time.hpp>
 	<boost/algorithm/string.hpp>
 	"Offer.h"
@@ -1032,7 +1033,7 @@
 	<vector>
 	<string>
 
-1391091130 /home/alex/Projects/worker/HistoryManager.h
+1391151200 /home/alex/Projects/worker/HistoryManager.h
 	<string>
 	<list>
 	<map>
@@ -1134,7 +1135,7 @@
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 
-1391089577 source:/home/alex/Projects/worker/Config.cpp
+1391153616 source:/home/alex/Projects/worker/Config.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -1143,7 +1144,7 @@
 	"Config.h"
 	<assert.h>
 
-1391091153 source:/home/alex/Projects/worker/Core.cpp
+1391157077 source:/home/alex/Projects/worker/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -1216,7 +1217,7 @@
 	"../Log.h"
 	"XXXSearcher.h"
 
-1391090122 source:/home/alex/Projects/worker/HistoryManager.cpp
+1391151572 source:/home/alex/Projects/worker/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -1460,7 +1461,7 @@
 	"Config.h"
 	"Log.h"
 
-1391088859 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
+1391151242 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"

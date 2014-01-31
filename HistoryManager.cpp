@@ -118,7 +118,7 @@ bool HistoryManager::updateUserHistory(
 {
     setDeprecatedOffers(items);
 
-    RetargetingUpdate(params, items, informer->RetargetingCount);
+    RetargetingUpdate(items, informer->RetargetingCount);
 
     try
     {

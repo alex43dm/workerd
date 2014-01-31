@@ -103,12 +103,7 @@ bool Config::LoadConfig(const std::string fName)
 
     if( (mElem = mRoot->FirstChildElement("retargeting_by_time")) && (mElem->GetText()) )
     {
-        struct tm t;
-        const char *p = mElem->GetText();
-        strptime(p, "%H:%M:%S", &t);
-        retargeting_by_time_ = t.tm_hour * 3600;
-        retargeting_by_time_ = retargeting_by_time_ + t.tm_min * 60;
-        retargeting_by_time_ = retargeting_by_time_ + t.tm_sec;
+        retargeting_by_time_ = getTime(mElem->GetText());
     }
     else
     {
@@ -338,4 +333,14 @@ Config::~Config()
     delete pDb;
 
     mInstance = NULL;
+}
+//---------------------------------------------------------------------------------------------------------------
+int Config::getTime(const char *p)
+{
+    struct tm t;
+    int ret;
+    strptime(p, "%H:%M:%S", &t);
+    ret = t.tm_hour * 3600;
+    ret = ret + t.tm_min * 60;
+    return ret + t.tm_sec;
 }

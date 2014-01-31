@@ -7,6 +7,7 @@
 //----------------------------Retargeting---------------------------------------
 void HistoryManager::getRetargeting()
 {
+    RetargetingClear();
     getHistoryByType(HistoryType::Retargeting, vretageting);
 #ifdef DEBUG
     Log::info("[%ld]HistoryManager::getRetargeting : done",tid);
@@ -52,7 +53,7 @@ std::string HistoryManager::getRetargetingAsyncWait()
     return ret;
 }
 
-void HistoryManager::RetargetingUpdate(const Params *pa, const Offer::Vector &v, unsigned len)
+void HistoryManager::RetargetingUpdate(const Offer::Vector &v, unsigned len)
 {
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
@@ -67,7 +68,7 @@ void HistoryManager::RetargetingUpdate(const Params *pa, const Offer::Vector &v,
         {
             sqlite3_snprintf(sizeof(buf),buf,
                              "SELECT viewTime FROM Retargeting WHERE id=%lli AND offerId=%lli;",
-                             pa->getUserKeyLong(), v[i]->id_int);
+                             params->getUserKeyLong(), v[i]->id_int);
 
             pStmt->Sql(buf);
             pStmt->FetchRow();
@@ -80,20 +81,20 @@ void HistoryManager::RetargetingUpdate(const Params *pa, const Offer::Vector &v,
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
                                      "UPDATE Retargeting SET uniqueHits=uniqueHits-1 WHERE id=%lli AND offerId=%lli;",
-                                     pa->getUserKeyLong(), v[i]->id_int);
+                                     params->getUserKeyLong(), v[i]->id_int);
                 }
                 else
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
                                      "DELETE FROM Retargeting WHERE id=%lli AND offerId=%lli;",
-                                     pa->getUserKeyLong(), v[i]->id_int);
+                                     params->getUserKeyLong(), v[i]->id_int);
                 }
             }
             else
             {
                 sqlite3_snprintf(sizeof(buf),buf,
                                  "INSERT INTO Retargeting(id,offerId,uniqueHits,viewTime) VALUES(%lli,%lli,%d,%lli);",
-                                 pa->getUserKeyLong(), v[i]->id_int, v[i]->uniqueHits,std::time(0));
+                                 params->getUserKeyLong(), v[i]->id_int, v[i]->uniqueHits,std::time(0));
             }
             pStmt->SqlStatement(buf);
         }
@@ -112,7 +113,7 @@ void HistoryManager::RetargetingUpdate(const Params *pa, const Offer::Vector &v,
 #endif // DEBUG
 }
 
-void HistoryManager::RetargetingClear(const Params *pa)
+void HistoryManager::RetargetingClear()
 {
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
@@ -124,7 +125,7 @@ void HistoryManager::RetargetingClear(const Params *pa)
     {
         sqlite3_snprintf(sizeof(buf),buf,
                          "DELETE FROM Retargeting WHERE id=%lli AND viewTime<%lli;",
-                         pa->getUserKeyLong(), std::time(0) - Config::Instance()->retargeting_by_time_);
+                         params->getUserKeyLong(), std::time(0) - Config::Instance()->retargeting_by_time_);
         pStmt->SqlStatement(buf);
     }
     catch(Kompex::SQLiteException &ex)

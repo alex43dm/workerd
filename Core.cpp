@@ -269,13 +269,6 @@ void Core::ProcessSaveResults()
         items.erase(o);
     }
 
-    for (Offer::it o = itemsRetargeting.begin(); o != itemsRetargeting.end(); ++o)
-    {
-        if(o->second)
-            delete o->second;
-        itemsRetargeting.erase(o);
-    }
-
     result.clear();
     resultRetargeting.clear();
 
@@ -389,18 +382,59 @@ bool Core::getAllOffers(Offer::Map &ret)
 
 bool Core::getAllRetargeting(Offer::Vector &ret)
 {
-    hm->RetargetingClear(params);
-
+    Kompex::SQLiteStatement *pStmt;
     std::string ids = hm->getRetargetingAsyncWait();
 
     sqlite3_snprintf(CMD_SIZE, cmd, RetargetingOfferStr.c_str(), params->getUserKeyLong(), ids.c_str());
 
-    getOffers(itemsRetargeting);
-
-    for(Offer::it i = itemsRetargeting.begin(); i != itemsRetargeting.end(); ++i)
+    try
     {
-        ret.push_back((*i).second);
+        pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
+        pStmt->Sql(cmd);
     }
+    catch(Kompex::SQLiteException &ex)
+    {
+        Log::err("DB error: getOffers: %s: %s", ex.GetString().c_str(), cmd);
+        delete pStmt;
+        return false;
+    }
+
+    try
+    {
+        while(pStmt->FetchRow())
+        {
+            Offer *off = new Offer(pStmt->GetColumnString(1),
+                                   pStmt->GetColumnInt64(0),
+                                   pStmt->GetColumnString(2),
+                                   pStmt->GetColumnString(3),
+                                   pStmt->GetColumnString(4),
+                                   pStmt->GetColumnString(5),
+                                   pStmt->GetColumnString(6),
+                                   pStmt->GetColumnString(7),
+                                   pStmt->GetColumnInt64(8),
+                                   true,
+                                   pStmt->GetColumnBool(9),
+                                   pStmt->GetColumnInt(10),
+                                   pStmt->GetColumnDouble(11),
+                                   pStmt->GetColumnBool(12),
+                                   pStmt->GetColumnInt(13),
+                                   pStmt->GetColumnInt(14),
+                                   pStmt->GetColumnInt(15)
+                                  );
+            off->social = pStmt->GetColumnBool(16);
+
+            ret.push_back(off);
+        }
+        pStmt->FreeQuery();
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        Log::err("DB error: %s", ex.GetString().c_str());
+        delete pStmt;
+        return false;
+    }
+
+    delete pStmt;
 
     return true;
 }
@@ -697,7 +731,8 @@ void Core::RISAlgorithm(Offer::Vector &result, Offer::Vector &RISResult, unsigne
             //если кампания тизера не занесена в список, выбираем тизер, выбираем кампанию
             if(!camps.count((*p)->campaign_id)
                && (*p)->rating > 0.0
-               && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+               && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
+               && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
             {
                 //LOG(INFO) << "add";
                 if(RISResult.size() < outLen) RISResult.push_back(*p);
@@ -716,7 +751,8 @@ void Core::RISAlgorithm(Offer::Vector &result, Offer::Vector &RISResult, unsigne
                     continue;
                 //доберём всё за один проход
                 //пробуем сначала добрать без повторений.
-                if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+                if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
+                   && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
                 {
                     if(RISResult.size() < outLen) RISResult.push_back(*p);
                     else goto make_return;
@@ -728,12 +764,13 @@ void Core::RISAlgorithm(Offer::Vector &result, Offer::Vector &RISResult, unsigne
         //очистка кармы
         hm->clean = true;
 
-        //теперь, если без повторений кампаний добрать не получилось
+        //теперь, если без повторений кампаний добрать не получилось...
         if(RISResult.size() < outLen)
         {
             for(p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
             {
-                if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+                if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
+                   && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
                 {
                     if(RISResult.size() < outLen) RISResult.push_back(*p);
                     else goto make_return;
