@@ -916,7 +916,7 @@
 	<mongo/client/dbclientinterface.h>
 	"KompexSQLiteDatabase.h"
 
-1391172613 /home/alex/Projects/worker/Offer.h
+1391251476 /home/alex/Projects/worker/Offer.h
 	<string>
 	<list>
 	<map>
@@ -1144,7 +1144,7 @@
 	"Config.h"
 	<assert.h>
 
-1391157077 source:/home/alex/Projects/worker/Core.cpp
+1391189032 source:/home/alex/Projects/worker/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -1260,7 +1260,7 @@
 	"CgiService.h"
 	"Log.h"
 
-1391187734 source:/home/alex/Projects/worker/Offer.cpp
+1391251554 source:/home/alex/Projects/worker/Offer.cpp
 	"Offer.h"
 	"DB.h"
 	"Log.h"

@@ -91,6 +91,10 @@ bool BaseCore::ProcessMQ()
                         Offer::remove(Config::Instance()->pDb->pDatabase, ofrId);
                     }
                 }
+                else if(m->getRoutingKey() == "advertise.updateRating")
+                {
+                    Offer::loadRating(Config::Instance()->pDb->pDatabase, true);
+                }
 
                 return true;
             }
@@ -151,7 +155,7 @@ void BaseCore::LoadAllEntities()
     //LOG(INFO) << "Загрузили все кампании.\n";
     Offer::loadAll(Config::Instance()->pDb->pDatabase);
     //LOG(INFO) << "Загрузили все предложения.\n";
-    Offer::loadReting(Config::Instance()->pDb->pDatabase);
+    Offer::loadRating(Config::Instance()->pDb->pDatabase, false);
 
     Config::Instance()->pDb->postDataLoad();
 

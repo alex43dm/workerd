@@ -139,7 +139,7 @@ void Offer::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
 }
 
 /** Загружает все товарные предложения из MongoDb */
-void Offer::loadReting(Kompex::SQLiteDatabase *pdb)
+void Offer::loadRating(Kompex::SQLiteDatabase *pdb, bool isClear)
 {
     mongo::DB db;
     Kompex::SQLiteStatement *pStmt;
@@ -159,6 +159,19 @@ void Offer::loadReting(Kompex::SQLiteDatabase *pdb)
     sz = sizeof(buf) - sz;
 
     pStmt->BeginTransaction();
+
+    if(isClear)
+    {
+            try
+            {
+                pStmt->SqlStatement("DELETE FROM Informer2OfferRating;");
+            }
+            catch(Kompex::SQLiteException &ex)
+            {
+                Log::err("Offers::loadReting insert(%s) error: %s", buf, ex.GetString().c_str());
+            }
+    }
+
     while (cursor->more())
     {
         mongo::BSONObj x = cursor->next();
