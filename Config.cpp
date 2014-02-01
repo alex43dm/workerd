@@ -252,6 +252,11 @@ bool Config::LoadConfig(const std::string fName)
             Log::warn("element dbpath is not inited: :memory:");
             dbpath_ = ":memory:";
         }
+        if( (mel = mElem->FirstChildElement("time_update")) && (mel->GetText()) )
+        {
+            time_update_ = getTime(mel->GetText());
+        }
+
 
         if( (mel = mElem->FirstChildElement("template_teaser")) && (mel->GetText()) )
             template_teaser_ = mel->GetText();

@@ -114,7 +114,7 @@ void CgiService::run()
         //todo make lock on mq read
         bcore->ProcessMQ();
         sleep(1);
-        if( i >= 15*60 )
+        if( i >= Config::Instance()->time_update_ )
         {
             bcore->ReloadAllEntities();
             i = 0;

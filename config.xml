@@ -155,6 +155,8 @@
     <lock_file>/tmp/worker.lock</lock_file>
     <pid_file>/tmp/worker.pid</pid_file>
     <user>alex</user>
+    <!--время обновление временных кампаний(HH:MM:SS)-->
+    <time_update>00:15:00</time_update>
 </server>
 
 </root>
