@@ -394,6 +394,7 @@ bool Core::getAllOffers(Offer::Map &ret)
     sqlite3_snprintf(CMD_SIZE, cmd, pStmtOfferStr.c_str(),
                      geo.c_str(),
                      informer->domainId,
+                     informer->domainId,
                      informer->accountId,
                      informer->id,
                      getpid(),
