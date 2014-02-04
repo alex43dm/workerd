@@ -42,14 +42,13 @@ Campaign::Campaign(long long _id) :
 /** \brief  Закгрузка всех рекламных кампаний из базы данных  Mongo
 
  */
-//#define CAMINS
 //==================================================================================
 void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
 {
     mongo::DB db;
     Kompex::SQLiteStatement *pStmt;
     char buf[8192], *pData;
-    int sz, i = 0;
+    int sz, i = 0, cats = 0;
 
     pStmt = new Kompex::SQLiteStatement(pdb);
 
@@ -71,7 +70,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         long long long_id = x.getField("guid_int").numberLong();
 
         bzero(buf,sizeof(buf));
-        snprintf(buf,sizeof(buf),"INSERT INTO Campaign(id,guid,title,project,social,valid,showCoverage,impressionsPerDayLimit) VALUES(");
+        snprintf(buf,sizeof(buf),"INSERT INTO Campaign(id,guid,title,project,social,valid,showCoverage,impressionsPerDayLimit,retargeting) VALUES(");
 
         sz = strlen(buf);
         pData = buf + sz;
@@ -79,7 +78,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
 
         bzero(pData,sz);
         sqlite3_snprintf(sz,pData,
-                         "%lld,'%q','%q','%q',%d, %d,'%q',%d)",
+                         "%lld,'%q','%q','%q',%d, %d,'%q',%d,%d)",
                          long_id,
                          id.c_str(),
                          x.getStringField("title"),
@@ -87,7 +86,8 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
                          x.getBoolField("social") ? 1 : 0,
                          o.isValid(),
                          o.getStringField("showCoverage"),
-                         x.getField("impressionsPerDayLimit").numberInt()
+                         x.getField("impressionsPerDayLimit").numberInt(),
+                         o.getBoolField("retargeting") ? 1 : 0
                         );
         try
         {
@@ -98,34 +98,14 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
             Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
         }
         //------------------------geoTargeting-----------------------
-
-        bzero(buf,sizeof(buf));
-
         mongo::BSONObjIterator it = o.getObjectField("geoTargeting");
         std::string country_targeting;
         while (it.more())
             country_targeting += "'" + it.next().str() + "',";
 
         country_targeting = country_targeting.substr(0, country_targeting.size()-1);
-        bzero(buf,sizeof(buf));
-        sqlite3_snprintf(sizeof(buf),buf,
-                         "INSERT INTO geoTargeting(id_cam,id_geo) \
-                    SELECT %lld,id FROM GeoRerions WHERE cid IN(%s)",
-                         long_id, country_targeting.c_str()
-                        );
-        try
-        {
-            pStmt->SqlStatement(buf);
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
-        }
 
         //------------------------regionTargeting-----------------------
-
-        bzero(buf,sizeof(buf));
-
         it = o.getObjectField("regionTargeting");
         std::string region_targeting;
         while (it.more())
@@ -136,12 +116,23 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         }
 
         region_targeting = region_targeting.substr(0, region_targeting.size()-1);
-        bzero(buf,sizeof(buf));
-        sqlite3_snprintf(sizeof(buf),buf,
-                         "INSERT INTO regionTargeting(id_cam,id_geo) \
-                    SELECT %lld,id FROM GeoRerions WHERE rname IN(%s)",
-                         long_id, region_targeting.c_str()
-                        );
+        if(region_targeting.size())
+        {
+            sqlite3_snprintf(sizeof(buf),buf,
+                             "INSERT INTO geoTargeting(id_cam,id_geo) \
+                              SELECT %lld,id FROM GeoRerions WHERE rname IN(%s);",
+                             long_id, region_targeting.c_str()
+                            );
+        }
+        else
+        {
+            sqlite3_snprintf(sizeof(buf),buf,
+                             "INSERT INTO geoTargeting(id_cam,id_geo) \
+                              SELECT %lld,id FROM GeoRerions WHERE cid IN(%s);",
+                             long_id, country_targeting.c_str()
+                            );
+        }
+
         try
         {
             pStmt->SqlStatement(buf);
@@ -207,7 +198,8 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         while (it.more())
         {
             bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name) VALUES('%q')",it.next().str().c_str());
+            std::string acnt = it.next().str();
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name) VALUES('%q')",acnt.c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -217,7 +209,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
                 Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
             }
 
-            accounts_allowed += "'"+it.next().str()+"',";
+            accounts_allowed += "'"+acnt+"',";
         }
 
 
@@ -243,7 +235,8 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         while (it.more())
         {
             bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name) VALUES('%q')",it.next().str().c_str());
+            std::string acnt = it.next().str();
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name) VALUES('%q')",acnt.c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -253,7 +246,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
                 Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
             }
 
-            accounts_ignored += "'"+it.next().str()+"',";
+            accounts_ignored += "'"+acnt+"',";
         }
 
         accounts_ignored = accounts_ignored.substr(0, accounts_ignored.size()-1);
@@ -281,7 +274,8 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         while (it.more())
         {
             bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q')",it.next().str().c_str());
+            std::string acnt = it.next().str();
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q')",acnt.c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -291,7 +285,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
                 Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
             }
 
-            domains_allowed += "'"+it.next().str()+"',";
+            domains_allowed += "'"+acnt+"',";
         }
 
         domains_allowed = domains_allowed.substr(0, domains_allowed.size()-1);
@@ -319,7 +313,8 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         while (it.more())
         {
             bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q')",it.next().str().c_str());
+            std::string acnt = it.next().str();
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q')",acnt.c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -329,7 +324,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
                 Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
             }
 
-            domains_ignored += "'"+it.next().str()+"',";
+            domains_ignored += "'"+acnt+"',";
         }
 
         domains_ignored = domains_ignored.substr(0, domains_ignored.size()-1);
@@ -353,7 +348,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
 
         // Дни недели, в которые осуществляется показ
         it = o.getObjectField("daysOfWeek");
-
+        int day;
         if (!it.more())
         {
             bzero(buf,sizeof(buf));
@@ -393,10 +388,11 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
 
         while (it.more())
         {
+            day = it.next().numberInt();
             bzero(buf,sizeof(buf));
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1)",
-                             long_id, it.next().numberInt(),
+                             long_id, day,
                              mongo::DB::toInt(o.getFieldDotted("startShowTime.hours")),
                              mongo::DB::toInt(o.getFieldDotted("startShowTime.minutes"))
                             );
@@ -412,7 +408,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
 
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,0)",
-                             long_id, it.next().numberInt(),
+                             long_id, day,
                              mongo::DB::toInt(o.getFieldDotted("endShowTime.hours")),
                              mongo::DB::toInt(o.getFieldDotted("endShowTime.minutes"))
                             );
@@ -425,12 +421,40 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
                 Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
             }
         }
-/*
+
  // Тематические категории, к которым относится кампания
-    it = o.getObjectField("categories");
-    while (it.more())
-        categories_.insert(it.next().str());
-*/
+        std::string catAll;
+        it = o.getObjectField("categories");
+        while (it.more())
+        {
+            std::string cat = it.next().str();
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Categories(id,guid) VALUES(%lli,'%q');",
+            cats, cat.c_str());
+            try
+            {
+                pStmt->SqlStatement(buf);
+                cats++;
+            }
+            catch(Kompex::SQLiteException &ex)
+            {
+                Log::err("CategoriesLoad insert(%s) error: %s", buf, ex.GetString().c_str());
+            }
+            catAll += "'"+cat+"',";
+        }
+
+        catAll = catAll.substr(0, catAll.size()-1);
+        sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Campaign2Categories(id_cam,id_cat) \
+                         SELECT %lld,cat.id FROM Categories AS cat WHERE cat.guid IN(%s);",
+                         long_id,catAll.c_str());
+        try
+        {
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("CategoriesLoad insert(%s) error: %s", buf, ex.GetString().c_str());
+        }
+
         i++;
     }
     pStmt->CommitTransaction();
@@ -486,7 +510,8 @@ void Campaign::update(Kompex::SQLiteDatabase *pdb, std::string aCampaignId)
                              social=%d, \
                              valid=%d, \
                              showCoverage='%q', \
-                             impressionsPerDayLimit=%d \
+                             impressionsPerDayLimit=%d, \
+                             retargeting=%d \
                              WHERE id=%lld;",
                              x.getStringField("title"),
                              x.getStringField("project"),
@@ -494,7 +519,8 @@ void Campaign::update(Kompex::SQLiteDatabase *pdb, std::string aCampaignId)
                              o.isValid(),
                              o.getStringField("showCoverage"),
                              x.getField("impressionsPerDayLimit").numberInt(),
-                             long_id);
+                             long_id,
+                             o.getBoolField("retargeting") ? 1 : 0);
         try
         {
             pStmt->SqlStatement(buf);

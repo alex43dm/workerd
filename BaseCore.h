@@ -9,6 +9,7 @@
 #include <AMQPcpp.h>
 
 #include "DataBase.h"
+#include "ParentDB.h"
 
 /// Класс, который связывает воедино все части системы.
 class BaseCore
@@ -82,6 +83,7 @@ private:
     std::vector<std::string> mq_log_;
     std::string toString(AMQPMessage *m);
     bool cmdParser(const std::string &cmd, std::string &offerId, std::string &campaignId);
+    ParentDB *pdb;
 };
 
 

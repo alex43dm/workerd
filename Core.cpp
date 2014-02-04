@@ -34,7 +34,6 @@ Core::Core()
 
     pStmtOfferStr = pDb->getSqlFile("requests/01.sql");
     InformerStr  = pDb->getSqlFile("requests/04.sql");
-    RetargetingOfferStr = pDb->getSqlFile("requests/03.sql");
     /*
         try
         {
@@ -81,6 +80,8 @@ Core::Core()
 
     hm = new HistoryManager(tmpTableName);
     hm->initDB();
+    hm->vretg = &resultRetargeting;
+    hm->RetargetingOfferStr = pDb->getSqlFile("requests/03.sql");
 
     Log::info("[%ld]core start",tid);
 }
@@ -160,8 +161,8 @@ std::string Core::Process(Params *prms)
     //load all history async
     hm->getUserHistory(params);
 
-    getAllRetargeting(resultRetargeting);
-    Log::gdb("[%ld]getAllRetargeting: %d done",tid,resultRetargeting.size());
+//    getAllRetargeting(resultRetargeting);
+//    Log::gdb("[%ld]getAllRetargeting: %d done",tid,resultRetargeting.size());
 
     getAllOffers(items);
     Log::gdb("[%ld]getOffers: %d done",tid, items.size());
@@ -178,7 +179,7 @@ std::string Core::Process(Params *prms)
         hm->clean = true;
     }
 
-
+    hm->getRetargetingAsyncWait();
     RISAlgorithmRetagreting(resultRetargeting, vOutPut, informer->RetargetingCount);
     Log::gdb("[%ld]RISAlgorithmRetagreting: vOutPut %ld done",tid, vOutPut.size());
 
@@ -367,15 +368,38 @@ file::memory:?cache=shared
 
 bool Core::getAllOffers(Offer::Map &ret)
 {
+    std::string geo;
+    if(params->getCountry().size() || params->getRegion().size())
+    {
+        if(params->getRegion().size() && params->getRegion().size())
+        {
+            geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+        INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND(reg.cid='"+params->getCountry()+"' AND reg.rname='"+params->getRegion()+"')";
+        }
+        else
+        {
+            if(params->getRegion().size())
+            {
+                geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+            INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND(reg.rname='"+params->getRegion()+"')";
+            }
+            else
+            {
+                geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+            INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND(reg.cid='"+params->getCountry()+"')";
+            }
+        }
+    }
+
     sqlite3_snprintf(CMD_SIZE, cmd, pStmtOfferStr.c_str(),
+                     geo.c_str(),
                      informer->domainId,
                      informer->accountId,
                      informer->id,
-                     params->getCountry().c_str(),
-                     params->getRegion().c_str(),
                      getpid(),
                      tid,
                      informer->id);
+printf("%s\n",cmd);
 
     hm->getDeprecatedOffersAsyncWait();
     return getOffers(ret);
@@ -383,60 +407,6 @@ bool Core::getAllOffers(Offer::Map &ret)
 
 bool Core::getAllRetargeting(Offer::Vector &ret)
 {
-    Kompex::SQLiteStatement *pStmt;
-    std::string ids = hm->getRetargetingAsyncWait();
-
-    sqlite3_snprintf(CMD_SIZE, cmd, RetargetingOfferStr.c_str(), params->getUserKeyLong(), ids.c_str());
-
-    try
-    {
-        pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
-        pStmt->Sql(cmd);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        Log::err("DB error: getOffers: %s: %s", ex.GetString().c_str(), cmd);
-        delete pStmt;
-        return false;
-    }
-
-    try
-    {
-        while(pStmt->FetchRow())
-        {
-            Offer *off = new Offer(pStmt->GetColumnString(1),
-                                   pStmt->GetColumnInt64(0),
-                                   pStmt->GetColumnString(2),
-                                   pStmt->GetColumnString(3),
-                                   pStmt->GetColumnString(4),
-                                   pStmt->GetColumnString(5),
-                                   pStmt->GetColumnString(6),
-                                   pStmt->GetColumnString(7),
-                                   pStmt->GetColumnInt64(8),
-                                   true,
-                                   pStmt->GetColumnBool(9),
-                                   pStmt->GetColumnInt(10),
-                                   pStmt->GetColumnDouble(11),
-                                   pStmt->GetColumnBool(12),
-                                   pStmt->GetColumnInt(13),
-                                   pStmt->GetColumnInt(14),
-                                   pStmt->GetColumnInt(15)
-                                  );
-            off->social = pStmt->GetColumnBool(16);
-
-            ret.push_back(off);
-        }
-        pStmt->FreeQuery();
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        Log::err("DB error: %s", ex.GetString().c_str());
-        delete pStmt;
-        return false;
-    }
-
-    delete pStmt;
-
     return true;
 }
 

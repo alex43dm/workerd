@@ -7,8 +7,60 @@
 //----------------------------Retargeting---------------------------------------
 void HistoryManager::getRetargeting()
 {
+    std::string ids;
+    Kompex::SQLiteStatement *pStmt;
+    char buf[8192];
+
     RetargetingClear();
+
     getHistoryByType(HistoryType::Retargeting, vretageting);
+    //fill
+    for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
+    {
+        if(i != vretageting.begin())
+            ids += ',';
+        ids += (*i);
+    }
+
+    sqlite3_snprintf(sizeof(buf), buf, RetargetingOfferStr.c_str(), params->getUserKeyLong(), ids.c_str());
+
+    try
+    {
+        pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+        pStmt->Sql(buf);
+
+        while(pStmt->FetchRow())
+        {
+            Offer *off = new Offer(pStmt->GetColumnString(1),
+                                   pStmt->GetColumnInt64(0),
+                                   pStmt->GetColumnString(2),
+                                   pStmt->GetColumnString(3),
+                                   pStmt->GetColumnString(4),
+                                   pStmt->GetColumnString(5),
+                                   pStmt->GetColumnString(6),
+                                   pStmt->GetColumnString(7),
+                                   pStmt->GetColumnInt64(8),
+                                   true,
+                                   pStmt->GetColumnBool(9),
+                                   pStmt->GetColumnInt(10),
+                                   pStmt->GetColumnDouble(11),
+                                   pStmt->GetColumnBool(12),
+                                   pStmt->GetColumnInt(13),
+                                   pStmt->GetColumnInt(14),
+                                   pStmt->GetColumnInt(15)
+                                  );
+            off->social = pStmt->GetColumnBool(16);
+
+            vretg->push_back(off);
+        }
+        pStmt->FreeQuery();
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        Log::err("DB error: %s", ex.GetString().c_str());
+    }
+
+    delete pStmt;
 #ifdef DEBUG
     Log::info("[%ld]HistoryManager::getRetargeting : done",tid);
 #endif // DEBUG
@@ -37,20 +89,14 @@ bool HistoryManager::getRetargetingAsync()
     return true;
 }
 
-std::string HistoryManager::getRetargetingAsyncWait()
+void HistoryManager::getRetargetingAsyncWait()
 {
-    std::string ret;
+
     pthread_join(thrGetRetargetingAsync, 0);
-    for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
-    {
-        if(i != vretageting.begin())
-            ret += ',';
-        ret += (*i);
-    }
 #ifdef DEBUG
     Log::info("[%ld]HistoryManager::getRetargetingAsyncWait return",tid);
 #endif // DEBUG
-    return ret;
+    return;
 }
 
 void HistoryManager::RetargetingUpdate(const Offer::Vector &v, unsigned len)

@@ -77,7 +77,6 @@ private:
     HistoryManager *hm;
 
     std::string pStmtOfferStr,
-                RetargetingOfferStr,
                 InformerStr;
 
     bool all_social;

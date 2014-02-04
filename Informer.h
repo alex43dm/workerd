@@ -2,19 +2,9 @@
 #define INFORMER_H
 
 #include <string>
-#include <map>
-#include <set>
-
-#include "KompexSQLiteDatabase.h"
 
 typedef long long			sphinx_int64_t;
 typedef unsigned long long	sphinx_uint64_t;
-
-// Forward declarations
-namespace mongo
-{
-class Query;
-}
 
 /**
     \brief Класс, описывающий рекламную выгрузку
@@ -28,8 +18,7 @@ public:
         Show_UserCode
     };
 
-public:
-        long long id;                         //Индентификатор РБ
+       long long id;                         //Индентификатор РБ
 //        sphinx_int64_t id_int;                             //Индентификатор РБ
         int capacity;                           //Количество мест под тизер
         std::string bannersCss;                 //Стиль CSS РБ для отображения банеров
@@ -39,11 +28,7 @@ public:
         unsigned rtgPercentage;
         unsigned RetargetingCount;
 
-        std::string domain;                     //Доменное имя за которым заркеплён РБ
-        std::string user;                       //Логин аккаунта Getmyad за которым заркеплён РБ
-        std::string title;                      //Название РБ
         bool blocked;                           //Статус активности РБ
-        std::set<std::string> categories;       //Принадлежность РБ к категории
         ShowNonRelevant nonrelevant;            //Что отображать при отсутствии платных РП
         std::string user_code;                  //Строка пользовательского кода
         bool valid;                             //Валидность блока
@@ -55,11 +40,6 @@ public:
     Informer(long id);
     Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss, long , long, int);
     virtual ~Informer();
-
-    /** Загружает информацию обо всех информерах */
-    static bool loadAll(Kompex::SQLiteDatabase *pdb);
-    static bool update(Kompex::SQLiteDatabase *pdb, const std::string &aInformerId);
-    static void remove(Kompex::SQLiteDatabase *pdb, const std::string &id);
 
     bool is_null() const
     {

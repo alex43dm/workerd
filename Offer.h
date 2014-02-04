@@ -6,10 +6,7 @@
 #include <map>
 #include <vector>
 
-#include <mongo/client/dbclientinterface.h>
-
 #include "Campaign.h"
-#include "KompexSQLiteDatabase.h"
 #include "EBranch.h"
 
 typedef long long			sphinx_int64_t;
@@ -78,9 +75,6 @@ public:
 
     virtual ~Offer();
 
-    static void loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query=mongo::Query());
-    static void remove(Kompex::SQLiteDatabase *pdb, const std::string &id);
-    static void loadRating(Kompex::SQLiteDatabase *pdb, bool isClear);
     //bool operator==(const Offer &other) const { return this->id_int == other.id_int; }
     //bool operator<(const Offer &other) const { return rating < other.rating; }
 /*

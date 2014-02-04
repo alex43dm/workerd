@@ -40,6 +40,9 @@ public:
     //Задаём обнавление долгосрочной истории
     bool updateContext;
 
+    std::string RetargetingOfferStr;
+    Offer::Vector *vretg;
+
     HistoryManager(const std::string &tmpTableName);
     virtual ~HistoryManager();
 
@@ -70,7 +73,7 @@ public:
     bool getPageKeywordsAsyncWait();
 
     bool getRetargetingAsync();
-    std::string getRetargetingAsyncWait();
+    void getRetargetingAsyncWait();
     void RetargetingUpdate(const Offer::Vector &v, unsigned);
     void RetargetingClear();
 

@@ -21,7 +21,8 @@ ca.social
 FROM Offer AS ofrs
 INNER JOIN Campaign AS ca ON ofrs.campaignId=ca.id
 INNER JOIN (
-		SELECT cn.id FROM Campaign2Time AS cn
+		SELECT cn.id FROM CampaignNow AS cn
+		%s
 		EXCEPT
             SELECT c2d.id_cam AS id
             FROM Campaign2Domains AS c2d
@@ -34,11 +35,9 @@ INNER JOIN (
             SELECT c2i.id_cam AS id
             FROM Campaign2Informer AS c2i
             WHERE c2i.allowed=1 AND c2i.id_inf=%lld
-        UNION ALL
-            SELECT geo.id_cam AS id
-            FROM geoTargeting AS geo
-            INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND (reg.cid='%s' OR reg.rid='%s')
 ) AS c ON ca.id=c.id
 LEFT JOIN tmp%d%lld AS deph ON ofrs.id=deph.id
 LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=%lld AND ofrs.id=iret.id_ofr
-WHERE ofrs.valid=1 AND deph.id IS NULL;
+WHERE ofrs.valid=1
+    AND deph.id IS NULL
+;

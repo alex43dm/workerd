@@ -22,7 +22,7 @@
 BaseCore::BaseCore()
 {
     time_service_started_ = boost::posix_time::second_clock::local_time();
-
+    pdb = new ParentDB();
     LoadAllEntities();
     InitMessageQueue();
     InitMongoDB();
@@ -81,19 +81,15 @@ bool BaseCore::ProcessMQ()
                 {
                     if(cmdParser(m1,ofrId,cmgId))
                     {
-                        Offer::loadAll(Config::Instance()->pDb->pDatabase, QUERY("guid" << ofrId));
+                        pdb->OfferLoad(QUERY("guid" << ofrId));
                     }
                 }
                 else if(m->getRoutingKey() == "advertise.delete")
                 {
                     if(cmdParser(m1,ofrId,cmgId))
                     {
-                        Offer::remove(Config::Instance()->pDb->pDatabase, ofrId);
+                        pdb->OfferRemove(ofrId);
                     }
-                }
-                else if(m->getRoutingKey() == "advertise.updateRating")
-                {
-                    Offer::loadRating(Config::Instance()->pDb->pDatabase, true);
                 }
 
                 return true;
@@ -107,11 +103,15 @@ bool BaseCore::ProcessMQ()
             {
                 if(m->getRoutingKey() == "informer.update")
                 {
-                    Informer::update(Config::Instance()->pDb->pDatabase, toString(m));
+                    pdb->InformerUpdate(toString(m));
                 }
                 else if(m->getRoutingKey() == "informer.delete")
                 {
-                    Informer::remove(Config::Instance()->pDb->pDatabase, toString(m));
+                    pdb->InformerRemove(toString(m));
+                }
+                else if(m->getRoutingKey() == "informer.updateRating")
+                {
+                    //Offer::loadRating(Config::Instance()->pDb->pDatabase, toString(m));
                 }
 
                 return true;
@@ -149,13 +149,16 @@ void BaseCore::LoadAllEntities()
     if(Config::Instance()->pDb->reopen)
         return;
 
-    Informer::loadAll(Config::Instance()->pDb->pDatabase);
-    //LOG(INFO) << "Загрузили все информеры.\n";
+    //Загрузили все информеры
+    pdb->InformerLoadAll();
+    //Загрузили все кампании
     Campaign::loadAll(Config::Instance()->pDb->pDatabase);
-    //LOG(INFO) << "Загрузили все кампании.\n";
-    Offer::loadAll(Config::Instance()->pDb->pDatabase);
-    //LOG(INFO) << "Загрузили все предложения.\n";
-    Offer::loadRating(Config::Instance()->pDb->pDatabase, false);
+    //Загрузили все предложения
+    pdb->OfferLoad();
+    //Загрузили все категории
+    pdb->CategoriesLoad();
+    //загрузили рейтинг
+    pdb->loadRating(false);
 
     Config::Instance()->pDb->postDataLoad();
 
