@@ -40,11 +40,11 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = bin/Release/getmyad
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/src/HistoryManagerLongTerm.o $(OBJDIR_DEBUG)/src/GeoRerions.o $(OBJDIR_DEBUG)/src/EBranch.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/src/HistoryManagerOffer.o $(OBJDIR_DEBUG)/utils/base64.o $(OBJDIR_DEBUG)/utils/UrlParser.o $(OBJDIR_DEBUG)/utils/SearchEngines.o $(OBJDIR_DEBUG)/utils/GeoIPTools.o $(OBJDIR_DEBUG)/utils/Cookie.o $(OBJDIR_DEBUG)/src/sphinxRequests.o $(OBJDIR_DEBUG)/src/json.o $(OBJDIR_DEBUG)/src/XXXSearcher.o $(OBJDIR_DEBUG)/src/Server.o $(OBJDIR_DEBUG)/src/RedisClient.o $(OBJDIR_DEBUG)/src/ParamParse.o $(OBJDIR_DEBUG)/src/HistoryManagerShortTerm.o $(OBJDIR_DEBUG)/src/HistoryManagerRetargeting.o $(OBJDIR_DEBUG)/src/HistoryManagerPageKeyWords.o $(OBJDIR_DEBUG)/KompexSQLiteStatement.o $(OBJDIR_DEBUG)/KompexSQLiteDatabase.o $(OBJDIR_DEBUG)/InformerTemplate.o $(OBJDIR_DEBUG)/Informer.o $(OBJDIR_DEBUG)/HistoryManager.o $(OBJDIR_DEBUG)/Log.o $(OBJDIR_DEBUG)/DataBase.o $(OBJDIR_DEBUG)/DB.o $(OBJDIR_DEBUG)/Core.o $(OBJDIR_DEBUG)/Config.o $(OBJDIR_DEBUG)/CgiService.o $(OBJDIR_DEBUG)/Campaign.o $(OBJDIR_DEBUG)/BaseCore.o $(OBJDIR_DEBUG)/Params.o $(OBJDIR_DEBUG)/Offer.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/src/HistoryManagerLongTerm.o $(OBJDIR_DEBUG)/src/GeoRerions.o $(OBJDIR_DEBUG)/src/EBranch.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/src/HistoryManagerOffer.o $(OBJDIR_DEBUG)/utils/base64.o $(OBJDIR_DEBUG)/utils/UrlParser.o $(OBJDIR_DEBUG)/utils/SearchEngines.o $(OBJDIR_DEBUG)/utils/GeoIPTools.o $(OBJDIR_DEBUG)/utils/Cookie.o $(OBJDIR_DEBUG)/src/sphinxRequests.o $(OBJDIR_DEBUG)/src/json.o $(OBJDIR_DEBUG)/src/XXXSearcher.o $(OBJDIR_DEBUG)/src/Server.o $(OBJDIR_DEBUG)/src/RedisClient.o $(OBJDIR_DEBUG)/src/ParentDB.o $(OBJDIR_DEBUG)/src/ParamParse.o $(OBJDIR_DEBUG)/src/HistoryManagerShortTerm.o $(OBJDIR_DEBUG)/src/HistoryManagerRetargeting.o $(OBJDIR_DEBUG)/src/HistoryManagerPageKeyWords.o $(OBJDIR_DEBUG)/KompexSQLiteStatement.o $(OBJDIR_DEBUG)/KompexSQLiteDatabase.o $(OBJDIR_DEBUG)/InformerTemplate.o $(OBJDIR_DEBUG)/Informer.o $(OBJDIR_DEBUG)/HistoryManager.o $(OBJDIR_DEBUG)/Log.o $(OBJDIR_DEBUG)/DataBase.o $(OBJDIR_DEBUG)/DB.o $(OBJDIR_DEBUG)/Core.o $(OBJDIR_DEBUG)/Config.o $(OBJDIR_DEBUG)/CgiService.o $(OBJDIR_DEBUG)/Campaign.o $(OBJDIR_DEBUG)/BaseCore.o $(OBJDIR_DEBUG)/Params.o $(OBJDIR_DEBUG)/Offer.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/src/HistoryManagerLongTerm.o $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/src/EBranch.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/src/HistoryManagerOffer.o $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/SearchEngines.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/src/sphinxRequests.o $(OBJDIR_RELEASE)/src/json.o $(OBJDIR_RELEASE)/src/XXXSearcher.o $(OBJDIR_RELEASE)/src/Server.o $(OBJDIR_RELEASE)/src/RedisClient.o $(OBJDIR_RELEASE)/src/ParamParse.o $(OBJDIR_RELEASE)/src/HistoryManagerShortTerm.o $(OBJDIR_RELEASE)/src/HistoryManagerRetargeting.o $(OBJDIR_RELEASE)/src/HistoryManagerPageKeyWords.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/Params.o $(OBJDIR_RELEASE)/Offer.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/src/HistoryManagerLongTerm.o $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/src/EBranch.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/src/HistoryManagerOffer.o $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/SearchEngines.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/src/sphinxRequests.o $(OBJDIR_RELEASE)/src/json.o $(OBJDIR_RELEASE)/src/XXXSearcher.o $(OBJDIR_RELEASE)/src/Server.o $(OBJDIR_RELEASE)/src/RedisClient.o $(OBJDIR_RELEASE)/src/ParentDB.o $(OBJDIR_RELEASE)/src/ParamParse.o $(OBJDIR_RELEASE)/src/HistoryManagerShortTerm.o $(OBJDIR_RELEASE)/src/HistoryManagerRetargeting.o $(OBJDIR_RELEASE)/src/HistoryManagerPageKeyWords.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/Params.o $(OBJDIR_RELEASE)/Offer.o
 
-all: debug
+all: debug release
 
 clean: clean_debug clean_release
 
@@ -105,6 +105,9 @@ $(OBJDIR_DEBUG)/src/Server.o: src/Server.cpp
 
 $(OBJDIR_DEBUG)/src/RedisClient.o: src/RedisClient.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/RedisClient.cpp -o $(OBJDIR_DEBUG)/src/RedisClient.o
+
+$(OBJDIR_DEBUG)/src/ParentDB.o: src/ParentDB.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/ParentDB.cpp -o $(OBJDIR_DEBUG)/src/ParentDB.o
 
 $(OBJDIR_DEBUG)/src/ParamParse.o: src/ParamParse.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/ParamParse.cpp -o $(OBJDIR_DEBUG)/src/ParamParse.o
@@ -227,6 +230,9 @@ $(OBJDIR_RELEASE)/src/Server.o: src/Server.cpp
 
 $(OBJDIR_RELEASE)/src/RedisClient.o: src/RedisClient.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/RedisClient.cpp -o $(OBJDIR_RELEASE)/src/RedisClient.o
+
+$(OBJDIR_RELEASE)/src/ParentDB.o: src/ParentDB.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/ParentDB.cpp -o $(OBJDIR_RELEASE)/src/ParentDB.o
 
 $(OBJDIR_RELEASE)/src/ParamParse.o: src/ParamParse.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/ParamParse.cpp -o $(OBJDIR_RELEASE)/src/ParamParse.o

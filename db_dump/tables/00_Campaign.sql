@@ -9,8 +9,8 @@ valid SMALLINT,
 impressionsPerDayLimit SMALLINT,
 showCoverage VARCHAR(35),
 retargeting SMALLINT,
-UNIQUE (id) ON CONFLICT REPLACE,
-UNIQUE (guid) ON CONFLICT REPLACE
+UNIQUE (id) ON CONFLICT IGNORE,
+UNIQUE (guid) ON CONFLICT IGNORE
 );
 
 CREATE INDEX IF NOT EXISTS idx_Campaign_id ON Campaign (id);

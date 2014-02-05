@@ -189,9 +189,9 @@ void DataBase::indexRebuild()
 {
     try
     {
-        pStmt->BeginTransaction();
+//        pStmt->BeginTransaction();
         pStmt->SqlStatement("REINDEX");
-        pStmt->CommitTransaction();
+//        pStmt->CommitTransaction();
     }
     catch(Kompex::SQLiteException &ex)
     {

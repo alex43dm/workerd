@@ -5,7 +5,7 @@
 <!--Название скрипта обработки редиректа-->
 <redirect_script></redirect_script>
 <!--Путь к файлу базы данных MaxMind GeoIP City Edition-->
-<geocity_path></geocity_path>
+<geocity_path>/usr/share/GeoIP/GeoLiteCity.dat</geocity_path>
 <!--"Продолжительность жизни" ключей в базе краткосрочной истории-->
 <shortterm_expire>864000</shortterm_expire><!--24 hours default-->
 <!--"Продолжительность жизни" ключей в базе истории контекста страницы-->
@@ -130,7 +130,7 @@
     <!--путь к каталогу дампа sqlite базы-->
     <db_dump_path>/home/alex/Projects/worker/db_dump</db_dump_path>
     <!--путь к csv файлу содержимого таблицы GeoRerions-->
-    <db_geo_csv>/home/alex/Projects/worker/db_dump/region.csv</db_geo_csv>
+    <db_geo_csv>/home/alex/Projects/worker/db_dump/UA_RU</db_geo_csv>
     <!-- Шаблон информера с тизерами со следующими подстановками (существовавший шаблон):
         %1%	    CSS
 	%2%	    JSON для initads (предложения, которые должны показаться на первой странице)

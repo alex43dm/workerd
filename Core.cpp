@@ -374,19 +374,19 @@ bool Core::getAllOffers(Offer::Map &ret)
         if(params->getRegion().size() && params->getRegion().size())
         {
             geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-        INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND(reg.cid='"+params->getCountry()+"' AND reg.rname='"+params->getRegion()+"')";
+        INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.country='"+params->getCountry()+"' AND reg.city='"+params->getRegion()+"')";
         }
         else
         {
             if(params->getRegion().size())
             {
                 geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-            INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND(reg.rname='"+params->getRegion()+"')";
+            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.city='"+params->getRegion()+"')";
             }
             else
             {
                 geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-            INNER JOIN GeoRerions AS reg ON geo.id_geo = reg.id AND(reg.cid='"+params->getCountry()+"')";
+            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.country='"+params->getCountry()+"' AND reg.region='')";
             }
         }
     }

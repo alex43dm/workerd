@@ -922,7 +922,7 @@
 	"Campaign.h"
 	"EBranch.h"
 
-1391445668 source:/home/alex/Projects/worker/Campaign.cpp
+1391610267 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"DB.h"
@@ -1140,7 +1140,7 @@
 	"Config.h"
 	<assert.h>
 
-1391439794 source:/home/alex/Projects/worker/Core.cpp
+1391609463 source:/home/alex/Projects/worker/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -1165,7 +1165,7 @@
 	<list>
 	<stdlib.h>
 
-1391028366 source:/home/alex/Projects/worker/DataBase.cpp
+1391542816 source:/home/alex/Projects/worker/DataBase.cpp
 	<iostream>
 	<algorithm>
 	<fstream>
@@ -1276,12 +1276,14 @@
 	"CHiredis.h"
 	"Log.h"
 
-1386837286 source:/home/alex/Projects/worker/src/GeoRerions.cpp
+1391606254 source:/home/alex/Projects/worker/src/GeoRerions.cpp
 	<iostream>
 	<fstream>
 	<string>
 	<strings.h>
 	<string.h>
+	<vector>
+	<boost/algorithm/string.hpp>
 	"GeoRerions.h"
 	"Log.h"
 	"KompexSQLiteStatement.h"
@@ -1465,11 +1467,11 @@
 	"ParamParse.h"
 	"Log.h"
 
-1391364573 /home/alex/Projects/worker/include/ParentDB.h
+1391517147 /home/alex/Projects/worker/include/ParentDB.h
 	"DB.h"
 	"KompexSQLiteDatabase.h"
 
-1391381417 source:/home/alex/Projects/worker/src/ParentDB.cpp
+1391520392 source:/home/alex/Projects/worker/src/ParentDB.cpp
 	"ParentDB.h"
 	"DB.h"
 	"Log.h"

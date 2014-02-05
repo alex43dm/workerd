@@ -120,15 +120,15 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         {
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO geoTargeting(id_cam,id_geo) \
-                              SELECT %lld,id FROM GeoRerions WHERE rname IN(%s);",
-                             long_id, region_targeting.c_str()
+                              SELECT %lld,locId FROM GeoLiteCity WHERE city IN(%s);",
+                             long_id,region_targeting.c_str()
                             );
         }
         else
         {
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO geoTargeting(id_cam,id_geo) \
-                              SELECT %lld,id FROM GeoRerions WHERE cid IN(%s);",
+                              SELECT %lld,locId FROM GeoLiteCity WHERE country IN(%s) AND region='';",
                              long_id, country_targeting.c_str()
                             );
         }
@@ -234,9 +234,8 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         it = o.getObjectField("ignored").getObjectField("accounts");
         while (it.more())
         {
-            bzero(buf,sizeof(buf));
             std::string acnt = it.next().str();
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name) VALUES('%q')",acnt.c_str());
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name) VALUES('%q');",acnt.c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -253,7 +252,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         bzero(buf,sizeof(buf));
         sqlite3_snprintf(sizeof(buf),buf,
                          "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) \
-                         SELECT %lld,id,0 FROM Accounts WHERE name IN(%s)",
+                         SELECT %lld,id,0 FROM Accounts WHERE name IN(%s);",
                          long_id, accounts_ignored.c_str()
                         );
         try
