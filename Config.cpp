@@ -243,6 +243,10 @@ bool Config::LoadConfig(const std::string fName)
         {
             pid_file_ = mel->GetText();
         }
+        if( (mel = mElem->FirstChildElement("mq_path")) && (mel->GetText()) )
+        {
+            mq_path_ = mel->GetText();
+        }
         if( (mel = mElem->FirstChildElement("user")) && (mel->GetText()) )
         {
             user_ = mel->GetText();

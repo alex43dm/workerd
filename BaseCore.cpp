@@ -50,6 +50,7 @@ bool BaseCore::ProcessMQ()
             AMQPMessage *m = mq_campaign_->getMessage();
             if (m->getMessageCount() > -1)
             {
+                Log::gdb("BaseCore::ProcessMQ campaign: %s",m->getRoutingKey().c_str());
                 if(m->getRoutingKey() == "campaign.update")
                 {
                     Campaign::update(Config::Instance()->pDb->pDatabase, toString(m));
@@ -76,6 +77,7 @@ bool BaseCore::ProcessMQ()
             AMQPMessage *m = mq_advertise_->getMessage();
             if (m->getMessageCount() > -1)
             {
+                Log::gdb("BaseCore::ProcessMQ advertise: %s",m->getRoutingKey().c_str());
                 m1 = toString(m);
                 if(m->getRoutingKey() == "advertise.update")
                 {
@@ -101,6 +103,7 @@ bool BaseCore::ProcessMQ()
             AMQPMessage *m = mq_informer_->getMessage();
             if (m->getMessageCount() > -1)
             {
+                Log::gdb("BaseCore::ProcessMQ informer: %s",m->getRoutingKey().c_str());
                 if(m->getRoutingKey() == "informer.update")
                 {
                     pdb->InformerUpdate(toString(m));
@@ -111,7 +114,8 @@ bool BaseCore::ProcessMQ()
                 }
                 else if(m->getRoutingKey() == "informer.updateRating")
                 {
-                    //Offer::loadRating(Config::Instance()->pDb->pDatabase, toString(m));
+                    //std::string infId = ;
+                    pdb->loadRating(toString(m));
                 }
 
                 return true;
@@ -158,7 +162,7 @@ void BaseCore::LoadAllEntities()
     //Загрузили все категории
     pdb->CategoriesLoad();
     //загрузили рейтинг
-    pdb->loadRating(false);
+    pdb->loadRating();
 
     Config::Instance()->pDb->postDataLoad();
 
@@ -182,10 +186,10 @@ void BaseCore::InitMessageQueue()
     try
     {
         // Объявляем точку обмена
-        amqp_ = new AMQP("guest:guest@localhost//");
-        exchange_ = amqp_->createExchange();
-        exchange_->Declare("getmyad", "topic", AMQP_AUTODELETE);
-        LogToAmqp("AMQP is up");
+        amqp_ = new AMQP(Config::Instance()->mq_path_);
+        //exchange_ = amqp_->createExchange();
+        //exchange_->Declare("getmyad", "topic", AMQP_AUTODELETE);
+        //LogToAmqp("AMQP is up");
 
         // Составляем уникальные имена для очередей
         boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
@@ -204,9 +208,9 @@ void BaseCore::InitMessageQueue()
         mq_advertise_->Declare(mq_advertise_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
 
         // Привязываем очереди
-        exchange_->Bind(mq_advertise_name, "advertise.#");
-        exchange_->Bind(mq_campaign_name, "campaign.#");
-        exchange_->Bind(mq_informer_name, "informer.#");
+        //exchange_->Bind(mq_advertise_name, "advertise.#");
+        //exchange_->Bind(mq_campaign_name, "campaign.#");
+        //exchange_->Bind(mq_informer_name, "informer.#");
 
        Log::info("Created ampq queues: %s, %s, %s",
                   mq_campaign_name.c_str(),

@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1391381026 source:/home/alex/Projects/worker/BaseCore.cpp
+1391694468 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -922,11 +922,12 @@
 	"Campaign.h"
 	"EBranch.h"
 
-1391610465 source:/home/alex/Projects/worker/Campaign.cpp
+1391680735 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"DB.h"
 	"Log.h"
+	"Config.h"
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 
@@ -973,7 +974,7 @@
 	"BaseCore.h"
 	"Config.h"
 
-1391254297 /home/alex/Projects/worker/Config.h
+1391687144 /home/alex/Projects/worker/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
@@ -988,7 +989,7 @@
 	<GeoIPCity.h>
 	<string>
 
-1391422058 /home/alex/Projects/worker/Core.h
+1391685403 /home/alex/Projects/worker/Core.h
 	<list>
 	<vector>
 	<map>
@@ -1131,7 +1132,7 @@
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 
-1391254354 source:/home/alex/Projects/worker/Config.cpp
+1391687186 source:/home/alex/Projects/worker/Config.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -1140,7 +1141,7 @@
 	"Config.h"
 	<assert.h>
 
-1391609463 source:/home/alex/Projects/worker/Core.cpp
+1391686636 source:/home/alex/Projects/worker/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -1468,7 +1469,7 @@
 	"ParamParse.h"
 	"Log.h"
 
-1391676885 /home/alex/Projects/worker/include/ParentDB.h
+1391694520 /home/alex/Projects/worker/include/ParentDB.h
 	"DB.h"
 	"KompexSQLiteDatabase.h"
 

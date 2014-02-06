@@ -16,39 +16,47 @@ ParentDB::~ParentDB()
 {
     //dtor
 }
-
-void ParentDB::loadRating(bool isClear)
+void ParentDB::loadRating(const std::string &id)
 {
     mongo::DB db;
+    mongo::Query q_correct;
     Kompex::SQLiteStatement *pStmt;
     char *pData;
     int sz;
     long long id_inf;
 
-    auto cursor = db.query("informer.rating", mongo::Query());
+    if(!id.size())
+    {
+        q_correct=mongo::Query();
+    }
+    else
+    {
+        q_correct=QUERY("guid" << id);
+    }
+
+    auto cursor = db.query("informer.rating", q_correct);
 
     pStmt = new Kompex::SQLiteStatement(pdb);
+    pStmt->BeginTransaction();
 
+    if(id.size())
+    {
+        try
+        {
+            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Informer2OfferRating WHERE id_inf='%s';",id.c_str());
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("Offers::loadReting DELETE FROM Informer2OfferRating error: %s", ex.GetString().c_str());
+        }
+    }
 
     bzero(buf,sizeof(buf));
     snprintf(buf,sizeof(buf),"INSERT INTO Informer2OfferRating(id_inf,id_ofr,rating) VALUES(");
     sz = strlen(buf);
     pData = buf + sz;
     sz = sizeof(buf) - sz;
-
-    pStmt->BeginTransaction();
-
-    if(isClear)
-    {
-            try
-            {
-                pStmt->SqlStatement("DELETE FROM Informer2OfferRating;");
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                Log::err("Offers::loadReting insert(%s) error: %s", buf, ex.GetString().c_str());
-            }
-    }
 
     while (cursor->more())
     {
@@ -540,7 +548,35 @@ void ParentDB::InformerRemove(const std::string &id)
 
     Log::info("informer %s removed",id.c_str());
 }
+/*
+void ParentDB::updateRating(const std::string &id)
+{
+    Kompex::SQLiteStatement *pStmt;
 
+    if(id.empty())
+    {
+        return;
+    }
+
+    pStmt = new Kompex::SQLiteStatement(pdb);
+    pStmt->BeginTransaction();
+    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Informer2OfferRating WHERE id_inf=%s;",id.c_str());
+        try
+        {
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("Informer::remove(%s) error: %s", buf, ex.GetString().c_str());
+        }
+    pStmt->CommitTransaction();
+    pStmt->FreeQuery();
+
+    delete pStmt;
+
+    Log::info("informer %s removed",id.c_str());
+}
+*/
 void ParentDB::CategoriesLoad()
 {
     mongo::DB db;

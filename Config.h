@@ -67,6 +67,7 @@ public:
     std::string template_banner_;
     std::string swfobject_;
     int time_update_;
+    std::string mq_path_;
 
     DataBase *pDb;
 

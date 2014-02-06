@@ -9,7 +9,7 @@ class ParentDB
     public:
         ParentDB();
         virtual ~ParentDB();
-        void loadRating(bool isClear);
+        void loadRating(const std::string &id="");
         void OfferLoad(mongo::Query=mongo::Query());
         void OfferRemove(const std::string &id);
         void CategoriesLoad();
@@ -23,7 +23,6 @@ class ParentDB
 
         long long insertAndGetDomainId(const std::string &domain);
         long long insertAndGetAccountId(const std::string &accout);
-        long long GeoRerionsAdd(const std::string &country, const std::string &region);
 };
 
 #endif // PARENTDB_H
