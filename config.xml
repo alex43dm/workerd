@@ -125,7 +125,7 @@
     <!--количество ниток на обработку-->
     <children>1</children>
     <!--путь к очереди сообщений-->
-    <mq_path>guest:guest@srv-2.yottos.com//</mq_path>
+    <mq_path>guest:guest@localhost//</mq_path>
     <!--путь к фалу базы данных-->
     <dbpath>/run/alex/mem.db</dbpath>
     <!--dbpath>:memory:</dbpath-->

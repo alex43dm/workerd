@@ -19,7 +19,7 @@ ParentDB::~ParentDB()
 void ParentDB::loadRating(const std::string &id)
 {
     mongo::DB db;
-    mongo::Query q_correct;
+    std::unique_ptr<mongo::DBClientCursor> cursor;
     Kompex::SQLiteStatement *pStmt;
     char *pData;
     int sz;
@@ -27,14 +27,13 @@ void ParentDB::loadRating(const std::string &id)
 
     if(!id.size())
     {
-        q_correct=mongo::Query();
+        cursor = db.query("informer.rating", mongo::Query());
     }
     else
     {
-        q_correct=QUERY("guid" << id);
+        std::string str = "{guid_int: "+id+"}";
+        cursor = db.query("informer.rating",str.c_str());
     }
-
-    auto cursor = db.query("informer.rating", q_correct);
 
     pStmt = new Kompex::SQLiteStatement(pdb);
     pStmt->BeginTransaction();
