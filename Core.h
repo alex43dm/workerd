@@ -105,6 +105,7 @@ private:
     std::string OffersToJson(const Offer::Vector &items) const;
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
+    std::string getGeo();
 };
 
 #endif // CORE_H

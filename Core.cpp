@@ -365,34 +365,55 @@ file::memory:?cache=shared
 	-#  Предложения, указанные в \c params.exluded_offers, по возможности
 	    исключаются из просмотра. Это используется в прокрутке информера.
  */
+std::string Core::getGeo()
+{
+    std::string geo;
+
+    if(params->getCountry().size() || params->getRegion().size())
+    {
+        if(params->getRegion().size())
+        {
+            try
+            {
+                Kompex::SQLiteStatement *pStmt;
+                pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
+                sqlite3_snprintf(CMD_SIZE, cmd,"SELECT geo.id_cam FROM geoTargeting AS geo \
+                INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND reg.city='%q';",
+                                 params->getRegion().c_str());
+                pStmt->Sql(cmd);
+                if(pStmt->GetDataCount())
+                {
+                    geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+        INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND reg.city='"+params->getRegion()+"'";
+                }
+                else if(params->getCountry().size())
+                {
+
+                    geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.country='"+params->getCountry()+"' AND reg.city='')";
+                }
+                pStmt->FreeQuery();
+            }
+            catch(Kompex::SQLiteException &ex)
+            {
+                Log::err("Core::getGeo %s error: %s", cmd, ex.GetString().c_str());
+            }
+
+        }
+        else if(params->getCountry().size())
+        {
+
+            geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.country='"+params->getCountry()+"' AND reg.city='')";
+        }
+    }
+    return geo;
+}
 
 bool Core::getAllOffers(Offer::Map &ret)
 {
-    std::string geo;
-    if(params->getCountry().size() || params->getRegion().size())
-    {
-        if(params->getRegion().size() && params->getRegion().size())
-        {
-            geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-        INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.country='"+params->getCountry()+"' AND reg.city='"+params->getRegion()+"')";
-        }
-        else
-        {
-            if(params->getRegion().size())
-            {
-                geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.city='"+params->getRegion()+"')";
-            }
-            else
-            {
-                geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.country='"+params->getCountry()+"' AND reg.region='')";
-            }
-        }
-    }
-
     sqlite3_snprintf(CMD_SIZE, cmd, pStmtOfferStr.c_str(),
-                     geo.c_str(),
+                     getGeo().c_str(),
                      informer->domainId,
                      informer->domainId,
                      informer->accountId,
@@ -400,8 +421,9 @@ bool Core::getAllOffers(Offer::Map &ret)
                      getpid(),
                      tid,
                      informer->id);
+#ifdef DEBUG
 printf("%s\n",cmd);
-
+#endif // DEBUG
     hm->getDeprecatedOffersAsyncWait();
     return getOffers(ret);
 }
