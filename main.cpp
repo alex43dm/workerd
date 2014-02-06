@@ -221,9 +221,12 @@
 
 Config *cfg;
 
+#include "utils/GeoIPTools.h"
+
 int main(int argc, char *argv[])
 {
     Log(LOG_LOCAL0);
+
     CgiService(argc, argv).run();
     return 0;
 }

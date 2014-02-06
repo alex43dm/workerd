@@ -33,6 +33,8 @@ public:
     static void remove(Kompex::SQLiteDatabase *pdb, std::string aCampaignId);
     static void startStop(Kompex::SQLiteDatabase *pdb, std::string aCampaignId, int);
     static std::string getName(long long campaign_id);
+    static void GeoRerionsAdd(const std::string &country, const std::string &region);
+
 private:
 
 };

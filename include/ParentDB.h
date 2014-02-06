@@ -23,6 +23,7 @@ class ParentDB
 
         long long insertAndGetDomainId(const std::string &domain);
         long long insertAndGetAccountId(const std::string &accout);
+        long long GeoRerionsAdd(const std::string &country, const std::string &region);
 };
 
 #endif // PARENTDB_H

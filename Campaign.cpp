@@ -3,6 +3,7 @@
 #include "Campaign.h"
 #include "DB.h"
 #include "Log.h"
+#include "Config.h"
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
 
@@ -36,6 +37,27 @@ Campaign::Campaign(long long _id) :
         valid = o.isValid();
         //o.getStringField("showCoverage");
         //x.getField("impressionsPerDayLimit").numberInt()
+    }
+}
+//-------------------------------------------------------------------------------------------------------
+void Campaign::GeoRerionsAdd(const std::string &country, const std::string &region)
+{
+    char buf[8192];
+    Kompex::SQLiteStatement *pStmt;
+
+    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+
+    sqlite3_snprintf(sizeof(buf),buf,
+            "INSERT INTO GeoLiteCity(locId,country,city) SELECT max(locId)+1,'%q','%q' FROM GeoLiteCity;",
+            country.c_str(),
+            region.c_str());
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        Log::err("GeoRerions::add %s error: %s", buf, ex.GetString().c_str());
     }
 }
 
@@ -111,6 +133,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         while (it.more())
         {
             std::string rep = it.next().str();
+            GeoRerionsAdd("", rep);
             boost::replace_all(rep,"'", "''");
             region_targeting += "'" + rep + "',";
         }
@@ -128,7 +151,7 @@ void Campaign::loadAll(Kompex::SQLiteDatabase *pdb, mongo::Query q_correct)
         {
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO geoTargeting(id_cam,id_geo) \
-                              SELECT %lld,locId FROM GeoLiteCity WHERE country IN(%s) AND region='';",
+                              SELECT %lld,locId FROM GeoLiteCity WHERE country IN(%s) AND city='';",
                              long_id, country_targeting.c_str()
                             );
         }

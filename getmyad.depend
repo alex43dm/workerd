@@ -907,7 +907,7 @@
 1391363950 /home/alex/Projects/worker/Informer.h
 	<string>
 
-1390207673 /home/alex/Projects/worker/Campaign.h
+1391677829 /home/alex/Projects/worker/Campaign.h
 	<string>
 	<map>
 	<list>
@@ -922,7 +922,7 @@
 	"Campaign.h"
 	"EBranch.h"
 
-1391610267 source:/home/alex/Projects/worker/Campaign.cpp
+1391610465 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"DB.h"
@@ -1247,9 +1247,10 @@
 1391029678 source:/home/alex/Projects/worker/Log.cpp
 	"Log.h"
 
-1389682566 source:/home/alex/Projects/worker/main.cpp
+1391674247 source:/home/alex/Projects/worker/main.cpp
 	"CgiService.h"
 	"Log.h"
+	"utils/GeoIPTools.h"
 
 1391360698 source:/home/alex/Projects/worker/Offer.cpp
 	"Offer.h"
@@ -1276,7 +1277,7 @@
 	"CHiredis.h"
 	"Log.h"
 
-1391606254 source:/home/alex/Projects/worker/src/GeoRerions.cpp
+1391676801 source:/home/alex/Projects/worker/src/GeoRerions.cpp
 	<iostream>
 	<fstream>
 	<string>
@@ -1301,7 +1302,7 @@
 	<string.h>
 	<boost/date_time/posix_time/posix_time.hpp>
 
-1388392311 source:/home/alex/Projects/worker/utils/GeoIPTools.cpp
+1391670818 source:/home/alex/Projects/worker/utils/GeoIPTools.cpp
 	"GeoIPTools.h"
 
 1389355305 source:/home/alex/Projects/worker/utils/SearchEngines.cpp
@@ -1467,11 +1468,11 @@
 	"ParamParse.h"
 	"Log.h"
 
-1391517147 /home/alex/Projects/worker/include/ParentDB.h
+1391676885 /home/alex/Projects/worker/include/ParentDB.h
 	"DB.h"
 	"KompexSQLiteDatabase.h"
 
-1391520392 source:/home/alex/Projects/worker/src/ParentDB.cpp
+1391677367 source:/home/alex/Projects/worker/src/ParentDB.cpp
 	"ParentDB.h"
 	"DB.h"
 	"Log.h"

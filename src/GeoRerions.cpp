@@ -98,3 +98,4 @@ bool GeoRerions::load(Kompex::SQLiteDatabase *pdb, const std::string &fname)
 
     return true;
 }
+
