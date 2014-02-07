@@ -978,9 +978,9 @@ void Campaign::startStop(Kompex::SQLiteDatabase *pdb,
     // Дни недели, в которые осуществляется показ
 
     bzero(buf,sizeof(buf));
-    sqlite3_snprintf(sizeof(buf),buf,"UPDATE CronCampaign \
-                     SET startStop=%d \
-                     WHERE id_cam IN (SELECT id FROM Campaign WHERE guid='%s');",StartStop,aCampaignId.c_str());
+    sqlite3_snprintf(sizeof(buf),buf,"UPDATE Campaign \
+                     SET valid=%d \
+                     WHERE guid='%s';",StartStop,aCampaignId.c_str());
     try
     {
         pStmt->SqlStatement(buf);
