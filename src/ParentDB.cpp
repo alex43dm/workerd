@@ -192,7 +192,7 @@ void ParentDB::OfferRemove(const std::string &id)
 
     pStmt = new Kompex::SQLiteStatement(pdb);
     pStmt->BeginTransaction();
-    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Offer WHERE id=%s;",id.c_str());
+    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Offer WHERE guid='%s';",id.c_str());
     try
     {
         pStmt->SqlStatement(buf);
@@ -366,16 +366,11 @@ bool ParentDB::InformerUpdate(const std::string &id)
 {
     mongo::DB db;
     std::unique_ptr<mongo::DBClientCursor> cursor = db.query("informer", QUERY("guid" << id));
-    int skipped = 0;
-    long long long_id = 0;
     Kompex::SQLiteStatement *pStmt;
-    char *buf1;
-    int i = 0;
-    long domainId,accountId;
+    long long domainId,accountId, long_id = 0;
 
     pStmt = new Kompex::SQLiteStatement(pdb);
     pStmt->BeginTransaction();
-
     while (cursor->more())
     {
         mongo::BSONObj x = cursor->next();
@@ -383,7 +378,6 @@ bool ParentDB::InformerUpdate(const std::string &id)
         boost::to_lower(id);
         if (id.empty())
         {
-            skipped++;
             continue;
         }
 
@@ -405,66 +399,12 @@ bool ParentDB::InformerUpdate(const std::string &id)
             capacity = 0;
         }
 
-        buf1 = sqlite3_mprintf("INSERT OR IGNORE INTO Domains(name) VALUES('%q')",x.getStringField("domain"));
-        try
-        {
-            pStmt->SqlStatement(buf1);
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            Log::err("Informer::Domains insert(%s) error: %s", buf1, ex.GetString().c_str());
-        }
-        sqlite3_free((void*)buf1);
-
         domainId = 0;
-        try
-        {
-            buf1 = sqlite3_mprintf("SELECT id FROM Domains WHERE name='%q'",x.getStringField("domain"));
-            pStmt->Sql(buf1);
-
-            pStmt->FetchRow();
-            domainId = pStmt->GetColumnInt64(0);
-            pStmt->Reset();
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            Log::err("Informer::Domains insert(%s) error: %s", buf1, ex.GetString().c_str());
-        }
-        sqlite3_free((void*)buf1);
-
-
-        buf1 = sqlite3_mprintf("INSERT OR IGNORE INTO Accounts(name) VALUES('%q')",x.getStringField("user"));
-        try
-        {
-            pStmt->SqlStatement(buf1);
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            Log::err("Informer::Accounts insert(%s) error: %s", buf1, ex.GetString().c_str());
-        }
-        sqlite3_free((void*)buf1);
-
         accountId = 0;
-        try
-        {
-            buf1 = sqlite3_mprintf("SELECT id FROM Accounts WHERE name='%q'",x.getStringField("user"));
-            pStmt->Sql(buf1);
+        domainId = insertAndGetDomainId(x.getStringField("domain"));
+        accountId = insertAndGetAccountId(x.getStringField("user"));
 
-            pStmt->FetchRow();
-            accountId = pStmt->GetColumnInt64(0);
-            pStmt->Reset();
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            Log::err("Informer::Accounts insert(%s) error: %s", buf1, ex.GetString().c_str());
-        }
-        sqlite3_free((void*)buf1);
-
-        bzero(buf,sizeof(buf));
-
-    snprintf(buf,sizeof(buf),"INSERT INTO ) VALUES(");
-
-        sqlite3_snprintf(sizeof(buf),buf,
+               sqlite3_snprintf(sizeof(buf),buf,
                          "UPDATE Informer SET\
                          title='%q',\
                          bannersCss='%q',\
@@ -502,20 +442,14 @@ bool ParentDB::InformerUpdate(const std::string &id)
         catch(Kompex::SQLiteException &ex)
         {
             Log::err("Informer::_loadFromQuery insert error: %s", ex.GetString().c_str());
-            skipped++;
         }
-        // Тематические категории
-        //LoadCategoriesByDomain(data->categories, x.getStringField("domain"));
-
-        i++;
     }
+
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
     delete pStmt;
 
     Log::info("updated informer id %lld", long_id);
-    if (skipped)
-        Log::warn("Informers with empty id skipped: %d", skipped);
     return true;
 }
 
@@ -531,7 +465,7 @@ void ParentDB::InformerRemove(const std::string &id)
 
     pStmt = new Kompex::SQLiteStatement(pdb);
     pStmt->BeginTransaction();
-    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Informer WHERE id=%s;",id.c_str());
+    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Informer WHERE guid='%s';",id.c_str());
         try
         {
             pStmt->SqlStatement(buf);
