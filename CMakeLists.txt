@@ -67,6 +67,13 @@ set ( workerd_SRCS
 	src/RedisClient.cpp
 	src/sphinxRequests.cpp
 	src/XXXSearcher.cpp
+	src/ParamParse.cpp
+	src/ParentDB.cpp
+	src/HistoryManagerLongTerm.cpp
+	src/HistoryManagerOffer.cpp
+	src/HistoryManagerPageKeyWords.cpp
+	src/HistoryManagerRetargeting.cpp
+	src/HistoryManagerShortTerm.cpp
 	BaseCore.cpp
 	Campaign.cpp
 	CgiService.cpp
