@@ -57,8 +57,8 @@ Core::Core()
                  pDb->getSqlFile("requests/02.sql").c_str());
         exit(1);
     }
-//+ boost::lexical_cast<std::string>(getpid()) + boost::lexical_cast<std::string>(tid)
-    tmpTableName = "tmp" + std::to_string(getpid()) + std::to_string(tid);
+
+    tmpTableName = "tmp" + std::to_string((long long int)getpid()) + std::to_string((long long int)tid);
 
     Kompex::SQLiteStatement *p;
     try

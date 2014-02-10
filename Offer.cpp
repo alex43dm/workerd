@@ -68,12 +68,7 @@ std::string Offer::toJson() const
 
 void Offer::gen()
 {
-    /*
-    std::ostringstream s;
-    s << std::hex << rand(); // Cлучайное число в шестнадцатиричном
-    token = s.str();  // исчислении
-    */
-    token = std::to_string(rand());
+    token = std::to_string((long long int)rand());
 }
 
 

@@ -44,7 +44,7 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-std=c++11" />
+			<Add option="-std=c++0x" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add directory="include" />
@@ -59,12 +59,14 @@
 			<Add library="rabbitmq" />
 			<Add library="boost_date_time" />
 			<Add library="boost_regex" />
+			<Add library="boost_filesystem" />
+			<Add library="boost_thread" />
+			<Add library="boost_system" />
 			<Add library="icui18n" />
 			<Add library="icuuc" />
 			<Add library="icudata" />
 			<Add library="tinyxml" />
 			<Add library="sqlite3" />
-			<Add library="boost_system" />
 			<Add library="pthread" />
 		</Linker>
 		<Unit filename="BaseCore.cpp" />

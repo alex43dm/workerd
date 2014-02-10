@@ -106,7 +106,7 @@ public:
 
     std::string toJson() const;
     bool setBranch(const  EBranchT tbranch);
-    std::string getBranch(){ return branch < EBranchL::LMAX ? EBranchL2String[(int)branch] : ""; };
+    std::string getBranch(){ return (int)branch < (int)EBranchL::LMAX ? EBranchL2String[(int)branch] : ""; };
 };
 
 class OfferExistByType

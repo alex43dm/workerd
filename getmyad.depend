@@ -850,7 +850,7 @@
 	"Offer.h"
 	"Config.h"
 
-1391791484 /home/alex/Projects/worker/DB.h
+1392019253 /home/alex/Projects/worker/DB.h
 	<mongo/client/connpool.h>
 	"Log.h"
 	<string>
@@ -907,14 +907,14 @@
 1391363950 /home/alex/Projects/worker/Informer.h
 	<string>
 
-1391791689 /home/alex/Projects/worker/Campaign.h
+1392019374 /home/alex/Projects/worker/Campaign.h
 	<string>
 	<map>
 	<list>
 	"DB.h"
 	"KompexSQLiteDatabase.h"
 
-1391360683 /home/alex/Projects/worker/Offer.h
+1392019262 /home/alex/Projects/worker/Offer.h
 	<string>
 	<list>
 	<map>
@@ -1186,7 +1186,7 @@
 1386837321 /home/alex/Projects/worker/include/GeoRerions.h
 	"KompexSQLiteDatabase.h"
 
-1391791554 source:/home/alex/Projects/worker/DB.cpp
+1392019253 source:/home/alex/Projects/worker/DB.cpp
 	"DB.h"
 
 1386588626 source:/home/alex/Projects/worker/DBAccessor/anet.cpp
@@ -1253,7 +1253,7 @@
 	"Log.h"
 	"utils/GeoIPTools.h"
 
-1391360698 source:/home/alex/Projects/worker/Offer.cpp
+1392026074 source:/home/alex/Projects/worker/Offer.cpp
 	"Offer.h"
 	"Log.h"
 	"json.h"
