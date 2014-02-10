@@ -5,12 +5,11 @@
 #include <map>
 #include <list>
 
-#include <mongo/client/dbclientinterface.h>
+#include "DB.h"
 #include "KompexSQLiteDatabase.h"
 
 typedef long long			sphinx_int64_t;
 typedef unsigned long long	sphinx_uint64_t;
-
 
 /**
   \brief  Класс, описывающий рекламную кампанию

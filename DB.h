@@ -39,34 +39,22 @@ namespace mongo
     параметра класс ReplicaSetConnection.
 
  */
+
+
 class DB
 {
 public:
-    DB(const std::string &name = std::string())
-        : db_( 0 )
+    class ConnectionOptions
     {
-        options_ = options_by_name(name);
-        if (!options_)
-            throw NotRegistered("Database " +
-                                (name.empty()? "(default)" : name) +
-                                " is not registered! Use addDatabase() first.");
+        public:
+        ConnectionOptions() : slave_ok(false) {}
+        std::string database;
+        std::string server_host;
+        std::string replica_set;
+        bool slave_ok;
+    };
 
-        if (options_->replica_set.empty())
-            db_ = ScopedDbConnection::getScopedDbConnection(options_->server_host);
-        else
-            db_ = ScopedDbConnection::getScopedDbConnection(
-                      ConnectionString(ConnectionString::SET,
-                                       options_->server_host,
-                                       options_->replica_set));
-    }
-
-    ~DB()
-    {
-        db_->done();
-        delete db_;
-    }
-
-    /** Описывает строку подключения к MongoDB Replica Set. */
+       /** Описывает строку подключения к MongoDB Replica Set. */
     class ReplicaSetConnection
     {
         std::string replica_set_;
@@ -91,6 +79,10 @@ public:
             return connection_string_;
         }
     };
+public:
+    DB(const std::string &name = std::string());
+    ~DB();
+
 
     /** Регистрирует подключение \a name к базе данных.
 
@@ -102,101 +94,51 @@ public:
     static void addDatabase(const std::string &name,
                             const std::string &server_host,
                             const std::string &database,
-                            bool slave_ok)
-    {
-        _addDatabase(name, server_host, database, "", slave_ok);
-    }
+                            bool slave_ok);
 
     /** Регистрирует подключение \a name к набору реплик баз данных
     (Replica Set). */
     static void addDatabase(const std::string &name,
                             const ReplicaSetConnection &connection_string,
                             const std::string &database,
-                            bool slave_ok)
-    {
-        _addDatabase(name, connection_string.connection_string(), database,
-                     connection_string.replica_set(), slave_ok);
-    }
+                            bool slave_ok);
 
     /** Регистрирует базу данных "по умолчанию". */
     static void addDatabase(const std::string &server_host,
                             const std::string &database,
-                            bool slave_ok)
-    {
-        _addDatabase("", server_host, database, "", slave_ok);
-    }
+                            bool slave_ok);
 
     /** Регистрирует базу данных "по умолчанию", подключение осуществляется
     к набору реплик (Replica Set). */
     static void addDatabase(const ReplicaSetConnection &connection_string,
-                            const std::string &database, bool slave_ok)
-    {
-        _addDatabase("", connection_string.connection_string(), database,
-                     connection_string.replica_set(), slave_ok);
-    }
+                            const std::string &database, bool slave_ok);
 
     /** Возвращает полное название коллекции */
-    std::string collection(const std::string &collection)
-    {
-        return database() +  "." + collection;
-    }
+    std::string collection(const std::string &collection);
 
     /** Название используемой базы данных */
-    std::string &database()
-    {
-        return options_->database;
-    }
+    std::string &database();
 
     /** Адрес сервера MongoDB */
-    std::string &server_host()
-    {
-        return options_->server_host;
-    }
+    std::string &server_host();
 
     /** Название набора реплик (replica set) */
-    std::string &replica_set()
-    {
-        return options_->replica_set;
-    }
+    std::string &replica_set();
 
     /** Возвращает true, если допускается read-only подключение к slave серверу в кластере */
-    bool slave_ok()
-    {
-        return options_->slave_ok;
-    }
+    bool slave_ok();
 
     /** Возвращает соединение к базе данных.
     Может использоваться для операций, не предусмотренных обёрткой.
      */
-    ScopedDbConnection &db()
-    {
-        return *db_;
-    }
+    ScopedDbConnection &db();
 
 
     /** Вспомогательный метод, возвращающий значение поля field как int.
         Реально значение может храниться как в int, так и в string.
         Если ни одно преобразование не сработало, вернёт 0.
      */
-    static int toInt(const BSONElement &element)
-    {
-        switch (element.type())
-        {
-        case NumberInt:
-            return element.numberInt();
-        case String:
-            try
-            {
-                return boost::lexical_cast<int>(element.str());
-            }
-            catch (boost::bad_lexical_cast &)
-            {
-                return 0;
-            }
-        default:
-            return 0;
-        }
-    }
+    static int toInt(const BSONElement &element);
 
     /** Вспомогательный метод, возвращающий значение поля field как float.
         Реально значение может храниться как в int или double, так и в string.
@@ -204,30 +146,7 @@ public:
 
     	добавлено RealInvest Soft
      */
-    static float toFloat(const BSONElement &element)
-    {
-        switch (element.type())
-        {
-        case NumberInt:
-            return (float)element.numberInt();
-        case NumberDouble:
-            return (float)element.numberDouble();
-        case String:
-            try
-            {
-                return boost::lexical_cast<float>(element.str());
-            }
-            catch (boost::bad_lexical_cast &)
-            {
-                return 0;
-            }
-        default:
-            return 0;
-        }
-    }
-
-
-
+    static float toFloat(const BSONElement &element);
 
     // Все нижеследующие методы являются просто обёртками над методами
     // DBClientConnection, принимающие вместо параметра ns (namespace)
@@ -245,74 +164,31 @@ public:
     // то функции чтения (query, findOne, count) всегда будут устанавливать
     // бит QueryOption_SlaveOk.
 
-    void insert( const string &coll, BSONObj obj, bool safe = false )
-    {
-        (*db_)->insert(this->collection(coll), obj);
-        if (safe)
-            (*db_)->getLastError();
-    }
+    void insert( const string &coll, BSONObj obj, bool safe = false );
 
     void remove( const string &coll, Query obj, bool justOne = 0,
-                 bool safe = false)
-    {
-        (*db_)->remove(this->collection(coll), obj, justOne);
-        if (safe)
-            (*db_)->getLastError();
-    }
+                 bool safe = false);
 
     void update( const string &coll, Query query, BSONObj obj,
-                 bool upsert = 0, bool multi = 0, bool safe = false )
-    {
-        (*db_)->update(this->collection(coll), query, obj, upsert, multi);
-        if (safe)
-            (*db_)->getLastError();
-    }
+                 bool upsert = 0, bool multi = 0, bool safe = false );
 
     BSONObj findOne(const string &coll, Query query,
-                    const BSONObj *fieldsToReturn = 0, int queryOptions = 0)
-    {
-        if (options_->slave_ok)
-            queryOptions |= QueryOption_SlaveOk;
-        return (*db_)->findOne(this->collection(coll), query, fieldsToReturn,
-                               queryOptions);
-    }
+                    const BSONObj *fieldsToReturn = 0, int queryOptions = 0);
 
     std::unique_ptr<DBClientCursor> query(const string &coll, Query query,
                                           int nToReturn = 0, int nToSkip = 0,
                                           const BSONObj *fieldsToReturn = 0,
-                                          int queryOptions = 0, int batchSize = 0 )
-    {
-        if (options_->slave_ok)
-            queryOptions |= QueryOption_SlaveOk;
-        return unique_ptr<DBClientCursor>(
-                   (*db_)->query(this->collection(coll), query, nToReturn, nToSkip,
-                                 fieldsToReturn, queryOptions, batchSize).release());
-    }
+                                          int queryOptions = 0, int batchSize = 0 );
 
     unsigned long long count(const string &coll,
-                             const BSONObj& query = BSONObj(), int options=0 )
-    {
-        if (options_->slave_ok)
-            options |= QueryOption_SlaveOk;
-        return (*db_)->count(this->collection(coll), query, options);
-    }
+                             const BSONObj& query = BSONObj(), int options=0 );
 
     bool createCollection(const string &coll, long long size = 0,
-                          bool capped = false, int max = 0, BSONObj *info = 0)
-    {
-        return (*db_)->createCollection(this->collection(coll), size,
-                                        capped, max, info);
-    }
+                          bool capped = false, int max = 0, BSONObj *info = 0);
 
-    bool dropCollection( const string &coll )
-    {
-        return (*db_)->dropCollection(this->collection(coll));
-    }
+    bool dropCollection( const string &coll );
 
-    bool dropDatabase()
-    {
-        return (*db_)->dropDatabase(database());
-    }
+    bool dropDatabase();
 
 
     /** Исключение, возникающее при попытке обратиться к незарегистированной
@@ -336,53 +212,20 @@ private:
 
 
 protected:
-
-    struct ConnectionOptions
-    {
-        ConnectionOptions() : slave_ok(false) {}
-        std::string database;
-        std::string server_host;
-        std::string replica_set;
-        bool slave_ok;
-    } *options_;
-
     typedef std::map<std::string, ConnectionOptions*> ConnectionOptionsMap;
     static ConnectionOptionsMap connection_options_map_;
+    ConnectionOptions *options_;
 
     /** Возвращает настройки для базы данных с именем \a name.
     Если база данных с таким именем не была добавлена, вернёт 0. */
-    static ConnectionOptions *options_by_name(const std::string &name)
-    {
-        ConnectionOptionsMap::const_iterator it =
-            connection_options_map_.find(name);
-        if (it != connection_options_map_.end())
-            return it->second;
-        else
-            return 0;
-    }
+    static ConnectionOptions *options_by_name(const std::string &name);
 
     /** Добавляет настройки подключения */
     static void _addDatabase(const std::string &name,
                              const std::string &server_host,
                              const std::string &database,
                              const std::string &replica_set,
-                             bool slave_ok)
-    {
-        ConnectionOptions *options = options_by_name(name);
-        if (!options)
-            options = new ConnectionOptions;
-        else
-        {
-            Log::warn("Database %s is already registered. Old connection will be overwritten.",
-                       (name.empty()? "(default)" : name).c_str());
-        };
-
-        options->database = database;
-        options->server_host = server_host;
-        options->replica_set = replica_set;
-        options->slave_ok = slave_ok;
-        connection_options_map_[name] = options;
-    }
+                             bool slave_ok);
 };
 
 
