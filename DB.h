@@ -44,6 +44,7 @@ namespace mongo
 class DB
 {
 public:
+    double socketTimeout;
     class ConnectionOptions
     {
         public:

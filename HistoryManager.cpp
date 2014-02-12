@@ -56,6 +56,7 @@ bool HistoryManager::initDB()
 
 void HistoryManager::getUserHistory(Params *_params)
 {
+    std::string q;
     clean = false;
     updateShort = false;
     updateContext = false;
@@ -67,38 +68,61 @@ void HistoryManager::getUserHistory(Params *_params)
 
     getRetargetingAsync();
 
-    //Запрос по П/З query
-    std::string q = getKeywordsString(params->getSearch());
-    if (!q.empty())
+    //Запрос по запросам к поисковикам
+    if (Config::Instance()->range_search_ > 0)
     {
-        lock();
-        stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_query_,EBranchT::T1));
-        unlock();
+        q = getKeywordsString(params->getSearch());
+        if (!q.empty())
+        {
+            lock();
+            stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_search_,EBranchT::T1));
+            unlock();
+        }
     }
-    //Запрос по контексту страницы context
-    q = getContextKeywordsString(params->getContext());
-    if (!q.empty())
+    //Запрос по контексту страницы
+    if (Config::Instance()->range_context_ > 0)
     {
-        lock();
-        stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_,EBranchT::T2));
-        unlock();
+        q = getContextKeywordsString(params->getContext());
+        if (!q.empty())
+        {
+            lock();
+            stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_,EBranchT::T2));
+            unlock();
+        }
     }
 
+    if(Config::Instance()->range_long_term_ > 0)
+        getLongTermAsync();
 
-    getLongTermAsync();
+    if(Config::Instance()->range_short_term_ > 0)
+        getShortTermAsync();
 
-    getShortTermAsync();
-
-    getPageKeywordsAsync();
+    if(Config::Instance()->range_context_ > 0)
+        getPageKeywordsAsync();
 }
 
 void HistoryManager::sphinxProcess(Offer::Map &items, Offer::Vector &result)
 {
+
+    if(Config::Instance()->range_short_term_ <= 0
+       && Config::Instance()->range_long_term_ <= 0
+       && Config::Instance()->range_context_ <= 0
+       && Config::Instance()->range_search_ <= 0
+       )
+    {
+        return;
+    }
+
     sphinx->makeFilter(items);
 
-    getShortTermAsyncWait();
-    getPageKeywordsAsyncWait();
-    getLongTermAsyncWait();
+    if(Config::Instance()->range_short_term_ > 0)
+        getShortTermAsyncWait();
+
+    if(Config::Instance()->range_context_ > 0)
+        getPageKeywordsAsyncWait();
+
+    if(Config::Instance()->range_long_term_ > 0)
+        getLongTermAsyncWait();
 
     Log::gdb("[%ld]sphinx get history: done",tid);
 

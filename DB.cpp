@@ -2,8 +2,9 @@
 
 mongo::DB::ConnectionOptionsMap mongo::DB::connection_options_map_;
 
-mongo::DB::DB(const std::string &name)
-    : db_( 0 )
+mongo::DB::DB(const std::string &name) :
+    socketTimeout(10.0),
+    db_( 0 )
 {
     options_ = options_by_name(name);
     if (!options_)
@@ -12,12 +13,14 @@ mongo::DB::DB(const std::string &name)
                             " is not registered! Use addDatabase() first.");
 
     if (options_->replica_set.empty())
-        db_ = ScopedDbConnection::getScopedDbConnection(options_->server_host);
+        db_ = ScopedDbConnection::getScopedDbConnection(options_->server_host, socketTimeout);
     else
-        db_ = ScopedDbConnection::getScopedDbConnection(
-                  ConnectionString(ConnectionString::SET,
+    {
+      db_ = ScopedDbConnection::getScopedDbConnection(
+                  mongo::ConnectionString(mongo::ConnectionString::SET,
                                    options_->server_host,
-                                   options_->replica_set));
+                                   options_->replica_set), socketTimeout);
+    }
 }
 
 mongo::DB::~DB()

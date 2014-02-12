@@ -52,6 +52,8 @@ set ( workerd_HDRS
 	SQLiteTmpTable.h
 	UrlParser.h
 	XXXSearcher.h
+	ParamParse.h
+	ParentDB.h
 	)
 
 set ( workerd_SRCS

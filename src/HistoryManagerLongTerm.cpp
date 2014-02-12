@@ -13,7 +13,7 @@ void HistoryManager::getLongTerm()
         if (!strSH.empty())
         {
             std::string q = getKeywordsString(strSH);
-            if (!q.empty())
+            if (!q.empty() && Config::Instance()->range_long_term_ > 0)
             {
                 lock();
                 stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_long_term_,EBranchT::T5));

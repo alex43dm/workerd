@@ -77,7 +77,9 @@ std::string ParamParse::getContextKeywordsString(const std::string& query)
 {
     try
     {
-        std::string q = query;
+        std::string q, exactly_phrases, keywords, description;
+
+        q = query;
         boost::trim(q);
         if (q.empty())
         {
@@ -86,23 +88,27 @@ std::string ParamParse::getContextKeywordsString(const std::string& query)
         std::string qs = stringWrapper(q);
         std::string qsn = stringWrapper(q, true);
         std::vector<std::string> strs;
-        std::string exactly_phrases;
-        std::string keywords;
         boost::split(strs,qs,boost::is_any_of("\t "),boost::token_compress_on);
         for (std::vector<std::string>::iterator it = strs.begin(); it != strs.end(); ++it)
         {
             exactly_phrases += "<<" + *it + " ";
             if (it != strs.begin())
             {
-                keywords += " | " + *it;
+                keywords += " | @description " + *it;
             }
             else
             {
-                keywords += " " + *it;
+                keywords += "@description " + *it;
             }
         }
-        std::string str = "((@exactly_phrases \"" + exactly_phrases + "\"~1) | (@title \"" + qsn + "\"/3)| (@description \"" + qsn + "\"/3) | (@keywords \"" + qs + "\"/3 ) | (@phrases \"" + qs + "\"~5))";
-        return str;
+/*
+        return "((@exactly_phrases \"" + exactly_phrases + "\") \
+        | (@title \"" + keywords + "\") \
+        | (@description \"" + keywords + "\") \
+        | (@keywords \"" + keywords + "\") \
+        | (@phrases \"" + keywords + "\"))";*/
+        return "('" +keywords+ "')";
+
     }
     catch (std::exception const &ex)
     {

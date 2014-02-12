@@ -199,19 +199,14 @@ bool Config::LoadConfig(const std::string fName)
 
     if( (mElem = mRoot->FirstChildElement("range")) )
     {
-        if( (mel = mElem->FirstChildElement("query")) && (mel->GetText()) )
-            range_query_ = ::atof(mel->GetText());
         if( (mel = mElem->FirstChildElement("short_term")) && (mel->GetText()) )
             range_short_term_ = ::atof(mel->GetText());
         if( (mel = mElem->FirstChildElement("long_term")) && (mel->GetText()) )
             range_long_term_ = ::atof(mel->GetText());
         if( (mel = mElem->FirstChildElement("context")) && (mel->GetText()) )
             range_context_ = ::atof(mel->GetText());
-        if( (mel = mElem->FirstChildElement("context_term")) && (mel->GetText()) )
-            range_context_term_ = ::atof(mel->GetText());
-        if( (mel = mElem->FirstChildElement("on_places")) && (mel->GetText()) )
-            range_on_places_ = ::atof(mel->GetText());
-
+        if( (mel = mElem->FirstChildElement("search")) && (mel->GetText()) )
+            range_search_ = ::atof(mel->GetText());
     }
 
 

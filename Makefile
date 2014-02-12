@@ -15,7 +15,7 @@ INC =  -Iinclude -I.
 CFLAGS =  -std=c++0x -Wall -fexceptions
 RESINC = 
 LIBDIR = 
-LIB =  -lmongoclient -lfcgi -lsphinxclient -lGeoIP -lrabbitmq -lboost_date_time -lboost_regex -lboost_filesystem -lboost_thread -lboost_system -licui18n -licuuc -licudata -ltinyxml -lsqlite3 -lpthread
+LIB =  -lmongoclient -lfcgi -lsphinxclient -lGeoIP -lrabbitmq -lboost_date_time -lboost_regex -lboost_filesystem -lboost_thread -lboost_system -ltinyxml -lsqlite3 -lpthread
 LDFLAGS =  /usr/lib/libamqpcpp.a
 
 INC_DEBUG =  $(INC) -Iinclude -I../libredis/

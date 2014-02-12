@@ -16,12 +16,12 @@ typedef unsigned long long	sphinx_uint64_t;
 class Offer
 {
 public:
-    typedef std::map <const long,Offer*> Map;
+    typedef std::map <const long long,Offer*> Map;
     typedef std::map <const float,Offer*, std::greater<float>> MapRate;
-    typedef std::map <const long,Offer*>::iterator it;
-    typedef std::map <const long,Offer*>::const_iterator cit;
+    typedef std::map <const long long,Offer*>::iterator it;
+    typedef std::map <const long long,Offer*>::const_iterator cit;
     typedef std::pair<const float,Offer*> PairRate;
-    typedef std::pair<const long,Offer*> Pair;
+    typedef std::pair<const long long,Offer*> Pair;
     typedef std::vector <Offer*> Vector;
     typedef std::vector <Offer*>::iterator itV;
 

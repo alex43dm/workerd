@@ -10,7 +10,7 @@ void HistoryManager::getShortTerm()
     for (auto i=vshortTerm.begin(); i != vshortTerm.end(); ++i)
     {
         std::string strSH = *i;
-        if (!strSH.empty())
+        if (!strSH.empty() && Config::Instance()->range_short_term_ > 0)
         {
             std::string q = getKeywordsString(strSH);
             if (!q.empty())

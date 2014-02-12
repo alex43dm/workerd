@@ -17,13 +17,13 @@ void HistoryManager::getPageKeywordsHistory()
     for (auto i=vkeywords.begin(); i != vkeywords.end(); ++i)
     {
         std::string strSH = *i;
-        if (!strSH.empty())
+        if (!strSH.empty() && Config::Instance()->range_context_ > 0)
         {
             std::string q = getContextKeywordsString(strSH);
             if (!q.empty())
             {
                 lock();
-                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_term_,EBranchT::T4));
+                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_,EBranchT::T4));
                 unlock();
             }
         }

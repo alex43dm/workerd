@@ -34,12 +34,12 @@ public:
     std::string redis_category_port_;
     std::string redis_retargeting_host_;
     std::string redis_retargeting_port_;
-    float range_query_;
+//    float range_query_;
     float range_short_term_;
     float range_long_term_;
     float range_context_;
-    float range_context_term_;
-    float range_on_places_;
+    float range_search_;
+//    float range_on_places_;
     std::string shortterm_expire_;
     std::string views_expire_;
     std::string context_expire_;

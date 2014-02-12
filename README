@@ -1,0 +1,19 @@
+Зависимости от других библиотек
+-------------------------------
+
+Есть в репозитарии debian:
+
+* fcgi
+* GeoIP
+* sqlite3
+* tinyxml
+* 
+Нужно собирать:
+
+* xmlrpc++ (0.7.0), http://sourceforge.net/projects/xmlrpcpp/files/
+* mongoclient (1.5.3), http://mongodb.org
+* google-glog (0.3.1)
+* rabbitmq (0.8)
+* rabbitcpp (http://code.google.com/p/rabbitcpp/)
+* git clone https://github.com/toymachine/libredis
+
