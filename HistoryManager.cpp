@@ -157,7 +157,7 @@ bool HistoryManager::updateUserHistory(
         mongo::BSONArray longTermArray = b2.arr();
 //        for (it=vkeywords.begin() ; it != vkeywords.end(); ++it )
 //            b3.append(*it);
-        mongo::BSONArray contextTermArray = b3.arr();
+//        mongo::BSONArray contextTermArray = b3.arr();
 
         for(auto i = items.begin(); i != items.end(); ++i)
         {
@@ -171,7 +171,7 @@ bool HistoryManager::updateUserHistory(
                                       append("context", params->getContext()).
                                       append("ShortTermHistory", shortTermArray).
                                       append("longtermhistory", longTermArray).
-                                      append("contexttermhistory", contextTermArray).
+                                      //append("contexttermhistory", contextTermArray).
                                       obj();
 
             Campaign *c = new Campaign((*i)->campaign_id);
