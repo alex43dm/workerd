@@ -17,7 +17,7 @@ XXXSearcher::XXXSearcher() :
     sphinx_set_limits(client, 0, 800, 800, 800);
 
     const char * field_names[FIELDS_LEN] =  {"title", "description", "keywords", "exactly_phrases", "phrases", "minuswords"};
-    int field_weights[FIELDS_LEN] =  {50, 30, 70, 100, 90, 100};
+    int field_weights[FIELDS_LEN] =  {80, 30, 70, 100, 90, 100};
 
     sphinx_set_field_weights( client, FIELDS_LEN, field_names, field_weights);
 
@@ -142,7 +142,7 @@ void XXXSearcher::processKeywords(
 
                 Offer *pOffer = p->second;
 
-                int weight = (sphinx_get_weight (res, i ) % 100) * 10;
+                float weight = sphinx_get_weight (res, i ) / 1000;
 
                 oldRating = pOffer->rating;
                 pOffer->rating = pOffer->rating

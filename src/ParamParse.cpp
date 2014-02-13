@@ -77,7 +77,7 @@ std::string ParamParse::getContextKeywordsString(const std::string& query)
 {
     try
     {
-        std::string q, exactly_phrases, keywords, description;
+        std::string q, exactly_phrases, keywords, description, title;
 
         q = query;
         boost::trim(q);
@@ -95,10 +95,12 @@ std::string ParamParse::getContextKeywordsString(const std::string& query)
             if (it != strs.begin())
             {
                 keywords += " | @description " + *it;
+                title += " | @title " + *it;
             }
             else
             {
                 keywords += "@description " + *it;
+                title += "@title " + *it;
             }
         }
 /*
@@ -107,7 +109,7 @@ std::string ParamParse::getContextKeywordsString(const std::string& query)
         | (@description \"" + keywords + "\") \
         | (@keywords \"" + keywords + "\") \
         | (@phrases \"" + keywords + "\"))";*/
-        return "('" +keywords+ "')";
+        return "('" +keywords+ "')|('"+title+"')";
 
     }
     catch (std::exception const &ex)
