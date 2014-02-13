@@ -45,9 +45,6 @@ bool HistoryManager::initDB()
     history_archive[LongTerm] = new RedisClient(cfg->redis_long_term_history_host_, cfg->redis_long_term_history_port_);
     history_archive[LongTerm]->connect();
 
-    history_archive[PageKeywords] = new RedisClient(cfg->redis_page_keywords_host_, cfg->redis_page_keywords_port_);
-    history_archive[PageKeywords]->connect();
-
     history_archive[Retargeting] = new RedisClient(cfg->redis_retargeting_host_, cfg->redis_retargeting_port_);
     history_archive[Retargeting]->connect();
 
@@ -69,9 +66,9 @@ void HistoryManager::getUserHistory(Params *_params)
     getRetargetingAsync();
 
     //Запрос по запросам к поисковикам
-    if (Config::Instance()->range_search_ > 0)
+    if(isSearch())
     {
-        q = getKeywordsString(params->getSearch());
+        q = getContextKeywordsString(params->getSearch());
         if (!q.empty())
         {
             lock();
@@ -80,7 +77,7 @@ void HistoryManager::getUserHistory(Params *_params)
         }
     }
     //Запрос по контексту страницы
-    if (Config::Instance()->range_context_ > 0)
+    if(isContext())
     {
         q = getContextKeywordsString(params->getContext());
         if (!q.empty())
@@ -91,42 +88,41 @@ void HistoryManager::getUserHistory(Params *_params)
         }
     }
 
-    if(Config::Instance()->range_long_term_ > 0)
+    if(isLongTerm())
         getLongTermAsync();
 
-    if(Config::Instance()->range_short_term_ > 0)
+    if(isShortTerm())
         getShortTermAsync();
-
-    if(Config::Instance()->range_context_ > 0)
-        getPageKeywordsAsync();
 }
 
 void HistoryManager::sphinxProcess(Offer::Map &items, Offer::Vector &result)
 {
 
-    if(Config::Instance()->range_short_term_ <= 0
-       && Config::Instance()->range_long_term_ <= 0
-       && Config::Instance()->range_context_ <= 0
-       && Config::Instance()->range_search_ <= 0
-       )
+    if(!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
     {
         return;
     }
 
     sphinx->makeFilter(items);
 
-    if(Config::Instance()->range_short_term_ > 0)
+    if(isShortTerm())
         getShortTermAsyncWait();
 
-    if(Config::Instance()->range_context_ > 0)
-        getPageKeywordsAsyncWait();
-
-    if(Config::Instance()->range_long_term_ > 0)
+    if(isLongTerm())
         getLongTermAsyncWait();
 
     Log::gdb("[%ld]sphinx get history: done",tid);
 
-    sphinx->processKeywords(stringQuery, items, result);
+    sphinx->processKeywords(stringQuery, items);
+
+    sphinx->cleanFilter();
+
+    Offer::MapRate resultAll;
+    for(auto i = items.begin(); i != items.end(); ++i)
+        resultAll.insert(Offer::PairRate((*i).second->rating, (*i).second));
+
+    for(auto i = resultAll.begin(); i != resultAll.end(); ++i)
+        result.push_back((*i).second);
 }
 
 
@@ -159,8 +155,8 @@ bool HistoryManager::updateUserHistory(
         for (it=vlongTerm.begin() ; it != vlongTerm.end(); ++it )
             b2.append(*it);
         mongo::BSONArray longTermArray = b2.arr();
-        for (it=vkeywords.begin() ; it != vkeywords.end(); ++it )
-            b3.append(*it);
+//        for (it=vkeywords.begin() ; it != vkeywords.end(); ++it )
+//            b3.append(*it);
         mongo::BSONArray contextTermArray = b3.arr();
 
         for(auto i = items.begin(); i != items.end(); ++i)
@@ -221,7 +217,6 @@ bool HistoryManager::updateUserHistory(
 
     vshortTerm.clear();
     vlongTerm.clear();
-    vkeywords.clear();
     vretageting.clear();
 
     stringQuery.clear();

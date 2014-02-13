@@ -14,13 +14,13 @@
 #include "Params.h"
 #include "ParamParse.h"
 #include "XXXSearcher.h"
+#include "Config.h"
 
 typedef enum
 {
     ShortTerm,
     LongTerm,
     ViewHistory,
-    PageKeywords,
     Category,
     Retargeting
 } HistoryType;
@@ -77,8 +77,11 @@ public:
     void RetargetingUpdate(const Offer::Vector &v, unsigned);
     void RetargetingClear();
 
+    bool isShortTerm(){return Config::Instance()->range_short_term_ > 0;}
+    bool isLongTerm(){return Config::Instance()->range_long_term_ > 0;}
+    bool isContext(){return Config::Instance()->range_context_ > 0;}
+    bool isSearch(){return Config::Instance()->range_search_ > 0;}
 
-//    void getHistory();
 protected:
 private:
     std::string key;
@@ -93,12 +96,10 @@ private:
     pthread_t   tid, thrGetDeprecatedOffersAsync,
                 thrGetLongTermAsync,
                 thrGetShortTermAsync,
-                thrGetPageKeywordsAsync,
                 thrGetRetargetingAsync;
 
     std::list<std::string> vshortTerm;
     std::list<std::string> vlongTerm;
-    std::list<std::string> vkeywords;
     std::list<std::string> vretageting;
 
     bool getHistoryByType(HistoryType type, std::list<std::string> &rr);
@@ -107,16 +108,13 @@ private:
     void unlock();
     void getLongTerm();
     void getShortTerm();
-    void getPageKeywordsHistory();
     void getRetargeting();
 
     void updateShortHistory(const std::string & query);
-    void updatePageKeywordsHistory(const std::string & query);
 
     static void *getDeprecatedOffersEnv(void *);
     static void *getLongTermEnv(void *);
     static void *getShortTermEnv(void *);
-    static void *getPageKeywordsEnv(void *);
     static void *getRetargetingEnv(void *);
 };
 #endif

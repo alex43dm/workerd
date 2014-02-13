@@ -5,8 +5,8 @@
 
 enum class EBranchT
 {
-    T1,
-    T2,
+    T1, //user search
+    T2, //context
     T3,
     T4,
     T5,

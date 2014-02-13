@@ -57,6 +57,7 @@ public:
     std::string db_geo_csv_;
     std::string sphinx_host_;
     int         sphinx_port_;
+    std::string sphinx_index_;
     int         instanceId;
     std::string lock_file_;
     std::string pid_file_;

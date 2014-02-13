@@ -316,6 +316,11 @@ bool Config::LoadConfig(const std::string fName)
         {
             sphinx_port_ = atoi(mel->GetText());
         }
+
+        if( (mel = mElem->FirstChildElement("index")) && (mel->GetText()) )
+        {
+            sphinx_index_ = mel->GetText();
+        }
     }
 
 

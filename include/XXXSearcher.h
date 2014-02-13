@@ -1,8 +1,10 @@
 #pragma once
+
 #include <string>
-#include <list>
-#include <set>
-#include <map>
+#include <vector>
+//#include <list>
+//#include <set>
+//#include <map>
 
 #include <stdlib.h>
 #include <boost/crc.hpp>
@@ -24,11 +26,17 @@ public:
 	/** \brief Метод обработки запроса к индексу.
      *
 	 */
-    void processKeywords(const std::vector<sphinxRequests> &sr, Offer::Map &items, Offer::Vector &result);
+    void processKeywords(const std::vector<sphinxRequests> &sr, Offer::Map &items);
     void makeFilter(Offer::Map &items);
+    void cleanFilter();
 
 protected:
 private:
+    std::string indexName;
     sphinx_client* client;
     bool makeFilterOn;
+    sphinx_int64_t *filter;
+    float midleRange, maxRating;
+
+    void dumpResult(sphinx_result *res) const;
 };

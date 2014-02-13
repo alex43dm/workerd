@@ -149,7 +149,6 @@
 		<Unit filename="src/GeoRerions.cpp" />
 		<Unit filename="src/HistoryManagerLongTerm.cpp" />
 		<Unit filename="src/HistoryManagerOffer.cpp" />
-		<Unit filename="src/HistoryManagerPageKeyWords.cpp" />
 		<Unit filename="src/HistoryManagerRetargeting.cpp" />
 		<Unit filename="src/HistoryManagerShortTerm.cpp" />
 		<Unit filename="src/ParamParse.cpp" />
