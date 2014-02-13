@@ -4,3 +4,7 @@ tmp
 CppCheckResults.xml
 *.save
 mem.db
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+getmyad.cscope_file_list
