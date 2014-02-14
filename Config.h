@@ -58,6 +58,12 @@ public:
     std::string sphinx_host_;
     int         sphinx_port_;
     std::string sphinx_index_;
+    const char **sphinx_field_names_;
+    int        *sphinx_field_weights_;
+    int         sphinx_field_len_;
+    std::string shpinx_match_mode_;
+    std::string shpinx_rank_mode_;
+    std::string shpinx_sort_mode_;
     int         instanceId;
     std::string lock_file_;
     std::string pid_file_;

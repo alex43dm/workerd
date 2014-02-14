@@ -2,6 +2,7 @@
 
 #include "ParamParse.h"
 #include "Log.h"
+#include "Config.h"
 
 ParamParse::ParamParse()
 {
@@ -77,7 +78,7 @@ std::string ParamParse::getContextKeywordsString(const std::string& query)
 {
     try
     {
-        std::string q, exactly_phrases, keywords, description, title;
+        std::string q, ret;
 
         q = query;
         boost::trim(q);
@@ -89,18 +90,29 @@ std::string ParamParse::getContextKeywordsString(const std::string& query)
         std::string qsn = stringWrapper(q, true);
         std::vector<std::string> strs;
         boost::split(strs,qs,boost::is_any_of("\t "),boost::token_compress_on);
-        for (std::vector<std::string>::iterator it = strs.begin(); it != strs.end(); ++it)
+        for(int i=0; i<Config::Instance()->sphinx_field_len_; i++)
         {
-            exactly_phrases += "<<" + *it + " ";
-            if (it != strs.begin())
+            std::string col = std::string(Config::Instance()->sphinx_field_names_[i]);
+            std::string iret;
+            for (std::vector<std::string>::iterator it = strs.begin(); it != strs.end(); ++it)
             {
-                keywords += " | @description " + *it;
-                title += " | @title " + *it;
+                    if (it != strs.begin())
+                    {
+                        iret += " | @"+col+" "+*it;
+                    }
+                    else
+                    {
+                        iret += "@"+col+" "+*it;
+                    }
+                //exactly_phrases += "<<" + *it + " ";
+            }
+            if(i)
+            {
+                ret += "|("+iret+")";
             }
             else
             {
-                keywords += "@description " + *it;
-                title += "@title " + *it;
+                ret += "("+iret+")";
             }
         }
 /*
@@ -109,7 +121,7 @@ std::string ParamParse::getContextKeywordsString(const std::string& query)
         | (@description \"" + keywords + "\") \
         | (@keywords \"" + keywords + "\") \
         | (@phrases \"" + keywords + "\"))";*/
-        return "('" +keywords+ "')|('"+title+"')";
+        return ret;
 
     }
     catch (std::exception const &ex)

@@ -42,7 +42,8 @@
     <!--Параметры подключения к основной базе данных-->
     <main>
         <!--Адрес сервера баз данных-->
-        <host>213.186.121.76:27018</host>
+        <!--host>213.186.121.76:27018</host-->
+        <host>127.0.0.1</host>
         <!--Название базы данных-->
         <db>getmyad_db</db>
         <!--Название группы реплик (если база данных находится в Replica Set)-->
@@ -115,9 +116,22 @@
 </redis>
 
 <sphinx>
-    <host>213.186.121.76</host>
+    <!--host>213.186.121.76</host-->
+    <host>127.0.0.1</host>
     <port>9312</port>
     <index>worker-full</index>
+    <!--all from /usr/include/sphinxclient.h-->
+    <mach_mode>SPH_MATCH_EXTENDED2</mach_mode>
+    <rank_mode>SPH_RANK_SPH04</rank_mode>
+    <sort_mode>SPH_SORT_RELEVANCE</sort_mode>
+    <fields>
+        <title>80</title>
+        <description>30</description>
+        <!--keywords>70</keywords-->
+        <!--exactly_phrases>100</exactly_phrases-->
+        <!--phrases>90</phrases-->
+        <!--minuswords>100</minuswords-->
+    </fields>
 </sphinx>
 
 <!--настройки сервера-->

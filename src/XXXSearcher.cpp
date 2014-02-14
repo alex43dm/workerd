@@ -2,7 +2,6 @@
 #include "Config.h"
 #include "XXXSearcher.h"
 
-#define FIELDS_LEN 6
 
 XXXSearcher::XXXSearcher() :
     indexName(Config::Instance()->sphinx_index_)
@@ -11,16 +10,15 @@ XXXSearcher::XXXSearcher() :
     sphinx_set_server ( client, Config::Instance()->sphinx_host_.c_str(), Config::Instance()->sphinx_port_ );
     sphinx_open ( client );
 
-    sphinx_set_match_mode(client, SPH_MATCH_EXTENDED2);
-    sphinx_set_ranking_mode(client, SPH_RANK_SPH04, NULL);
-    sphinx_set_sort_mode(client, SPH_SORT_RELEVANCE, NULL);
+    sphinx_set_match_mode(client,map_match[Config::Instance()->shpinx_match_mode_]);
+    sphinx_set_ranking_mode(client, map_rank[Config::Instance()->shpinx_rank_mode_], NULL);
+    sphinx_set_sort_mode(client, map_sort[Config::Instance()->shpinx_sort_mode_], NULL);
     sphinx_set_limits(client, 0, 800, 800, 800);
 
-    const char * field_names[FIELDS_LEN] =  {"title", "description", "keywords", "exactly_phrases", "phrases", "minuswords"};
-    int field_weights[FIELDS_LEN] =  {80, 30, 70, 100, 90, 100};
-
-    sphinx_set_field_weights( client, FIELDS_LEN, field_names, field_weights);
-
+    sphinx_set_field_weights( client,
+                             Config::Instance()->sphinx_field_len_,
+                             Config::Instance()->sphinx_field_names_,
+                             Config::Instance()->sphinx_field_weights_);
     makeFilterOn = false;
 }
 

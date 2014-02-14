@@ -321,8 +321,36 @@ bool Config::LoadConfig(const std::string fName)
         {
             sphinx_index_ = mel->GetText();
         }
-    }
 
+        if( (mel = mElem->FirstChildElement("mach_mode")) && (mel->GetText()) )
+        {
+            shpinx_match_mode_ = mel->GetText();
+        }
+
+        if( (mel = mElem->FirstChildElement("rank_mode")) && (mel->GetText()) )
+        {
+            shpinx_rank_mode_ = mel->GetText();
+        }
+
+        if( (mel = mElem->FirstChildElement("sort_mode")) && (mel->GetText()) )
+        {
+            shpinx_sort_mode_ = mel->GetText();
+        }
+
+        if((mel = mElem->FirstChildElement("fields")))
+        {
+            sphinx_field_names_ = (const char**)malloc(sizeof(const char**));
+            sphinx_field_weights_ = (int *)malloc(sizeof(int*));
+            sphinx_field_len_ = 0;
+            for(mElem = mel->FirstChildElement(); mElem; mElem = mElem->NextSiblingElement(),sphinx_field_len_++)
+            {
+                sphinx_field_names_[sphinx_field_len_] = mElem->Value();
+                sphinx_field_weights_[sphinx_field_len_] = atoi(mElem->GetText());
+            }
+        }
+
+        Log::info("sphinx mach: %s, rank: %s sort: %s", shpinx_match_mode_.c_str(), shpinx_rank_mode_.c_str(), shpinx_sort_mode_.c_str());
+    }
 
     pDb = new DataBase(true);
 

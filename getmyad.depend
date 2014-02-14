@@ -974,7 +974,7 @@
 	"BaseCore.h"
 	"Config.h"
 
-1392282642 /home/alex/Projects/worker/Config.h
+1392383597 /home/alex/Projects/worker/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
@@ -1133,7 +1133,7 @@
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 
-1392282692 source:/home/alex/Projects/worker/Config.cpp
+1392363787 source:/home/alex/Projects/worker/Config.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -1362,14 +1362,15 @@
 	"KompexSQLiteException.h"
 	"Log.h"
 
-1392292770 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+1392363982 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
 	"Log.h"
 	"Config.h"
 	"XXXSearcher.h"
 
-1392283105 /home/alex/Projects/worker/include/XXXSearcher.h
+1392384065 /home/alex/Projects/worker/include/XXXSearcher.h
 	<string>
 	<vector>
+	<map>
 	<stdlib.h>
 	<boost/crc.hpp>
 	<sphinxclient.h>
@@ -1463,10 +1464,11 @@
 	<string>
 	<boost/regex/icu.hpp>
 
-1392300061 source:/home/alex/Projects/worker/src/ParamParse.cpp
+1392382632 source:/home/alex/Projects/worker/src/ParamParse.cpp
 	<boost/algorithm/string.hpp>
 	"ParamParse.h"
 	"Log.h"
+	"Config.h"
 
 1391694520 /home/alex/Projects/worker/include/ParentDB.h
 	"DB.h"
