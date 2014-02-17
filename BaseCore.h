@@ -1,12 +1,20 @@
 #ifndef BASECORE_H
 #define BASECORE_H
 
+#include "config.h"
+
 #include <list>
 #include <vector>
 #include <map>
 #include <utility>
 #include <boost/date_time.hpp>
+
+#ifdef AMQPCPP_OLD
+#include <amqpcpp.h>
+#else
 #include <AMQPcpp.h>
+#endif // AMQPCPP_OLD
+
 
 #include "DataBase.h"
 #include "ParentDB.h"

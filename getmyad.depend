@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1391697191 source:/home/alex/Projects/worker/BaseCore.cpp
+1392628275 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -850,7 +850,8 @@
 	"Offer.h"
 	"Config.h"
 
-1392032618 /home/alex/Projects/worker/DB.h
+1392630004 /home/alex/Projects/worker/DB.h
+	"config.h"
 	<mongo/client/connpool.h>
 	"Log.h"
 	<string>
@@ -862,12 +863,14 @@
 	<stdarg.h>
 	<pthread.h>
 
-1391359743 /home/alex/Projects/worker/BaseCore.h
+1392629965 /home/alex/Projects/worker/BaseCore.h
+	"config.h"
 	<list>
 	<vector>
 	<map>
 	<utility>
 	<boost/date_time.hpp>
+	<amqpcpp.h>
 	<AMQPcpp.h>
 	"DataBase.h"
 	"ParentDB.h"
@@ -951,9 +954,8 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1391254375 source:/home/alex/Projects/worker/CgiService.cpp
+1392629222 source:/home/alex/Projects/worker/CgiService.cpp
 	<boost/algorithm/string.hpp>
-	<fcgi_stdio.h>
 	"DB.h"
 	"Log.h"
 	"CgiService.h"
@@ -967,12 +969,13 @@
 	"utils/Cookie.h"
 	"DataBase.h"
 	"Server.h"
+	<fcgi_stdio.h>
 
-1389278309 /home/alex/Projects/worker/CgiService.h
+1392629273 /home/alex/Projects/worker/CgiService.h
 	<string>
-	<fcgiapp.h>
 	"BaseCore.h"
 	"Config.h"
+	<fcgiapp.h>
 
 1392383597 /home/alex/Projects/worker/Config.h
 	<string>
@@ -1133,7 +1136,7 @@
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 
-1392363787 source:/home/alex/Projects/worker/Config.cpp
+1392384411 source:/home/alex/Projects/worker/Config.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -1362,7 +1365,7 @@
 	"KompexSQLiteException.h"
 	"Log.h"
 
-1392363982 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+1392384396 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
 	"Log.h"
 	"Config.h"
 	"XXXSearcher.h"
@@ -1483,4 +1486,6 @@
 	"json.h"
 	"Config.h"
 	"Offer.h"
+
+1392630104 /home/alex/Projects/worker/config.h
 

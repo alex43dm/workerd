@@ -2,10 +2,11 @@
 #define CGISERVICE_H
 
 #include <string>
-#include <fcgiapp.h>
 
 #include "BaseCore.h"
 #include "Config.h"
+
+#include <fcgiapp.h>
 
 class Core;
 

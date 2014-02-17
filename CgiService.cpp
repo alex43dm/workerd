@@ -1,7 +1,5 @@
 #include <boost/algorithm/string.hpp>
 
-#include <fcgi_stdio.h>
-
 #include "DB.h"
 #include "Log.h"
 #include "CgiService.h"
@@ -15,6 +13,8 @@
 #include "utils/Cookie.h"
 #include "DataBase.h"
 #include "Server.h"
+
+#include <fcgi_stdio.h>
 
 #define THREAD_STACK_SIZE PTHREAD_STACK_MIN + 10 * 1024
 

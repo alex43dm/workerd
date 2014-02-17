@@ -11,7 +11,17 @@ mongo::DB::DB(const std::string &name) :
         throw NotRegistered("Database " +
                             (name.empty()? "(default)" : name) +
                             " is not registered! Use addDatabase() first.");
-
+#ifdef MONGO_2_0
+    if (options_->replica_set.empty())
+        db_ = new ScopedDbConnection(options_->server_host, socketTimeout);
+    else
+    {
+      db_ = new ScopedDbConnection(
+                  mongo::ConnectionString(mongo::ConnectionString::SET,
+                                   options_->server_host,
+                                   options_->replica_set), socketTimeout);
+    }
+#else
     if (options_->replica_set.empty())
         db_ = ScopedDbConnection::getScopedDbConnection(options_->server_host, socketTimeout);
     else
@@ -21,6 +31,7 @@ mongo::DB::DB(const std::string &name) :
                                    options_->server_host,
                                    options_->replica_set), socketTimeout);
     }
+#endif // MONGO_2
 }
 
 mongo::DB::~DB()
