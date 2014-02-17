@@ -141,16 +141,27 @@ void DataBase::readDir(const std::string &dname)
 
     if (dir == NULL)
     {
-        Log::err("scandir: %s error",dname.c_str());
+        Log::err("DataBase::readDir: scandir: %s error",dname.c_str());
         return;
     }
     std::vector<std::string> files;
     while( (sql_name = readdir(dir)) != NULL )
     {
         if(sql_name->d_type != DT_REG)
+        {
+            Log::warn("DataBase::readDir: alien file %s does not included!", sql_name->d_name);
             continue;
+        }
+
         if(strstr(sql_name->d_name, ".sql") != NULL)
+        {
             files.push_back(dname + "/" + sql_name->d_name);
+            Log::info("DataBase::readDir: add file: %s", sql_name->d_name);
+        }
+        else
+        {
+            Log::warn("DataBase::readDir: file %s does not included!", sql_name->d_name);
+        }
     }
     closedir(dir);
     std::sort (files.begin(), files.end());
@@ -205,6 +216,7 @@ bool DataBase::runSqlFile(const std::string &file)
 
     if( (fd = open(file.c_str(), O_RDONLY))<2 )
     {
+        Log::err("DataBase::runSqlFile: error open %s", file.c_str());
         return false;
     }
 
@@ -245,7 +257,7 @@ bool DataBase::runSqlFile(const std::string &file)
     }
 
     free(buf);
-
+    Log::err("DataBase::runSqlFile: run %s", file.c_str());
     return true;
 }
 
