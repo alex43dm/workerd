@@ -51,7 +51,7 @@
 			<Add directory="." />
 		</Compiler>
 		<Linker>
-			<Add option="/usr/lib/libamqpcpp.a" />
+			<Add option="/usr/local/lib/libamqpcpp.a" />
 			<Add library="mongoclient" />
 			<Add library="fcgi" />
 			<Add library="sphinxclient" />
@@ -101,6 +101,7 @@
 		<Unit filename="Offer.h" />
 		<Unit filename="Params.cpp" />
 		<Unit filename="Params.h" />
+		<Unit filename="config.h" />
 		<Unit filename="config.xml" />
 		<Unit filename="db_dump/post/01.sql" />
 		<Unit filename="db_dump/region.csv" />
@@ -166,8 +167,6 @@
 		<Unit filename="utils/Cookie.h" />
 		<Unit filename="utils/GeoIPTools.cpp" />
 		<Unit filename="utils/GeoIPTools.h" />
-		<Unit filename="utils/SearchEngines.cpp" />
-		<Unit filename="utils/SearchEngines.h" />
 		<Unit filename="utils/UrlParser.cpp" />
 		<Unit filename="utils/UrlParser.h" />
 		<Unit filename="utils/base64.cpp" />

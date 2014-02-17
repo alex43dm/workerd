@@ -954,7 +954,7 @@
 	"DB.h"
 	"CampaignShowOptions.h"
 
-1392629222 source:/home/alex/Projects/worker/CgiService.cpp
+1392635938 source:/home/alex/Projects/worker/CgiService.cpp
 	<boost/algorithm/string.hpp>
 	"DB.h"
 	"Log.h"
@@ -964,7 +964,6 @@
 	"BaseCore.h"
 	"Core.h"
 	"Informer.h"
-	"utils/SearchEngines.h"
 	"InformerTemplate.h"
 	"utils/Cookie.h"
 	"DataBase.h"
@@ -977,7 +976,7 @@
 	"Config.h"
 	<fcgiapp.h>
 
-1392383597 /home/alex/Projects/worker/Config.h
+1392636850 /home/alex/Projects/worker/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
@@ -1136,7 +1135,7 @@
 	<boost/date_time.hpp>
 	<boost/date_time/gregorian/gregorian.hpp>
 
-1392384411 source:/home/alex/Projects/worker/Config.cpp
+1392635683 source:/home/alex/Projects/worker/Config.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -1190,7 +1189,7 @@
 1386837321 /home/alex/Projects/worker/include/GeoRerions.h
 	"KompexSQLiteDatabase.h"
 
-1392032979 source:/home/alex/Projects/worker/DB.cpp
+1392633224 source:/home/alex/Projects/worker/DB.cpp
 	"DB.h"
 
 1386588626 source:/home/alex/Projects/worker/DBAccessor/anet.cpp

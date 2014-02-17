@@ -16,7 +16,7 @@ CFLAGS =  -std=c++0x -Wall -fexceptions
 RESINC = 
 LIBDIR = 
 LIB =  -lmongoclient -lfcgi -lsphinxclient -lGeoIP -lrabbitmq -lboost_date_time -lboost_regex -lboost_filesystem -lboost_thread -lboost_system -licui18n -licuuc -licudata -ltinyxml -lsqlite3 -lpthread
-LDFLAGS =  /usr/lib/libamqpcpp.a
+LDFLAGS =  /usr/local/lib/libamqpcpp.a
 
 INC_DEBUG =  $(INC) -Iinclude -I../libredis/
 CFLAGS_DEBUG =  $(CFLAGS) -g -DDEBUG
@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = bin/Release/getmyad
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/src/GeoRerions.o $(OBJDIR_DEBUG)/src/EBranch.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/src/HistoryManagerLongTerm.o $(OBJDIR_DEBUG)/utils/base64.o $(OBJDIR_DEBUG)/utils/UrlParser.o $(OBJDIR_DEBUG)/utils/SearchEngines.o $(OBJDIR_DEBUG)/utils/GeoIPTools.o $(OBJDIR_DEBUG)/utils/Cookie.o $(OBJDIR_DEBUG)/src/sphinxRequests.o $(OBJDIR_DEBUG)/src/json.o $(OBJDIR_DEBUG)/src/XXXSearcher.o $(OBJDIR_DEBUG)/src/Server.o $(OBJDIR_DEBUG)/src/RedisClient.o $(OBJDIR_DEBUG)/src/ParentDB.o $(OBJDIR_DEBUG)/src/ParamParse.o $(OBJDIR_DEBUG)/src/HistoryManagerShortTerm.o $(OBJDIR_DEBUG)/src/HistoryManagerRetargeting.o $(OBJDIR_DEBUG)/src/HistoryManagerOffer.o $(OBJDIR_DEBUG)/KompexSQLiteStatement.o $(OBJDIR_DEBUG)/KompexSQLiteDatabase.o $(OBJDIR_DEBUG)/InformerTemplate.o $(OBJDIR_DEBUG)/Informer.o $(OBJDIR_DEBUG)/HistoryManager.o $(OBJDIR_DEBUG)/Log.o $(OBJDIR_DEBUG)/DataBase.o $(OBJDIR_DEBUG)/DB.o $(OBJDIR_DEBUG)/Core.o $(OBJDIR_DEBUG)/Config.o $(OBJDIR_DEBUG)/CgiService.o $(OBJDIR_DEBUG)/Campaign.o $(OBJDIR_DEBUG)/BaseCore.o $(OBJDIR_DEBUG)/Params.o $(OBJDIR_DEBUG)/Offer.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/src/EBranch.o $(OBJDIR_DEBUG)/utils/base64.o $(OBJDIR_DEBUG)/utils/UrlParser.o $(OBJDIR_DEBUG)/utils/GeoIPTools.o $(OBJDIR_DEBUG)/utils/Cookie.o $(OBJDIR_DEBUG)/src/sphinxRequests.o $(OBJDIR_DEBUG)/src/json.o $(OBJDIR_DEBUG)/src/XXXSearcher.o $(OBJDIR_DEBUG)/src/Server.o $(OBJDIR_DEBUG)/src/RedisClient.o $(OBJDIR_DEBUG)/src/ParentDB.o $(OBJDIR_DEBUG)/src/ParamParse.o $(OBJDIR_DEBUG)/src/HistoryManagerShortTerm.o $(OBJDIR_DEBUG)/src/HistoryManagerRetargeting.o $(OBJDIR_DEBUG)/src/HistoryManagerOffer.o $(OBJDIR_DEBUG)/src/HistoryManagerLongTerm.o $(OBJDIR_DEBUG)/src/GeoRerions.o $(OBJDIR_DEBUG)/KompexSQLiteStatement.o $(OBJDIR_DEBUG)/KompexSQLiteDatabase.o $(OBJDIR_DEBUG)/InformerTemplate.o $(OBJDIR_DEBUG)/Informer.o $(OBJDIR_DEBUG)/HistoryManager.o $(OBJDIR_DEBUG)/Log.o $(OBJDIR_DEBUG)/DataBase.o $(OBJDIR_DEBUG)/DB.o $(OBJDIR_DEBUG)/Core.o $(OBJDIR_DEBUG)/Config.o $(OBJDIR_DEBUG)/CgiService.o $(OBJDIR_DEBUG)/Campaign.o $(OBJDIR_DEBUG)/BaseCore.o $(OBJDIR_DEBUG)/Params.o $(OBJDIR_DEBUG)/Offer.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/src/EBranch.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/src/HistoryManagerLongTerm.o $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/SearchEngines.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/src/sphinxRequests.o $(OBJDIR_RELEASE)/src/json.o $(OBJDIR_RELEASE)/src/XXXSearcher.o $(OBJDIR_RELEASE)/src/Server.o $(OBJDIR_RELEASE)/src/RedisClient.o $(OBJDIR_RELEASE)/src/ParentDB.o $(OBJDIR_RELEASE)/src/ParamParse.o $(OBJDIR_RELEASE)/src/HistoryManagerShortTerm.o $(OBJDIR_RELEASE)/src/HistoryManagerRetargeting.o $(OBJDIR_RELEASE)/src/HistoryManagerOffer.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/Params.o $(OBJDIR_RELEASE)/Offer.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/src/EBranch.o $(OBJDIR_RELEASE)/utils/base64.o $(OBJDIR_RELEASE)/utils/UrlParser.o $(OBJDIR_RELEASE)/utils/GeoIPTools.o $(OBJDIR_RELEASE)/utils/Cookie.o $(OBJDIR_RELEASE)/src/sphinxRequests.o $(OBJDIR_RELEASE)/src/json.o $(OBJDIR_RELEASE)/src/XXXSearcher.o $(OBJDIR_RELEASE)/src/Server.o $(OBJDIR_RELEASE)/src/RedisClient.o $(OBJDIR_RELEASE)/src/ParentDB.o $(OBJDIR_RELEASE)/src/ParamParse.o $(OBJDIR_RELEASE)/src/HistoryManagerShortTerm.o $(OBJDIR_RELEASE)/src/HistoryManagerRetargeting.o $(OBJDIR_RELEASE)/src/HistoryManagerOffer.o $(OBJDIR_RELEASE)/src/HistoryManagerLongTerm.o $(OBJDIR_RELEASE)/src/GeoRerions.o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o $(OBJDIR_RELEASE)/KompexSQLiteDatabase.o $(OBJDIR_RELEASE)/InformerTemplate.o $(OBJDIR_RELEASE)/Informer.o $(OBJDIR_RELEASE)/HistoryManager.o $(OBJDIR_RELEASE)/Log.o $(OBJDIR_RELEASE)/DataBase.o $(OBJDIR_RELEASE)/DB.o $(OBJDIR_RELEASE)/Core.o $(OBJDIR_RELEASE)/Config.o $(OBJDIR_RELEASE)/CgiService.o $(OBJDIR_RELEASE)/Campaign.o $(OBJDIR_RELEASE)/BaseCore.o $(OBJDIR_RELEASE)/Params.o $(OBJDIR_RELEASE)/Offer.o
 
 all: debug release
 
@@ -50,8 +50,8 @@ clean: clean_debug clean_release
 
 before_debug: 
 	test -d bin/Debug || mkdir -p bin/Debug
-	test -d $(OBJDIR_DEBUG)/src || mkdir -p $(OBJDIR_DEBUG)/src
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
+	test -d $(OBJDIR_DEBUG)/src || mkdir -p $(OBJDIR_DEBUG)/src
 	test -d $(OBJDIR_DEBUG)/utils || mkdir -p $(OBJDIR_DEBUG)/utils
 
 after_debug: 
@@ -61,26 +61,17 @@ debug: before_debug out_debug after_debug
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) $(LIBDIR_DEBUG) -o $(OUT_DEBUG) $(OBJ_DEBUG)  $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
-$(OBJDIR_DEBUG)/src/GeoRerions.o: src/GeoRerions.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/GeoRerions.cpp -o $(OBJDIR_DEBUG)/src/GeoRerions.o
-
-$(OBJDIR_DEBUG)/src/EBranch.o: src/EBranch.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/EBranch.cpp -o $(OBJDIR_DEBUG)/src/EBranch.o
-
 $(OBJDIR_DEBUG)/main.o: main.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.cpp -o $(OBJDIR_DEBUG)/main.o
 
-$(OBJDIR_DEBUG)/src/HistoryManagerLongTerm.o: src/HistoryManagerLongTerm.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/HistoryManagerLongTerm.cpp -o $(OBJDIR_DEBUG)/src/HistoryManagerLongTerm.o
+$(OBJDIR_DEBUG)/src/EBranch.o: src/EBranch.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/EBranch.cpp -o $(OBJDIR_DEBUG)/src/EBranch.o
 
 $(OBJDIR_DEBUG)/utils/base64.o: utils/base64.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c utils/base64.cpp -o $(OBJDIR_DEBUG)/utils/base64.o
 
 $(OBJDIR_DEBUG)/utils/UrlParser.o: utils/UrlParser.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c utils/UrlParser.cpp -o $(OBJDIR_DEBUG)/utils/UrlParser.o
-
-$(OBJDIR_DEBUG)/utils/SearchEngines.o: utils/SearchEngines.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c utils/SearchEngines.cpp -o $(OBJDIR_DEBUG)/utils/SearchEngines.o
 
 $(OBJDIR_DEBUG)/utils/GeoIPTools.o: utils/GeoIPTools.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c utils/GeoIPTools.cpp -o $(OBJDIR_DEBUG)/utils/GeoIPTools.o
@@ -117,6 +108,12 @@ $(OBJDIR_DEBUG)/src/HistoryManagerRetargeting.o: src/HistoryManagerRetargeting.c
 
 $(OBJDIR_DEBUG)/src/HistoryManagerOffer.o: src/HistoryManagerOffer.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/HistoryManagerOffer.cpp -o $(OBJDIR_DEBUG)/src/HistoryManagerOffer.o
+
+$(OBJDIR_DEBUG)/src/HistoryManagerLongTerm.o: src/HistoryManagerLongTerm.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/HistoryManagerLongTerm.cpp -o $(OBJDIR_DEBUG)/src/HistoryManagerLongTerm.o
+
+$(OBJDIR_DEBUG)/src/GeoRerions.o: src/GeoRerions.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/GeoRerions.cpp -o $(OBJDIR_DEBUG)/src/GeoRerions.o
 
 $(OBJDIR_DEBUG)/KompexSQLiteStatement.o: KompexSQLiteStatement.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c KompexSQLiteStatement.cpp -o $(OBJDIR_DEBUG)/KompexSQLiteStatement.o
@@ -166,14 +163,14 @@ $(OBJDIR_DEBUG)/Offer.o: Offer.cpp
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf bin/Debug
-	rm -rf $(OBJDIR_DEBUG)/src
 	rm -rf $(OBJDIR_DEBUG)
+	rm -rf $(OBJDIR_DEBUG)/src
 	rm -rf $(OBJDIR_DEBUG)/utils
 
 before_release: 
 	test -d bin/Release || mkdir -p bin/Release
-	test -d $(OBJDIR_RELEASE)/src || mkdir -p $(OBJDIR_RELEASE)/src
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
+	test -d $(OBJDIR_RELEASE)/src || mkdir -p $(OBJDIR_RELEASE)/src
 	test -d $(OBJDIR_RELEASE)/utils || mkdir -p $(OBJDIR_RELEASE)/utils
 
 after_release: 
@@ -183,26 +180,17 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE)  $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
-$(OBJDIR_RELEASE)/src/GeoRerions.o: src/GeoRerions.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/GeoRerions.cpp -o $(OBJDIR_RELEASE)/src/GeoRerions.o
-
-$(OBJDIR_RELEASE)/src/EBranch.o: src/EBranch.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/EBranch.cpp -o $(OBJDIR_RELEASE)/src/EBranch.o
-
 $(OBJDIR_RELEASE)/main.o: main.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.cpp -o $(OBJDIR_RELEASE)/main.o
 
-$(OBJDIR_RELEASE)/src/HistoryManagerLongTerm.o: src/HistoryManagerLongTerm.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/HistoryManagerLongTerm.cpp -o $(OBJDIR_RELEASE)/src/HistoryManagerLongTerm.o
+$(OBJDIR_RELEASE)/src/EBranch.o: src/EBranch.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/EBranch.cpp -o $(OBJDIR_RELEASE)/src/EBranch.o
 
 $(OBJDIR_RELEASE)/utils/base64.o: utils/base64.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c utils/base64.cpp -o $(OBJDIR_RELEASE)/utils/base64.o
 
 $(OBJDIR_RELEASE)/utils/UrlParser.o: utils/UrlParser.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c utils/UrlParser.cpp -o $(OBJDIR_RELEASE)/utils/UrlParser.o
-
-$(OBJDIR_RELEASE)/utils/SearchEngines.o: utils/SearchEngines.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c utils/SearchEngines.cpp -o $(OBJDIR_RELEASE)/utils/SearchEngines.o
 
 $(OBJDIR_RELEASE)/utils/GeoIPTools.o: utils/GeoIPTools.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c utils/GeoIPTools.cpp -o $(OBJDIR_RELEASE)/utils/GeoIPTools.o
@@ -239,6 +227,12 @@ $(OBJDIR_RELEASE)/src/HistoryManagerRetargeting.o: src/HistoryManagerRetargeting
 
 $(OBJDIR_RELEASE)/src/HistoryManagerOffer.o: src/HistoryManagerOffer.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/HistoryManagerOffer.cpp -o $(OBJDIR_RELEASE)/src/HistoryManagerOffer.o
+
+$(OBJDIR_RELEASE)/src/HistoryManagerLongTerm.o: src/HistoryManagerLongTerm.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/HistoryManagerLongTerm.cpp -o $(OBJDIR_RELEASE)/src/HistoryManagerLongTerm.o
+
+$(OBJDIR_RELEASE)/src/GeoRerions.o: src/GeoRerions.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/GeoRerions.cpp -o $(OBJDIR_RELEASE)/src/GeoRerions.o
 
 $(OBJDIR_RELEASE)/KompexSQLiteStatement.o: KompexSQLiteStatement.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c KompexSQLiteStatement.cpp -o $(OBJDIR_RELEASE)/KompexSQLiteStatement.o
@@ -288,8 +282,8 @@ $(OBJDIR_RELEASE)/Offer.o: Offer.cpp
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf bin/Release
-	rm -rf $(OBJDIR_RELEASE)/src
 	rm -rf $(OBJDIR_RELEASE)
+	rm -rf $(OBJDIR_RELEASE)/src
 	rm -rf $(OBJDIR_RELEASE)/utils
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release
