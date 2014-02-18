@@ -147,12 +147,13 @@ void DataBase::readDir(const std::string &dname)
     std::vector<std::string> files;
     while( (sql_name = readdir(dir)) != NULL )
     {
-        if(sql_name->d_type != DT_REG)
+#ifdef GLIBC_2_17
+        if(sql_name->d_type == DT_REG)
         {
             Log::warn("DataBase::readDir: alien file %s does not included!", sql_name->d_name);
             continue;
         }
-
+#endif // GLIBC_2_17
         if(strstr(sql_name->d_name, ".sql") != NULL)
         {
             files.push_back(dname + "/" + sql_name->d_name);
