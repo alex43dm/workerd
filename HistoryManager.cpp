@@ -94,8 +94,7 @@ void HistoryManager::getUserHistory(Params *_params)
     if(isShortTerm())
         getShortTermAsync();
 }
-
-void HistoryManager::sphinxProcess(Offer::Map &items, Offer::Vector &result)
+void HistoryManager::sphinxProcess(Offer::Map &items)
 {
 
     if(!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
@@ -116,13 +115,6 @@ void HistoryManager::sphinxProcess(Offer::Map &items, Offer::Vector &result)
     sphinx->processKeywords(stringQuery, items);
 
     sphinx->cleanFilter();
-
-    Offer::MapRate resultAll;
-    for(auto i = items.begin(); i != items.end(); ++i)
-        resultAll.insert(Offer::PairRate((*i).second->rating, (*i).second));
-
-    for(auto i = resultAll.begin(); i != resultAll.end(); ++i)
-        result.push_back((*i).second);
 }
 
 
@@ -162,6 +154,8 @@ bool HistoryManager::updateUserHistory(
         for(auto i = items.begin(); i != items.end(); ++i)
         {
 
+            if( (*i)->social ) social_processed_++;
+
             std::tm dt_tm;
             dt_tm = boost::posix_time::to_tm(params->time_);
             mongo::Date_t dt( (mktime(&dt_tm)) * 1000LLU);
@@ -189,7 +183,7 @@ bool HistoryManager::updateUserHistory(
                                     append("token", (*i)->token).
                                     append("type", (*i)->type).
                                     append("isOnClick", (*i)->isOnClick).
-                                    append("campaignId", c->id).
+                                    append("campaignId", c->guid).
                                     append("campaignId_int", (*i)->campaign_id).
                                     append("campaignTitle", c->title).
                                     append("project", c->project).
@@ -197,7 +191,7 @@ bool HistoryManager::updateUserHistory(
                                     append("region", (params->getRegion().empty()?"NOT FOUND":params->getRegion().c_str())).
                                     append("keywords", keywords).
                                     append("branch", (*i)->getBranch()).
-                                    append("conformity", (*i)->conformity).
+                                    append("conformity", "place").//(*i)->conformity).
                                     append("matching", (*i)->matching).
                                     obj();
             delete c;

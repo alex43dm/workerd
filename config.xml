@@ -12,10 +12,6 @@
 <views_expire>864000</views_expire><!--24 hours default-->
 <!--"Продолжительность жизни" ключей в базе истории просмотров пользователя-->
 <context_expire>864000</context_expire><!--24 hours default-->
-<!--Название папки, в которой находится индекс по рекламным предложениям-->
-<folder_offer>/var/www/indexOffer</folder_offer>
-<!--Название папки, в которой находится индекс по информерам и рейтингам РП внутри этих информеров-->
-<folder_informer>/var/www/indexInformer</folder_informer>
 <!-- -->
 <retargeting_by_persents>50</retargeting_by_persents>
 <!--период жизни ретаргетинга(ЧЧ:ММ:СС)-->
@@ -32,9 +28,9 @@
     <!--соответствующих долгосрочной истории-->
     <long_term>0</long_term>
     <!--контексту страницы-->
-    <context>0.9</context>
+    <context>0</context>
     <!--поисковым запросам пользователя страницы-->
-    <search>1.3</search>
+    <search>0</search>
 </range>
 
 <!--Параметры подключения к базам данных-->
@@ -52,7 +48,7 @@
         Это балансирует нагрузку в режиме только для чтения, но появляется
         вероятность чтения не самых свежих данных (разница от мастера до
         нескольких секунд).-->
-        <slave>false</slave>
+        <slave>true</slave>
     </main>
     <!--Параметры подключения к базе данных журнала-->
     <log>
@@ -116,8 +112,8 @@
 </redis>
 
 <sphinx>
-    <!--host>213.186.121.76</host-->
-    <host>127.0.0.1</host>
+    <host>213.186.121.76</host>
+    <!--host>127.0.0.1</host-->
     <port>9312</port>
     <index>worker-full</index>
     <!--all from /usr/include/sphinxclient.h-->
@@ -143,8 +139,8 @@
     <!--путь к очереди сообщений-->
     <mq_path>guest:guest@localhost//</mq_path>
     <!--путь к фалу базы данных-->
-    <!--dbpath>/run/alex/mem.db</dbpath-->
-    <dbpath>:memory:</dbpath>
+    <dbpath>/run/alex/mem.db</dbpath>
+    <!--dbpath>:memory:</dbpath-->
     <!--путь к каталогу дампа sqlite базы-->
     <db_dump_path>/home/alex/Projects/worker/db_dump</db_dump_path>
     <!--путь к csv файлу содержимого таблицы GeoRerions-->

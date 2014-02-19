@@ -73,7 +73,10 @@ Params &Params::time(const boost::posix_time::ptime &time)
 */
 Params &Params::country(const std::string &country)
 {
-    country_ = country;
+    if(!country_.size())
+    {
+        country_ = country;
+    }
     return *this;
 }
 
@@ -90,7 +93,10 @@ Params &Params::country(const std::string &country)
 */
 Params &Params::region(const std::string &region)
 {
-    region_ = region;
+    if(!region_.size())
+    {
+        region_ = region;
+    }
     return *this;
 }
 

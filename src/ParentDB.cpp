@@ -339,7 +339,8 @@ bool ParentDB::InformerLoadAll()
                          x.getIntField("height_banner"),
                          x.getIntField("width_banner"),
                          capacity,
-                         x.getIntField("rtgPercentage") > 0 ? x.getIntField("rtgPercentage") : 0
+                         0
+//                         x.getIntField("rtgPercentage") > 0 ? x.getIntField("rtgPercentage") : 0
                          );
         try
         {
@@ -432,7 +433,7 @@ bool ParentDB::InformerUpdate(const std::string &id)
                          x.getIntField("height_banner"),
                          x.getIntField("width_banner"),
                          capacity,
-                         x.getIntField("rtgPercentage"),
+                         0,//x.getIntField("rtgPercentage"),
                          long_id
                          );
         try

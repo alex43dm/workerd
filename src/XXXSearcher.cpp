@@ -33,7 +33,7 @@ void XXXSearcher::makeFilter(Offer::Map &items)
     if(makeFilterOn)
         return;
 
-    sphinx_set_select(client,"guidint,rating");
+    sphinx_set_select(client,"guidint,rating,match,sphrases,skeywords,sexactly_phrases");
 
     //Создаем фильтр
     filter = (sphinx_int64_t *)new sphinx_int64_t[(int)items.size()];

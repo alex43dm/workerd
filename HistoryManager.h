@@ -53,7 +53,7 @@ public:
 
     //main methods
     void getUserHistory(Params *params);
-    void sphinxProcess(Offer::Map &items, Offer::Vector &result);
+    void sphinxProcess(Offer::Map &items);
     bool updateUserHistory(const Offer::Vector &items, const Params *params, const Informer *informer);
 
     bool setDeprecatedOffers(const Offer::Vector &items);

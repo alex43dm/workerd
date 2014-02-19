@@ -40,6 +40,28 @@ Campaign::Campaign(long long _id) :
     }
 }
 //-------------------------------------------------------------------------------------------------------
+void Campaign::info()
+{
+    char buf[8192];
+    Kompex::SQLiteStatement *pStmt;
+
+    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+
+    sqlite3_snprintf(sizeof(buf),buf,
+            "SELECT c.title,c.valid,c.social,count(ofr.campaignId) FROM Campaign AS c \
+            LEFT JOIN Offer AS ofr ON c.id=ofr.campaignId \
+            GROUP BY ofr.campaignId;");
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        Log::err("GeoRerions::add %s error: %s", buf, ex.GetString().c_str());
+    }
+}
+
+//-------------------------------------------------------------------------------------------------------
 void Campaign::GeoRerionsAdd(const std::string &country, const std::string &region)
 {
     char buf[8192];

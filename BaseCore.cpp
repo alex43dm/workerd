@@ -257,14 +257,14 @@ std::string BaseCore::Status()
     // Вычисляем количество запросов в секунду
     if (last_time_accessed.is_not_a_date_time())
         last_time_accessed = time_service_started_;
-    //ptime now = microsec_clock::local_time();
-  //  int millisecs_since_last_access =
-    //    (now - last_time_accessed).total_milliseconds();
-    //int millisecs_since_start =
-    //    (now - time_service_started_).total_milliseconds();
-    //int requests_per_second_current = 0;
-    //int requests_per_second_average = 0;
-    /*
+    boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
+    int millisecs_since_last_access =
+        (now - last_time_accessed).total_milliseconds();
+    int millisecs_since_start =
+        (now - time_service_started_).total_milliseconds();
+    int requests_per_second_current = 0;
+    int requests_per_second_average = 0;
+
     if (millisecs_since_last_access)
         requests_per_second_current =
             (request_processed_ - last_time_request_processed) * 1000 /
@@ -276,41 +276,36 @@ std::string BaseCore::Status()
     last_time_accessed = now;
     last_time_request_processed = request_processed_;
 
-    std::stringstream out;
-    out << "<html>\n"
-        "<head><meta http-equiv=\"content-type\" content=\"text/html; "
-        "charset=UTF-8\">\n"
-        "<style>\n"
-        "body { font-family: Arial, Helvetica, sans-serif; }\n"
-        "h1, h2, h3 {font-family: \"georgia\", serif; font-weight: 400;}\n"
-        "table { border-collapse: collapse; border: 1px solid gray; }\n"
-        "td { border: 1px dotted gray; padding: 5px; font-size: 10pt; }\n"
-        "th {border: 1px solid gray; padding: 8px; font-size: 10pt; }\n"
-        "</style>\n"
-        "</head>"
-        "<body>\n<h1>Состояние службы Yottos GetMyAd worker</h1>\n"
-        "<table>"
-        "<tr>"
-        "<td>Обработано запросов:</td> <td><b>" << request_processed_ <<
-        "</b> (" << requests_per_second_current << "/сек, "
-        " в среднем " << requests_per_second_average << "/сек) "
-        "</td></tr>\n"
-        "<tr>"
-        "<td>Общее кол-во показов:</td> <td><b>" << offer_processed_ <<
-        "</b> (" << social_processed_ << " из них социальная реклама) "
-        "</td></tr>\n";
-*/
+    out << "<html>";
+    out << "<head>";
+    out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
+    out << "<style type=\"text/css\">";
+    out << "body { font-family: Arial, Helvetica, sans-serif; }";
+    out << "h1, h2, h3 {font-family: \"georgia\", serif; font-weight: 400;}";
+    out << "table { border-collapse: collapse; border: 1px solid gray; }";
+    out << "td { border: 1px dotted gray; padding: 5px; font-size: 10pt; }";
+    out << "th {border: 1px solid gray; padding: 8px; font-size: 10pt; }";
+    out << "</style>";
+    out << "</head>";
+    out << "<body>";
+    out << "<h1>Состояние службы Yottos GetMyAd worker</h1>";
+    out << "<table>";
+    out << "<tr>";
+    out << "<td>Обработано запросов:</td> <td><b>" << request_processed_;
+    out << "</b> (" << requests_per_second_current << "/сек, ";
+    out << " в среднем " << requests_per_second_average << "/сек) ";
+    out << "</td></tr>";
+    out << "<tr>";
+    out << "<td>Общее кол-во показов:</td> <td><b>" << offer_processed_;
+    out << "</b> (" << social_processed_ << " из них социальная реклама) ";
+    out << "</td></tr>";
     out << "<tr><td>Имя сервера: </td> <td>" <<
         (getenv("SERVER_NAME")? getenv("SERVER_NAME"): "неизвестно") <<
-        "</td></tr>\n";
-        /*
-    out << "<tr><td>IP сервера: </td> <td>" <<
-        (server_ip_.empty()? "неизвестно": server_ip_) <<
-        "</td></tr>\n";
-        */
+        "</td></tr>";
+    out << "<tr><td>IP сервера: </td> <td>" <<Config::Instance()->server_ip_ <<"</td></tr>";
     out << "<tr><td>Текущее время: </td> <td>" <<
         boost::posix_time::second_clock::local_time() <<
-        "</td></tr>\n";
+        "</td></tr>";
 
     try
     {
@@ -322,52 +317,55 @@ std::string BaseCore::Status()
             out << " (no replica set)";
         else
             out << " (replSet=" << db_main.replica_set() << ")";
-        out << "</td></tr>\n";
+        out << "</td></tr>";
     }
     catch (mongo::DB::NotRegistered &)
     {
-        out << "Основная база не определена</td></tr>\n";
+        out << "Основная база не определена</td></tr>";
     }
-    /*
+
     out << "<tr><td>База данных Redis (краткосрочная история):</td> <td>" <<
-        HistoryManager::instance()->getConnectionParams()->redis_short_term_history_host_ << ":";
-    out << HistoryManager::instance()->getConnectionParams()->redis_short_term_history_port_;
-    out << "(TTL =" << HistoryManager::instance()->getConnectionParams()->shortterm_expire_ << ")<br/>";
-    out << "status = " << (HistoryManager::instance()->getDBStatus(1)? "true" : "false");
-    out << "</td></tr>\n";
+        Config::Instance()->redis_short_term_history_host_ << ":";
+    out << Config::Instance()->redis_short_term_history_port_;
+    out << "(TTL =" << Config::Instance()->shortterm_expire_ << ")<br/>";
+    out << "status = " << (Config::Instance()->range_short_term_ > 0 ? "true" : "false");
+    out << "</td></tr>";
 
     out << "<tr><td>База данных Redis (долгосрочная история):</td> <td>" <<
-        HistoryManager::instance()->getConnectionParams()->redis_long_term_history_host_ << ":";
-    out << HistoryManager::instance()->getConnectionParams()->redis_long_term_history_port_ <<"<br/>";
-    out << "status = " << (HistoryManager::instance()->getDBStatus(2)? "true" : "false");
-    out << "</td></tr>\n";
+        Config::Instance()->redis_long_term_history_host_ << ":";
+    out << Config::Instance()->redis_long_term_history_port_;
+    out << "(TTL =0)<br/>";
+    out << "status = " << (Config::Instance()->range_long_term_ > 0 ? "true" : "false");
+    out << "</td></tr>";
 
     out << "<tr><td>База данных Redis (история показов):</td> <td>" <<
-        HistoryManager::instance()->getConnectionParams()->redis_user_view_history_host_ << ":";
-    out << HistoryManager::instance()->getConnectionParams()->redis_user_view_history_port_ ;
-    out << "(TTL =" << HistoryManager::instance()->getConnectionParams()->views_expire_ << ")<br/>";
-    out << "status = " << (HistoryManager::instance()->getDBStatus(3)? "true" : "false");
-    out << "</td></tr>\n";
+        Config::Instance()->redis_user_view_history_host_ << ":";
+    out << Config::Instance()->redis_user_view_history_port_;
+    out << "(TTL =" << Config::Instance()->views_expire_ << ")<br/>";
+    out << "status = true";
+    out << "</td></tr>";
 
     out << "<tr><td>База данных Redis (констекст страниц):</td> <td>" <<
-        HistoryManager::instance()->getConnectionParams()->redis_page_keywords_host_ << ":";
-    out << HistoryManager::instance()->getConnectionParams()->redis_page_keywords_port_;
-    out << "(TTL =" << HistoryManager::instance()->getConnectionParams()->context_expire_ << ")<br/>";
-    out << "status = " << (HistoryManager::instance()->getDBStatus(4)? "true" : "false");
-    out << "</td></tr>\n";
+        Config::Instance()->redis_long_term_history_host_ << ":";
+    out << Config::Instance()->redis_long_term_history_port_;
+    out << "(TTL =" << Config::Instance()->context_expire_ << ")<br/>";
+    out << "status = " << (Config::Instance()->range_context_ > 0 ? "true" : "false");
+    out << "</td></tr>";
 
     out << "<tr><td>База данных Redis (категорий):</td> <td>" <<
-        HistoryManager::instance()->getConnectionParams()->redis_category_host_ << ":";
-    out << HistoryManager::instance()->getConnectionParams()->redis_category_port_<<"<br/>";;
-    out << "status = " << (HistoryManager::instance()->getDBStatus(5)? "true" : "false");
-    out << "</td></tr>\n";
+        Config::Instance()->redis_category_host_ << ":";
+    out << Config::Instance()->redis_category_port_;
+    out << "(TTL =0)<br/>";
+    out << "status = false";
+    out << "</td></tr>";
 
     out << "<tr><td>База данных Redis (ретаргетинг):</td> <td>" <<
-        HistoryManager::instance()->getConnectionParams()->redis_retargeting_host_ << ":";
-    out << HistoryManager::instance()->getConnectionParams()->redis_retargeting_port_<<"<br/>";;
-    out << "status = " << (HistoryManager::instance()->getDBStatus(6)? "true" : "false");
+        Config::Instance()->redis_retargeting_host_ << ":";
+    out << Config::Instance()->redis_retargeting_port_;
+    out << "(TTL =" << Config::Instance()->retargeting_by_time_ << ")<br/>";
+    out << "status = true";
     out << "</td></tr>\n";
-    */
+
     try
     {
         mongo::DB db_log("log");
@@ -383,19 +381,17 @@ std::string BaseCore::Status()
     }
     catch (mongo::DB::NotRegistered &)
     {
-        out << "База данных журналирования не определена</td></tr>\n";
+        out << "База данных журналирования не определена</td></tr>";
     }
 
     out << "<tr><td>Время запуска:</td> <td>" << time_service_started_ <<
         "</td></tr>" <<
         "<tr><td>AMQP:</td><td>" <<
         (amqp_? "активен" : "не активен") <<
-        "</td></tr>\n";
-    out <<  "<tr><td>Сборка: </td><td>" << __DATE__ << " " << __TIME__ <<
         "</td></tr>";
-   // out <<  "<tr><td>Драйвер mongo: </td><td>" << mongo::versionString <<
-       // "</td></tr>";
-    out << "</table>\n";
+    out <<  "<tr><td>Сборка: </td><td>" << __DATE__ << " " << __TIME__<<"</td></tr>";
+    //out <<  "<tr><td>Драйвер mongo: </td><td>" << mongo::versionString << "</td></tr>";
+    out << "</table>";
 /*
     std::list<Campaign> campaigns = Campaign::all();
     out << "<p>Загружено <b>" << campaigns.size() << "</b> кампаний: </p>\n";
@@ -405,8 +401,7 @@ std::string BaseCore::Status()
         "<th>Социальная</th>"
         "<th>Предложений</th>"
         "</tr>\n";
-        */
-        /*
+
     for (auto it = campaigns.begin(); it != campaigns.end(); it++)
     {
         Campaign c(*it);
@@ -417,19 +412,19 @@ std::string BaseCore::Status()
             "<td>" << Offers::x()->offers_by_campaign(c).size() << "</td>"<<
             "</tr>\n";
     }*/
-    out << "</table>\n\n";
+    out << "</table>";
 
     // Журнал сообщений AMQP
-    out << "<p>Журнал AMQP: </p>\n"
-        "<table>\n";
+    out << "<p>Журнал AMQP: </p>"
+        "<table>";
     int i = 0;
     for (auto it = mq_log_.begin(); it != mq_log_.end(); it++)
         out << "<tr><td>" << ++i << "</td>"
-            "<td>" << *it << "</td></tr>\n";
-    out << "<tr><td></td><td>Последняя проверка сообщений: 1 </td><tr>\n"
-        "</table>\n";
-
-    out << "</body>\n</html>\n";
+            "<td>" << *it << "</td></tr>";
+    out << "<tr><td></td><td>Последняя проверка сообщений: </td><tr>"
+        "</table>";
+    out << "</body>";
+    out << "</html>";
 
     return out.str();
 }

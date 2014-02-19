@@ -49,7 +49,7 @@ public:
         int width;					///< ширина РП (имеет значение для баннеров)
         bool social;
         bool isBanner;
-
+        long long int token_int;
         std::string token;          ///< Токен для проверки ссылки
         std::string redirect_url;   ///< Cсылка перенаправления
 
@@ -102,7 +102,7 @@ public:
     }
 
     // Каждому элементу просмотра присваиваем уникальный токен
-    void gen();
+    long long int gen();
 
     std::string toJson() const;
     bool setBranch(const  EBranchT tbranch);

@@ -133,7 +133,7 @@ public:
                         boost::format("id=%s\ninf=%d\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
                         % p->id_int
                         % informerId
-                        % rand()
+                        % p->gen()
                         % p->url
                         % Config::Instance()->server_ip_
                         % location_
@@ -167,11 +167,11 @@ std::string Core::Process(Params *prms)
     getAllOffers(items);
     Log::gdb("[%ld]getOffers: %d done",tid, items.size());
     //wait all history load
-    hm->sphinxProcess(items, result);
+    hm->sphinxProcess(items);
     Log::gdb("[%ld]sphinxProcess: done",tid);
 
     //новый алгоритм
-    RISAlgorithm(result, vRIS, informer->capacity);
+    RISAlgorithm(items, vRIS, informer->capacity);
     Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
 
     if (vRIS.size() < (u_int)informer->capacity)
@@ -242,6 +242,10 @@ void Core::ProcessSaveResults()
 {
     if (params->test_mode_)
         return;
+
+    request_processed_++;
+    offer_processed_ += vOutPut.size();
+
     // Сохраняем выданные ссылки в базе данных
     //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
     hm->updateUserHistory(vOutPut, params, informer);
@@ -481,6 +485,7 @@ bool Core::getOffers(Offer::Map &result)
                                    pStmt->GetColumnInt(15)
                                   );
             off->social = pStmt->GetColumnBool(16);
+            off->branch = EBranchL::L30;
 
             if(!off->social)
                 all_social = false;
@@ -583,29 +588,39 @@ bool Core::checkBannerSize(const Offer *offer)
 	если выбранных тизеров достаточно для РБ, показываем.
 	если нет - добираем из исходного массива стоящие слева тизеры.
  */
-void Core::RISAlgorithm(Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen)
+void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsigned outLen)
 {
     std::map<const long,long> camps;
     Offer::itV p;
+    Offer::Vector result;
+    Offer::MapRate resultAll;
 
     RISResult.clear();
 
-    if(result.size() < outLen)
+    if(items.size() < outLen)
     {
 #ifdef DEBUG
         Log::warn("result size less then 5, return");
 #endif // DEBUG
-        for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
-            RISResult.push_back(*p);
+        for(auto p = items.begin(); p != items.end() && RISResult.size() < outLen; ++p)
+            RISResult.push_back((*p).second);
         goto make_return;
     }
 
-    for(auto i = result.begin(); i != result.end(); ++i)
-        if((*i)->type == Offer::Type::teazer)
+    //sort by rating
+    for(auto i = items.begin(); i != items.end(); ++i)
+        resultAll.insert(Offer::PairRate((*i).second->rating, (*i).second));
+
+    for(auto i = resultAll.begin(); i != resultAll.end(); ++i)
+    {
+        result.push_back((*i).second);
+        if((*i).second->type == Offer::Type::teazer)
         {
             teasersCount++;
-            teasersMediumRating += (*i)->rating;
+            teasersMediumRating += (*i).second->rating;
         }
+    }
+
     teasersMediumRating /= teasersCount;
 
 
@@ -627,6 +642,7 @@ void Core::RISAlgorithm(Offer::Vector &result, Offer::Vector &RISResult, unsigne
         //заставляем очиститься историю показов пользователей
         //если товаров будет хватать, то происходить это будет редко
         hm->clean = true;
+        Log::gdb("clean history");
     }
 
     //если первый элемент баннер, возвращаем баннер.
@@ -791,7 +807,7 @@ make_return:
                         boost::format("id=%s\ninf=%d\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
                         % (*p)->id_int
                         % informer->id
-                        % rand()
+                        % (*p)->gen()
                         % (*p)->url
                         % Config::Instance()->server_ip_
                         % params->location_
@@ -859,7 +875,7 @@ make_return:
                         boost::format("id=%s\ninf=%d\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
                         % (*p)->id_int
                         % informer->id
-                        % rand()
+                        % (*p)->gen()
                         % (*p)->url
                         % Config::Instance()->server_ip_
                         % params->location_

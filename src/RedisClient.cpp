@@ -28,8 +28,13 @@ RedisClient::~RedisClient()
 
 bool RedisClient::connect()
 {
+    isConnected_ = false;
     connection = Connection_new((host + ":" + port).c_str());
-
+    if(connection==NULL)
+    {
+        Log::err("redis cannot connect to %s port %s", host.c_str(), port.c_str());
+        return false;
+    }
     isConnected_ = true;
     return true;
 }
@@ -45,6 +50,7 @@ bool RedisClient::getRange(const std::string &key,
 
     if( !exists(key) )
     {
+        Log::warn("redis no key: %s", key.c_str());
         return true;
     }
 
@@ -72,7 +78,11 @@ bool RedisClient::getRange(const std::string &key,
         int level;
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
-            if(RT_BULK == reply_type)
+            if(reply_type == RT_ERROR)
+            {
+                Log::err("redis getRange: false: %s", reply_data);
+            }
+            else if(RT_BULK == reply_type)
                 ret += std::string(reply_data, reply_len) + ",";
         }
     }
@@ -121,7 +131,11 @@ bool RedisClient::getRange(const std::string &key,
         int level;
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
-            if(RT_BULK == reply_type)
+            if(reply_type == RT_ERROR)
+            {
+                Log::err("redis cmd: getRange false: %s", reply_data);
+            }
+            else if(RT_BULK == reply_type)
             {
                 ret.push_back(std::string(reply_data, reply_len));
             }
@@ -177,7 +191,11 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
 
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
-            if(RT_BULK == reply_type)
+            if(reply_type == RT_ERROR)
+            {
+                Log::err("redis cmd: getRange false: %s", reply_data);
+            }
+            else if(RT_BULK == reply_type)
             {
                     try
                     {
@@ -266,7 +284,11 @@ bool RedisClient::isConnected() const
     int level;
     while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
     {
-        if(reply_type == RT_OK)
+        if(reply_type == RT_ERROR)
+        {
+            Log::err("redis cmd: isConnected false: %s", reply_data);
+        }
+        else if(reply_type == RT_OK)
         {
             std::string ans = std::string(reply_data);
             if(ans.compare(0, 4, "PONG") == 0){ ret = true; break; }
@@ -317,7 +339,11 @@ long int RedisClient::zrank(const std::string &key, long id)
         int level;
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
-            if(reply_type == RT_INTEGER)
+            if(reply_type == RT_ERROR)
+            {
+                Log::err("redis cmd: zrank false: %s",reply_data);
+            }
+            else if(reply_type == RT_INTEGER)
             {
                 ret = strtol(reply_data,NULL,10);
                 break;
@@ -376,7 +402,11 @@ int RedisClient::zscore(const std::string &key, long id)
         int level;
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
-            if(reply_type == RT_INTEGER)
+            if(reply_type == RT_ERROR)
+            {
+                Log::err("redis cmd: zscore false: %s", reply_data);
+            }
+            else if(reply_type == RT_INTEGER)
             {
                 ret = strtol(reply_data,NULL,10);
                 break;
@@ -437,7 +467,11 @@ bool RedisClient::execCmd(const std::string &cmd)
         int level;
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
-            if(reply_type == RT_INTEGER)
+            if(reply_type == RT_ERROR)
+            {
+                Log::err("redis cmd: %s false: %s",cmd.c_str(), reply_data);
+            }
+            else if(reply_type == RT_INTEGER)
             {
 //                ret = strtol(reply_data,NULL,10);
                 break;
@@ -489,7 +523,11 @@ int RedisClient::zcount(const std::string &key) const
         int level;
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
-            if(reply_type == RT_INTEGER)
+            if(reply_type == RT_ERROR)
+            {
+                Log::err("redis cmd: zcount false: %s",reply_data);
+            }
+            else if(reply_type == RT_INTEGER)
             {
                 ret = strtol(reply_data,NULL,10);
                 break;
@@ -534,7 +572,11 @@ int RedisClient::zcount(const std::string &key, long Min, long Max) const
         int level;
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
-            if(reply_type == RT_INTEGER)
+            if(reply_type == RT_ERROR)
+            {
+                Log::err("redis cmd: zcount false: %s",reply_data);
+            }
+            else if(reply_type == RT_INTEGER)
             {
                 ret = strtol(reply_data,NULL,10);
                 break;

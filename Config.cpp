@@ -8,6 +8,11 @@
 #include "Config.h"
 #include <assert.h>
 
+unsigned long request_processed_;
+unsigned long last_time_request_processed;
+unsigned long offer_processed_;
+unsigned long social_processed_;
+
 // Global static pointer used to ensure a single instance of the class.
 Config* Config::mInstance = NULL;
 
@@ -42,6 +47,7 @@ bool Config::LoadConfig(const std::string fName)
     if(!mDoc->LoadFile())
     {
         std::cerr<<"error load file: "<<fName<<std::endl;
+        ::exit(-1);
         return mIsInited;
     }
 
@@ -353,6 +359,11 @@ bool Config::LoadConfig(const std::string fName)
     }
 
     pDb = new DataBase(true);
+
+    request_processed_ = 0;
+    last_time_request_processed = 0;
+    offer_processed_ = 0;
+    social_processed_ = 0;
 
     mIsInited = true;
     return mIsInited;

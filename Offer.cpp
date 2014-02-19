@@ -66,9 +66,11 @@ std::string Offer::toJson() const
     return json.str();
 }
 
-void Offer::gen()
+long long int Offer::gen()
 {
-    token = std::to_string((long long int)rand());
+    token_int = (long long int)rand();
+    token = std::to_string(token_int);
+    return token_int;
 }
 
 

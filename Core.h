@@ -61,7 +61,7 @@ private:
     bool checkBannerSize(const Offer *offer);
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(Offer::Vector &result, Offer::Vector &RISresult, unsigned outLen);
+    void RISAlgorithm(const Offer::Map &items, Offer::Vector &RISresult, unsigned outLen);
 
     bool isSocial (Offer& i);
 

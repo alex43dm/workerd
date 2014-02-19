@@ -148,8 +148,7 @@ void CgiService::Response(FCGX_Request *req,
     FCGX_FPrintF(req->out,"Set-Cookie: %s\r\n", cookie.c_str());
     FCGX_FPrintF(req->out,"Status: 200 OK\r\n");
     FCGX_FFlush(req->out);
-    FCGX_FPrintF(req->out,"%s\r\n", out.c_str());
-
+    FCGX_FPrintF(req->out,"\r\n%s\n", out.c_str());
     FCGX_Finish_r(req);
 }
 
@@ -303,7 +302,7 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
 
     if (url.param("show") == "status")
     {
-        //Response(req, core->Status(), 200);
+        Response(req, bcore->Status(), "");
         return;
     }
 
