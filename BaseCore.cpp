@@ -49,6 +49,7 @@ std::string BaseCore::toString(AMQPMessage *m)
 
 bool BaseCore::ProcessMQ()
 {
+    time_mq_check_ = boost::posix_time::second_clock::local_time();
     try
     {
         {
@@ -58,6 +59,7 @@ bool BaseCore::ProcessMQ()
             if (m->getMessageCount() > -1)
             {
                 Log::gdb("BaseCore::ProcessMQ campaign: %s",m->getRoutingKey().c_str());
+                mq_log_ = "BaseCore::ProcessMQ campaign: " + m->getRoutingKey();
                 if(m->getRoutingKey() == "campaign.update")
                 {
                     Campaign::update(Config::Instance()->pDb->pDatabase, toString(m));
@@ -85,6 +87,7 @@ bool BaseCore::ProcessMQ()
             if (m->getMessageCount() > -1)
             {
                 Log::gdb("BaseCore::ProcessMQ advertise: %s",m->getRoutingKey().c_str());
+                mq_log_ = "BaseCore::ProcessMQ advertise: " + m->getRoutingKey();
                 m1 = toString(m);
                 if(m->getRoutingKey() == "advertise.update")
                 {
@@ -111,6 +114,7 @@ bool BaseCore::ProcessMQ()
             if (m->getMessageCount() > -1)
             {
                 Log::gdb("BaseCore::ProcessMQ informer: %s",m->getRoutingKey().c_str());
+                mq_log_ = "BaseCore::ProcessMQ informer: " + m->getRoutingKey();
                 if(m->getRoutingKey() == "informer.update")
                 {
                     pdb->InformerUpdate(toString(m));
@@ -133,16 +137,6 @@ bool BaseCore::ProcessMQ()
         Log::err("AMQPException: %s", ex.getMessage().c_str());
     }
     return false;
-}
-
-/** Помещает сообщение \a message в журнал AMQP */
-void BaseCore::LogToAmqp(const std::string &message)
-{
-    string logline = boost::str(
-	    boost::format("%1% \t %2%")
-	    % boost::posix_time::second_clock::local_time()
-	    % message);
-    mq_log_.push_back(logline);
 }
 
 /*
@@ -306,6 +300,7 @@ std::string BaseCore::Status()
     out << "<tr><td>Текущее время: </td> <td>" <<
         boost::posix_time::second_clock::local_time() <<
         "</td></tr>";
+    out << "<tr><td>Количество ниток: </td> <td>" << Config::Instance()->server_children_<< "</td></tr>";
 
     try
     {
@@ -392,8 +387,9 @@ std::string BaseCore::Status()
     out <<  "<tr><td>Сборка: </td><td>" << __DATE__ << " " << __TIME__<<"</td></tr>";
     //out <<  "<tr><td>Драйвер mongo: </td><td>" << mongo::versionString << "</td></tr>";
     out << "</table>";
-/*
-    std::list<Campaign> campaigns = Campaign::all();
+
+    std::vector<Campaign*> campaigns;
+    Campaign::info(campaigns);
     out << "<p>Загружено <b>" << campaigns.size() << "</b> кампаний: </p>\n";
     out << "<table><tr>\n"
         "<th>Наименование</th>"
@@ -404,24 +400,20 @@ std::string BaseCore::Status()
 
     for (auto it = campaigns.begin(); it != campaigns.end(); it++)
     {
-        Campaign c(*it);
         out << "<tr>" <<
-            "<td>" << c.title() << "</td>" <<
-            "<td>" << (c.valid()? "Да" : "Нет") << "</td>" <<
-            "<td>" << (c.social()? "Да" : "Нет") << "</td>" <<
-            "<td>" << Offers::x()->offers_by_campaign(c).size() << "</td>"<<
+            "<td>" << (*it)->title << "</td>" <<
+            "<td>" << ((*it)->valid ? "Да" : "Нет") << "</td>" <<
+            "<td>" << ((*it)->social ? "Да" : "Нет") << "</td>" <<
+            "<td>" << (*it)->offersCount << "</td>"<<
             "</tr>\n";
-    }*/
+    }
     out << "</table>";
 
     // Журнал сообщений AMQP
     out << "<p>Журнал AMQP: </p>"
         "<table>";
-    int i = 0;
-    for (auto it = mq_log_.begin(); it != mq_log_.end(); it++)
-        out << "<tr><td>" << ++i << "</td>"
-            "<td>" << *it << "</td></tr>";
-    out << "<tr><td></td><td>Последняя проверка сообщений: </td><tr>"
+    out << "<tr><td>Последнее сообщение:</td><td>"<< mq_log_<< "</td></tr>";
+    out << "<tr><td>Последняя проверка сообщений:</td><td>"<< time_mq_check_ <<"</td><tr>"
         "</table>";
     out << "</body>";
     out << "</html>";

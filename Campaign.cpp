@@ -40,7 +40,7 @@ Campaign::Campaign(long long _id) :
     }
 }
 //-------------------------------------------------------------------------------------------------------
-void Campaign::info()
+void Campaign::info(std::vector<Campaign*> &res)
 {
     char buf[8192];
     Kompex::SQLiteStatement *pStmt;
@@ -51,14 +51,27 @@ void Campaign::info()
             "SELECT c.title,c.valid,c.social,count(ofr.campaignId) FROM Campaign AS c \
             LEFT JOIN Offer AS ofr ON c.id=ofr.campaignId \
             GROUP BY ofr.campaignId;");
+
     try
     {
-        pStmt->SqlStatement(buf);
+        pStmt->Sql(buf);
+
+        while(pStmt->FetchRow())
+        {
+            Campaign *c = new Campaign();
+            c->title = pStmt->GetColumnString(0);
+            c->valid = pStmt->GetColumnInt(1) ? true : false;
+            c->social = pStmt->GetColumnInt(2) ? true : false;
+            c->offersCount = pStmt->GetColumnInt(3);
+            res.push_back(c);
+        }
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("GeoRerions::add %s error: %s", buf, ex.GetString().c_str());
+        Log::err("Campaign::info %s error: %s", buf, ex.GetString().c_str());
     }
+
+    pStmt->FreeQuery();
 }
 
 //-------------------------------------------------------------------------------------------------------

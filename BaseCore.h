@@ -69,10 +69,9 @@ public:
 private:
     void InitMessageQueue();
     void InitMongoDB();
-    void LogToAmqp(const std::string &message);
 
  /// Время запуска службы
-    boost::posix_time::ptime time_service_started_;
+    boost::posix_time::ptime time_service_started_,time_mq_check_;
 
     AMQP *amqp_;
 
@@ -88,7 +87,7 @@ private:
     AMQPQueue *mq_advertise_;
 
     /// История полученных сообщений MQ
-    std::vector<std::string> mq_log_;
+    std::string mq_log_;
     std::string toString(AMQPMessage *m);
     bool cmdParser(const std::string &cmd, std::string &offerId, std::string &campaignId);
     ParentDB *pdb;

@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1392740616 source:/home/alex/Projects/worker/BaseCore.cpp
+1392893410 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -863,7 +863,7 @@
 	<stdarg.h>
 	<pthread.h>
 
-1392629965 /home/alex/Projects/worker/BaseCore.h
+1392899315 /home/alex/Projects/worker/BaseCore.h
 	"config.h"
 	<list>
 	<vector>
@@ -910,7 +910,7 @@
 1391363950 /home/alex/Projects/worker/Informer.h
 	<string>
 
-1392797476 /home/alex/Projects/worker/Campaign.h
+1392898243 /home/alex/Projects/worker/Campaign.h
 	<string>
 	<map>
 	<list>
@@ -925,7 +925,7 @@
 	"Campaign.h"
 	"EBranch.h"
 
-1392797376 source:/home/alex/Projects/worker/Campaign.cpp
+1392898235 source:/home/alex/Projects/worker/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"DB.h"
@@ -1217,7 +1217,7 @@
 	"../Log.h"
 	"XXXSearcher.h"
 
-1392812595 source:/home/alex/Projects/worker/HistoryManager.cpp
+1392815721 source:/home/alex/Projects/worker/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -1475,7 +1475,7 @@
 	"DB.h"
 	"KompexSQLiteDatabase.h"
 
-1392717104 source:/home/alex/Projects/worker/src/ParentDB.cpp
+1392898210 source:/home/alex/Projects/worker/src/ParentDB.cpp
 	"ParentDB.h"
 	"DB.h"
 	"Log.h"
@@ -1485,5 +1485,5 @@
 	"Config.h"
 	"Offer.h"
 
-1392713249 /home/alex/Projects/worker/config.h
+1392892337 /home/alex/Projects/worker/config.h
 
