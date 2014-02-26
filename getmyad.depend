@@ -830,7 +830,7 @@
 	<AMQPcpp.h>
 	"DataBase.h"
 
-1392893410 source:/home/alex/Projects/worker/BaseCore.cpp
+1392900024 source:/home/alex/Projects/worker/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -1363,7 +1363,7 @@
 	"KompexSQLiteException.h"
 	"Log.h"
 
-1392794708 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+1392983350 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
 	"Log.h"
 	"Config.h"
 	"XXXSearcher.h"
@@ -1486,4 +1486,323 @@
 	"Offer.h"
 
 1392892337 /home/alex/Projects/worker/config.h
+
+1386588626 /home/alex/Projects/worker/include/KompexSQLiteDatabase.h
+	<string>
+	"sqlite3.h"
+	"KompexSQLitePrerequisites.h"
+
+1386588626 /home/alex/Projects/worker/include/KompexSQLitePrerequisites.h
+
+1391029722 /home/alex/Projects/worker/include/Log.h
+	<stdio.h>
+	<syslog.h>
+	<stdarg.h>
+	<pthread.h>
+
+1386588626 /home/alex/Projects/worker/include/KompexSQLiteStatement.h
+	<map>
+	<string>
+	"sqlite3.h"
+	"KompexSQLitePrerequisites.h"
+
+1389182040 /home/alex/Projects/worker/include/KompexSQLiteException.h
+	<map>
+	<string>
+	<sstream>
+	<iostream>
+	"KompexSQLitePrerequisites.h"
+
+1392983686 /home/alex/Projects/worker/include/HistoryManager.h
+	<string>
+	<list>
+	<map>
+	<boost/date_time.hpp>
+	<boost/date_time/gregorian/gregorian.hpp>
+	"Offer.h"
+	"Informer.h"
+	"RedisClient.h"
+	"Params.h"
+	"ParamParse.h"
+	"XXXSearcher.h"
+	"Config.h"
+
+1392806488 /home/alex/Projects/worker/include/Offer.h
+	<string>
+	<list>
+	<map>
+	<vector>
+	"Campaign.h"
+	"EBranch.h"
+
+1392898243 /home/alex/Projects/worker/include/Campaign.h
+	<string>
+	<map>
+	<list>
+	"DB.h"
+	"KompexSQLiteDatabase.h"
+
+1392630004 /home/alex/Projects/worker/include/DB.h
+	"config.h"
+	<mongo/client/connpool.h>
+	"Log.h"
+	<string>
+	<utility>
+
+1391363950 /home/alex/Projects/worker/include/Informer.h
+	<string>
+
+1390993298 /home/alex/Projects/worker/include/Params.h
+	<sstream>
+	<string>
+	<boost/date_time.hpp>
+
+1392729438 /home/alex/Projects/worker/include/Config.h
+	<string>
+	<list>
+	<tinyxml.h>
+	"DataBase.h"
+
+1389361472 /home/alex/Projects/worker/include/DataBase.h
+	<string>
+	<vector>
+	<stdio.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<fcntl.h>
+	<unistd.h>
+	"KompexSQLiteDatabase.h"
+	"KompexSQLiteStatement.h"
+
+1393225911 source:/home/alex/Projects/worker/src/BaseCore.cpp
+	"DB.h"
+	<boost/foreach.hpp>
+	<boost/date_time/posix_time/ptime.hpp>
+	<boost/date_time/posix_time/posix_time_io.hpp>
+	<boost/format.hpp>
+	<boost/regex.hpp>
+	<ctime>
+	<cstdlib>
+	<sstream>
+	"Log.h"
+	"BaseCore.h"
+	"base64.h"
+	"InformerTemplate.h"
+	"Informer.h"
+	"Campaign.h"
+	"Offer.h"
+	"Config.h"
+
+1392899315 /home/alex/Projects/worker/include/BaseCore.h
+	"config.h"
+	<list>
+	<vector>
+	<map>
+	<utility>
+	<boost/date_time.hpp>
+	<amqpcpp.h>
+	<AMQPcpp.h>
+	"DataBase.h"
+	"ParentDB.h"
+
+1386588626 /home/alex/Projects/worker/include/base64.h
+	<string>
+
+1390810601 /home/alex/Projects/worker/include/InformerTemplate.h
+	<string>
+
+1392898235 source:/home/alex/Projects/worker/src/Campaign.cpp
+	<boost/algorithm/string/replace.hpp>
+	"Campaign.h"
+	"DB.h"
+	"Log.h"
+	"Config.h"
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+
+1393225943 source:/home/alex/Projects/worker/src/CgiService.cpp
+	<boost/algorithm/string.hpp>
+	"DB.h"
+	"Log.h"
+	"CgiService.h"
+	"UrlParser.h"
+	"GeoIPTools.h"
+	"BaseCore.h"
+	"Core.h"
+	"Informer.h"
+	"InformerTemplate.h"
+	"Cookie.h"
+	"DataBase.h"
+	"Server.h"
+	<fcgi_stdio.h>
+
+1392797462 /home/alex/Projects/worker/include/CgiService.h
+	<string>
+	"BaseCore.h"
+	"Config.h"
+	<fcgiapp.h>
+
+1389354901 /home/alex/Projects/worker/include/UrlParser.h
+	<map>
+	<string>
+
+1388392311 /home/alex/Projects/worker/include/GeoIPTools.h
+	<GeoIP.h>
+	<GeoIPCity.h>
+	<string>
+
+1392812501 /home/alex/Projects/worker/include/Core.h
+	<list>
+	<vector>
+	<map>
+	<utility>
+	<algorithm>
+	<boost/date_time.hpp>
+	<boost/algorithm/string.hpp>
+	"Offer.h"
+	"Informer.h"
+	"Params.h"
+	"DataBase.h"
+	"HistoryManager.h"
+
+1386588626 /home/alex/Projects/worker/include/Cookie.h
+	<string>
+	<time.h>
+	<boost/date_time/posix_time/posix_time_types.hpp>
+
+1392729646 source:/home/alex/Projects/worker/src/Config.cpp
+	<iostream>
+	<fstream>
+	<string.h>
+	<stdlib.h>
+	"Log.h"
+	"Config.h"
+	<assert.h>
+
+1393226004 source:/home/alex/Projects/worker/src/Core.cpp
+	<boost/foreach.hpp>
+	<boost/date_time/posix_time/ptime.hpp>
+	<boost/date_time/posix_time/posix_time_io.hpp>
+	<boost/format.hpp>
+	<boost/algorithm/string.hpp>
+	<ctime>
+	<cstdlib>
+	"Config.h"
+	"Log.h"
+	"Core.h"
+	"DB.h"
+	"InformerTemplate.h"
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+	"base64.h"
+	"EBranch.h"
+
+1392713232 source:/home/alex/Projects/worker/src/DataBase.cpp
+	<iostream>
+	<algorithm>
+	<fstream>
+	<signal.h>
+	<time.h>
+	<dirent.h>
+	<sys/stat.h>
+	<strings.h>
+	<stdlib.h>
+	<string.h>
+	"Log.h"
+	"DataBase.h"
+	"KompexSQLiteException.h"
+	"GeoRerions.h"
+	"Config.h"
+
+1392636850 source:/home/alex/Projects/worker/src/DB.cpp
+	"DB.h"
+
+1392815721 source:/home/alex/Projects/worker/src/HistoryManager.cpp
+	"HistoryManager.h"
+	"Config.h"
+	"Log.h"
+	"DB.h"
+
+1391363428 source:/home/alex/Projects/worker/src/Informer.cpp
+	"Informer.h"
+
+1390821469 source:/home/alex/Projects/worker/src/InformerTemplate.cpp
+	<fstream>
+	"Config.h"
+	"InformerTemplate.h"
+
+1386588626 source:/home/alex/Projects/worker/src/KompexSQLiteDatabase.cpp
+	<fstream>
+	<iostream>
+	<exception>
+	"KompexSQLiteDatabase.h"
+	"KompexSQLiteException.h"
+
+1389943561 source:/home/alex/Projects/worker/src/KompexSQLiteStatement.cpp
+	<iostream>
+	<iomanip>
+	<exception>
+	<sstream>
+	<string.h>
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteDatabase.h"
+	"KompexSQLiteException.h"
+
+1391029678 source:/home/alex/Projects/worker/src/Log.cpp
+	"Log.h"
+
+1393226135 source:/home/alex/Projects/worker/src/main.cpp
+	"CgiService.h"
+	"Log.h"
+
+1392806520 source:/home/alex/Projects/worker/src/Offer.cpp
+	"Offer.h"
+	"Log.h"
+	"json.h"
+
+1393226153 source:/home/alex/Projects/worker/src/Params.cpp
+	<sstream>
+	<boost/algorithm/string/trim.hpp>
+	<boost/regex/icu.hpp>
+	<boost/date_time.hpp>
+	<string>
+	"Params.h"
+	"GeoIPTools.h"
+	"Log.h"
+
+1389967621 source:/home/alex/Projects/worker/src/RedisHistory.cpp
+	"Config.h"
+	"RedisHistory.h"
+	"Log.h"
+
+1389968418 /home/alex/Projects/worker/include/RedisHistory.h
+	<string>
+	<list>
+	"main.h"
+	"RedisClient.h"
+
+1389967273 /home/alex/Projects/worker/include/main.h
+
+1389969115 source:/home/alex/Projects/worker/src/sphinxRequestsQueue.cpp
+	"sphinxRequestsQueue.h"
+
+1389969154 /home/alex/Projects/worker/include/sphinxRequestsQueue.h
+	<vector>
+	"sphinxRequests.h"
+
+1391670818 source:/home/alex/Projects/worker/src/GeoIPTools.cpp
+	"GeoIPTools.h"
+
+1392637687 source:/home/alex/Projects/worker/src/UrlParser.cpp
+	<sstream>
+	"UrlParser.h"
+
+1389357062 source:/home/alex/Projects/worker/src/Cookie.cpp
+	"Cookie.h"
+	<string.h>
+	<boost/date_time/posix_time/posix_time.hpp>
+
+1386588626 source:/home/alex/Projects/worker/src/base64.cpp
+	"base64.h"
+	<iostream>
 

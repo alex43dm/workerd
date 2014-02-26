@@ -71,7 +71,10 @@ void XXXSearcher::processKeywords(
     const std::vector<sphinxRequests> &sr,
     Offer::Map &items)
 {
+#ifdef DEBUG
     int counts;
+        counts = 0;
+#endif // DEBUG
     float oldRating;
 
     try
@@ -79,7 +82,6 @@ void XXXSearcher::processKeywords(
         sphinx_result * res;
 
         //Создаем запросы
-        counts = 0;
         for (auto it = sr.begin(); it != sr.end(); ++it)
         {
             sphinx_add_query( client, (*it).query.c_str(), indexName.c_str(), NULL );
@@ -167,6 +169,30 @@ void XXXSearcher::processKeywords(
                                              const sphinx_uint64_t * docids,
                                              const sphinx_int64_t * values );
                 }*/
+                /*
+                            std::string match = sphinx_get_int(res, i, 2);
+                            if ( match == "nomatch")
+                            {
+                                matching = (string) sphinx_get_string( res, i, 0 ) + " | " + (string) sphinx_get_string( res, i, 1 );
+                            }
+                            else if (match == "broadmatch")
+                            {
+                                matching = sphinx_get_string( res, i, 2 );
+                            }
+                            else if (match == "phrasematch")
+                            {
+                                matching = sphinx_get_string( res, i, 4 );
+                            }
+                            else if (match == "exactmatch")
+                            {
+                                matching = sphinx_get_string( res, i, 3 );
+                            }
+                            else
+                            {
+                                Log::warn("Результат: %s лишний",pOffer->id_int);
+                                break;
+                            }
+*/
 
             }
         }

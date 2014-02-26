@@ -221,8 +221,6 @@
 
 Config *cfg;
 
-#include "utils/GeoIPTools.h"
-
 int main(int argc, char *argv[])
 {
     Log(LOG_LOCAL0);

@@ -71,6 +71,8 @@ public:
 
     bool getPageKeywordsAsync();
     bool getPageKeywordsAsyncWait();
+    void *getPageKeywordsEnv(void *data);
+    void getPageKeywordsHistory();
 
     bool getRetargetingAsync();
     void getRetargetingAsyncWait();
@@ -96,7 +98,8 @@ private:
     pthread_t   tid, thrGetDeprecatedOffersAsync,
                 thrGetLongTermAsync,
                 thrGetShortTermAsync,
-                thrGetRetargetingAsync;
+                thrGetRetargetingAsync,
+                thrGetPageKeywordsAsync;
 
     std::list<std::string> vshortTerm;
     std::list<std::string> vlongTerm;

@@ -14,7 +14,7 @@
 #include "InformerTemplate.h"
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
-#include "utils/base64.h"
+#include "base64.h"
 #include "EBranch.h"
 
 #define CMD_SIZE 8192

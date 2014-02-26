@@ -7,7 +7,7 @@
 #include <string>
 
 #include "Params.h"
-#include "utils/GeoIPTools.h"
+#include "GeoIPTools.h"
 #include "Log.h"
 
 
