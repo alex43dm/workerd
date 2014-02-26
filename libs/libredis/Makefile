@@ -21,6 +21,8 @@ libredis: libredis/batch.o libredis/connection.o libredis/ketama.o libredis/md5.
 	gcc -shared -o "lib/libredis.so" ./libredis/batch.o ./libredis/buffer.o ./libredis/connection.o ./libredis/ketama.o ./libredis/md5.o ./libredis/module.o ./libredis/parser.o $(LIBS)
 	ar rcs lib/libredis.a ./libredis/batch.o ./libredis/buffer.o ./libredis/connection.o ./libredis/ketama.o ./libredis/md5.o ./libredis/module.o ./libredis/parser.o
 
+all: libredis
+
 php_ext:
 	rm -rf $(PHP_EXT_BUILD)
 	cp -a php/ext/libredis $(PHP_EXT_BUILD)

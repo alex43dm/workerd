@@ -11,7 +11,6 @@
 #include "Log.h"
 #include "BaseCore.h"
 #include "base64.h"
-//#include "utils/benchmark.h"
 
 #include "InformerTemplate.h"
 #include "Informer.h"
