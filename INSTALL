@@ -147,7 +147,6 @@ option `--program-prefix=PREFIX' or `--program-suffix=SUFFIX'.
 
 Optional Features
 =================
-
    Some packages pay attention to `--enable-FEATURE' options to
 `configure', where FEATURE indicates an optional part of the package.
 They may also pay attention to `--with-PACKAGE' options, where PACKAGE

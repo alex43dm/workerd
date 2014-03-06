@@ -636,6 +636,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+DEBUG_FALSE
+DEBUG_TRUE
 BOOST_REGEX_LIBS
 BOOST_REGEX_LDPATH
 BOOST_REGEX_LDFLAGS
@@ -791,6 +793,7 @@ with_sysroot
 enable_libtool_lock
 with_boost
 enable_static_boost
+enable_debug
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1437,6 +1440,7 @@ Optional Features:
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-static-boost   Prefer the static boost libraries over the shared
                           ones [no]
+  --enable-debug          enable debugging, default: no
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -3632,7 +3636,6 @@ else
 fi
 
 
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ${MAKE-make} sets \$(MAKE)" >&5
 $as_echo_n "checking whether ${MAKE-make} sets \$(MAKE)... " >&6; }
 set x ${MAKE-make}
@@ -3663,6 +3666,7 @@ else
 $as_echo "no" >&6; }
   SET_MAKE="MAKE=${MAKE-make}"
 fi
+
 
 
 ac_ext=cpp
@@ -15146,6 +15150,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 # Only expand once:
 
 
+LTCFLAGS="-O2"
+LTCXXFLAGS="-O2"
 
 
 
@@ -15334,7 +15340,6 @@ _ACEOF
 else
   as_fn_error $? "icudata library missing" "$LINENO" 5
 fi
-
 
 
 echo "$as_me: this is boost.m4 serial 18" >&5
@@ -18011,6 +18016,28 @@ else
 fi
 
 
+# Check whether --enable-debug was given.
+if test "${enable_debug+set}" = set; then :
+  enableval=$enable_debug; case "${enableval}" in
+		yes) debug=true ;;
+		no)  debug=false ;;
+		*)   as_fn_error $? "bad value ${enableval} for --enable-debug" "$LINENO" 5 ;;
+		esac
+else
+  debug=false
+fi
+
+ if test x"$debug" = x"true"; then
+  DEBUG_TRUE=
+  DEBUG_FALSE='#'
+else
+  DEBUG_TRUE='#'
+  DEBUG_FALSE=
+fi
+
+
+CPPFLAGS="-W -Wall"
+
 ac_config_headers="$ac_config_headers config.h"
 
 
@@ -18152,6 +18179,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${DEBUG_TRUE}" && test -z "${DEBUG_FALSE}"; then
+  as_fn_error $? "conditional \"DEBUG\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

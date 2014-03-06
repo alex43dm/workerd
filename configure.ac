@@ -4,14 +4,16 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE
 
 AC_PROG_CXX
-AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+AC_PROG_INSTALL
 
 AC_LANG_CPLUSPLUS
 
 dnl Check for libtool
 LT_PREREQ([2.2.6])
 LT_INIT([disable-static])
+LTCFLAGS="-O2"
+LTCXXFLAGS="-O2"
 
 AC_CONFIG_LIBOBJ_DIR([libs/libredis])
 AC_CONFIG_LIBOBJ_DIR([libs/amqpcpp])
@@ -22,7 +24,6 @@ AC_CHECK_LIB([mongoclient],[main],[],[AC_MSG_ERROR([mongoclient(mongodb build wi
 AC_CHECK_LIB([icuuc],[u_tolower],[],[AC_MSG_ERROR([icuuc library missing])])
 AC_CHECK_LIB([icui18n],[main],[],[AC_MSG_ERROR([icui18n library missing])])
 AC_CHECK_LIB([icudata],[main],[],[AC_MSG_ERROR([icudata library missing])])
-
 
 BOOST_REQUIRE([1.48],AC_MSG_ERROR([boost>=1.48 required]))
 BOOST_FILESYSTEM()
@@ -36,6 +37,19 @@ AC_CHECK_LIB([sphinxclient], [sphinx_add_query], [], [AC_MSG_ERROR([sphinxclient
 AC_CHECK_LIB([GeoIP], [GeoIP_region_name_by_code], [], [AC_MSG_ERROR([GeoIP was not found])])
 AC_CHECK_LIB([tinyxml], [main], [], [AC_MSG_ERROR([tinyxml was not found])])
 AC_CHECK_LIB([rabbitmq],[main],[],[AC_MSG_ERROR([rabbitmq library missing])])
+
+AC_ARG_ENABLE(debug,
+AS_HELP_STRING([--enable-debug],
+	[enable debugging, default: no]),
+		[case "${enableval}" in
+		yes) debug=true ;;
+		no)  debug=false ;;
+		*)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
+		esac],
+		[debug=false])
+AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
+
+CPPFLAGS="-W -Wall"
 
 AC_CONFIG_HEADERS([config.h])
 

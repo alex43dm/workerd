@@ -18,6 +18,8 @@ all: lib $(EXAMPLES)
 
 lib: $(LIBFILE)
 
+install:
+
 $(LIBFILE): $(OBJECTS)
 	$(AR) rcs $@ $(OBJECTS)
 

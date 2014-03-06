@@ -36,6 +36,7 @@ c_test: libredis test.o
 	gcc -o test test.o -Llib -lredis
 	@echo "!! executing test, make sure you have redis running locally at 127.0.0.1:6379 !!"
 	LD_LIBRARY_PATH=lib ./test
+install:
 	
 clean:
 	cd libredis; rm -rf *.o

@@ -97,8 +97,8 @@ EMPTY STRING
 
 Core algorithm
 
-each thread wait input, so it cann't get cpu resources, after parsing intput variables(class Param):
-1) get informer:
+each thread wait input, so it cann't get cpu resources, after parsing intput variables(class Param) and get geo data:
+1) load informer:
 cat db_dump/requests/02.sql 
 SELECT 	inf.id,
 	inf.capacity,
@@ -112,7 +112,7 @@ LIMIT 1;
 
 2) load all histories(class HistoryManager) asynchronous in it own thread.
 3) get all offers from request(Outputs)
-4) wait until all histories were loaded and process rating correction in sphinx(class XXXSearcher)
+4) wait until all histories were loaded and process rating correction in sphinx(class XXXSearcher) history with zero rating does not use
 5) process RIS algorithm(main)
 6) wait and process re-targeting offers request by RIS algorithm
 7) merge re-targeting and main vector;
@@ -122,12 +122,50 @@ LIMIT 1;
 RUN
 workerd -c path/to/config.xml [-s path/to/unix/socket/path]
 
+DEBUG
+If the program configured with –debug-enable it does not fork in background, and will print debug information to stdout. 
+
 SYSLOG-NG
 add to /etc/syslog-ng/syslog-ng.conf:
+
+template t_isots
+{
+    template("$R_ISODATE $MSG\n");
+    template_escape(no);
+};
 
 destination getmyad { file("/var/log/workerd.log" template(t_isots)); };
 filter f_getmyad { program("getmyad"); };
 log { source(src); filter(f_getmyad); destination(getmyad); };
+
+NIGING
+the sample nginx configuration:
+
+        upstream fastcgi_backend {
+                server unix:/tmp/workerd.sock;
+                server unix:/tmp/workerd1.sock;
+                server unix:/tmp/workerd2.sock;
+        }
+
+        server {
+                listen 0.0.0.0;
+                server_name yottos.com;
+                access_log off;#/var/log/nginx/localhost.access_log main;
+                error_log /var/log/nginx/localhost.error_log info;
+                root /var/www/localhost/htdocs;
+                keepalive_timeout 1ms;
+
+                location /adshow.fcgi { 
+                        send_timeout 100ms;
+                        fastcgi_cache off;
+                        fastcgi_pass fastcgi_backend;
+                        fastcgi_buffer_size 24k;
+                        fastcgi_buffers 2 24k;
+                        fastcgi_busy_buffers_size 24k;
+                        fastcgi_keep_conn on;
+                        include fastcgi_params; 
+                } 
+        }
 
 DATABASES
 At start(if not configured with --enable-debug) forks in background and get data from mongo database described in config.xml section:
@@ -268,22 +306,22 @@ Sphinx server:
 	SPH_MATCH_EXTENDED2 The same as SPH_MATCH_EXTENDED plus ranking and quorum searching support.
 
  sphinx/rank_mode:
- SPH_RANK_PROXIMITY_BM25 = sum(lcs*user_weight)*1000+bm25
- SPH_RANK_BM25 = bm25
- SPH_RANK_NONE = 1
- SPH_RANK_WORDCOUNT = sum(hit_count*user_weight)
- SPH_RANK_PROXIMITY = sum(lcs*user_weight)
- SPH_RANK_MATCHANY = sum((word_count+(lcs-1)*max_lcs)*user_weight)
- SPH_RANK_FIELDMASK = field_mask
- SPH_RANK_SPH04 = sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight)*1000+bm25
+	SPH_RANK_PROXIMITY_BM25 = sum(lcs*user_weight)*1000+bm25
+	SPH_RANK_BM25 = bm25
+	SPH_RANK_NONE = 1
+	SPH_RANK_WORDCOUNT = sum(hit_count*user_weight)
+	SPH_RANK_PROXIMITY = sum(lcs*user_weight)
+	SPH_RANK_MATCHANY = sum((word_count+(lcs-1)*max_lcs)*user_weight)
+	SPH_RANK_FIELDMASK = field_mask
+	SPH_RANK_SPH04 = sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight)*1000+bm25
 
  sphinx/sort_mode:
- SPH_SORT_RELEVANCE Sort by relevance in descending order (best matches first).
- SPH_SORT_ATTR_DESC Sort by an attribute in descending order (bigger attribute values first).
- SPH_SORT_ATTR_ASC Sort by an attribute in ascending order (smaller attribute values first).
- SPH_SORT_TIME_SEGMENTS Sort by time segments (last hour/day/week/month) in descending order, and then by relevance in descending order.
- SPH_SORT_EXTENDED Sort by SQL-like combination of columns in ASC/DESC order.
- SPH_SORT_EXPR Sort by an arithmetic expression.
+	SPH_SORT_RELEVANCE Sort by relevance in descending order (best matches first).
+	SPH_SORT_ATTR_DESC Sort by an attribute in descending order (bigger attribute values first).
+	SPH_SORT_ATTR_ASC Sort by an attribute in ascending order (smaller attribute values first).
+	SPH_SORT_TIME_SEGMENTS Sort by time segments (last hour/day/week/month) in descending order, and then by relevance in descending order.
+	SPH_SORT_EXTENDED Sort by SQL-like combination of columns in ASC/DESC order.
+	SPH_SORT_EXPR Sort by an arithmetic expression.
 
  sphinx/fields{title,description,keywords,exactly_phrases,phrases,minuswords}: search fields with weight
 
@@ -301,9 +339,9 @@ Server configuration:
  	server/db_geo_csv geo ip database file path
  	server/template_teaser teaser template file path:
 	        	%1%	    CSS
-		%2%	    JSON
-		%3%	    offers count
-		%4%	    next link
+ %2%	    JSON
+ %3%	    offers count
+ %4%	    next link
 	server/template_banner the banner template path
 	server/swfobject swfobject.js file
  	server/geoGity geo city file path
@@ -316,8 +354,8 @@ Server configuration:
 	server/time_update: campaign by time update interval
 
  install:
-    #aclocal -I m4 && autoconf && automake
-    #make
-    run:
-    ./worker
+    	#aclocal -I m4 && autoconf && automake
+    	#./configure
+ 	#make
 
+good luck:)

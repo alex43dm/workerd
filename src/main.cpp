@@ -1,30 +1,20 @@
 #include "CgiService.h"
 #include "Log.h"
 
-/** \mainpage GetMyAd worker
+/** \mainpage workerd
 
     \section usage_section Использование
 
-    \b getmyad-worker --- это модуль, ответственный за непосредственное отображение
-    рекламы на сайтах-партнёрах. Может подключаться тремя вариантами:
-
-    -# Основной режим использования --- через FastCGI.
-    -# Через CGI --- удобно для проверки работоспобности с сервером.
-    -# Для удобства отладки может вызываться из командной строки с параметром
-        QUERY_STRING, то есть той частью, которая находится после вопросительного
-        знака в url.
-
-    Примеры использования из командной строки:
-
-    \code
-	getmyad-worker ?scr=49A37671-D505-4B07-8BCA-0B3F65A99B73&country=UA
-	getmyad-worker ?show=status
-    \endcode
-
+    \b workerd --- it's deamon, to return html(inframe) with offers
+    install:
+    #aclocal -I m4 && autoconf && automake
+    #make
+    run:
+    ./worker
 
     \section settings_section Настройка сервиса
 
-    getmyad-worker использует две базы данных mongo:
+    workerd использует две базы данных mongo:
 
     -# Главная БД, которая содержит описание всех сущностей (информеры,
        кампании, предложения и т.д.). Это основная база данных проекта,
@@ -144,36 +134,8 @@
 	range_context=0.25
 	\endcode
 
-	Модуль будет искать индекс в папке "/var/www/index".
-
-	Для реализации возможности выделения строки запроса пользователя в одной папке с модулем должен находиться
-	файл "SearchEngines.txt", в котором должны быть заданы поисковики и имена параметров, отвечающих за запрос
-	пользователя.\n
-	Пример записи данных в файле:
-	\code
-	google.: q=, as_q=, as=
-	rambler.ru: query=, words=
-	go.mail.ru/search_images: q=
-	go.mail.ru: q=
-	images.google.: q=
-	search.live.com: q=
-	rapidshare-search-engine: s=
-	search.yahoo.com: p=
-	nigma.ru/index.php: s=, q=
-	search.msn.com/results: q=
-	ask.com/web: q=
-	search.qip.ru/search: query=
-	rapidall.com/search.php: query=
-	images.yandex.ru/: text=
-	m.yandex.ru/search: query=
-	hghltd.yandex.net: text=
-	yandex.ru: text=
-	\endcode
-
 	Для реализации возможности отображения flash-баннеров в одной папке с модулем должен находиться файл "swfobject.js".
 	Это файл с javascript-библиотекой swfobject. При написании модуля использовалась версия swfobject 2.2.
-
-
 
 
     \section query_params_section Параметры запроса

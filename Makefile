@@ -99,7 +99,8 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(docdir)"
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(docdir)" \
+	"$(DESTDIR)$(sysconfdir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_workerd_OBJECTS = workerd-base64.$(OBJEXT) workerd-Core.$(OBJEXT) \
 	workerd-GeoRerions.$(OBJEXT) \
@@ -208,7 +209,7 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-DATA = $(dist_doc_DATA)
+DATA = $(dist_doc_DATA) $(sysconf_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -314,7 +315,7 @@ CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPP = gcc -E
-CPPFLAGS = 
+CPPFLAGS = -W -Wall
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
@@ -417,15 +418,18 @@ psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 srcdir = .
-sysconfdir = ${prefix}/etc
+sysconfdir = ${prefix}/etc/worker
 target_alias = 
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = libs/libredis libs/amqpcpp
-workerd_CFLAGS = -O2
-workerd_CPPFLAGS = -Wall -std=c++11 -Iinclude -Ilibs/libredis
+AM_CFLAGS = -Ofast
+#AM_CFLAGS = -g -DDEBUG -Wall
+AM_CXXFLAGS = -Ofast
+#AM_CXXFLAGS = -g -DDEBUG -Wall
+workerd_CPPFLAGS = -std=c++11 -Iinclude -Ilibs/libredis
 workerd_SOURCES = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/InformerTemplate.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
 workerd_LDADD = \
 	$(BOOST_DATE_TIME_LIBS) \
@@ -437,6 +441,43 @@ workerd_LDADD = \
 	libs/amqpcpp/libamqpcpp.a
 
 dist_doc_DATA = README
+sysconf_DATA = \
+db_dump/requests/02.sql \
+db_dump/requests/01.sql \
+db_dump/requests/04.sql \
+db_dump/requests/03.sql \
+db_dump/UA_RU \
+db_dump/tables/11_GeoCountries.sql \
+db_dump/tables/00_Campaign.sql \
+db_dump/tables/17_Retargeting.sql \
+db_dump/tables/12_GeoRerions.sql \
+db_dump/tables/20_GeoLiteCity.sql \
+db_dump/tables/06_Accounts.sql \
+db_dump/tables/02_Offer.sql \
+db_dump/tables/07_Campaign2Accounts.sql \
+db_dump/tables/15_CampaignNow.sql \
+db_dump/tables/16_Informer.sql \
+db_dump/tables/18_Informer2OfferRating.sql \
+db_dump/tables/10_CronCampaign.sql \
+db_dump/tables/05_Campaign2Informer.sql \
+db_dump/tables/14_regionTargeting.sql \
+db_dump/tables/08_Domains.sql \
+db_dump/tables/19_Campaign2Categories.sql \
+db_dump/tables/04_Categories2Domain.sql \
+db_dump/tables/13_geoTargeting.sql \
+db_dump/tables/03_Categories.sql \
+db_dump/tables/09_Campaign2Domains.sql \
+db_dump/tables/04_Categories2Informer.sql \
+db_dump/view/00_Campaign2GeoRerions.sql \
+db_dump/view/03_Campaign2Acnts.sql \
+db_dump/view/02_Campaign2Doms.sql \
+db_dump/view/04_Campaign2Infs.sql \
+db_dump/post/01.sql \
+db_dump/schema/CampaignNow.sql \
+template/swfobject.js \
+template/banner.html \
+template/teaser.html
+
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -1097,6 +1138,27 @@ uninstall-dist_docDATA:
 	@list='$(dist_doc_DATA)'; test -n "$(docdir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(docdir)'; $(am__uninstall_files_from_dir)
+install-sysconfDATA: $(sysconf_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(sysconf_DATA)'; test -n "$(sysconfdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(sysconfdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(sysconfdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(sysconfdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(sysconfdir)" || exit $$?; \
+	done
+
+uninstall-sysconfDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(sysconf_DATA)'; test -n "$(sysconfdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(sysconfdir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -1390,10 +1452,9 @@ check: check-recursive
 all-am: Makefile $(PROGRAMS) $(DATA) config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(docdir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(sysconfdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
@@ -1452,7 +1513,7 @@ install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-binPROGRAMS install-sysconfDATA
 
 install-html: install-html-recursive
 
@@ -1494,7 +1555,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA
+uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA \
+	uninstall-sysconfDATA
 
 .MAKE: $(am__recursive_targets) all install-am install-strip
 
@@ -1511,12 +1573,27 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA
 	install-dvi-am install-exec install-exec-am install-html \
 	install-html-am install-info install-info-am install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-binPROGRAMS uninstall-dist_docDATA
+	install-strip install-sysconfDATA installcheck installcheck-am \
+	installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-dist_docDATA uninstall-sysconfDATA
 
+
+install: install-binPROGRAMS
+	$(MKDIR_P) $(sysconfdir)/template
+	$(MKDIR_P) $(sysconfdir)/db_dump
+	$(MKDIR_P) $(sysconfdir)/db_dump/schema
+	$(MKDIR_P) $(sysconfdir)/db_dump/post
+	$(MKDIR_P) $(sysconfdir)/db_dump/view
+	$(MKDIR_P) $(sysconfdir)/db_dump/tables
+	$(MKDIR_P) $(sysconfdir)/db_dump/requests
+	$(SED) 's/\/home\/alex\/Projects\/worker/\/usr/' < ./config.xml > $(sysconfdir)/config.xml
+	@list='$(sysconf_DATA)'; \
+	for p in $$list; do \
+	$(INSTALL_DATA) $$p "$(DESTDIR)$(sysconfdir)/$$p" || exit $$?; \
+	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
