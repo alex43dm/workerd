@@ -704,15 +704,11 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
             camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
     }
-
 expand_size:
     //expand to return size
-    if(!FULL)
+    for(p = result.begin(); RISResult.size() < outLen && p != result.end(); ++p)
     {
-        for(p = result.begin(); RISResult.size() <outLen && p != result.end(); ++p)
-        {
-            RISResult.push_back(*p);
-        }
+        RISResult.push_back(*p);
     }
 
 links_make:
