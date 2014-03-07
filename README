@@ -111,12 +111,30 @@ WHERE inf.guid=@informerUid
 LIMIT 1; 
 
 2) load all histories(class HistoryManager) asynchronous in it own thread.
+The HistoryManager get short term, long term, user view, category, re-targeting from redis servers asynchronous.
+The shot, long histories and seach, category url parameters use for reting tune by shpinx full text search on offer collection(Outputs) with multiplication coefficients from config.xml:
+
+<range>
+    <short_term>0</short_term>
+    <long_term>0</long_term>
+    <context>0</context>
+    <search>1.2</search>
+</range>
+ if 0 – does not use in sphinx search and the don't make history request.
+For fine tune sphinx(Context search by offers)
+
 3) get all offers from request(Outputs)
+
 4) wait until all histories were loaded and process rating correction in sphinx(class XXXSearcher) history with zero rating does not use
+
 5) process RIS algorithm(main)
+
 6) wait and process re-targeting offers request by RIS algorithm
+
 7) merge re-targeting and main vector;
+
 8) output html
+
 9) save log and user histories
 
 RUN
