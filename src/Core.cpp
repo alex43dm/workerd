@@ -583,6 +583,7 @@ bool Core::checkBannerSize(const Offer *offer)
 	если выбранных тизеров достаточно для РБ, показываем.
 	если нет - добираем из исходного массива стоящие слева тизеры.
  */
+#define NOTFULL RISResult.size() < outLen
 void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsigned outLen)
 {
     std::map<const long,long> camps;
@@ -652,7 +653,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
                 && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
         {
-            if(RISResult.size() < outLen)
+            if(NOTFULL)
             {
                 RISResult.push_back(*p);
                 camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
@@ -676,7 +677,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
                     && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
                     && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
             {
-                if(RISResult.size() < outLen)
+                if(NOTFULL)
                 {
                     RISResult.push_back(*p);
                     camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
@@ -697,7 +698,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
             if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
                     && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
             {
-                if(RISResult.size() < outLen)
+                if(NOTFULL)
                 {
                     RISResult.push_back(*p);
                 }
@@ -711,7 +712,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
 
 expand_size:
     //expand to return size
-    if(RISResult.size() < outLen)
+    if(NOTFULL)
     {
         for(p = result.begin(); RISResult.size() <outLen && p != result.end(); ++p)
         {
