@@ -590,12 +590,6 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     Offer::Vector result;
     Offer::MapRate resultAll;
 
-    if(items.size() < outLen)
-    {
-        Log::gdb("result size less then 5, return");
-        goto expand_size;
-    }
-
     RISResult.clear();
 
     //sort by rating
@@ -620,6 +614,15 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
 
         result.push_back((*i).second);
     }
+
+    //size check
+    if(result.size() < outLen)
+    {
+        hm->clean = true;
+        Log::gdb("result size less then 5, return");
+        goto expand_size;
+    }
+
     //medium reting
     teasersMediumRating /= teasersCount;
 
