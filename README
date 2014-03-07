@@ -128,22 +128,22 @@ For fine tune sphinx(Context search by offers)
 4) wait until all histories were loaded and process rating correction in sphinx(class XXXSearcher) history with zero rating does not use
 
 5) process RIS algorithm(main)
-input:
-	const Offer::Map &items,
-	unsigned outLen(capacity)
-output:
-	Offer::Vector &RISResult
+	input:
+		const Offer::Map &items,
+		unsigned outLen(capacity)
+	output:
+		Offer::Vector &RISResult
 
-a) sort by rating
-b) teaser rating and banner check: if fount first banner(max rating) return
-c) turn on clean history flag if all offers are social
-d) if result size less then capacity go to expand vector size(j);
-e) remove social
-f) add teaser with company unique and rating > 0 if teasers count more capacity return
-g) user history view clean
-h) add teaser with company unique and with any rating  if teasers count more capacity return
-i) teaser with id unique and with any rating  if teasers count more capacity return
-j) expand vector size to capacity
+	a) sort by rating
+	b) teaser rating and banner check: if fount first banner(max rating) return
+	c) turn on clean history flag if all offers are social
+	d) if teaser vector size less then capacity go to expand vector size(j);
+	e) remove social
+	f) add teaser with company unique and rating > 0 if teasers count equal capacity return
+	g) user history view clean
+	h) add teaser with company unique and with any rating  if teasers count equal capacity return
+	i) teaser with id unique and with any rating  if teasers count equal capacity return
+	j) expand vector size to capacity
 
 6) wait and process re-targeting offers request by RIS algorithm
 

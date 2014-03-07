@@ -174,7 +174,7 @@ std::string Core::Process(Params *prms)
     RISAlgorithm(items, vRIS, informer->capacity);
     Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
 
-    if (vRIS.size() < (u_int)informer->capacity)
+    if (vRIS.size() < (u_int)informer->capacity && (*vRIS.begin())->type != Offer::Type::banner)
     {
         hm->clean = true;
     }
