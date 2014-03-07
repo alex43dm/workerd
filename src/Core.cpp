@@ -622,10 +622,10 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
         else if((*i).second->type == Offer::Type::banner)
         {
             //NON social banner
-            if(!(*i).second->social)
+            if(!(*i).second->social && (*i).second->rating > teasersMediumRating / teasersCount)
             {
                 result.erase(result.begin(), result.end());
-                RISResult.push_back(*i);
+                RISResult.push_back((*i).second);
                 goto make_return;
             }
 //            if((*result.begin())->isBanner && (*result.begin())->social && result.size()==1)
