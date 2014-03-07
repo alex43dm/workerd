@@ -666,36 +666,6 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     if (teasersCount <= outLen)
     {
         //LOG(INFO) << "teasersCount <= informer.capacity";
-        //шаг 12
-        //вычислить средний рейтинг РП типа тизер в последовательности.
-
-        //найти первый баннер
-        p = std::find_if(result.begin(),result.end(), OfferExistByType(Offer::Type::banner));
-        //если баннер есть и его рейтинг > среднего рейтинга по тизерам - отобразить баннер
-        if (p!=result.end() && (*p)->rating > teasersMediumRating)
-        {
-            result.erase(result.begin(), p);
-            p++;
-            result.erase(p, result.end());
-            for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
-                RISResult.push_back(*p);
-            goto make_return;
-        }
-        //баннер не найден или его рейтинг <= среднего рейтинга тизеров
-        //иначе - выбрать все тизеры с дублированием
-        //т.е. удалить все баннеры и добавлять в конец вектора существующие элементы
-        for( auto o = result.begin(); o != result.end(); )
-        {
-            if( (*o)->type == Offer::Type::banner)
-            {
-                o = result.erase(o);
-            }
-            else
-            {
-                ++o;
-            }
-        }
-
         unsigned c=0;
         while (result.size() < outLen)
         {
@@ -711,20 +681,6 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     }
     else//teasersCount > informer->capacity
     {
-        //шаг 14
-        //удаляем все баннеры, т.к. с ними больше не работаем
-        for( auto o = result.begin(); o != result.end(); )
-        {
-            if( (*o)->type == Offer::Type::banner)
-            {
-                o = result.erase(o);
-            }
-            else
-            {
-                ++o;
-            }
-        }
-
         //заполняем тизеры по рейтингу с уникальностью кампаний
         for(p = result.begin(); p != result.end(); ++p)
         {
@@ -735,11 +691,20 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
                && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
             {
                 //LOG(INFO) << "add";
-                if(RISResult.size() < outLen) RISResult.push_back(*p);
-                else goto make_return;
-                camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+                if(RISResult.size() < outLen)
+                {
+                    RISResult.push_back(*p);
+                    camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+                }
+                else
+                {
+                    goto make_return;
+                }
             }
         }
+
+        //очистка кармы
+        hm->clean = true;
 
         //если выбрали тизеров меньше, чем мест в информере,
         //заполняем тизеры без рейтинга с уникальностью кампаний
@@ -747,22 +712,22 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
         {
             for(p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
             {
-                if(camps.count((*p)->campaign_id))
-                    continue;
-                //доберём всё за один проход
-                //пробуем сначала добрать без повторений.
-                if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
+                if(!camps.count((*p)->campaign_id)
+                   && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
                    && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
                 {
-                    if(RISResult.size() < outLen) RISResult.push_back(*p);
-                    else goto make_return;
-                    camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+                    if(RISResult.size() < outLen)
+                    {
+                        RISResult.push_back(*p);
+                        camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+                    }
+                    else
+                    {
+                        goto make_return;
+                    }
                 }
             }
         }
-
-        //очистка кармы
-        hm->clean = true;
 
         //теперь, если без повторений кампаний добрать не получилось...
         if(RISResult.size() < outLen)
