@@ -161,16 +161,14 @@ std::string Core::Process(Params *prms)
     //load all history async
     hm->getUserHistory(params);
 
-//    getAllRetargeting(resultRetargeting);
-//    Log::gdb("[%ld]getAllRetargeting: %d done",tid,resultRetargeting.size());
-
     getAllOffers(items);
     Log::gdb("[%ld]getOffers: %d done",tid, items.size());
+
     //wait all history load
     hm->sphinxProcess(items);
     Log::gdb("[%ld]sphinxProcess: done",tid);
 
-    //новый алгоритм
+    //ris algorithm
     RISAlgorithm(items, vRIS, informer->capacity);
     Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
 
@@ -186,45 +184,34 @@ std::string Core::Process(Params *prms)
     informer->RetargetingCount = vOutPut.size();
 
     //merge
-    Offer::itV last;
-    if( informer->capacity - vOutPut.size() < vRIS.size())
+    if( (*vOutPut.begin())->type != Offer::Type::banner || (*vRIS.begin())->type != Offer::Type::banner )
     {
-        last = vRIS.begin() + (informer->capacity - vOutPut.size());
+        if( (*vOutPut.begin())->type != Offer::Type::banner )
+        {
+
+        }
+        else
+        {
+
+        }
     }
     else
     {
-        last = vRIS.end();
-    }
-
-    vOutPut.insert(vOutPut.end(),
-                   vRIS.begin(),
-                   last);
-
-    // hm->getRetargetingAsyncWait();
-
-    // Если нужно показать только социальную рекламу, а настройках стоит
-    // опция "В случае отсутствия релевантной рекламы показывать
-    // пользовательский код", то возвращаем пользовательскую заглушку
-    /*
-        if (informer.nonrelevant() == Informer::Show_UserCode && !params.json_)
+        Offer::itV last;
+        if( informer->capacity - vOutPut.size() < vRIS.size())
         {
-            bool all_social = true;
-            for (auto it = offers.begin(); it != offers.end(); it++)
-            {
-                if (!Campaign(it->campaign_id()).social())
-                {
-                    all_social = false;
-                    break;
-                }
-            }
-            if (all_social)
-                return informer.user_code();
+            last = vRIS.begin() + (informer->capacity - vOutPut.size());
         }
-    */
+        else
+        {
+            last = vRIS.end();
+        }
 
-    // Составляем ссылку перенаправления для каждого элемента moved to RIS
-    //GenerateRedirectLink redirect_generator(informer->id_int, params.location_);
-    //std::for_each(RISResult.begin(), RISResult.end(), redirect_generator);
+        vOutPut.insert(vOutPut.end(),
+                       vRIS.begin(),
+                       last);
+
+    }
 
     std::string ret;
     if (params->json_)
@@ -612,8 +599,11 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
             RISResult.push_back((*i).second);
             goto links_make;
         }
-
-        result.push_back((*i).second);
+        //add if all not social and not social offer(skip social)
+        if(!all_social && !(*p).second->social)
+        {
+            result.push_back((*i).second);
+        }
     }
 
     //size check
@@ -627,24 +617,14 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     //medium reting
     teasersMediumRating /= teasersCount;
 
-    //remove social
-    if (!all_social)
-    {
-        p = result.begin();
-        while(p != result.end())
-        {
-            if ((*p)->social)
-                result.erase(p);
-            else p++;
-        }
-    }
-    else
+    //check is all social
+    if(all_social)
     {
         hm->clean = true;
         Log::gdb("clean history");
     }
 
-    //teaser with company unique and rating > 0
+    //add teaser when teaser unique id and with company unique and rating > 0
     for(p = result.begin(); p != result.end(); ++p)
     {
         if(!camps.count((*p)->campaign_id)
@@ -669,7 +649,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
         goto links_make;
     }
 
-    //teaser with company unique and with any rating
+    //add teaser when teaser unique id and with company unique and with any rating
     for(p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
     {
         if(!camps.count((*p)->campaign_id)
@@ -690,7 +670,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
         goto links_make;
     }
 
-    //teaser with id unique and with any rating
+    //add teaser when teaser unique id and with id unique and with any rating
     for(p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
     {
         if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
