@@ -426,15 +426,10 @@ bool Core::getAllOffers(Offer::Map &ret)
                      tid,
                      informer->id);
 #ifdef DEBUG
-printf("%s\n",cmd);
+    printf("%s\n",cmd);
 #endif // DEBUG
     hm->getDeprecatedOffersAsyncWait();
     return getOffers(ret);
-}
-
-bool Core::getAllRetargeting(Offer::Vector &ret)
-{
-    return true;
 }
 
 bool Core::getOffers(Offer::Map &result)
@@ -595,25 +590,23 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     Offer::Vector result;
     Offer::MapRate resultAll;
 
-    RISResult.clear();
-
     if(items.size() < outLen)
     {
-#ifdef DEBUG
-        Log::warn("result size less then 5, return");
-#endif // DEBUG
-        for(auto p = items.begin(); p != items.end() && RISResult.size() < outLen; ++p)
-            RISResult.push_back((*p).second);
-        goto make_return;
+        Log::gdb("result size less then 5, return");
+        goto expand_size;
     }
+
+    RISResult.clear();
 
     //sort by rating
     for(auto i = items.begin(); i != items.end(); ++i)
+    {
         resultAll.insert(Offer::PairRate((*i).second->rating, (*i).second));
+    }
 
+    //vector by rating
     for(auto i = resultAll.begin(); i != resultAll.end(); ++i)
     {
-        result.push_back((*i).second);
         if((*i).second->type == Offer::Type::teazer)
         {
             teasersCount++;
@@ -621,21 +614,16 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
         }
         else if((*i).second->type == Offer::Type::banner)
         {
-            //NON social banner
-            if(!(*i).second->social && (*i).second->rating > teasersMediumRating / teasersCount)
-            {
-                result.erase(result.begin(), result.end());
-                RISResult.push_back((*i).second);
-                goto make_return;
-            }
-//            if((*result.begin())->isBanner && (*result.begin())->social && result.size()==1)
+            RISResult.push_back((*i).second);
+            goto links_make;
         }
-    }
 
+        result.push_back((*i).second);
+    }
+    //medium reting
     teasersMediumRating /= teasersCount;
 
-
-    //Удаляем социалку
+    //remove social
     if (!all_social)
     {
         //LOG(INFO) << "Удаляем социалку";
@@ -649,48 +637,42 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     }
     else
     {
-        //Так как у нас осталась одна социалка
-        //заставляем очиститься историю показов пользователей
-        //если товаров будет хватать, то происходить это будет редко
         hm->clean = true;
         Log::gdb("clean history");
     }
 
-    //Первый элемент не баннер
-    //посчитать тизеры.
-    //int teasersCount = std::count_if(result.begin(),result.end(),CExistElementFunctorByType(Offer::Type::teazer, EOD_TYPE));
-    //Log::info("result: %d teasersCount %d informer->capacity: %d", result.size(), teasersCount, informer->capacity);
-    //кол-во тизеров < кол-ва мест на РБ -> шаг 12.
-    //нет -> шаг 14.
-
-    if (teasersCount <= outLen)
+    //teaser with company unique and rating > 0
+    for(p = result.begin(); p != result.end(); ++p)
     {
-        //LOG(INFO) << "teasersCount <= informer.capacity";
-        unsigned c=0;
-        while (result.size() < outLen)
+        if(!camps.count((*p)->campaign_id)
+                && (*p)->rating > 0.0
+                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
+                && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
         {
-            if(c>=teasersCount)
+            if(RISResult.size() < outLen)
             {
-                c=0;
+                RISResult.push_back(*p);
+                camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
             }
-
-            result.push_back(*result.begin());
-            c++;
-        }
-        hm->clean = true;
-    }
-    else//teasersCount > informer->capacity
-    {
-        //заполняем тизеры по рейтингу с уникальностью кампаний
-        for(p = result.begin(); p != result.end(); ++p)
-        {
-            //если кампания тизера не занесена в список, выбираем тизер, выбираем кампанию
-            if(!camps.count((*p)->campaign_id)
-               && (*p)->rating > 0.0
-               && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
-               && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
+            else
             {
-                //LOG(INFO) << "add";
+                goto links_make;
+            }
+        }
+    }
+
+    //user history view clean
+    hm->clean = true;
+
+    //teaser with company unique and with any rating
+    if(RISResult.size() < outLen)
+    {
+        for(p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
+        {
+            if(!camps.count((*p)->campaign_id)
+                    && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
+                    && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
+            {
                 if(RISResult.size() < outLen)
                 {
                     RISResult.push_back(*p);
@@ -698,54 +680,34 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
                 }
                 else
                 {
-                    goto make_return;
-                }
-            }
-        }
-
-        //очистка кармы
-        hm->clean = true;
-
-        //если выбрали тизеров меньше, чем мест в информере,
-        //заполняем тизеры без рейтинга с уникальностью кампаний
-        if(RISResult.size() < outLen)
-        {
-            for(p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
-            {
-                if(!camps.count((*p)->campaign_id)
-                   && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
-                   && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
-                {
-                    if(RISResult.size() < outLen)
-                    {
-                        RISResult.push_back(*p);
-                        camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
-                    }
-                    else
-                    {
-                        goto make_return;
-                    }
-                }
-            }
-        }
-
-        //теперь, если без повторений кампаний добрать не получилось...
-        if(RISResult.size() < outLen)
-        {
-            for(p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
-            {
-                if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
-                   && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
-                {
-                    if(RISResult.size() < outLen) RISResult.push_back(*p);
-                    else goto make_return;
+                    goto links_make;
                 }
             }
         }
     }
 
-make_return:
-    //сеня - наливай!
+    //teaser with id unique and with any rating
+    if(RISResult.size() < outLen)
+    {
+        for(p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
+        {
+            if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
+                    && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
+            {
+                if(RISResult.size() < outLen)
+                {
+                    RISResult.push_back(*p);
+                }
+                else
+                {
+                    goto links_make;
+                }
+            }
+        }
+    }
+
+expand_size:
+    //expand to return size
     if(RISResult.size() < outLen)
     {
         for(p = result.begin(); RISResult.size() <outLen && p != result.end(); ++p)
@@ -753,7 +715,9 @@ make_return:
             RISResult.push_back(*p);
         }
     }
-    //формирование ссылок
+
+links_make:
+    //redirect links make
     for(p = RISResult.begin(); p != RISResult.end(); ++p)
     {
         (*p)->redirect_url =
@@ -781,9 +745,10 @@ void Core::RISAlgorithmRetagreting(Offer::Vector &result, Offer::Vector &RISResu
     {
         //если кампания тизера не занесена в список, выбираем тизер, выбираем кампанию
         if(!camps.count((*p)->campaign_id) && (*p)->rating > 0.0
-           && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
-            if(RISResult.size() < outLen) RISResult.push_back(*p); else goto make_return;
+            if(RISResult.size() < outLen) RISResult.push_back(*p);
+            else goto make_return;
             camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
     }
