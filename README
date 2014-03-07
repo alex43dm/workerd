@@ -130,14 +130,14 @@ For fine tune sphinx(Context search by offers)
 5) process RIS algorithm(main)
 input:
 	const Offer::Map &items,
-	unsigned outLen
+	unsigned outLen(capacity)
 output:
 	Offer::Vector &RISResult
 
-a) if result size less then capacity goto expand_size;
+a) if result size less then capacity go to expand vector size(j);
 b) sort by rating
 c) teaser rating and banner check: if fount first banner(max rating) return
-d)  turn on clean history flag if all offers are social
+d) turn on clean history flag if all offers are social
 e) remove social
 f) add teaser with company unique and rating > 0 if teasers count more capacity return
 g) user history view clean
