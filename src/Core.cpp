@@ -619,6 +619,17 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
             teasersCount++;
             teasersMediumRating += (*i).second->rating;
         }
+        else if((*i).second->type == Offer::Type::banner)
+        {
+            //NON social banner
+            if(!(*i).second->social)
+            {
+                result.erase(result.begin(), result.end());
+                RISResult.push_back(*i);
+                goto make_return;
+            }
+//            if((*result.begin())->isBanner && (*result.begin())->social && result.size()==1)
+        }
     }
 
     teasersMediumRating /= teasersCount;
@@ -645,28 +656,6 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
         Log::gdb("clean history");
     }
 
-    //если первый элемент баннер, возвращаем баннер.
-    if((*result.begin())->isBanner && !(*result.begin())->social)
-    {
-        //NON social banner
-        p = result.begin();
-        p++;
-        result.erase(p, result.end());
-        for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
-            RISResult.push_back(*p);
-        goto make_return;
-    }
-
-    if((*result.begin())->isBanner && (*result.begin())->social && result.size()==1)
-    {
-        //social banner
-        p = result.begin();
-        p++;
-        result.erase(p, result.end());
-        for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
-            RISResult.push_back(*p);
-        goto make_return;
-    }
     //Первый элемент не баннер
     //посчитать тизеры.
     //int teasersCount = std::count_if(result.begin(),result.end(),CExistElementFunctorByType(Offer::Type::teazer, EOD_TYPE));
