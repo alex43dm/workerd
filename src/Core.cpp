@@ -583,7 +583,7 @@ bool Core::checkBannerSize(const Offer *offer)
 	если выбранных тизеров достаточно для РБ, показываем.
 	если нет - добираем из исходного массива стоящие слева тизеры.
  */
-#define NOTFULL RISResult.size() < outLen
+#define FULL RISResult.size() >= outLen
 void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsigned outLen)
 {
     std::map<const long,long> camps;
@@ -630,7 +630,6 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     //remove social
     if (!all_social)
     {
-        //LOG(INFO) << "Удаляем социалку";
         p = result.begin();
         while(p != result.end())
         {
@@ -650,69 +649,65 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     {
         if(!camps.count((*p)->campaign_id)
                 && (*p)->rating > 0.0
-                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
-                && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
+                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
-            if(NOTFULL)
-            {
-                RISResult.push_back(*p);
-                camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
-            }
-            else
+            if(FULL)
             {
                 goto links_make;
             }
+
+            RISResult.push_back(*p);
+            camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
     }
 
     //user history view clean
     hm->clean = true;
 
-    //teaser with company unique and with any rating
-    if(RISResult.size() < outLen)
+    if(FULL)
     {
-        for(p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
+        goto links_make;
+    }
+
+    //teaser with company unique and with any rating
+    for(p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
+    {
+        if(!camps.count((*p)->campaign_id)
+                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
-            if(!camps.count((*p)->campaign_id)
-                    && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
-                    && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
+            if(FULL)
             {
-                if(NOTFULL)
-                {
-                    RISResult.push_back(*p);
-                    camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
-                }
-                else
-                {
-                    goto links_make;
-                }
+                goto links_make;
             }
+
+            RISResult.push_back(*p);
+            camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
     }
 
-    //teaser with id unique and with any rating
-    if(RISResult.size() < outLen)
+    if(FULL)
     {
-        for(p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
+        goto links_make;
+    }
+
+    //teaser with id unique and with any rating
+    for(p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
+    {
+        if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
-            if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end()
-                    && std::find(vOutPut.begin(), vOutPut.end(), *p) == vOutPut.end())
+            if(FULL)
             {
-                if(NOTFULL)
-                {
-                    RISResult.push_back(*p);
-                }
-                else
-                {
-                    goto links_make;
-                }
+                goto links_make;
             }
+
+            RISResult.push_back(*p);
+            camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
     }
 
 expand_size:
     //expand to return size
-    if(NOTFULL)
+    if(!FULL)
     {
         for(p = result.begin(); RISResult.size() <outLen && p != result.end(); ++p)
         {
