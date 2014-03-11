@@ -95,7 +95,7 @@ private:
     bool getOffers(Offer::Map &result);
     Informer *getInformer();
     bool getAllOffers(Offer::Map &v);
-    void RISAlgorithmRetagreting(Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen);
+    void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen);
 
     //bool contains( const Offer::Vector &v, const Offer::itV p) const {return std::find(v.begin(), v.end(), *p) != v.end();}
     //bool containsInRetargeting(const Offer::itV p)const {return contains(resultRetargeting, p);}

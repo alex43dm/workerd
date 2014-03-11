@@ -127,8 +127,7 @@ workerd_OBJECTS = $(am_workerd_OBJECTS)
 am__DEPENDENCIES_1 =
 workerd_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) libs/libredis/lib/libredis.a \
-	libs/amqpcpp/libamqpcpp.a
+	$(am__DEPENDENCIES_1) libs/libredis/lib/libredis.a
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -424,7 +423,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = libs/libredis libs/amqpcpp
+SUBDIRS = libs/libredis
+OBJS = .obj
 @DEBUG_FALSE@AM_CFLAGS = -Ofast
 @DEBUG_TRUE@AM_CFLAGS = -g -DDEBUG -Wall
 @DEBUG_FALSE@AM_CXXFLAGS = -Ofast
@@ -437,8 +437,7 @@ workerd_LDADD = \
 	$(BOOST_THREAD_LIBS) \
 	$(BOOST_SYSTEM_LIBS) \
 	$(BOOST_REGEX_LIBS) \
-	libs/libredis/lib/libredis.a \
-	libs/amqpcpp/libamqpcpp.a
+	libs/libredis/lib/libredis.a
 
 dist_doc_DATA = README
 sysconf_DATA = \

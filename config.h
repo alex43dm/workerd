@@ -2,7 +2,7 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* amqpcpp library old */
-#define AMQPCPP_OLD 1
+/* #undef AMQPCPP_OLD */
 
 /* Defined if the requested minimum BOOST version is satisfied */
 #define HAVE_BOOST 1

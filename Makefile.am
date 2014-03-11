@@ -4,7 +4,7 @@ bin_PROGRAMS = workerd
 
 sysconfdir = ${prefix}/etc/worker
 
-SUBDIRS = libs/libredis libs/amqpcpp
+SUBDIRS = libs/libredis
 
 if DEBUG
 AM_CFLAGS = -g -DDEBUG -Wall
@@ -22,8 +22,7 @@ workerd_LDADD = \
 	$(BOOST_THREAD_LIBS) \
 	$(BOOST_SYSTEM_LIBS) \
 	$(BOOST_REGEX_LIBS) \
-	libs/libredis/lib/libredis.a \
-	libs/amqpcpp/libamqpcpp.a
+	libs/libredis/lib/libredis.a
 
 dist_doc_DATA=README
 

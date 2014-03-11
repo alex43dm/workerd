@@ -116,6 +116,15 @@ bool Config::LoadConfig(const std::string fName)
         retargeting_by_time_ = 24*3600;
     }
 
+    if( (mElem = mRoot->FirstChildElement("retargeting_unique_by_campaign")) && (mElem->GetText()) )
+    {
+        retargeting_unique_by_campaign_ = strncmp(mElem->GetText(),"false", 5) > 0 ? false : true;
+    }
+    else
+    {
+        retargeting_unique_by_campaign_ = false;
+    }
+
     if( (mels = mRoot->FirstChildElement("mongo")) )
     {
         if( (mel = mels->FirstChildElement("main")) )

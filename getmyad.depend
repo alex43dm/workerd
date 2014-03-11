@@ -1485,7 +1485,7 @@
 	"Config.h"
 	"Offer.h"
 
-1394116939 /home/alex/Projects/worker/config.h
+1394535599 /home/alex/Projects/worker/config.h
 
 1386588626 /home/alex/Projects/worker/include/KompexSQLiteDatabase.h
 	<string>
@@ -1557,7 +1557,7 @@
 	<string>
 	<boost/date_time.hpp>
 
-1392729438 /home/alex/Projects/worker/include/Config.h
+1394544821 /home/alex/Projects/worker/include/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
@@ -1650,7 +1650,7 @@
 	<GeoIPCity.h>
 	<string>
 
-1394183549 /home/alex/Projects/worker/include/Core.h
+1394543045 /home/alex/Projects/worker/include/Core.h
 	<list>
 	<vector>
 	<map>
@@ -1730,7 +1730,7 @@
 	"Config.h"
 	"InformerTemplate.h"
 
-1386588626 source:/home/alex/Projects/worker/src/KompexSQLiteDatabase.cpp
+1394526027 source:/home/alex/Projects/worker/src/KompexSQLiteDatabase.cpp
 	<fstream>
 	<iostream>
 	<exception>

@@ -16,6 +16,8 @@
 <retargeting_by_persents>50</retargeting_by_persents>
 <!--период жизни ретаргетинга(ЧЧ:ММ:СС)-->
 <retargeting_by_time>06:00:00</retargeting_by_time>
+<!--выдерживать уникальность кампаний-->
+<retargeting_unique_by_campaign>false</retargeting_unique_by_campaign>
 
 <!--Весовые коэффициенты
  умножается на максимальный рейтинг выборки

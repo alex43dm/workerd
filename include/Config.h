@@ -75,6 +75,7 @@ public:
     std::string user_;
     int retargeting_by_persents_;
     int retargeting_by_time_;
+    bool retargeting_unique_by_campaign_;
     std::string template_teaser_;
     std::string template_banner_;
     std::string swfobject_;
