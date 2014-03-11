@@ -91,7 +91,7 @@ void SQLiteDatabase::Open(const std::string &filename, int flags, const char *zV
     if(mDatabaseHandle)
         Close();
 
-/*
+#ifdef SQLITE_THREADSAFE
     if (sqlite3_threadsafe() > 0)
     {
         int retCode = sqlite3_config(SQLITE_CONFIG_SERIALIZED);
@@ -104,7 +104,8 @@ void SQLiteDatabase::Open(const std::string &filename, int flags, const char *zV
     {
         printf("Your SQLite database is not compiled to be threadsafe.\n");
     }
-*/
+#endif // SQLITE_THREADSAFE
+
     if(sqlite3_open_v2(filename.c_str(), &mDatabaseHandle, flags, zVfs) != SQLITE_OK)
         KOMPEX_EXCEPT(sqlite3_errmsg(mDatabaseHandle));
 
@@ -117,7 +118,7 @@ void SQLiteDatabase::Open(const wchar_t *filename)
     // close old db, if one exist
     if(mDatabaseHandle)
         Close();
-/*
+#ifdef SQLITE_THREADSAFE
     if (sqlite3_threadsafe() > 0)
     {
         int retCode = sqlite3_config(SQLITE_CONFIG_SERIALIZED);
@@ -130,7 +131,7 @@ void SQLiteDatabase::Open(const wchar_t *filename)
     {
         printf("Your SQLite database is not compiled to be threadsafe.\n");
     }
-*/
+#endif // SQLITE_THREADSAFE
     // standard usage: SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE
     if(sqlite3_open16(filename, &mDatabaseHandle) != SQLITE_OK)
         KOMPEX_EXCEPT(sqlite3_errmsg(mDatabaseHandle));

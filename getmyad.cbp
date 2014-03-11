@@ -67,9 +67,12 @@
 			<Add library="sqlite3" />
 			<Add library="pthread" />
 		</Linker>
+		<Unit filename="INSTALL" />
+		<Unit filename="Makefile.am" />
+		<Unit filename="README" />
 		<Unit filename="config.h" />
 		<Unit filename="config.xml" />
-		<Unit filename="configure.in" />
+		<Unit filename="configure.ac" />
 		<Unit filename="db_dump/post/01.sql" />
 		<Unit filename="db_dump/region.csv" />
 		<Unit filename="db_dump/requests/01.sql" />

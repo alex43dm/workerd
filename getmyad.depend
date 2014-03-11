@@ -1485,7 +1485,7 @@
 	"Config.h"
 	"Offer.h"
 
-1392892337 /home/alex/Projects/worker/config.h
+1394116939 /home/alex/Projects/worker/config.h
 
 1386588626 /home/alex/Projects/worker/include/KompexSQLiteDatabase.h
 	<string>
@@ -1535,15 +1535,15 @@
 	"Campaign.h"
 	"EBranch.h"
 
-1392898243 /home/alex/Projects/worker/include/Campaign.h
+1393923007 /home/alex/Projects/worker/include/Campaign.h
 	<string>
 	<map>
 	<list>
 	"DB.h"
 	"KompexSQLiteDatabase.h"
 
-1392630004 /home/alex/Projects/worker/include/DB.h
-	"config.h"
+1393229301 /home/alex/Projects/worker/include/DB.h
+	"../config.h"
 	<mongo/client/connpool.h>
 	"Log.h"
 	<string>
@@ -1574,7 +1574,7 @@
 	"KompexSQLiteDatabase.h"
 	"KompexSQLiteStatement.h"
 
-1393225911 source:/home/alex/Projects/worker/src/BaseCore.cpp
+1393315840 source:/home/alex/Projects/worker/src/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -1593,15 +1593,14 @@
 	"Offer.h"
 	"Config.h"
 
-1392899315 /home/alex/Projects/worker/include/BaseCore.h
-	"config.h"
+1393367565 /home/alex/Projects/worker/include/BaseCore.h
+	"../config.h"
 	<list>
 	<vector>
 	<map>
 	<utility>
 	<boost/date_time.hpp>
-	<amqpcpp.h>
-	<AMQPcpp.h>
+	"../libs/amqpcpp/include/AMQPcpp.h"
 	"DataBase.h"
 	"ParentDB.h"
 
@@ -1651,7 +1650,7 @@
 	<GeoIPCity.h>
 	<string>
 
-1392812501 /home/alex/Projects/worker/include/Core.h
+1394183549 /home/alex/Projects/worker/include/Core.h
 	<list>
 	<vector>
 	<map>
@@ -1679,7 +1678,7 @@
 	"Config.h"
 	<assert.h>
 
-1393226004 source:/home/alex/Projects/worker/src/Core.cpp
+1394524883 source:/home/alex/Projects/worker/src/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -1751,7 +1750,7 @@
 1391029678 source:/home/alex/Projects/worker/src/Log.cpp
 	"Log.h"
 
-1393226135 source:/home/alex/Projects/worker/src/main.cpp
+1394004309 source:/home/alex/Projects/worker/src/main.cpp
 	"CgiService.h"
 	"Log.h"
 
@@ -1805,4 +1804,18 @@
 1386588626 source:/home/alex/Projects/worker/src/base64.cpp
 	"base64.h"
 	<iostream>
+
+1393362863 /home/alex/Projects/worker/libs/amqpcpp/include/AMQPcpp.h
+	<cstdlib>
+	<cstdio>
+	<cstring>
+	"strings.h"
+	<unistd.h>
+	<stdint.h>
+	"amqp.h"
+	"amqp_framing.h"
+	<iostream>
+	<vector>
+	<map>
+	<memory>
 

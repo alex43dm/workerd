@@ -33,6 +33,7 @@ BOOST_REGEX()
 
 AC_CHECK_LIB([fcgi], [FCGX_FPrintF], [], [AC_MSG_ERROR([fcgi was not found])])
 AC_CHECK_LIB([sqlite3], [sqlite3_open], [], [AC_MSG_ERROR([sqlite3 was not found])])
+AC_CHECK_LIB([sqlite3], [sqlite3_threadsafe], [AC_DEFINE(SQLITE_THREADSAFE,[1],[sqlite3_threadsafe was found])],[])
 AC_CHECK_LIB([sphinxclient], [sphinx_add_query], [], [AC_MSG_ERROR([sphinxclient was not found])])
 AC_CHECK_LIB([GeoIP], [GeoIP_region_name_by_code], [], [AC_MSG_ERROR([GeoIP was not found])])
 AC_CHECK_LIB([tinyxml], [main], [], [AC_MSG_ERROR([tinyxml was not found])])

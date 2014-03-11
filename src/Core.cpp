@@ -184,15 +184,17 @@ std::string Core::Process(Params *prms)
     informer->RetargetingCount = vOutPut.size();
 
     //merge
-    if( (*vOutPut.begin())->type != Offer::Type::banner || (*vRIS.begin())->type != Offer::Type::banner )
+    if( (*vOutPut.begin())->type == Offer::Type::banner || (*vRIS.begin())->type == Offer::Type::banner )
     {
-        if( (*vOutPut.begin())->type != Offer::Type::banner )
+        if( (*vOutPut.begin())->type == Offer::Type::banner )
         {
 
         }
-        else
+        else if( (*vRIS.begin())->type == Offer::Type::banner )
         {
-
+            vOutPut.insert(vOutPut.begin(),
+                       vRIS.begin(),
+                       vRIS.begin()+1);
         }
     }
     else
@@ -600,28 +602,26 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
             goto links_make;
         }
         //add if all not social and not social offer(skip social)
-        if(!all_social && !(*p).second->social)
+        if(!all_social && !(*i).second->social)
         {
             result.push_back((*i).second);
         }
     }
+    //medium reting
+    teasersMediumRating /= teasersCount;
 
     //size check
     if(result.size() < outLen)
     {
         hm->clean = true;
-        Log::gdb("result size less then 5, return");
-        goto expand_size;
+        Log::warn("result size less then %d: clean history", outLen);
     }
-
-    //medium reting
-    teasersMediumRating /= teasersCount;
 
     //check is all social
     if(all_social)
     {
         hm->clean = true;
-        Log::gdb("clean history");
+        Log::warn("all social: clean history");
     }
 
     //add teaser when teaser unique id and with company unique and rating > 0
@@ -684,7 +684,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
             camps.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
     }
-expand_size:
+
     //expand to return size
     for(p = result.begin(); RISResult.size() < outLen && p != result.end(); ++p)
     {
