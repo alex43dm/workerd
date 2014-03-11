@@ -8,3 +8,11 @@ CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
 getmyad.cscope_file_list
+config.log
+*~
+.deps
+*.o
+autom4te.cache
+config.status
+config.guess
+config.sub

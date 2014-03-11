@@ -708,14 +708,12 @@ links_make:
     }
 }
 //
-void Core::RISAlgorithmRetagreting(Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen)
+void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen)
 {
-    Offer::itV p;
-
     RISResult.clear();
 
     //add teaser when teaser unique id and with company unique and rating > 0
-    for(p = result.begin(); p != result.end(); ++p)
+    for(auto p = result.begin(); p != result.end(); ++p)
     {
         if((*p)->type == Offer::Type::banner)
         {
@@ -744,7 +742,7 @@ void Core::RISAlgorithmRetagreting(Offer::Vector &result, Offer::Vector &RISResu
     //add teaser when teaser unique id and with company unique and any rating
     if(RISResult.size() < outLen)
     {
-        for(p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
+        for(auto p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
         {
             if(!OutPutCampaignMap.count((*p)->campaign_id)
                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
@@ -763,20 +761,23 @@ void Core::RISAlgorithmRetagreting(Offer::Vector &result, Offer::Vector &RISResu
     }
 
     //add teaser when teaser unique id
-    if(RISResult.size() < outLen)
+    if(!Config::Instance()->retargeting_unique_by_campaign_)
     {
-        for(p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
+        if(RISResult.size() < outLen)
         {
-            if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+            for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
             {
-                if(RISResult.size() < outLen)
+                if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
                 {
-                    RISResult.push_back(*p);
-                    OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
-                }
-                else
-                {
-                    goto make_return;
+                    if(RISResult.size() < outLen)
+                    {
+                        RISResult.push_back(*p);
+                        OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+                    }
+                    else
+                    {
+                        goto make_return;
+                    }
                 }
             }
         }
@@ -784,7 +785,7 @@ void Core::RISAlgorithmRetagreting(Offer::Vector &result, Offer::Vector &RISResu
 
 make_return:
     //redirect links make
-    for(p = RISResult.begin(); p != RISResult.end(); ++p)
+    for(auto p = RISResult.begin(); p != RISResult.end(); ++p)
     {
         (*p)->redirect_url =
             Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(

@@ -125,7 +125,46 @@ For fine tune sphinx(Context search by offers)
 
 3) get all offers from request(Outputs)
 
-4) wait until all histories were loaded and process rating correction in sphinx(class XXXSearcher) history with zero rating does not use
+4) wait until all histories were loaded and process rating correction in sphinx(class XXXSearcher) history with zero rating does not use. The daemon can correct rating by context search(sphinx) on selected offers(“Input”) by formula:
+
+                float weight = sphinx_get_weight (res, i ) / 1000;
+
+                pOffer->rating = pOffer->rating
+                    + rate_from_config  * maxRating
+                    + weight;
+
+rate_from_config – config section:   <range></ range>
+maxRating – max rating in offers
+weight – sphinx  weight / 1000
+
+The sphinx uses config.xml sphinx.fields describes:
+
+ <sphinx>
+	<field_name>field_rating</field_name>
+</ sphinx>
+
+field_name MUST be the same as in sphinx schema: /etc/sphinx/sphinx_driver.py
+       <sphinx:schema>
+        <sphinx:field name="title"/>
+        <sphinx:field name="description"/>
+        <sphinx:field name="keywords"/>
+        <sphinx:field name="exactly_phrases"/>
+        <sphinx:field name="phrases"/>
+        <sphinx:field name="minuswords"/>
+        <sphinx:attr name="stitle" type="string"/>
+        <sphinx:attr name="sdescription" type="string"/>
+        <sphinx:attr name="skeywords" type="string"/>
+        <sphinx:attr name="sexactly_phrases" type="string"/>
+        <sphinx:attr name="sphrases" type="string"/>
+        <sphinx:attr name="guid" type="string"/>
+        <sphinx:attr name="match" type="string"/>
+        <sphinx:attr name="fguid" type="int"/>
+        </sphinx:schema>
+
+in section <index>worker-full</index> set sphinx index name: /etc/sphinx/sphinx_driver.py
+mode == "worker-full"
+
+The  mach_mode,  rank_mode, sort_mode see “Context search by offers”.
 
 5) process RIS algorithm(main)
 	input:
@@ -146,6 +185,13 @@ For fine tune sphinx(Context search by offers)
 	j) expand vector size to capacity
 
 6) wait and process re-targeting offers request by RIS algorithm
+Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen
+	input:
+		const Offer::Map &items,
+		unsigned outLen(capacity)
+	output:
+		Offer::Vector &RISResult
+
     	a) add teaser when teaser unique id and with company unique and rating > 0
     	b) add teaser when teaser unique id and with company unique and any rating
     	c) add teaser when teaser unique id
@@ -267,22 +313,22 @@ Threads number: server/children
 SPHINX
 To match search 
 <sphinx>
-    <!--host>213.186.121.76</host-->
-    <host>127.0.0.1</host>
-    <port>9312</port>
-    <index>worker</index>
-    <!--all from /usr/include/sphinxclient.h-->
-    <mach_mode>SPH_MATCH_EXTENDED2</mach_mode>
-    <rank_mode>SPH_RANK_SPH04</rank_mode>
-    <sort_mode>SPH_SORT_RELEVANCE</sort_mode>
-    <fields>
-        <title>80</title>
-        <description>30</description>
-        <!--keywords>70</keywords-->
-        <!--exactly_phrases>100</exactly_phrases-->
-        <!--phrases>90</phrases-->
-        <!--minuswords>100</minuswords-->
-    </fields>
+ <!--host>213.186.121.76</host-->
+ <host>127.0.0.1</host>
+ <port>9312</port>
+ <index>worker</index>
+ <!--all from /usr/include/sphinxclient.h-->
+ <mach_mode>SPH_MATCH_EXTENDED2</mach_mode>
+ <rank_mode>SPH_RANK_SPH04</rank_mode>
+ <sort_mode>SPH_SORT_RELEVANCE</sort_mode>
+ <fields>
+ <title>80</title>
+ <description>30</description>
+ <!--keywords>70</keywords-->
+ <!--exactly_phrases>100</exactly_phrases-->
+ <!--phrases>90</phrases-->
+ <!--minuswords>100</minuswords-->
+ </fields>
 </sphinx>
 
 ALL
@@ -292,16 +338,17 @@ The configuration options by groups(mongo/main/db means xpath:
 <mongo><main><db/></main></mongo>):
 
 Main configuration:
-	server_ip: ip uses to redirect script
-	redirect_script: the redirect script name
-	geocity_path: geo city database file path
-	shortterm_expire: time to live keys in shortterm redis database in seconds
+ server_ip: ip uses to redirect script
+ redirect_script: the redirect script name
+ geocity_path: geo city database file path
+ shortterm_expire: time to live keys in shortterm redis database in seconds
 	views_expire: time to live keys in  user view redis database in seconds
 	context_expire: time to live keys in site contex  redis database in seconds
 
 The  re-targeting
 	retargeting_by_persents: how match max re-targeting offers can be in result 
 	retargeting_by_time: re-targeting user view history time to live
+	retargeting_unique_by_campaign: re-targeting unique by campaign
 
 The range coefficients for shpinx, 0- off, 1-max:
 	range/short_term: short term hostory
