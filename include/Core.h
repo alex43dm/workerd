@@ -83,6 +83,8 @@ private:
 
     unsigned teasersCount;
 
+    std::map<long,long> OutPutCampaignMap;
+
     char *cmd;
     float teasersMediumRating;
     std::string tmpTableName;

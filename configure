@@ -15156,7 +15156,6 @@ LTCXXFLAGS="-O2"
 
 
 
-
 for ac_header in string.h fcntl.h sys/file.h sys/param.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
@@ -15170,6 +15169,82 @@ fi
 
 done
 
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lamqpcpp" >&5
+$as_echo_n "checking for main in -lamqpcpp... " >&6; }
+if ${ac_cv_lib_amqpcpp_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lamqpcpp  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_amqpcpp_main=yes
+else
+  ac_cv_lib_amqpcpp_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_amqpcpp_main" >&5
+$as_echo "$ac_cv_lib_amqpcpp_main" >&6; }
+if test "x$ac_cv_lib_amqpcpp_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBAMQPCPP 1
+_ACEOF
+
+  LIBS="-lamqpcpp $LIBS"
+
+else
+  as_fn_error $? "amqpcpp library missing" "$LINENO" 5
+fi
+
+
+ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+SAVED_LDFLAGS=$LDFLAGS
+LDFLAGS="$LDFLAGS -lamqpcpp"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <AMQPcpp.h>
+int
+main ()
+{
+AMQPMessage *m;
+    unsigned len;
+    char *pMes;
+    pMes = m->getMessage(&len);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+else
+
+$as_echo "#define AMQPCPP_OLD 1" >>confdefs.h
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LDFLAGS=$SAVED_LDFLAGS
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lmongoclient" >&5
 $as_echo_n "checking for main in -lmongoclient... " >&6; }

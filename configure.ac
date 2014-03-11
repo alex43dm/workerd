@@ -16,9 +16,25 @@ LTCFLAGS="-O2"
 LTCXXFLAGS="-O2"
 
 AC_CONFIG_LIBOBJ_DIR([libs/libredis])
-AC_CONFIG_LIBOBJ_DIR([libs/amqpcpp])
+dnl AC_CONFIG_LIBOBJ_DIR([libs/amqpcpp])
 
 AC_HAVE_HEADERS(string.h fcntl.h sys/file.h sys/param.h)
+
+
+AC_CHECK_LIB([amqpcpp],[main],[],[AC_MSG_ERROR([amqpcpp library missing])])
+
+AC_LANG(C++)
+SAVED_LDFLAGS=$LDFLAGS
+LDFLAGS="$LDFLAGS -lamqpcpp"
+AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM([#include <AMQPcpp.h>],
+    [AMQPMessage *m;
+    unsigned len;
+    char *pMes;
+    pMes = m->getMessage(&len);])],
+    [],
+    [AC_DEFINE(AMQPCPP_OLD,[1],[amqpcpp library old])])
+LDFLAGS=$SAVED_LDFLAGS
 
 AC_CHECK_LIB([mongoclient],[main],[],[AC_MSG_ERROR([mongoclient(mongodb build with client shared library) missing])])
 AC_CHECK_LIB([icuuc],[u_tolower],[],[AC_MSG_ERROR([icuuc library missing])])

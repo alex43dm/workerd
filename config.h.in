@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* amqpcpp library old */
+#undef AMQPCPP_OLD
+
 /* Defined if the requested minimum BOOST version is satisfied */
 #undef HAVE_BOOST
 
@@ -26,6 +29,9 @@
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `amqpcpp' library (-lamqpcpp). */
+#undef HAVE_LIBAMQPCPP
 
 /* Define to 1 if you have the `fcgi' library (-lfcgi). */
 #undef HAVE_LIBFCGI
@@ -112,7 +118,7 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* sqlite3 was not found */
+/* sqlite3_threadsafe was found */
 #undef SQLITE_THREADSAFE
 
 /* Define to 1 if you have the ANSI C header files. */

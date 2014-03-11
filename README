@@ -146,6 +146,9 @@ For fine tune sphinx(Context search by offers)
 	j) expand vector size to capacity
 
 6) wait and process re-targeting offers request by RIS algorithm
+    	a) add teaser when teaser unique id and with company unique and rating > 0
+    	b) add teaser when teaser unique id and with company unique and any rating
+    	c) add teaser when teaser unique id
 
 7) merge re-targeting and main vector;
 
