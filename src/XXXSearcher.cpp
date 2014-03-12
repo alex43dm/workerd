@@ -123,7 +123,7 @@ void XXXSearcher::processKeywords(
 
             for ( int i=0; i<res->num_matches; i++ )
             {
-                if (res->num_attrs != 2)
+                if (res->num_attrs != 6)
                 {
                     Log::warn("num_attrs: %d",res->num_attrs);
                     continue;

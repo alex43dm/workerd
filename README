@@ -23,54 +23,54 @@ and url variables:
 
 Outputs:
 html with offers selected by rating from:
-cat db_dump/requests/01.sql 
+cat db_dump/requests/01.sql 
 
-SELECT ofrs.id,
-ofrs.guid,
-ofrs.title,
-ofrs.price,
-ofrs.description,
-ofrs.url,
-ofrs.image,
-ofrs.swf,
-ofrs.campaignId,
-ofrs.isOnClick,
-ofrs.type,
-CASE WHEN iret.rating IS NOT NULL
-THEN iret.rating
-ELSE ofrs.rating
-END AS rating,
-ofrs.retargeting,
-ofrs.uniqueHits,
-ofrs.height,
-ofrs.width,
-ca.social
-FROM Offer AS ofrs
-INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
-INNER JOIN (
-		SELECT cn.id FROM CampaignNow AS cn
-		%s
-        INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
-        INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
-                AND ct2d.id_dom=%lld
-		EXCEPT
-            SELECT c2d.id_cam AS id
-            FROM Campaign2Domains AS c2d
-            WHERE c2d.id_dom=%lld AND c2d.allowed=0
-		EXCEPT
-            SELECT c2a.id_cam AS id
-            FROM Campaign2Accounts AS c2a
-            WHERE c2a.id_acc=%lld AND c2a.allowed=0
-        EXCEPT
-            SELECT c2i.id_cam AS id
-            FROM Campaign2Informer AS c2i
-            WHERE c2i.id_inf=%lld AND c2i.allowed=0
-) AS c ON ca.id=c.id
-LEFT JOIN tmp%d%lld AS deph ON ofrs.id=deph.id
-LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=%lld AND ofrs.id=iret.id_ofr
-WHERE ofrs.valid=1
-    AND deph.id IS NULL
-;
+SELECT ofrs.id,
+ofrs.guid,
+ofrs.title,
+ofrs.price,
+ofrs.description,
+ofrs.url,
+ofrs.image,
+ofrs.swf,
+ofrs.campaignId,
+ofrs.isOnClick,
+ofrs.type,
+CASE WHEN iret.rating IS NOT NULL
+THEN iret.rating
+ELSE ofrs.rating
+END AS rating,
+ofrs.retargeting,
+ofrs.uniqueHits,
+ofrs.height,
+ofrs.width,
+ca.social
+FROM Offer AS ofrs
+INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
+INNER JOIN (
+		SELECT cn.id FROM CampaignNow AS cn
+		%s
+        INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
+        INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
+                AND ct2d.id_dom=%lld
+		EXCEPT
+            SELECT c2d.id_cam AS id
+            FROM Campaign2Domains AS c2d
+            WHERE c2d.id_dom=%lld AND c2d.allowed=0
+		EXCEPT
+            SELECT c2a.id_cam AS id
+            FROM Campaign2Accounts AS c2a
+            WHERE c2a.id_acc=%lld AND c2a.allowed=0
+        EXCEPT
+            SELECT c2i.id_cam AS id
+            FROM Campaign2Informer AS c2i
+            WHERE c2i.id_inf=%lld AND c2i.allowed=0
+) AS c ON ca.id=c.id
+LEFT JOIN tmp%d%lld AS deph ON ofrs.id=deph.id
+LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=%lld AND ofrs.id=iret.id_ofr
+WHERE ofrs.valid=1
+    AND deph.id IS NULL
+;
 
 where:
 tmp%d%lld – user view offers history
@@ -99,27 +99,21 @@ Core algorithm
 
 each thread wait input, so it cann't get cpu resources, after parsing intput variables(class Param) and get geo data:
 1) load informer:
-cat db_dump/requests/02.sql 
-SELECT 	inf.id,
-	inf.capacity,
-	inf.bannersCss,
-	inf.teasersCss,
-	inf.domainId,
-	inf.accountId
-FROM Informer AS inf
-WHERE inf.guid=@informerUid
-LIMIT 1; 
-
-2) load all histories(class HistoryManager) asynchronous in it own thread.
-The HistoryManager get short term, long term, user view, category, re-targeting from redis servers asynchronous.
-The shot, long histories and seach, category url parameters use for reting tune by shpinx full text search on offer collection(Outputs) with multiplication coefficients from config.xml:
-
-<range>
-    <short_term>0</short_term>
-    <long_term>0</long_term>
-    <context>0</context>
-    <search>1.2</search>
-</range>
+cat db_dump/requests/02.sql 
+SELECT 	inf.id,
+	inf.capacity,
+	inf.bannersCss,
+	inf.teasersCss,
+	inf.domainId,
+	inf.accountId
+FROM Informer AS inf
+WHERE inf.guid=@informerUid
+LIMIT 1;
+    <short_term>0</short_term>
+    <long_term>0</long_term>
+    <context>0</context>
+    <search>1.2</search>
+</range>
  if 0 – does not use in sphinx search and the don't make history request.
 For fine tune sphinx(Context search by offers)
 
@@ -144,21 +138,21 @@ The sphinx uses config.xml sphinx.fields describes:
 </ sphinx>
 
 field_name MUST be the same as in sphinx schema: /etc/sphinx/sphinx_driver.py
-       <sphinx:schema>
-        <sphinx:field name="title"/>
-        <sphinx:field name="description"/>
-        <sphinx:field name="keywords"/>
-        <sphinx:field name="exactly_phrases"/>
-        <sphinx:field name="phrases"/>
-        <sphinx:field name="minuswords"/>
-        <sphinx:attr name="stitle" type="string"/>
-        <sphinx:attr name="sdescription" type="string"/>
-        <sphinx:attr name="skeywords" type="string"/>
-        <sphinx:attr name="sexactly_phrases" type="string"/>
-        <sphinx:attr name="sphrases" type="string"/>
-        <sphinx:attr name="guid" type="string"/>
-        <sphinx:attr name="match" type="string"/>
-        <sphinx:attr name="fguid" type="int"/>
+       <sphinx:schema>
+        <sphinx:field name="title"/>
+        <sphinx:field name="description"/>
+        <sphinx:field name="keywords"/>
+        <sphinx:field name="exactly_phrases"/>
+        <sphinx:field name="phrases"/>
+        <sphinx:field name="minuswords"/>
+        <sphinx:attr name="stitle" type="string"/>
+        <sphinx:attr name="sdescription" type="string"/>
+        <sphinx:attr name="skeywords" type="string"/>
+        <sphinx:attr name="sexactly_phrases" type="string"/>
+        <sphinx:attr name="sphrases" type="string"/>
+        <sphinx:attr name="guid" type="string"/>
+        <sphinx:attr name="match" type="string"/>
+        <sphinx:attr name="fguid" type="int"/>
         </sphinx:schema>
 
 in section <index>worker-full</index> set sphinx index name: /etc/sphinx/sphinx_driver.py
@@ -173,82 +167,50 @@ The  mach_mode,  rank_mode, sort_mode see “Context search by offers”.
 	output:
 		Offer::Vector &RISResult
 
-	a) sort by rating
+
 	b) teaser rating and banner check: if fount first banner(max rating) return
 	c) turn on clean history flag if all offers are social
-	d) if teaser vector size less then capacity go to expand vector size(j);
-	e) remove social
-	f) add teaser with company unique and rating > 0 if teasers count equal capacity return
-	g) user history view clean
-	h) add teaser with company unique and with any rating  if teasers count equal capacity return
-	i) teaser with id unique and with any rating  if teasers count equal capacity return
-	j) expand vector size to capacity
+	d) if teaser vector size less then capacity
+	e) remove social
+	f) add teaser with company unique and rating > 0
+	h) add teaser with company unique and with any rating
+{
+    template("$R_ISODATE $MSG\n");
+    template_escape(no);
+};
 
-6) wait and process re-targeting offers request by RIS algorithm
-Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen
-	input:
-		const Offer::Map &items,
-		unsigned outLen(capacity)
-	output:
-		Offer::Vector &RISResult
-
-    	a) add teaser when teaser unique id and with company unique and rating > 0
-    	b) add teaser when teaser unique id and with company unique and any rating
-    	c) add teaser when teaser unique id
-
-7) merge re-targeting and main vector;
-
-8) output html
-
-9) save log and user histories
-
-RUN
-workerd -c path/to/config.xml [-s path/to/unix/socket/path]
-
-DEBUG
-If the program configured with –debug-enable it does not fork in background, and will print debug information to stdout. 
-
-SYSLOG-NG
-add to /etc/syslog-ng/syslog-ng.conf:
-
-template t_isots
-{
-    template("$R_ISODATE $MSG\n");
-    template_escape(no);
-};
-
-destination getmyad { file("/var/log/workerd.log" template(t_isots)); };
-filter f_getmyad { program("getmyad"); };
-log { source(src); filter(f_getmyad); destination(getmyad); };
+destination getmyad { file("/var/log/workerd.log" template(t_isots)); };
+filter f_getmyad { program("getmyad"); };
+log { source(src); filter(f_getmyad); destination(getmyad); };
 
 NIGING
 the sample nginx configuration:
 
-        upstream fastcgi_backend {
-                server unix:/tmp/workerd.sock;
-                server unix:/tmp/workerd1.sock;
-                server unix:/tmp/workerd2.sock;
-        }
-
-        server {
-                listen 0.0.0.0;
-                server_name yottos.com;
-                access_log off;#/var/log/nginx/localhost.access_log main;
-                error_log /var/log/nginx/localhost.error_log info;
-                root /var/www/localhost/htdocs;
-                keepalive_timeout 1ms;
+        upstream fastcgi_backend {
+                server unix:/tmp/workerd.sock;
+                server unix:/tmp/workerd1.sock;
+                server unix:/tmp/workerd2.sock;
+        }
 
-                location /adshow.fcgi { 
-                        send_timeout 100ms;
-                        fastcgi_cache off;
-                        fastcgi_pass fastcgi_backend;
-                        fastcgi_buffer_size 24k;
-                        fastcgi_buffers 2 24k;
-                        fastcgi_busy_buffers_size 24k;
-                        fastcgi_keep_conn on;
-                        include fastcgi_params; 
-                } 
-        }
+        server {
+                listen 0.0.0.0;
+                server_name yottos.com;
+                access_log off;#/var/log/nginx/localhost.access_log main;
+                error_log /var/log/nginx/localhost.error_log info;
+                root /var/www/localhost/htdocs;
+                keepalive_timeout 1ms;
+
+                location /adshow.fcgi { 
+                        send_timeout 100ms;
+                        fastcgi_cache off;
+                        fastcgi_pass fastcgi_backend;
+                        fastcgi_buffer_size 24k;
+                        fastcgi_buffers 2 24k;
+                        fastcgi_busy_buffers_size 24k;
+                        fastcgi_keep_conn on;
+                        include fastcgi_params; 
+                } 
+        }
 
 DATABASES
 At start(if not configured with --enable-debug) forks in background and get data from mongo database described in config.xml section:
@@ -411,35 +373,55 @@ Sphinx server:
 
 Server configuration:
 	server/socket_path: unix socket path fast cgi, the same path must in nginx.conf:
-	        upstream fastcgi_backend {
-              	  	server unix:/tmp/workerd.sock;
-                	server unix:/tmp/workerd1.sock;
-                	server unix:/tmp/workerd2.sock;
+	        upstream fastcgi_backend {
+              	  	server unix:/tmp/workerd.sock;
+                	server unix:/tmp/workerd1.sock;
+                	server unix:/tmp/workerd2.sock;
         		}
-    	server/children: threads number
-	server/mq_path: message queue server user and password
-	server/dbpath sqlite database file path
-	server/db_dump_path sqlite database dump(without data, only schema)
- 	server/db_geo_csv geo ip database file path
- 	server/template_teaser teaser template file path:
-	        	%1%	    CSS
+ server/children: threads number
+ server/mq_path: message queue server user and password
+ server/dbpath sqlite database file path
+ server/db_dump_path sqlite database dump(without data, only schema)
+ server/db_geo_csv geo ip database file path
+ server/template_teaser teaser template file path:
+ %1%	    CSS
  %2%	    JSON
  %3%	    offers count
  %4%	    next link
-	server/template_banner the banner template path
-	server/swfobject swfobject.js file
- 	server/geoGity geo city file path
-	server/cookie_name coockie name
-	server/cookie_domain: coockie domain name
-	server/cookie_path coockie path
-	server/lock_file lock file path
-	server/pid_file pid file path
-	server/user: run as user
-	server/time_update: campaign by time update interval
+ server/template_banner the banner template path
+ server/swfobject swfobject.js file
+ server/geoGity geo city file path
+ server/cookie_name coockie name
+ server/cookie_domain: coockie domain name
+ server/cookie_path coockie path
+ server/lock_file lock file path
+ server/pid_file pid file path
+ server/user: run as user
+ server/time_update: campaign by time update interval
 
  install:
-    	#aclocal -I m4 && autoconf && automake
-    	#./configure
- 	#make
+ #aclocal -I m4 && autoconf && automake
+ #./configure
+ #make
+
+TESTING
+start:
+nginx, redis[1-6], searchd, rabbitmq, syslog-ng, mongodb
+
+compile debug version:
+make clean
+./configure ./configure --with-debug
+make
+./workerd
+
+in default browser:
+http://yottos.com/adshow.fcgi?scr=00122a9a-9f60-11e1-a3a7-00163e0301c1&location=http%3A%2F%2Fhelpers.com.ua%2F&w=1855&h=1110&search=%D0%B5%D0%B4%D0%B0%20%D0%BA%D0%B0%D0%B7%D0%B8%D0%BD%D0%BE&context=bind%20linux%20windows%20apache%20nginx%20mysql%20%D1%81%D0%B5%D1%80%D0%B2%D0%B5%D1%80%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0%20%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0%20mongodb%20mssql%20iptables%20hyper&rand=105921
+
+where
+src – informer guid
+alex@hp ~/Projects/worker $ echo "select guid from informer limit 1;"|sqlite3 /run/alex/mem.db 
+00122a9a-9f60-11e1-a3a7-00163e0301c1
+search – words by space(%20)(rating.search in the config.xml must be more then 0) 
 
 good luck:)
+
