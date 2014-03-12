@@ -48,10 +48,10 @@ Params &Params::cookie_id(const std::string &cookie_id)
 }
 
 /// ID информера.
-Params &Params::informer(const std::string &informer)
+Params &Params::informer_id(const std::string &informer_id)
 {
-    informer_ = informer;
-    boost::to_lower(informer_);
+    informer_id_ = informer_id;
+    boost::to_lower(informer_id_);
     return *this;
 }
 /// Время. По умолчанию равно текущему моменту.
@@ -222,9 +222,9 @@ std::string Params::getRegion() const
     return region_;
 }
 
-std::string Params::getInformer() const
+std::string Params::getInformerId() const
 {
-    return informer_;
+    return informer_id_;
 }
 
 boost::posix_time::ptime Params::getTime() const
@@ -280,7 +280,7 @@ std::string Params::getSearch() const
 std::string Params::getUrl() const
 {
     std::stringstream url;
-    url << script_name_ <<"?scr=" << informer_ <<"&show=json";
+    url << script_name_ <<"?scr=" << informer_id_ <<"&show=json";
 
     if (test_mode_)
         url << "&test=true";

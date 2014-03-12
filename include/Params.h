@@ -17,7 +17,7 @@ public:
     /// ID посетителя, взятый из cookie
     Params &cookie_id(const std::string &cookie_id);
     /// ID информера.
-    Params &informer(const std::string &informer);
+    Params &informer_id(const std::string &informer_id);
     /// Время. По умолчанию равно текущему моменту.
     Params &time(const boost::posix_time::ptime &time);
     /** \brief  Двухбуквенный код страны посетителя.
@@ -86,7 +86,7 @@ public:
     unsigned long long getUserKeyLong() const;
     std::string getCountry() const;
     std::string getRegion() const;
-    std::string getInformer() const;
+    std::string getInformerId() const;
     boost::posix_time::ptime getTime() const;
     bool isTestMode() const;
     bool isJson() const;
@@ -110,7 +110,7 @@ private:
     std::string country_;
     std::string countryByIp_;
     std::string region_;
-    std::string informer_;
+    std::string informer_id_;
     boost::posix_time::ptime time_;
     bool test_mode_;
     bool json_;

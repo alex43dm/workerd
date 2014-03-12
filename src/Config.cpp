@@ -273,21 +273,29 @@ bool Config::LoadConfig(const std::string fName)
 
 
         if( (mel = mElem->FirstChildElement("template_teaser")) && (mel->GetText()) )
-            template_teaser_ = mel->GetText();
+            template_teaser_ = getFileContents(mel->GetText());
         else
         {
             Log::warn("element template_teaser is not inited");
         }
 
         if( (mel = mElem->FirstChildElement("template_banner")) && (mel->GetText()) )
-            template_banner_ = mel->GetText();
+            template_banner_ = getFileContents(mel->GetText());
         else
         {
             Log::warn("element template_banner is not inited");
         }
 
+        if( (mel = mElem->FirstChildElement("template_error")) && (mel->GetText()) )
+            template_error_ = getFileContents(mel->GetText());
+        else
+        {
+            Log::warn("element template_error is not inited");
+        }
+
+
         if( (mel = mElem->FirstChildElement("swfobject")) && (mel->GetText()) )
-            swfobject_ = mel->GetText();
+            swfobject_ = getFileContents(mel->GetText());
         else
         {
             Log::warn("element swfobject is not inited");
@@ -400,4 +408,23 @@ int Config::getTime(const char *p)
     ret = t.tm_hour * 3600;
     ret = ret + t.tm_min * 60;
     return ret + t.tm_sec;
+}
+//---------------------------------------------------------------------------------------------------------------
+std::string Config::getFileContents(const std::string &fileName)
+{
+    std::ifstream in(fileName, std::ios::in | std::ios::binary);
+
+    if(in)
+    {
+        std::string cnt;
+        in.seekg(0, std::ios::end);
+        cnt.resize(in.tellg());
+        in.seekg(0, std::ios::beg);
+        in.read(&cnt[0], cnt.size());
+        in.close();
+        return(cnt);
+    }
+
+    Log::err("error open file: %s: %d",fileName.c_str(), errno);
+    return std::string();
 }

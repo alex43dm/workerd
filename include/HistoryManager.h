@@ -40,7 +40,6 @@ public:
     //Задаём обнавление долгосрочной истории
     bool updateContext;
 
-    std::string RetargetingOfferStr;
     Offer::Vector *vretg;
 
     HistoryManager(const std::string &tmpTableName);

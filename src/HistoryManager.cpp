@@ -135,7 +135,6 @@ bool HistoryManager::updateUserHistory(
     try
     {
         mongo::DB db("log");
-        //LOG(INFO) << "writing to log...";
 
         int count = 0;
         std::list<std::string>::iterator it;
@@ -175,7 +174,7 @@ bool HistoryManager::updateUserHistory(
                                     append("id", (*i)->id).
                                     append("id_int", (*i)->id_int).
                                     append("title", (*i)->title).
-                                    append("inf", params->informer_).
+                                    append("inf", params->informer_id_).
                                     append("inf_int", informer->id).
                                     append("ip", params->ip_).
                                     append("cookie", params->cookie_id_).

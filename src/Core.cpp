@@ -11,7 +11,6 @@
 #include "Log.h"
 #include "Core.h"
 #include "DB.h"
-#include "InformerTemplate.h"
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
 #include "base64.h"
@@ -31,32 +30,6 @@ Core::Core()
     cmd = new char[CMD_SIZE];
 
     pDb = Config::Instance()->pDb;
-
-    pStmtOfferStr = pDb->getSqlFile("requests/01.sql");
-    InformerStr  = pDb->getSqlFile("requests/04.sql");
-    /*
-        try
-        {
-            pStmtOffer = new SQLiteStatement(pDb->pDatabase);
-            pStmtOffer->Sql(pDb->getSqlFile("requests/01.sql"));
-        }
-        catch(SQLiteException &ex)
-        {
-            Log::err("DB error: pStmtOffer: %s %s", ex.GetString().c_str(), pDb->getSqlFile("requests/01.sql").c_str());
-            exit(1);
-        }
-    */
-    try
-    {
-        pStmtInformer = new Kompex::SQLiteStatement(pDb->pDatabase);
-        pStmtInformer->Sql(pDb->getSqlFile("requests/02.sql"));
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        Log::err("DB error: pStmtInformer: %s %s", ex.GetString().c_str(),
-                 pDb->getSqlFile("requests/02.sql").c_str());
-        exit(1);
-    }
 
     tmpTableName = "tmp" + std::to_string((long long int)getpid()) + std::to_string((long long int)tid);
 
@@ -81,7 +54,7 @@ Core::Core()
     hm = new HistoryManager(tmpTableName);
     hm->initDB();
     hm->vretg = &resultRetargeting;
-    hm->RetargetingOfferStr = pDb->getSqlFile("requests/03.sql");
+    //hm->RetargetingOfferStr = pDb->getSqlFile("requests/03.sql");
 
     Log::info("[%ld]core start",tid);
 }
@@ -89,12 +62,6 @@ Core::Core()
 Core::~Core()
 {
     delete []cmd;
-
-    pStmtInformer->FreeQuery();
-    delete pStmtInformer;
-
-    pStmtOffer->FreeQuery();
-    delete pStmtOffer;
 
     delete hm;
 }
@@ -155,13 +122,18 @@ std::string Core::Process(Params *prms)
 
     params = prms;
 
-    getInformer();
+    if(getInformer() == 0)
+    {
+        Log::err("there is no informer id: %s", prms->getInformerId().c_str());
+        return Config::Instance()->template_error_;
+    }
+
     Log::gdb("[%ld]getInformer: done",tid);
 
     //load all history async
     hm->getUserHistory(params);
 
-    getAllOffers(items);
+    getOffers(items);
     Log::gdb("[%ld]getOffers: %d done",tid, items.size());
 
     //wait all history load
@@ -184,13 +156,14 @@ std::string Core::Process(Params *prms)
     informer->RetargetingCount = vOutPut.size();
 
     //merge
-    if( (*vOutPut.begin())->type == Offer::Type::banner || (*vRIS.begin())->type == Offer::Type::banner )
+    if( (vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner) ||
+       (vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner) )
     {
-        if( (*vOutPut.begin())->type == Offer::Type::banner )
+        if( vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner )
         {
 
         }
-        else if( (*vRIS.begin())->type == Offer::Type::banner )
+        else if( vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner )
         {
             vOutPut.insert(vOutPut.begin(),
                        vRIS.begin(),
@@ -234,7 +207,7 @@ void Core::ProcessSaveResults()
 
     // Сохраняем выданные ссылки в базе данных
     //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
-    if (!params->test_mode_)
+    if (!params->test_mode_ && informer)
         hm->updateUserHistory(vOutPut, params, informer);
 
     OutPutCampaignMap.clear();
@@ -252,10 +225,6 @@ void Core::ProcessSaveResults()
     }
     delete p;
 
-    pStmtInformer->Reset();
-    //  pStmtOffer->Reset();
-
-
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
         if(o->second)
@@ -269,28 +238,37 @@ void Core::ProcessSaveResults()
     vOutPut.clear();
 
     //items.clear();
-    delete informer;
+    if(informer)
+        delete informer;
 }
 
 Informer *Core::getInformer()
 {
     Kompex::SQLiteStatement *pStmt;
 
-    sqlite3_snprintf(CMD_SIZE, cmd, InformerStr.c_str(), params->informer_.c_str());
+    pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
+
+    sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->informerSqlStr.c_str(), params->informer_id_.c_str());
     try
     {
-        pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
         pStmt->Sql(cmd);
     }
     catch(Kompex::SQLiteException &ex)
     {
         Log::err("DB error: getOffers: %s: %s", ex.GetString().c_str(), cmd);
         delete pStmt;
-        return nullptr;
+        return 0;
     }
 
     try
     {
+/*
+        if(pStmt->GetNumberOfRows())
+        {
+            Log::err("no informer id: %s",params->informer_id_.c_str());
+            return 0;
+        }
+*/
         while(pStmt->FetchRow())
         {
             informer =  new Informer(pStmt->GetColumnInt64(0),
@@ -301,23 +279,26 @@ Informer *Core::getInformer()
                                      pStmt->GetColumnInt64(5),
                                      pStmt->GetColumnInt(6)
                                     );
+
+            if(!informer->rtgPercentage)
+                informer->RetargetingCount  =
+                informer->capacity * Config::Instance()->retargeting_by_persents_ / 100;
+            else
+                informer->RetargetingCount  =
+                informer->capacity * informer->rtgPercentage / 100;
+            break;
         }
     }
     catch(Kompex::SQLiteException &ex)
     {
         Log::err("DB error: %s", ex.GetString().c_str());
         delete pStmt;
-        return nullptr;
+        return 0;
     }
 
     delete pStmt;
 
-    if(!informer->rtgPercentage)
-        informer->RetargetingCount  = informer->capacity * Config::Instance()->retargeting_by_persents_ / 100;
-    else
-        informer->RetargetingCount  = informer->capacity * informer->rtgPercentage / 100;
-
-    return nullptr;
+    return informer;
 }
 /**
     Алгоритм работы таков:
@@ -402,10 +383,31 @@ std::string Core::getGeo()
     }
     return geo;
 }
-
+/*
 bool Core::getAllOffers(Offer::Map &ret)
 {
-    sqlite3_snprintf(CMD_SIZE, cmd, pStmtOfferStr.c_str(),
+    sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
+                     getGeo().c_str(),
+                     informer->domainId,
+                     informer->domainId,
+                     informer->accountId,
+                     informer->id,
+                     getpid(),
+                     tid,
+                     informer->id);
+    hm->getDeprecatedOffersAsyncWait();
+    return getOffers(ret);
+}
+*/
+bool Core::getOffers(Offer::Map &result)
+{
+    boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
+    startTime = boost::posix_time::microsec_clock::local_time();
+
+    Kompex::SQLiteStatement *pStmt;
+    pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
+
+    sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
                      getGeo().c_str(),
                      informer->domainId,
                      informer->domainId,
@@ -417,23 +419,9 @@ bool Core::getAllOffers(Offer::Map &ret)
 #ifdef DEBUG
     printf("%s\n",cmd);
 #endif // DEBUG
-    hm->getDeprecatedOffersAsyncWait();
-    return getOffers(ret);
-}
-
-bool Core::getOffers(Offer::Map &result)
-{
-    boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
-    startTime = boost::posix_time::microsec_clock::local_time();
-
-    Kompex::SQLiteStatement *pStmt;
-
-//    Log::info("getOffers start");
-    //Log::info("[%ld]get history size: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
 
     try
     {
-        pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
         pStmt->Sql(cmd);
         printf("%s\n",cmd);
     }
@@ -499,16 +487,16 @@ std::string Core::OffersToHtml(const Offer::Vector &items, const std::string &ur
     {
         // Получаем HTML-код информера для отображение баннера
         informer_html =
-            boost::str(boost::format(InformerTemplate::instance()->getBannersTemplate())
+            boost::str(boost::format(Config::Instance()->template_banner_)
                        % informer->bannersCss
-                       % InformerTemplate::instance()->getSwfobjectLibStr()
+                       % Config::Instance()->swfobject_
                        % OffersToJson(items));
     }
     else
     {
         // Получаем HTML-код информера для отображение тизера
         informer_html =
-            boost::str(boost::format(InformerTemplate::instance()->getTeasersTemplate())
+            boost::str(boost::format(Config::Instance()->template_teaser_)
                        % informer->teasersCss
                        % OffersToJson(items)
                        % informer->capacity

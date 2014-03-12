@@ -111,9 +111,8 @@ am_workerd_OBJECTS = workerd-base64.$(OBJEXT) workerd-Core.$(OBJEXT) \
 	workerd-main.$(OBJEXT) workerd-Server.$(OBJEXT) \
 	workerd-Campaign.$(OBJEXT) workerd-DB.$(OBJEXT) \
 	workerd-HistoryManagerLongTerm.$(OBJEXT) \
-	workerd-InformerTemplate.$(OBJEXT) workerd-Offer.$(OBJEXT) \
-	workerd-sphinxRequests.$(OBJEXT) workerd-CgiService.$(OBJEXT) \
-	workerd-EBranch.$(OBJEXT) \
+	workerd-Offer.$(OBJEXT) workerd-sphinxRequests.$(OBJEXT) \
+	workerd-CgiService.$(OBJEXT) workerd-EBranch.$(OBJEXT) \
 	workerd-HistoryManagerOffer.$(OBJEXT) workerd-json.$(OBJEXT) \
 	workerd-ParamParse.$(OBJEXT) workerd-UrlParser.$(OBJEXT) \
 	workerd-Config.$(OBJEXT) \
@@ -424,13 +423,12 @@ top_builddir = .
 top_srcdir = .
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = libs/libredis
-OBJS = .obj
 AM_CFLAGS = -Ofast
 #AM_CFLAGS = -g -DDEBUG -Wall
 AM_CXXFLAGS = -Ofast
 #AM_CXXFLAGS = -g -DDEBUG -Wall
 workerd_CPPFLAGS = -std=c++11 -Iinclude -Ilibs/libredis
-workerd_SOURCES = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/InformerTemplate.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+workerd_SOURCES = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
 workerd_LDADD = \
 	$(BOOST_DATE_TIME_LIBS) \
 	$(BOOST_FILESYSTEM_LIBS) \
@@ -608,7 +606,6 @@ include ./$(DEPDIR)/workerd-HistoryManagerOffer.Po
 include ./$(DEPDIR)/workerd-HistoryManagerRetargeting.Po
 include ./$(DEPDIR)/workerd-HistoryManagerShortTerm.Po
 include ./$(DEPDIR)/workerd-Informer.Po
-include ./$(DEPDIR)/workerd-InformerTemplate.Po
 include ./$(DEPDIR)/workerd-KompexSQLiteDatabase.Po
 include ./$(DEPDIR)/workerd-KompexSQLiteStatement.Po
 include ./$(DEPDIR)/workerd-Log.Po
@@ -855,20 +852,6 @@ workerd-HistoryManagerLongTerm.obj: src/HistoryManagerLongTerm.cpp
 #	$(AM_V_CXX)source='src/HistoryManagerLongTerm.cpp' object='workerd-HistoryManagerLongTerm.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd-HistoryManagerLongTerm.obj `if test -f 'src/HistoryManagerLongTerm.cpp'; then $(CYGPATH_W) 'src/HistoryManagerLongTerm.cpp'; else $(CYGPATH_W) '$(srcdir)/src/HistoryManagerLongTerm.cpp'; fi`
-
-workerd-InformerTemplate.o: src/InformerTemplate.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd-InformerTemplate.o -MD -MP -MF $(DEPDIR)/workerd-InformerTemplate.Tpo -c -o workerd-InformerTemplate.o `test -f 'src/InformerTemplate.cpp' || echo '$(srcdir)/'`src/InformerTemplate.cpp
-	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd-InformerTemplate.Tpo $(DEPDIR)/workerd-InformerTemplate.Po
-#	$(AM_V_CXX)source='src/InformerTemplate.cpp' object='workerd-InformerTemplate.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd-InformerTemplate.o `test -f 'src/InformerTemplate.cpp' || echo '$(srcdir)/'`src/InformerTemplate.cpp
-
-workerd-InformerTemplate.obj: src/InformerTemplate.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd-InformerTemplate.obj -MD -MP -MF $(DEPDIR)/workerd-InformerTemplate.Tpo -c -o workerd-InformerTemplate.obj `if test -f 'src/InformerTemplate.cpp'; then $(CYGPATH_W) 'src/InformerTemplate.cpp'; else $(CYGPATH_W) '$(srcdir)/src/InformerTemplate.cpp'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd-InformerTemplate.Tpo $(DEPDIR)/workerd-InformerTemplate.Po
-#	$(AM_V_CXX)source='src/InformerTemplate.cpp' object='workerd-InformerTemplate.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd-InformerTemplate.obj `if test -f 'src/InformerTemplate.cpp'; then $(CYGPATH_W) 'src/InformerTemplate.cpp'; else $(CYGPATH_W) '$(srcdir)/src/InformerTemplate.cpp'; fi`
 
 workerd-Offer.o: src/Offer.cpp
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd-Offer.o -MD -MP -MF $(DEPDIR)/workerd-Offer.Tpo -c -o workerd-Offer.o `test -f 'src/Offer.cpp' || echo '$(srcdir)/'`src/Offer.cpp

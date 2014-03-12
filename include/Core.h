@@ -67,17 +67,12 @@ private:
 
     DataBase *pDb;
 
-    Kompex::SQLiteStatement *pStmtInformer, *pStmtOffer, *pStmtOfferDefault;
-
     pthread_t tid;
 
     Informer *informer;
     Params *params;
 
     HistoryManager *hm;
-
-    std::string pStmtOfferStr,
-                InformerStr;
 
     bool all_social;
 
@@ -94,7 +89,6 @@ private:
 
     bool getOffers(Offer::Map &result);
     Informer *getInformer();
-    bool getAllOffers(Offer::Map &v);
     void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen);
 
     //bool contains( const Offer::Vector &v, const Offer::itV p) const {return std::find(v.begin(), v.end(), *p) != v.end();}

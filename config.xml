@@ -45,8 +45,8 @@
         <!--Название базы данных-->
         <db>getmyad_db</db>
         <!--Название группы реплик (если база данных находится в Replica Set)-->
-        <set></set>
-        <!--set>vsrv</set-->
+        <!--set></set-->
+        <set>vsrv</set>
         <!--Может ли сервис подключаться к slave серверам базам данных.
         Это балансирует нагрузку в режиме только для чтения, но появляется
         вероятность чтения не самых свежих данных (разница от мастера до
@@ -58,7 +58,7 @@
         <!--Адрес сервера баз данных-->
         <host>localhost</host>
         <!--Название базы данных-->
-        <db>getmyad</db>
+        <db>worker_log</db>
         <!--Название группы реплик (если база данных находится в Replica Set)-->
         <set></set>
         <!--Может ли сервис подключаться к slave серверам базам данных.
@@ -159,6 +159,7 @@
 	 %2%	    swfobject
 	 %3%	    JSON initads-->
     <template_banner>/home/alex/Projects/worker/template/banner.html</template_banner>
+    <template_error>/home/alex/Projects/worker/template/error.html</template_error>
     <swfobject>/home/alex/Projects/worker/template/swfobject.js</swfobject>
 
     <geoGity>/usr/share/GeoIP/GeoLiteCity.dat</geoGity>

@@ -8,7 +8,6 @@
 #include "BaseCore.h"
 #include "Core.h"
 #include "Informer.h"
-#include "InformerTemplate.h"
 #include "Cookie.h"
 #include "DataBase.h"
 #include "Server.h"
@@ -339,7 +338,7 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
         Params prm = Params()
                      .ip(ip)
                      .cookie_id(cookie_value)
-                     .informer(url.param("scr"))
+                     .informer_id(url.param("scr"))
                      .country(url.param("country"))
                      .region(url.param("region"))
                      .test_mode(url.param("test") == "false")
@@ -379,21 +378,6 @@ void CgiService::RISinit()
 //        Response("", 200);
     }
 
-    //инициализируем шаблоны. операция критическая, т.к. без неё модуль не сможет отображать баннеры в принципе.
-    if (!InformerTemplate::instance()->init())
-    {
-        Log::err("Сбой при инициализации шаблонов.");
-        while (InformerTemplate::instance()->init()==false)
-        {
-            sleep(1);
-//            Response("Error templates' initialization", 503);
-        }
-//       Response("", 200);
-    }
-    else
-    {
-        Log::info("Шаблоны проинициализированы.");
-    }
 }
 
 std::string time_t_to_string(time_t t)

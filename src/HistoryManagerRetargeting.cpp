@@ -22,7 +22,7 @@ void HistoryManager::getRetargeting()
         ids += (*i);
     }
 
-    sqlite3_snprintf(sizeof(buf), buf, RetargetingOfferStr.c_str(), params->getUserKeyLong(), ids.c_str());
+    sqlite3_snprintf(sizeof(buf), buf, Config::Instance()->retargetingOfferSqlStr.c_str(), params->getUserKeyLong(), ids.c_str());
 
     try
     {

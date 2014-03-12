@@ -49,6 +49,11 @@ bool DataBase::openDb()
 {
     int flags;
 
+    //load requests
+    Config::Instance()->offerSqlStr = getSqlFile("requests/01.sql");
+    Config::Instance()->informerSqlStr = getSqlFile("requests/04.sql");
+    Config::Instance()->retargetingOfferSqlStr = getSqlFile("requests/03.sql");
+
     try
     {
         if(pStmt)

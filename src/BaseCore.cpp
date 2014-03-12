@@ -12,7 +12,6 @@
 #include "BaseCore.h"
 #include "base64.h"
 
-#include "InformerTemplate.h"
 #include "Informer.h"
 #include "Campaign.h"
 #include "Offer.h"

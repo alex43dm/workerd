@@ -78,9 +78,11 @@ public:
     bool retargeting_unique_by_campaign_;
     std::string template_teaser_;
     std::string template_banner_;
+    std::string template_error_;
     std::string swfobject_;
     int time_update_;
     std::string mq_path_;
+    std::string offerSqlStr, informerSqlStr, retargetingOfferSqlStr;
 
     DataBase *pDb;
 
@@ -112,6 +114,7 @@ private:
     TiXmlElement* mElem;
 
     int getTime(const char *p);
+    std::string getFileContents(const std::string &fileName);
 };
 
 extern Config *cfg;
