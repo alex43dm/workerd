@@ -76,3 +76,17 @@ install: install-binPROGRAMS
 	for p in $$list; do \
 	$(INSTALL_DATA) $$p "$(DESTDIR)$(sysconfdir)/$$p" || exit $$?; \
 	done
+deb:
+	rm -f debian
+	mkdir -p debian/DEBIAN
+	mkdir -p debian/usr/bin
+	mkdir -p debian/etc/workerd
+	mkdir -p debian/etc/init.d
+	cp install/control debian/DEBIAN
+	cp install/workerd debian/etc/init.d/
+	cp workerd debian/usr/bin
+	$(SED) 's/\/home\/alex\/Projects\/worker/\/etc\/workerd/' < ./config.xml > debian/etc/workerd/config.xml
+	cp -r db_dump debian/etc/workerd/
+	cp -r template debian/etc/workerd/
+	dpkg-deb --build debian
+

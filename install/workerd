@@ -1,0 +1,84 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:	  workerd
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the workerd web server
+# Description:       starts workerd using start-stop-daemon
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/workerd
+DAEMON_OPTS="-c /etc/workerd/config.xml"
+NAME=workerd
+DESC=workerd
+PID=/run/worker.pid
+
+. /lib/lsb/init-functions
+
+# Include workerd defaults if available
+if [ ! -f /etc/workerd/config.xml ]; then
+	echo "no config file"
+	exit 1
+fi
+
+test -x $DAEMON || exit 0
+
+start() {
+		start-stop-daemon --start --quiet --pidfile $PID \
+			--retry 5 --exec $DAEMON --oknodo -- $DAEMON_OPTS
+}
+
+stop() {
+		start-stop-daemon --stop --quiet --pidfile $PID \
+			--retry 5 --oknodo --exec $DAEMON
+}
+
+case "$1" in
+	start)
+		log_daemon_msg "Starting $DESC" "$NAME"
+		start
+		log_end_msg $?
+		;;
+
+	stop)
+		stop
+		log_daemon_msg "Stopping $DESC" "$NAME"
+		log_end_msg $?
+		;;
+
+	restart|force-reload)
+		log_daemon_msg "Restarting $DESC" "$NAME"
+		stop
+		sleep 1
+		start
+		log_end_msg $?
+		;;
+
+	reload)
+		log_daemon_msg "Reloading $DESC configuration" "$NAME"
+		start-stop-daemon --stop --signal HUP --quiet --pidfile $PID \
+			--oknodo --exec $DAEMON
+		log_end_msg $?
+		;;
+
+	configtest|testconfig)
+		log_daemon_msg "Testing $DESC configuration"
+		test_workerd_config
+		log_end_msg $?
+		;;
+
+	status)
+		status_of_proc -p $PID "$DAEMON" workerd
+		;;
+
+	*)
+		echo "Usage: $NAME {start|stop|restart|reload|force-reload|status|configtest}" >&2
+		exit 1
+		;;
+esac
+
+exit 0
