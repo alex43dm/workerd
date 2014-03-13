@@ -37,7 +37,9 @@ AC_LINK_IFELSE(
 LDFLAGS=$SAVED_LDFLAGS
 
 AC_CHECK_LIB([mongoclient],[main],[],[AC_MSG_ERROR([mongoclient(mongodb build with client shared library) missing])])
-AC_CHECK_LIB([icuuc],[u_tolower],[],[AC_MSG_ERROR([icuuc library missing])])
+AC_CHECK_LIB([mongoclient],[getScopedDbConnection],[],[AC_DEFINE([MONGO_2_0],[],[old mongo])])
+
+dnl AC_CHECK_LIB([icuuc],[u_tolower],[],[AC_MSG_ERROR([icuuc library missing])])
 AC_CHECK_LIB([icui18n],[main],[],[AC_MSG_ERROR([icui18n library missing])])
 AC_CHECK_LIB([icudata],[main],[],[AC_MSG_ERROR([icudata library missing])])
 

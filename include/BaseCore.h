@@ -9,7 +9,11 @@
 #include <utility>
 #include <boost/date_time.hpp>
 
-#include "../libs/amqpcpp/include/AMQPcpp.h"
+#ifndef AMQPCPP_OLD
+#include <AMQPcpp.h>
+#else
+#include <amqpcpp.h>
+#endif
 
 
 #include "DataBase.h"
