@@ -98,6 +98,9 @@
    */
 #define LT_OBJDIR ".libs/"
 
+/* mongoclient library old */
+/* #undef MONGO_2_0 */
+
 /* Name of package */
 #define PACKAGE "workerd"
 

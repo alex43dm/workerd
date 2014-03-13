@@ -97,6 +97,9 @@
    */
 #undef LT_OBJDIR
 
+/* mongoclient library old */
+#undef MONGO_2_0
+
 /* Name of package */
 #undef PACKAGE
 

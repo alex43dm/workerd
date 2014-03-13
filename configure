@@ -15212,40 +15212,6 @@ else
   as_fn_error $? "amqpcpp library missing" "$LINENO" 5
 fi
 
-
-ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-SAVED_LDFLAGS=$LDFLAGS
-LDFLAGS="$LDFLAGS -lamqpcpp"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <AMQPcpp.h>
-int
-main ()
-{
-AMQPMessage *m;
-    unsigned len;
-    char *pMes;
-    pMes = m->getMessage(&len);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-
-else
-
-$as_echo "#define AMQPCPP_OLD 1" >>confdefs.h
-
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LDFLAGS=$SAVED_LDFLAGS
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lmongoclient" >&5
 $as_echo_n "checking for main in -lmongoclient... " >&6; }
 if ${ac_cv_lib_mongoclient_main+:} false; then :
@@ -15286,6 +15252,65 @@ _ACEOF
 else
   as_fn_error $? "mongoclient(mongodb build with client shared library) missing" "$LINENO" 5
 fi
+
+
+ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+SAVED_LDFLAGS=$LDFLAGS
+LDFLAGS="$LDFLAGS -lamqpcpp"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <AMQPcpp.h>
+int
+main ()
+{
+AMQPMessage *m;
+    unsigned len;
+    char *pMes;
+    pMes = m->getMessage(&len);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+else
+
+$as_echo "#define AMQPCPP_OLD 1" >>confdefs.h
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+LDFLAGS="$SAVED_LDFLAGS -lmongoclient -lboost_system"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mongo/client/connpool.h>
+int
+main ()
+{
+mongo::ScopedDbConnection *db;
+     db = mongo::ScopedDbConnection::getScopedDbConnection("", 0);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+else
+
+$as_echo "#define MONGO_2_0 /**/" >>confdefs.h
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+lDFLAGS=$SAVED_LDFLAGS
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for u_tolower in -licuuc" >&5
 $as_echo_n "checking for u_tolower in -licuuc... " >&6; }
@@ -15331,7 +15356,8 @@ _ACEOF
   LIBS="-licuuc $LIBS"
 
 else
-  as_fn_error $? "icuuc library missing" "$LINENO" 5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: icuuc library missing" >&5
+$as_echo "$as_me: WARNING: icuuc library missing" >&2;}
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -licui18n" >&5
