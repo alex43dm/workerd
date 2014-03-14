@@ -1,8 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 bin_PROGRAMS = workerd
-
-sysconfdir = ${prefix}/etc/worker
+debian_BUILD = $(PACKAGE)-$(VERSION)
 
 SUBDIRS = libs/libredis
 
@@ -61,32 +60,39 @@ db_dump/post/01.sql \
 db_dump/schema/CampaignNow.sql \
 template/swfobject.js \
 template/banner.html \
+template/error.html \
 template/teaser.html
 
+install_f =\
+echo "install to $1"; \
+$(MKDIR_P) $(1)/etc/worker/template; \
+$(MKDIR_P) $(1)/etc/worker/db_dump; \
+$(MKDIR_P) $(1)/etc/worker/db_dump/schema; \
+$(MKDIR_P) $(1)/etc/worker/db_dump/post; \
+$(MKDIR_P) $(1)/etc/worker/db_dump/view; \
+$(MKDIR_P) $(1)/etc/worker/db_dump/tables; \
+$(MKDIR_P) $(1)/etc/worker/db_dump/requests; \
+$(MKDIR_P) $(1)/etc/init.d; \
+$(MKDIR_P) $(1)/usr/bin; \
+$(SED) 's/\/home\/alex\/Projects\/worker/\/$(1)\/etc\/worker/' < ./config.xml > $(1)/etc/worker/config.xml; \
+$(INSTALL) $(bin_PROGRAMS) $(1)/usr/bin; \
+$(INSTALL) install/workerd $(1)/etc/init.d; \
+@list='$(sysconf_DATA)'; \
+for p in $$list; do \
+$(INSTALL_DATA) $$p "$(1)/etc/worker/$$p" || exit $$?; \
+done
+
 install: install-binPROGRAMS
-	$(MKDIR_P) $(sysconfdir)/template
-	$(MKDIR_P) $(sysconfdir)/db_dump
-	$(MKDIR_P) $(sysconfdir)/db_dump/schema
-	$(MKDIR_P) $(sysconfdir)/db_dump/post
-	$(MKDIR_P) $(sysconfdir)/db_dump/view
-	$(MKDIR_P) $(sysconfdir)/db_dump/tables
-	$(MKDIR_P) $(sysconfdir)/db_dump/requests
-	$(SED) 's/\/home\/alex\/Projects\/worker/\/usr/' < ./config.xml > $(sysconfdir)/config.xml
-	@list='$(sysconf_DATA)'; \
-	for p in $$list; do \
-	$(INSTALL_DATA) $$p "$(DESTDIR)$(sysconfdir)/$$p" || exit $$?; \
+	@DOLLAR_SIGN@(call install_f,$(prefix))
+
+deb: $(bin_PROGRAMS)
+	rm -rf $(debian_BUILD)
+	$(MKDIR_P) $(debian_BUILD)/DEBIAN
+	cp install/control $(debian_BUILD)/DEBIAN
+	@DOLLAR_SIGN@(call install_f,$(debian_BUILD))
+	for p in `find $(debian_BUILD) -type f -print | grep -v DEBIAN`; do \
+	md5sum $$p | $(SED) 's/$(debian_BUILD)\///'>>$(debian_BUILD)/DEBIAN/md5sum; \
 	done
-deb:
-	rm -f debian
-	mkdir -p debian/DEBIAN
-	mkdir -p debian/usr/bin
-	mkdir -p debian/etc/workerd
-	mkdir -p debian/etc/init.d
-	cp install/control debian/DEBIAN
-	cp install/workerd debian/etc/init.d/
-	cp workerd debian/usr/bin
-	$(SED) 's/\/home\/alex\/Projects\/worker/\/etc\/workerd/' < ./config.xml > debian/etc/workerd/config.xml
-	cp -r db_dump debian/etc/workerd/
-	cp -r template debian/etc/workerd/
-	dpkg-deb --build debian
+	dpkg-deb --build $(debian_BUILD)
+	rm -rf $(debian_BUILD)
 

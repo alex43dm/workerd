@@ -323,6 +323,7 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DISTCHECK_CONFIGURE_FLAGS = @DISTCHECK_CONFIGURE_FLAGS@
 DLLTOOL = @DLLTOOL@
+DOLLAR_SIGN = @DOLLAR_SIGN@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -416,12 +417,13 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
-sysconfdir = ${prefix}/etc/worker
+sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
+debian_BUILD = $(PACKAGE)-$(VERSION)
 SUBDIRS = libs/libredis
 @DEBUG_FALSE@AM_CFLAGS = -Ofast
 @DEBUG_TRUE@AM_CFLAGS = -g -DDEBUG -Wall
@@ -473,7 +475,29 @@ db_dump/post/01.sql \
 db_dump/schema/CampaignNow.sql \
 template/swfobject.js \
 template/banner.html \
+template/error.html \
 template/teaser.html
+
+install_f = \
+echo "install to $1"; \
+$(MKDIR_P) $(1)/etc/worker/template; \
+$(MKDIR_P) $(1)/etc/worker/db_dump; \
+$(MKDIR_P) $(1)/etc/worker/db_dump/schema; \
+$(MKDIR_P) $(1)/etc/worker/db_dump/post; \
+$(MKDIR_P) $(1)/etc/worker/db_dump/view; \
+$(MKDIR_P) $(1)/etc/worker/db_dump/tables; \
+$(MKDIR_P) $(1)/etc/worker/db_dump/requests; \
+$(MKDIR_P) $(1)/etc/init.d; \
+$(MKDIR_P) $(1)/usr/bin; \
+$(SED) 's/\/home\/alex\/Projects\/worker/\/usr/' < ./config.xml > $(1)/etc/worker/config.xml; \
+$(INSTALL) $(bin_PROGRAMS) $(1)/usr/bin; \
+$(INSTALL) install/workerd $(1)/etc/init.d; \
+@list='$(sysconf_DATA)'; \
+for p in $$list; do \
+$(INSTALL_DATA) $$p "$(1)/etc/worker/$$p" || exit $$?; \
+done; \
+$(INSTALL) $(bin_PROGRAMS) $(1)/usr/bin; \
+$(INSTALL) install/workerd $(1)/etc/init.d
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -1564,18 +1588,18 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA \
 
 
 install: install-binPROGRAMS
-	$(MKDIR_P) $(sysconfdir)/template
-	$(MKDIR_P) $(sysconfdir)/db_dump
-	$(MKDIR_P) $(sysconfdir)/db_dump/schema
-	$(MKDIR_P) $(sysconfdir)/db_dump/post
-	$(MKDIR_P) $(sysconfdir)/db_dump/view
-	$(MKDIR_P) $(sysconfdir)/db_dump/tables
-	$(MKDIR_P) $(sysconfdir)/db_dump/requests
-	$(SED) 's/\/home\/alex\/Projects\/worker/\/usr/' < ./config.xml > $(sysconfdir)/config.xml
-	@list='$(sysconf_DATA)'; \
-	for p in $$list; do \
-	$(INSTALL_DATA) $$p "$(DESTDIR)$(sysconfdir)/$$p" || exit $$?; \
+	@DOLLAR_SIGN@(call install_f,$(prefix))
+
+deb: $(bin_PROGRAMS)
+	rm -rf $(debian_BUILD)
+	$(MKDIR_P) $(debian_BUILD)/DEBIAN
+	cp install/control $(debian_BUILD)/DEBIAN
+	@DOLLAR_SIGN@(call install_f,$(debian_BUILD))
+	for p in `find $(debian_BUILD) -type f -print | grep -v DEBIAN`; do \
+	md5sum $$p | $(SED) 's/$(debian_BUILD)\///'>>$(debian_BUILD)/DEBIAN/md5sum; \
 	done
+	dpkg-deb --build $(debian_BUILD)
+	rm -rf $(debian_BUILD)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

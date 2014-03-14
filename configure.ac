@@ -15,6 +15,8 @@ LT_INIT([disable-static])
 LTCFLAGS="-O2"
 LTCXXFLAGS="-O2"
 
+AC_SUBST([DOLLAR_SIGN],[$]) 
+
 AC_CONFIG_LIBOBJ_DIR([libs/libredis])
 dnl AC_CONFIG_LIBOBJ_DIR([libs/amqpcpp])
 
