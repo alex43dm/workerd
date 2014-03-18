@@ -7,7 +7,7 @@ add_definitions ( -std=c++11 -Wall )
 find_package(Boost
  COMPONENTS system filesystem thread 
 	program_options date_time regex REQUIRED)
-
+#pkg_check_modules(SQLITE3	sqlite3 	REQUIRED)
 
 include_directories (
 	${CMAKE_SOURCE_DIR} 
@@ -46,10 +46,7 @@ set ( workerd_HDRS
 	Params.h
 	pch.h
 	RedisClient.h
-	SearchEngines.h
 	Server.h
-	sphinxRequests.h
-	SQLiteTmpTable.h
 	UrlParser.h
 	XXXSearcher.h
 	ParamParse.h
@@ -60,7 +57,6 @@ set ( workerd_SRCS
 	utils/base64.cpp
 	utils/Cookie.cpp
 	utils/GeoIPTools.cpp
-	utils/SearchEngines.cpp
 	utils/UrlParser.cpp
 	src/EBranch.cpp
 	src/json.cpp
@@ -73,7 +69,6 @@ set ( workerd_SRCS
 	src/ParentDB.cpp
 	src/HistoryManagerLongTerm.cpp
 	src/HistoryManagerOffer.cpp
-	src/HistoryManagerPageKeyWords.cpp
 	src/HistoryManagerRetargeting.cpp
 	src/HistoryManagerShortTerm.cpp
 	BaseCore.cpp
@@ -103,7 +98,7 @@ add_executable ( workerd
 )
 
 target_link_libraries ( workerd
-	/usr/lib/libamqpcpp.a
+	/usr/local/lib/libamqpcpp.a
 	/home/alex/Projects/libredis/lib/libredis.a
 	${Boost_FILESYSTEM_LIBRARY}
 	${Boost_SYSTEM_LIBRARY}
