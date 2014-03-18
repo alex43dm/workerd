@@ -36,6 +36,7 @@ INNER JOIN (
             FROM Campaign2Informer AS c2i
             WHERE c2i.id_inf=%lld AND c2i.allowed=0
 ) AS c ON ca.id=c.id
+GROUP BY ofrs.campaignId
 ORDER BY RANDOM()
 LIMIT %d
 ;
