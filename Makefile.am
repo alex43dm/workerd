@@ -1,7 +1,42 @@
 ACLOCAL_AMFLAGS = -I m4
 
+SRC_ALL=src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+SRC_DUMMY=src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/Offer.cpp src/CgiService.cpp src/EBranch.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
 
-debian_BUILD = $(PACKAGE)-$(VERSION)
+CMN_CPPFLAGS=-std=c++11 -Iinclude
+CMN_LDADD = $(BOOST_DATE_TIME_LIBS) $(BOOST_FILESYSTEM_LIBS) $(BOOST_THREAD_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_REGEX_LIBS)
+
+if DUMMY
+
+if DEBUG
+bin_PROGRAMS = workerd-dummy-dev
+workerd_dummy_dev_SOURCES=$(SRC_DUMMY)
+workerd_dummy_dev_CPPFLAGS=$(CMN_CPPFLAGS)
+workerd_dummy_dev_LDADD = $(CMN_LDADD)
+else
+bin_PROGRAMS = workerd-dummy
+workerd_dummy_SOURCES=$(SRC_DUMMY)
+workerd_dummy_CPPFLAGS=$(CMN_CPPFLAGS)
+workerd_dummy_LDADD = $(CMN_LDADD)
+endif
+
+else #DUMMY
+
+if DEBUG
+bin_PROGRAMS = workerd-dev
+workerd_dev_SOURCES=$(SRC_ALL)
+workerd_dev_CPPFLAGS=$(CMN_CPPFLAGS) -Ilibs/libredis
+workerd_dev_LDADD=$(CMN_LDADD) libs/libredis/lib/libredis.a
+else
+bin_PROGRAMS = workerd
+workerd_SOURCES=$(SRC_ALL)
+workerd_CPPFLAGS=$(CMN_CPPFLAGS) -Ilibs/libredis
+workerd_LDADD=$(CMN_LDADD) libs/libredis/lib/libredis.a
+endif
+
+SUBDIRS = libs/libredis
+
+endif #DUMMY
 
 if DEBUG
 AM_CFLAGS = -g -DDEBUG -Wall
@@ -11,30 +46,7 @@ AM_CFLAGS = -Ofast
 AM_CXXFLAGS = -Ofast
 endif
 
-if DUMMY
-bin_PROGRAMS = workerdDummy
-workerdDummy_SOURCES=src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/Offer.cpp src/CgiService.cpp src/EBranch.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
-workerdDummy_CPPFLAGS=-std=c++11 -Iinclude
-workerdDummy_LDADD = \
-	$(BOOST_DATE_TIME_LIBS) \
-	$(BOOST_FILESYSTEM_LIBS) \
-	$(BOOST_THREAD_LIBS) \
-	$(BOOST_SYSTEM_LIBS) \
-	$(BOOST_REGEX_LIBS)
-else
-bin_PROGRAMS = workerd
-workerd_SOURCES=src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
-workerd_CPPFLAGS=-std=c++11 -Iinclude -Ilibs/libredis
-workerd_LDADD = \
-	$(BOOST_DATE_TIME_LIBS) \
-	$(BOOST_FILESYSTEM_LIBS) \
-	$(BOOST_THREAD_LIBS) \
-	$(BOOST_SYSTEM_LIBS) \
-	$(BOOST_REGEX_LIBS) \
-	libs/libredis/lib/libredis.a
-
-SUBDIRS = libs/libredis
-endif
+debian_BUILD = $(bin_PROGRAMS)-$(VERSION)
 
 dist_doc_DATA=README
 
@@ -87,10 +99,10 @@ $(MKDIR_P) $(1)/etc/worker/db_dump/view; \
 $(MKDIR_P) $(1)/etc/worker/db_dump/tables; \
 $(MKDIR_P) $(1)/etc/worker/db_dump/requests; \
 $(MKDIR_P) $(1)/etc/init.d; \
-$(MKDIR_P) $(1)/usr/bin; \
-$(SED) 's/\/home\/alex\/Projects\/worker/\/$(1)\/etc\/worker/' < ./config.xml > $(1)/etc/worker/config.xml; \
-$(INSTALL) $(bin_PROGRAMS) $(1)/usr/bin; \
-$(INSTALL) install/workerd $(1)/etc/init.d; \
+$(MKDIR_P) $(1)/usr/sbin; \
+$(SED) 's/\/home\/alex\/Projects\/worker/\/$(1)\/etc\/worker/' < ./config.xml > $(1)/etc/worker/config-$(bin_PROGRAMS).xml; \
+$(INSTALL) $(bin_PROGRAMS) $(1)/usr/sbin; \
+$(SED) 's/\/etc\/workerd\/config.xml/\/$(1)/etc/worker/config-$(bin_PROGRAMS).xml/;s/\/usr\/sbin\/workerd/\/$(1)/usr/sbin/$(bin_PROGRAMS)/' < ./install/workerd > $(1)/etc/init.d/$(bin_PROGRAMS); \
 @list='$(sysconf_DATA)'; \
 for p in $$list; do \
 $(INSTALL_DATA) $$p "$(1)/etc/worker/$$p" || exit $$?; \
@@ -102,7 +114,7 @@ install: install-binPROGRAMS
 deb: $(bin_PROGRAMS)
 	rm -rf $(debian_BUILD)
 	$(MKDIR_P) $(debian_BUILD)/DEBIAN
-	cp install/control $(debian_BUILD)/DEBIAN
+	$(SED) 's/xversion/$(VERSION)/'< install/control >  $(debian_BUILD)/DEBIAN/control
 	@DOLLAR_SIGN@(call install_f,$(debian_BUILD))
 	for p in `find $(debian_BUILD) -type f -print | grep -v DEBIAN`; do \
 	md5sum $$p | $(SED) 's/$(debian_BUILD)\///'>>$(debian_BUILD)/DEBIAN/md5sum; \

@@ -1,5 +1,7 @@
 dnl Process this file with autoconf
-AC_INIT([workerd], [0.1], [wvdial@gmail.com])
+
+AC_INIT([workerd], m4_esyscmd([echo -n $(git describe --tags --long | sed "s/v\([0-9]\.[0-9]-.*\)-.*/\1/")]), [wvdial@gmail.com])
+
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE
 
@@ -17,6 +19,8 @@ LTCXXFLAGS="-O2"
 
 AC_SUBST([DOLLAR_SIGN],[$])
 
+AC_HAVE_HEADERS(string.h fcntl.h sys/file.h sys/param.h)
+
 AC_ARG_ENABLE(dummy,
 AS_HELP_STRING([--enable-dummy],
 	[enable dummy mode, default: no]),
@@ -26,21 +30,24 @@ AS_HELP_STRING([--enable-dummy],
 		*)   AC_MSG_ERROR([bad value ${enableval} for --enable-dummy]) ;;
 		esac],
 		[dummy=false])
-
 AM_CONDITIONAL(DUMMY, test x"$dummy" = x"true")
 
-AC_HAVE_HEADERS(string.h fcntl.h sys/file.h sys/param.h)
+AC_ARG_ENABLE(debug,
+AS_HELP_STRING([--enable-debug],
+	[enable debugging, default: no]),
+		[case "${enableval}" in
+		yes) debug=true ;;
+		no)  debug=false ;;
+		*)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
+		esac],
+		[debug=false])
+AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
+
 
 if test "x$dummy" = "xfalse" ; then
 AC_CONFIG_LIBOBJ_DIR([libs/libredis])
 AC_CHECK_LIB([sphinxclient], [sphinx_add_query], [], [AC_MSG_ERROR([sphinxclient was not found])])
 else
-PACKAGE=workerdDummy
-PACKAGE_NAME=workerdDummy
-PACKAGE_STRING="workerdDummy 0.1"
-PACKAGE_TARNAME=workerdDummy
-PACKAGE_VERSION=0.1
-
 AC_DEFINE(DUMMY,[1],[dummy worker])
 fi
 
@@ -88,17 +95,6 @@ AC_CHECK_LIB([sqlite3], [sqlite3_threadsafe], [AC_DEFINE(SQLITE_THREADSAFE,[1],[
 AC_CHECK_LIB([GeoIP], [GeoIP_region_name_by_code], [], [AC_MSG_ERROR([GeoIP was not found])])
 AC_CHECK_LIB([tinyxml], [main], [], [AC_MSG_ERROR([tinyxml was not found])])
 AC_CHECK_LIB([rabbitmq],[main],[],[AC_MSG_ERROR([rabbitmq library missing])])
-
-AC_ARG_ENABLE(debug,
-AS_HELP_STRING([--enable-debug],
-	[enable debugging, default: no]),
-		[case "${enableval}" in
-		yes) debug=true ;;
-		no)  debug=false ;;
-		*)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
-		esac],
-		[debug=false])
-AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
 CPPFLAGS="-W -Wall"
 

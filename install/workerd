@@ -11,16 +11,17 @@
 ### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/bin/workerd
-DAEMON_OPTS="-c /etc/workerd/config.xml"
+DAEMON=/usr/sbin/workerd
+CONFIG="/etc/workerd/config.xml"
+DAEMON_OPTS="-c $CONFIG"
 NAME=workerd
-DESC=workerd
+DESC="worker daemon"
 PID=/run/worker.pid
 
 . /lib/lsb/init-functions
 
 # Include workerd defaults if available
-if [ ! -f /etc/workerd/config.xml ]; then
+if [ ! -f $CONFIG ]; then
 	echo "no config file"
 	exit 1
 fi

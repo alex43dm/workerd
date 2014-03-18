@@ -1,5 +1,5 @@
 Package: worker
-Version: 0.1-0
+Version: xversion
 Section: base
 Priority: optional
 Architecture: all
