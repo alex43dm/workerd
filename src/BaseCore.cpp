@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <sstream>
 
+#include "../config.h"
+
 #include "Log.h"
 #include "BaseCore.h"
 #include "base64.h"
@@ -91,7 +93,13 @@ bool BaseCore::ProcessMQ()
                 {
                     if(cmdParser(m1,ofrId,cmgId))
                     {
-                        pdb->OfferLoad(QUERY("guid" << ofrId));
+                        mongo::Query q;
+                        #ifdef DUMMY
+                        q = mongo::Query("{$and: [{ \"retargeting\" : false}, {\"type\" : \"teaser\"}, { \"guid\" : \""+ofrId+"\"}]}");
+                        #else
+                        q = QUERY("guid" << ofrId);
+                        #endif // DUMMY
+                        pdb->OfferLoad(q);
                     }
                 }
                 else if(m->getRoutingKey() == "advertise.delete")
@@ -153,10 +161,20 @@ void BaseCore::LoadAllEntities()
 
     //Загрузили все информеры
     pdb->InformerLoadAll();
+
     //Загрузили все кампании
     Campaign::loadAll(Config::Instance()->pDb->pDatabase);
+
     //Загрузили все предложения
-    pdb->OfferLoad();
+    mongo::Query q;
+#ifdef DUMMY
+    q = mongo::Query("{$and: [{ \"retargeting\" : false}, {\"type\" : \"teaser\"}]}");
+#else
+    q = mongo::Query();
+#endif // DUMMY
+
+    pdb->OfferLoad(q);
+
     //Загрузили все категории
     pdb->CategoriesLoad();
     //загрузили рейтинг

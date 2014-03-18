@@ -1,9 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
-bin_PROGRAMS = workerd
-debian_BUILD = $(PACKAGE)-$(VERSION)
 
-SUBDIRS = libs/libredis
+debian_BUILD = $(PACKAGE)-$(VERSION)
 
 if DEBUG
 AM_CFLAGS = -g -DDEBUG -Wall
@@ -13,8 +11,20 @@ AM_CFLAGS = -Ofast
 AM_CXXFLAGS = -Ofast
 endif
 
-workerd_CPPFLAGS=-std=c++11 -Iinclude -Ilibs/libredis
+if DUMMY
+bin_PROGRAMS = workerdDummy
+workerdDummy_SOURCES=src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/Offer.cpp src/CgiService.cpp src/EBranch.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+workerdDummy_CPPFLAGS=-std=c++11 -Iinclude
+workerdDummy_LDADD = \
+	$(BOOST_DATE_TIME_LIBS) \
+	$(BOOST_FILESYSTEM_LIBS) \
+	$(BOOST_THREAD_LIBS) \
+	$(BOOST_SYSTEM_LIBS) \
+	$(BOOST_REGEX_LIBS)
+else
+bin_PROGRAMS = workerd
 workerd_SOURCES=src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+workerd_CPPFLAGS=-std=c++11 -Iinclude -Ilibs/libredis
 workerd_LDADD = \
 	$(BOOST_DATE_TIME_LIBS) \
 	$(BOOST_FILESYSTEM_LIBS) \
@@ -23,11 +33,15 @@ workerd_LDADD = \
 	$(BOOST_REGEX_LIBS) \
 	libs/libredis/lib/libredis.a
 
+SUBDIRS = libs/libredis
+endif
+
 dist_doc_DATA=README
 
 sysconf_DATA= \
 db_dump/requests/02.sql \
 db_dump/requests/01.sql \
+db_dump/requests/05.sql \
 db_dump/requests/04.sql \
 db_dump/requests/03.sql \
 db_dump/UA_RU \

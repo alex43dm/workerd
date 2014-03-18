@@ -283,6 +283,7 @@ long long ParentDB::insertAndGetAccountId(const std::string &accout)
 bool ParentDB::InformerLoadAll()
 {
     mongo::DB db;
+
     std::unique_ptr<mongo::DBClientCursor> cursor = db.query("informer", mongo::Query());
     int skipped = 0;
     Kompex::SQLiteStatement *pStmt;

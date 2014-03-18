@@ -4,6 +4,9 @@
 /* amqpcpp library old */
 /* #undef AMQPCPP_OLD */
 
+/* dummy worker */
+/* #undef DUMMY */
+
 /* Defined if the requested minimum BOOST version is satisfied */
 #define HAVE_BOOST 1
 

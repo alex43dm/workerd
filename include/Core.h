@@ -14,8 +14,9 @@
 #include "Informer.h"
 #include "Params.h"
 #include "DataBase.h"
+#ifndef DUMMY
 #include "HistoryManager.h"
-
+#endif
 /// Класс, который связывает воедино все части системы.
 class Core
 {
@@ -71,9 +72,9 @@ private:
 
     Informer *informer;
     Params *params;
-
+#ifndef DUMMY
     HistoryManager *hm;
-
+#endif
     bool all_social;
 
     unsigned teasersCount;

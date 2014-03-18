@@ -660,6 +660,8 @@ BOOST_SYSTEM_LDFLAGS
 BOOST_CPPFLAGS
 DISTCHECK_CONFIGURE_FLAGS
 BOOST_ROOT
+DUMMY_FALSE
+DUMMY_TRUE
 DOLLAR_SIGN
 CXXCPP
 CPP
@@ -792,6 +794,7 @@ enable_fast_install
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+enable_dummy
 with_boost
 enable_static_boost
 enable_debug
@@ -1439,6 +1442,7 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --enable-dummy          enable dummy mode, default: no
   --enable-static-boost   Prefer the static boost libraries over the shared
                           ones [no]
   --enable-debug          enable debugging, default: no
@@ -15157,6 +15161,25 @@ LTCXXFLAGS="-O2"
 DOLLAR_SIGN=$
 
 
+# Check whether --enable-dummy was given.
+if test "${enable_dummy+set}" = set; then :
+  enableval=$enable_dummy; case "${enableval}" in
+		yes) dummy=true ;;
+		no)  dummy=false ;;
+		*)   as_fn_error $? "bad value ${enableval} for --enable-dummy" "$LINENO" 5 ;;
+		esac
+else
+  dummy=false
+fi
+
+
+ if test x"$dummy" = x"true"; then
+  DUMMY_TRUE=
+  DUMMY_FALSE='#'
+else
+  DUMMY_TRUE='#'
+  DUMMY_FALSE=
+fi
 
 
 
@@ -15173,6 +15196,61 @@ fi
 
 done
 
+
+if test "x$dummy" = "xfalse" ; then
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sphinx_add_query in -lsphinxclient" >&5
+$as_echo_n "checking for sphinx_add_query in -lsphinxclient... " >&6; }
+if ${ac_cv_lib_sphinxclient_sphinx_add_query+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lsphinxclient  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char sphinx_add_query ();
+int
+main ()
+{
+return sphinx_add_query ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_sphinxclient_sphinx_add_query=yes
+else
+  ac_cv_lib_sphinxclient_sphinx_add_query=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_sphinxclient_sphinx_add_query" >&5
+$as_echo "$ac_cv_lib_sphinxclient_sphinx_add_query" >&6; }
+if test "x$ac_cv_lib_sphinxclient_sphinx_add_query" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBSPHINXCLIENT 1
+_ACEOF
+
+  LIBS="-lsphinxclient $LIBS"
+
+else
+  as_fn_error $? "sphinxclient was not found" "$LINENO" 5
+fi
+
+else
+
+$as_echo "#define DUMMY 1" >>confdefs.h
+
+fi
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lamqpcpp" >&5
@@ -17986,53 +18064,6 @@ $as_echo "#define SQLITE_THREADSAFE 1" >>confdefs.h
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sphinx_add_query in -lsphinxclient" >&5
-$as_echo_n "checking for sphinx_add_query in -lsphinxclient... " >&6; }
-if ${ac_cv_lib_sphinxclient_sphinx_add_query+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsphinxclient  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char sphinx_add_query ();
-int
-main ()
-{
-return sphinx_add_query ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_sphinxclient_sphinx_add_query=yes
-else
-  ac_cv_lib_sphinxclient_sphinx_add_query=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_sphinxclient_sphinx_add_query" >&5
-$as_echo "$ac_cv_lib_sphinxclient_sphinx_add_query" >&6; }
-if test "x$ac_cv_lib_sphinxclient_sphinx_add_query" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBSPHINXCLIENT 1
-_ACEOF
-
-  LIBS="-lsphinxclient $LIBS"
-
-else
-  as_fn_error $? "sphinxclient was not found" "$LINENO" 5
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GeoIP_region_name_by_code in -lGeoIP" >&5
 $as_echo_n "checking for GeoIP_region_name_by_code in -lGeoIP... " >&6; }
 if ${ac_cv_lib_GeoIP_GeoIP_region_name_by_code+:} false; then :
@@ -18326,6 +18357,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${DUMMY_TRUE}" && test -z "${DUMMY_FALSE}"; then
+  as_fn_error $? "conditional \"DUMMY\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${DEBUG_TRUE}" && test -z "${DEBUG_FALSE}"; then

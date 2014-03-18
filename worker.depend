@@ -6,7 +6,7 @@
 1386588626 /home/alex/Projects/worker/include/base64.h
 	<string>
 
-1394620087 source:/home/alex/Projects/worker/src/BaseCore.cpp
+1395056176 source:/home/alex/Projects/worker/src/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -16,6 +16,7 @@
 	<ctime>
 	<cstdlib>
 	<sstream>
+	"../config.h"
 	"Log.h"
 	"BaseCore.h"
 	"base64.h"
@@ -31,7 +32,7 @@
 	<string>
 	<utility>
 
-1394535599 /home/alex/Projects/worker/config.h
+1395056617 /home/alex/Projects/worker/config.h
 
 1391029722 /home/alex/Projects/worker/include/Log.h
 	<stdio.h>
@@ -39,14 +40,15 @@
 	<stdarg.h>
 	<pthread.h>
 
-1393367565 /home/alex/Projects/worker/include/BaseCore.h
+1394706570 /home/alex/Projects/worker/include/BaseCore.h
 	"../config.h"
 	<list>
 	<vector>
 	<map>
 	<utility>
 	<boost/date_time.hpp>
-	"../libs/amqpcpp/include/AMQPcpp.h"
+	<AMQPcpp.h>
+	<amqpcpp.h>
 	"DataBase.h"
 	"ParentDB.h"
 
@@ -249,7 +251,7 @@
 	<string.h>
 	<boost/date_time/posix_time/posix_time.hpp>
 
-1394623226 source:/home/alex/Projects/worker/src/DataBase.cpp
+1395057999 source:/home/alex/Projects/worker/src/DataBase.cpp
 	<iostream>
 	<algorithm>
 	<fstream>
@@ -260,6 +262,7 @@
 	<strings.h>
 	<stdlib.h>
 	<string.h>
+	"../config.h"
 	"Log.h"
 	"DataBase.h"
 	"KompexSQLiteException.h"
@@ -367,7 +370,7 @@
 	"GeoIPTools.h"
 	"Log.h"
 
-1392898210 source:/home/alex/Projects/worker/src/ParentDB.cpp
+1395054596 source:/home/alex/Projects/worker/src/ParentDB.cpp
 	"ParentDB.h"
 	"DB.h"
 	"Log.h"
@@ -410,7 +413,7 @@
 	<sstream>
 	"UrlParser.h"
 
-1392983350 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+1394635575 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
 	"Log.h"
 	"Config.h"
 	"XXXSearcher.h"

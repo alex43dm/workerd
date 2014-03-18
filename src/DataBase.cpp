@@ -10,11 +10,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../config.h"
+
 #include "Log.h"
 #include "DataBase.h"
 #include "KompexSQLiteException.h"
 #include "GeoRerions.h"
 #include "Config.h"
+
+
 
 #define INSERTSTATMENT "INSERT INTO Offer (id) VALUES (%lu)"
 
@@ -50,7 +54,13 @@ bool DataBase::openDb()
     int flags;
 
     //load requests
+
+#ifdef DUMMY
+    Config::Instance()->offerSqlStr = getSqlFile("requests/05.sql");
+#else
     Config::Instance()->offerSqlStr = getSqlFile("requests/01.sql");
+#endif
+
     Config::Instance()->informerSqlStr = getSqlFile("requests/04.sql");
     Config::Instance()->retargetingOfferSqlStr = getSqlFile("requests/03.sql");
 
@@ -101,7 +111,7 @@ bool DataBase::openDb()
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DB error: %s", ex.GetString().c_str());
+        Log::err("DB(%s)  error: %s", dbFileName.c_str(), ex.GetString().c_str());
         exit(1);
     }
 

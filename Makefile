@@ -80,6 +80,7 @@ POST_UNINSTALL = :
 build_triplet = x86_64-unknown-linux-gnu
 host_triplet = x86_64-unknown-linux-gnu
 bin_PROGRAMS = workerd$(EXEEXT)
+#bin_PROGRAMS = workerdDummy$(EXEEXT)
 subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -102,35 +103,94 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(docdir)" \
 	"$(DESTDIR)$(sysconfdir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_workerd_OBJECTS = workerd-base64.$(OBJEXT) workerd-Core.$(OBJEXT) \
+am__workerd_SOURCES_DIST = src/base64.cpp src/Core.cpp \
+	src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp \
+	src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp \
+	src/HistoryManager.cpp src/Informer.cpp src/main.cpp \
+	src/Server.cpp src/Campaign.cpp src/DB.cpp \
+	src/HistoryManagerLongTerm.cpp src/Offer.cpp \
+	src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp \
+	src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp \
+	src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp \
+	src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp \
+	src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp \
+	src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+am_workerd_OBJECTS = workerd-base64.$(OBJEXT) \
+	workerd-Core.$(OBJEXT) \
 	workerd-GeoRerions.$(OBJEXT) \
 	workerd-HistoryManagerShortTerm.$(OBJEXT) \
-	workerd-Log.$(OBJEXT) workerd-RedisClient.$(OBJEXT) \
-	workerd-BaseCore.$(OBJEXT) workerd-DataBase.$(OBJEXT) \
-	workerd-HistoryManager.$(OBJEXT) workerd-Informer.$(OBJEXT) \
-	workerd-main.$(OBJEXT) workerd-Server.$(OBJEXT) \
+	workerd-Log.$(OBJEXT) \
+	workerd-RedisClient.$(OBJEXT) \
+	workerd-BaseCore.$(OBJEXT) \
+	workerd-DataBase.$(OBJEXT) \
+	workerd-HistoryManager.$(OBJEXT) \
+	workerd-Informer.$(OBJEXT) workerd-main.$(OBJEXT) \
+	workerd-Server.$(OBJEXT) \
 	workerd-Campaign.$(OBJEXT) workerd-DB.$(OBJEXT) \
 	workerd-HistoryManagerLongTerm.$(OBJEXT) \
-	workerd-Offer.$(OBJEXT) workerd-sphinxRequests.$(OBJEXT) \
-	workerd-CgiService.$(OBJEXT) workerd-EBranch.$(OBJEXT) \
-	workerd-HistoryManagerOffer.$(OBJEXT) workerd-json.$(OBJEXT) \
-	workerd-ParamParse.$(OBJEXT) workerd-UrlParser.$(OBJEXT) \
+	workerd-Offer.$(OBJEXT) \
+	workerd-sphinxRequests.$(OBJEXT) \
+	workerd-CgiService.$(OBJEXT) \
+	workerd-EBranch.$(OBJEXT) \
+	workerd-HistoryManagerOffer.$(OBJEXT) \
+	workerd-json.$(OBJEXT) \
+	workerd-ParamParse.$(OBJEXT) \
+	workerd-UrlParser.$(OBJEXT) \
 	workerd-Config.$(OBJEXT) \
 	workerd-KompexSQLiteDatabase.$(OBJEXT) \
-	workerd-Params.$(OBJEXT) workerd-XXXSearcher.$(OBJEXT) \
-	workerd-Cookie.$(OBJEXT) workerd-GeoIPTools.$(OBJEXT) \
+	workerd-Params.$(OBJEXT) \
+	workerd-XXXSearcher.$(OBJEXT) \
+	workerd-Cookie.$(OBJEXT) \
+	workerd-GeoIPTools.$(OBJEXT) \
 	workerd-HistoryManagerRetargeting.$(OBJEXT) \
 	workerd-KompexSQLiteStatement.$(OBJEXT) \
 	workerd-ParentDB.$(OBJEXT)
 workerd_OBJECTS = $(am_workerd_OBJECTS)
 am__DEPENDENCIES_1 =
-workerd_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+workerd_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) libs/libredis/lib/libredis.a
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	libs/libredis/lib/libredis.a
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+am__workerdDummy_SOURCES_DIST = src/base64.cpp src/Core.cpp \
+	src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp \
+	src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp \
+	src/Campaign.cpp src/DB.cpp src/Offer.cpp src/CgiService.cpp \
+	src/EBranch.cpp src/json.cpp src/ParamParse.cpp \
+	src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp \
+	src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp \
+	src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+#am_workerdDummy_OBJECTS = workerdDummy-base64.$(OBJEXT) \
+#	workerdDummy-Core.$(OBJEXT) \
+#	workerdDummy-GeoRerions.$(OBJEXT) \
+#	workerdDummy-Log.$(OBJEXT) \
+#	workerdDummy-BaseCore.$(OBJEXT) \
+#	workerdDummy-DataBase.$(OBJEXT) \
+#	workerdDummy-Informer.$(OBJEXT) \
+#	workerdDummy-main.$(OBJEXT) \
+#	workerdDummy-Server.$(OBJEXT) \
+#	workerdDummy-Campaign.$(OBJEXT) \
+#	workerdDummy-DB.$(OBJEXT) \
+#	workerdDummy-Offer.$(OBJEXT) \
+#	workerdDummy-CgiService.$(OBJEXT) \
+#	workerdDummy-EBranch.$(OBJEXT) \
+#	workerdDummy-json.$(OBJEXT) \
+#	workerdDummy-ParamParse.$(OBJEXT) \
+#	workerdDummy-UrlParser.$(OBJEXT) \
+#	workerdDummy-Config.$(OBJEXT) \
+#	workerdDummy-KompexSQLiteDatabase.$(OBJEXT) \
+#	workerdDummy-Params.$(OBJEXT) \
+#	workerdDummy-Cookie.$(OBJEXT) \
+#	workerdDummy-GeoIPTools.$(OBJEXT) \
+#	workerdDummy-KompexSQLiteStatement.$(OBJEXT) \
+#	workerdDummy-ParentDB.$(OBJEXT)
+workerdDummy_OBJECTS = $(am_workerdDummy_OBJECTS)
+#workerdDummy_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+#	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+#	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -165,8 +225,9 @@ AM_V_CXXLD = $(am__v_CXXLD_$(V))
 am__v_CXXLD_ = $(am__v_CXXLD_$(AM_DEFAULT_VERBOSITY))
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(workerd_SOURCES)
-DIST_SOURCES = $(workerd_SOURCES)
+SOURCES = $(workerd_SOURCES) $(workerdDummy_SOURCES)
+DIST_SOURCES = $(am__workerd_SOURCES_DIST) \
+	$(am__workerdDummy_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -237,7 +298,7 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = libs/libredis
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -341,7 +402,7 @@ INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LD = /usr/x86_64-pc-linux-gnu/bin/ld -m elf_x86_64
 LDFLAGS =  -lmongoclient -lboost_system
 LIBOBJS = 
-LIBS = -lrabbitmq -ltinyxml -lGeoIP -lsphinxclient -lsqlite3 -lfcgi -licudata -licui18n -licuuc -lmongoclient -lamqpcpp 
+LIBS = -lrabbitmq -ltinyxml -lGeoIP -lsqlite3 -lfcgi -licudata -licui18n -licuuc -lmongoclient -lamqpcpp -lsphinxclient 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
@@ -424,13 +485,21 @@ top_builddir = .
 top_srcdir = .
 ACLOCAL_AMFLAGS = -I m4
 debian_BUILD = $(PACKAGE)-$(VERSION)
-SUBDIRS = libs/libredis
 AM_CFLAGS = -Ofast
 #AM_CFLAGS = -g -DDEBUG -Wall
 AM_CXXFLAGS = -Ofast
 #AM_CXXFLAGS = -g -DDEBUG -Wall
-workerd_CPPFLAGS = -std=c++11 -Iinclude -Ilibs/libredis
+#workerdDummy_SOURCES = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/Offer.cpp src/CgiService.cpp src/EBranch.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+#workerdDummy_CPPFLAGS = -std=c++11 -Iinclude
+#workerdDummy_LDADD = \
+#	$(BOOST_DATE_TIME_LIBS) \
+#	$(BOOST_FILESYSTEM_LIBS) \
+#	$(BOOST_THREAD_LIBS) \
+#	$(BOOST_SYSTEM_LIBS) \
+#	$(BOOST_REGEX_LIBS)
+
 workerd_SOURCES = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+workerd_CPPFLAGS = -std=c++11 -Iinclude -Ilibs/libredis
 workerd_LDADD = \
 	$(BOOST_DATE_TIME_LIBS) \
 	$(BOOST_FILESYSTEM_LIBS) \
@@ -439,10 +508,12 @@ workerd_LDADD = \
 	$(BOOST_REGEX_LIBS) \
 	libs/libredis/lib/libredis.a
 
+SUBDIRS = libs/libredis
 dist_doc_DATA = README
 sysconf_DATA = \
 db_dump/requests/02.sql \
 db_dump/requests/01.sql \
+db_dump/requests/05.sql \
 db_dump/requests/04.sql \
 db_dump/requests/03.sql \
 db_dump/UA_RU \
@@ -489,15 +560,13 @@ $(MKDIR_P) $(1)/etc/worker/db_dump/tables; \
 $(MKDIR_P) $(1)/etc/worker/db_dump/requests; \
 $(MKDIR_P) $(1)/etc/init.d; \
 $(MKDIR_P) $(1)/usr/bin; \
-$(SED) 's/\/home\/alex\/Projects\/worker/\/usr/' < ./config.xml > $(1)/etc/worker/config.xml; \
+$(SED) 's/\/home\/alex\/Projects\/worker/\/$(1)\/etc\/worker/' < ./config.xml > $(1)/etc/worker/config.xml; \
 $(INSTALL) $(bin_PROGRAMS) $(1)/usr/bin; \
 $(INSTALL) install/workerd $(1)/etc/init.d; \
 @list='$(sysconf_DATA)'; \
 for p in $$list; do \
 $(INSTALL_DATA) $$p "$(1)/etc/worker/$$p" || exit $$?; \
-done; \
-$(INSTALL) $(bin_PROGRAMS) $(1)/usr/bin; \
-$(INSTALL) install/workerd $(1)/etc/init.d
+done
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -607,6 +676,10 @@ workerd$(EXEEXT): $(workerd_OBJECTS) $(workerd_DEPENDENCIES) $(EXTRA_workerd_DEP
 	@rm -f workerd$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(workerd_OBJECTS) $(workerd_LDADD) $(LIBS)
 
+workerdDummy$(EXEEXT): $(workerdDummy_OBJECTS) $(workerdDummy_DEPENDENCIES) $(EXTRA_workerdDummy_DEPENDENCIES) 
+	@rm -f workerdDummy$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(workerdDummy_OBJECTS) $(workerdDummy_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -645,6 +718,30 @@ include ./$(DEPDIR)/workerd-base64.Po
 include ./$(DEPDIR)/workerd-json.Po
 include ./$(DEPDIR)/workerd-main.Po
 include ./$(DEPDIR)/workerd-sphinxRequests.Po
+include ./$(DEPDIR)/workerdDummy-BaseCore.Po
+include ./$(DEPDIR)/workerdDummy-Campaign.Po
+include ./$(DEPDIR)/workerdDummy-CgiService.Po
+include ./$(DEPDIR)/workerdDummy-Config.Po
+include ./$(DEPDIR)/workerdDummy-Cookie.Po
+include ./$(DEPDIR)/workerdDummy-Core.Po
+include ./$(DEPDIR)/workerdDummy-DB.Po
+include ./$(DEPDIR)/workerdDummy-DataBase.Po
+include ./$(DEPDIR)/workerdDummy-EBranch.Po
+include ./$(DEPDIR)/workerdDummy-GeoIPTools.Po
+include ./$(DEPDIR)/workerdDummy-GeoRerions.Po
+include ./$(DEPDIR)/workerdDummy-Informer.Po
+include ./$(DEPDIR)/workerdDummy-KompexSQLiteDatabase.Po
+include ./$(DEPDIR)/workerdDummy-KompexSQLiteStatement.Po
+include ./$(DEPDIR)/workerdDummy-Log.Po
+include ./$(DEPDIR)/workerdDummy-Offer.Po
+include ./$(DEPDIR)/workerdDummy-ParamParse.Po
+include ./$(DEPDIR)/workerdDummy-Params.Po
+include ./$(DEPDIR)/workerdDummy-ParentDB.Po
+include ./$(DEPDIR)/workerdDummy-Server.Po
+include ./$(DEPDIR)/workerdDummy-UrlParser.Po
+include ./$(DEPDIR)/workerdDummy-base64.Po
+include ./$(DEPDIR)/workerdDummy-json.Po
+include ./$(DEPDIR)/workerdDummy-main.Po
 
 .cpp.o:
 	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1114,6 +1211,342 @@ workerd-ParentDB.obj: src/ParentDB.cpp
 #	$(AM_V_CXX)source='src/ParentDB.cpp' object='workerd-ParentDB.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd-ParentDB.obj `if test -f 'src/ParentDB.cpp'; then $(CYGPATH_W) 'src/ParentDB.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ParentDB.cpp'; fi`
+
+workerdDummy-base64.o: src/base64.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-base64.o -MD -MP -MF $(DEPDIR)/workerdDummy-base64.Tpo -c -o workerdDummy-base64.o `test -f 'src/base64.cpp' || echo '$(srcdir)/'`src/base64.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-base64.Tpo $(DEPDIR)/workerdDummy-base64.Po
+#	$(AM_V_CXX)source='src/base64.cpp' object='workerdDummy-base64.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-base64.o `test -f 'src/base64.cpp' || echo '$(srcdir)/'`src/base64.cpp
+
+workerdDummy-base64.obj: src/base64.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-base64.obj -MD -MP -MF $(DEPDIR)/workerdDummy-base64.Tpo -c -o workerdDummy-base64.obj `if test -f 'src/base64.cpp'; then $(CYGPATH_W) 'src/base64.cpp'; else $(CYGPATH_W) '$(srcdir)/src/base64.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-base64.Tpo $(DEPDIR)/workerdDummy-base64.Po
+#	$(AM_V_CXX)source='src/base64.cpp' object='workerdDummy-base64.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-base64.obj `if test -f 'src/base64.cpp'; then $(CYGPATH_W) 'src/base64.cpp'; else $(CYGPATH_W) '$(srcdir)/src/base64.cpp'; fi`
+
+workerdDummy-Core.o: src/Core.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Core.o -MD -MP -MF $(DEPDIR)/workerdDummy-Core.Tpo -c -o workerdDummy-Core.o `test -f 'src/Core.cpp' || echo '$(srcdir)/'`src/Core.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Core.Tpo $(DEPDIR)/workerdDummy-Core.Po
+#	$(AM_V_CXX)source='src/Core.cpp' object='workerdDummy-Core.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Core.o `test -f 'src/Core.cpp' || echo '$(srcdir)/'`src/Core.cpp
+
+workerdDummy-Core.obj: src/Core.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Core.obj -MD -MP -MF $(DEPDIR)/workerdDummy-Core.Tpo -c -o workerdDummy-Core.obj `if test -f 'src/Core.cpp'; then $(CYGPATH_W) 'src/Core.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Core.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Core.Tpo $(DEPDIR)/workerdDummy-Core.Po
+#	$(AM_V_CXX)source='src/Core.cpp' object='workerdDummy-Core.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Core.obj `if test -f 'src/Core.cpp'; then $(CYGPATH_W) 'src/Core.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Core.cpp'; fi`
+
+workerdDummy-GeoRerions.o: src/GeoRerions.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-GeoRerions.o -MD -MP -MF $(DEPDIR)/workerdDummy-GeoRerions.Tpo -c -o workerdDummy-GeoRerions.o `test -f 'src/GeoRerions.cpp' || echo '$(srcdir)/'`src/GeoRerions.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-GeoRerions.Tpo $(DEPDIR)/workerdDummy-GeoRerions.Po
+#	$(AM_V_CXX)source='src/GeoRerions.cpp' object='workerdDummy-GeoRerions.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-GeoRerions.o `test -f 'src/GeoRerions.cpp' || echo '$(srcdir)/'`src/GeoRerions.cpp
+
+workerdDummy-GeoRerions.obj: src/GeoRerions.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-GeoRerions.obj -MD -MP -MF $(DEPDIR)/workerdDummy-GeoRerions.Tpo -c -o workerdDummy-GeoRerions.obj `if test -f 'src/GeoRerions.cpp'; then $(CYGPATH_W) 'src/GeoRerions.cpp'; else $(CYGPATH_W) '$(srcdir)/src/GeoRerions.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-GeoRerions.Tpo $(DEPDIR)/workerdDummy-GeoRerions.Po
+#	$(AM_V_CXX)source='src/GeoRerions.cpp' object='workerdDummy-GeoRerions.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-GeoRerions.obj `if test -f 'src/GeoRerions.cpp'; then $(CYGPATH_W) 'src/GeoRerions.cpp'; else $(CYGPATH_W) '$(srcdir)/src/GeoRerions.cpp'; fi`
+
+workerdDummy-Log.o: src/Log.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Log.o -MD -MP -MF $(DEPDIR)/workerdDummy-Log.Tpo -c -o workerdDummy-Log.o `test -f 'src/Log.cpp' || echo '$(srcdir)/'`src/Log.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Log.Tpo $(DEPDIR)/workerdDummy-Log.Po
+#	$(AM_V_CXX)source='src/Log.cpp' object='workerdDummy-Log.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Log.o `test -f 'src/Log.cpp' || echo '$(srcdir)/'`src/Log.cpp
+
+workerdDummy-Log.obj: src/Log.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Log.obj -MD -MP -MF $(DEPDIR)/workerdDummy-Log.Tpo -c -o workerdDummy-Log.obj `if test -f 'src/Log.cpp'; then $(CYGPATH_W) 'src/Log.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Log.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Log.Tpo $(DEPDIR)/workerdDummy-Log.Po
+#	$(AM_V_CXX)source='src/Log.cpp' object='workerdDummy-Log.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Log.obj `if test -f 'src/Log.cpp'; then $(CYGPATH_W) 'src/Log.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Log.cpp'; fi`
+
+workerdDummy-BaseCore.o: src/BaseCore.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-BaseCore.o -MD -MP -MF $(DEPDIR)/workerdDummy-BaseCore.Tpo -c -o workerdDummy-BaseCore.o `test -f 'src/BaseCore.cpp' || echo '$(srcdir)/'`src/BaseCore.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-BaseCore.Tpo $(DEPDIR)/workerdDummy-BaseCore.Po
+#	$(AM_V_CXX)source='src/BaseCore.cpp' object='workerdDummy-BaseCore.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-BaseCore.o `test -f 'src/BaseCore.cpp' || echo '$(srcdir)/'`src/BaseCore.cpp
+
+workerdDummy-BaseCore.obj: src/BaseCore.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-BaseCore.obj -MD -MP -MF $(DEPDIR)/workerdDummy-BaseCore.Tpo -c -o workerdDummy-BaseCore.obj `if test -f 'src/BaseCore.cpp'; then $(CYGPATH_W) 'src/BaseCore.cpp'; else $(CYGPATH_W) '$(srcdir)/src/BaseCore.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-BaseCore.Tpo $(DEPDIR)/workerdDummy-BaseCore.Po
+#	$(AM_V_CXX)source='src/BaseCore.cpp' object='workerdDummy-BaseCore.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-BaseCore.obj `if test -f 'src/BaseCore.cpp'; then $(CYGPATH_W) 'src/BaseCore.cpp'; else $(CYGPATH_W) '$(srcdir)/src/BaseCore.cpp'; fi`
+
+workerdDummy-DataBase.o: src/DataBase.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-DataBase.o -MD -MP -MF $(DEPDIR)/workerdDummy-DataBase.Tpo -c -o workerdDummy-DataBase.o `test -f 'src/DataBase.cpp' || echo '$(srcdir)/'`src/DataBase.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-DataBase.Tpo $(DEPDIR)/workerdDummy-DataBase.Po
+#	$(AM_V_CXX)source='src/DataBase.cpp' object='workerdDummy-DataBase.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-DataBase.o `test -f 'src/DataBase.cpp' || echo '$(srcdir)/'`src/DataBase.cpp
+
+workerdDummy-DataBase.obj: src/DataBase.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-DataBase.obj -MD -MP -MF $(DEPDIR)/workerdDummy-DataBase.Tpo -c -o workerdDummy-DataBase.obj `if test -f 'src/DataBase.cpp'; then $(CYGPATH_W) 'src/DataBase.cpp'; else $(CYGPATH_W) '$(srcdir)/src/DataBase.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-DataBase.Tpo $(DEPDIR)/workerdDummy-DataBase.Po
+#	$(AM_V_CXX)source='src/DataBase.cpp' object='workerdDummy-DataBase.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-DataBase.obj `if test -f 'src/DataBase.cpp'; then $(CYGPATH_W) 'src/DataBase.cpp'; else $(CYGPATH_W) '$(srcdir)/src/DataBase.cpp'; fi`
+
+workerdDummy-Informer.o: src/Informer.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Informer.o -MD -MP -MF $(DEPDIR)/workerdDummy-Informer.Tpo -c -o workerdDummy-Informer.o `test -f 'src/Informer.cpp' || echo '$(srcdir)/'`src/Informer.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Informer.Tpo $(DEPDIR)/workerdDummy-Informer.Po
+#	$(AM_V_CXX)source='src/Informer.cpp' object='workerdDummy-Informer.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Informer.o `test -f 'src/Informer.cpp' || echo '$(srcdir)/'`src/Informer.cpp
+
+workerdDummy-Informer.obj: src/Informer.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Informer.obj -MD -MP -MF $(DEPDIR)/workerdDummy-Informer.Tpo -c -o workerdDummy-Informer.obj `if test -f 'src/Informer.cpp'; then $(CYGPATH_W) 'src/Informer.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Informer.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Informer.Tpo $(DEPDIR)/workerdDummy-Informer.Po
+#	$(AM_V_CXX)source='src/Informer.cpp' object='workerdDummy-Informer.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Informer.obj `if test -f 'src/Informer.cpp'; then $(CYGPATH_W) 'src/Informer.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Informer.cpp'; fi`
+
+workerdDummy-main.o: src/main.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-main.o -MD -MP -MF $(DEPDIR)/workerdDummy-main.Tpo -c -o workerdDummy-main.o `test -f 'src/main.cpp' || echo '$(srcdir)/'`src/main.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-main.Tpo $(DEPDIR)/workerdDummy-main.Po
+#	$(AM_V_CXX)source='src/main.cpp' object='workerdDummy-main.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-main.o `test -f 'src/main.cpp' || echo '$(srcdir)/'`src/main.cpp
+
+workerdDummy-main.obj: src/main.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-main.obj -MD -MP -MF $(DEPDIR)/workerdDummy-main.Tpo -c -o workerdDummy-main.obj `if test -f 'src/main.cpp'; then $(CYGPATH_W) 'src/main.cpp'; else $(CYGPATH_W) '$(srcdir)/src/main.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-main.Tpo $(DEPDIR)/workerdDummy-main.Po
+#	$(AM_V_CXX)source='src/main.cpp' object='workerdDummy-main.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-main.obj `if test -f 'src/main.cpp'; then $(CYGPATH_W) 'src/main.cpp'; else $(CYGPATH_W) '$(srcdir)/src/main.cpp'; fi`
+
+workerdDummy-Server.o: src/Server.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Server.o -MD -MP -MF $(DEPDIR)/workerdDummy-Server.Tpo -c -o workerdDummy-Server.o `test -f 'src/Server.cpp' || echo '$(srcdir)/'`src/Server.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Server.Tpo $(DEPDIR)/workerdDummy-Server.Po
+#	$(AM_V_CXX)source='src/Server.cpp' object='workerdDummy-Server.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Server.o `test -f 'src/Server.cpp' || echo '$(srcdir)/'`src/Server.cpp
+
+workerdDummy-Server.obj: src/Server.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Server.obj -MD -MP -MF $(DEPDIR)/workerdDummy-Server.Tpo -c -o workerdDummy-Server.obj `if test -f 'src/Server.cpp'; then $(CYGPATH_W) 'src/Server.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Server.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Server.Tpo $(DEPDIR)/workerdDummy-Server.Po
+#	$(AM_V_CXX)source='src/Server.cpp' object='workerdDummy-Server.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Server.obj `if test -f 'src/Server.cpp'; then $(CYGPATH_W) 'src/Server.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Server.cpp'; fi`
+
+workerdDummy-Campaign.o: src/Campaign.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Campaign.o -MD -MP -MF $(DEPDIR)/workerdDummy-Campaign.Tpo -c -o workerdDummy-Campaign.o `test -f 'src/Campaign.cpp' || echo '$(srcdir)/'`src/Campaign.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Campaign.Tpo $(DEPDIR)/workerdDummy-Campaign.Po
+#	$(AM_V_CXX)source='src/Campaign.cpp' object='workerdDummy-Campaign.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Campaign.o `test -f 'src/Campaign.cpp' || echo '$(srcdir)/'`src/Campaign.cpp
+
+workerdDummy-Campaign.obj: src/Campaign.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Campaign.obj -MD -MP -MF $(DEPDIR)/workerdDummy-Campaign.Tpo -c -o workerdDummy-Campaign.obj `if test -f 'src/Campaign.cpp'; then $(CYGPATH_W) 'src/Campaign.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Campaign.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Campaign.Tpo $(DEPDIR)/workerdDummy-Campaign.Po
+#	$(AM_V_CXX)source='src/Campaign.cpp' object='workerdDummy-Campaign.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Campaign.obj `if test -f 'src/Campaign.cpp'; then $(CYGPATH_W) 'src/Campaign.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Campaign.cpp'; fi`
+
+workerdDummy-DB.o: src/DB.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-DB.o -MD -MP -MF $(DEPDIR)/workerdDummy-DB.Tpo -c -o workerdDummy-DB.o `test -f 'src/DB.cpp' || echo '$(srcdir)/'`src/DB.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-DB.Tpo $(DEPDIR)/workerdDummy-DB.Po
+#	$(AM_V_CXX)source='src/DB.cpp' object='workerdDummy-DB.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-DB.o `test -f 'src/DB.cpp' || echo '$(srcdir)/'`src/DB.cpp
+
+workerdDummy-DB.obj: src/DB.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-DB.obj -MD -MP -MF $(DEPDIR)/workerdDummy-DB.Tpo -c -o workerdDummy-DB.obj `if test -f 'src/DB.cpp'; then $(CYGPATH_W) 'src/DB.cpp'; else $(CYGPATH_W) '$(srcdir)/src/DB.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-DB.Tpo $(DEPDIR)/workerdDummy-DB.Po
+#	$(AM_V_CXX)source='src/DB.cpp' object='workerdDummy-DB.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-DB.obj `if test -f 'src/DB.cpp'; then $(CYGPATH_W) 'src/DB.cpp'; else $(CYGPATH_W) '$(srcdir)/src/DB.cpp'; fi`
+
+workerdDummy-Offer.o: src/Offer.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Offer.o -MD -MP -MF $(DEPDIR)/workerdDummy-Offer.Tpo -c -o workerdDummy-Offer.o `test -f 'src/Offer.cpp' || echo '$(srcdir)/'`src/Offer.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Offer.Tpo $(DEPDIR)/workerdDummy-Offer.Po
+#	$(AM_V_CXX)source='src/Offer.cpp' object='workerdDummy-Offer.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Offer.o `test -f 'src/Offer.cpp' || echo '$(srcdir)/'`src/Offer.cpp
+
+workerdDummy-Offer.obj: src/Offer.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Offer.obj -MD -MP -MF $(DEPDIR)/workerdDummy-Offer.Tpo -c -o workerdDummy-Offer.obj `if test -f 'src/Offer.cpp'; then $(CYGPATH_W) 'src/Offer.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Offer.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Offer.Tpo $(DEPDIR)/workerdDummy-Offer.Po
+#	$(AM_V_CXX)source='src/Offer.cpp' object='workerdDummy-Offer.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Offer.obj `if test -f 'src/Offer.cpp'; then $(CYGPATH_W) 'src/Offer.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Offer.cpp'; fi`
+
+workerdDummy-CgiService.o: src/CgiService.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-CgiService.o -MD -MP -MF $(DEPDIR)/workerdDummy-CgiService.Tpo -c -o workerdDummy-CgiService.o `test -f 'src/CgiService.cpp' || echo '$(srcdir)/'`src/CgiService.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-CgiService.Tpo $(DEPDIR)/workerdDummy-CgiService.Po
+#	$(AM_V_CXX)source='src/CgiService.cpp' object='workerdDummy-CgiService.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-CgiService.o `test -f 'src/CgiService.cpp' || echo '$(srcdir)/'`src/CgiService.cpp
+
+workerdDummy-CgiService.obj: src/CgiService.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-CgiService.obj -MD -MP -MF $(DEPDIR)/workerdDummy-CgiService.Tpo -c -o workerdDummy-CgiService.obj `if test -f 'src/CgiService.cpp'; then $(CYGPATH_W) 'src/CgiService.cpp'; else $(CYGPATH_W) '$(srcdir)/src/CgiService.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-CgiService.Tpo $(DEPDIR)/workerdDummy-CgiService.Po
+#	$(AM_V_CXX)source='src/CgiService.cpp' object='workerdDummy-CgiService.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-CgiService.obj `if test -f 'src/CgiService.cpp'; then $(CYGPATH_W) 'src/CgiService.cpp'; else $(CYGPATH_W) '$(srcdir)/src/CgiService.cpp'; fi`
+
+workerdDummy-EBranch.o: src/EBranch.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-EBranch.o -MD -MP -MF $(DEPDIR)/workerdDummy-EBranch.Tpo -c -o workerdDummy-EBranch.o `test -f 'src/EBranch.cpp' || echo '$(srcdir)/'`src/EBranch.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-EBranch.Tpo $(DEPDIR)/workerdDummy-EBranch.Po
+#	$(AM_V_CXX)source='src/EBranch.cpp' object='workerdDummy-EBranch.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-EBranch.o `test -f 'src/EBranch.cpp' || echo '$(srcdir)/'`src/EBranch.cpp
+
+workerdDummy-EBranch.obj: src/EBranch.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-EBranch.obj -MD -MP -MF $(DEPDIR)/workerdDummy-EBranch.Tpo -c -o workerdDummy-EBranch.obj `if test -f 'src/EBranch.cpp'; then $(CYGPATH_W) 'src/EBranch.cpp'; else $(CYGPATH_W) '$(srcdir)/src/EBranch.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-EBranch.Tpo $(DEPDIR)/workerdDummy-EBranch.Po
+#	$(AM_V_CXX)source='src/EBranch.cpp' object='workerdDummy-EBranch.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-EBranch.obj `if test -f 'src/EBranch.cpp'; then $(CYGPATH_W) 'src/EBranch.cpp'; else $(CYGPATH_W) '$(srcdir)/src/EBranch.cpp'; fi`
+
+workerdDummy-json.o: src/json.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-json.o -MD -MP -MF $(DEPDIR)/workerdDummy-json.Tpo -c -o workerdDummy-json.o `test -f 'src/json.cpp' || echo '$(srcdir)/'`src/json.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-json.Tpo $(DEPDIR)/workerdDummy-json.Po
+#	$(AM_V_CXX)source='src/json.cpp' object='workerdDummy-json.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-json.o `test -f 'src/json.cpp' || echo '$(srcdir)/'`src/json.cpp
+
+workerdDummy-json.obj: src/json.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-json.obj -MD -MP -MF $(DEPDIR)/workerdDummy-json.Tpo -c -o workerdDummy-json.obj `if test -f 'src/json.cpp'; then $(CYGPATH_W) 'src/json.cpp'; else $(CYGPATH_W) '$(srcdir)/src/json.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-json.Tpo $(DEPDIR)/workerdDummy-json.Po
+#	$(AM_V_CXX)source='src/json.cpp' object='workerdDummy-json.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-json.obj `if test -f 'src/json.cpp'; then $(CYGPATH_W) 'src/json.cpp'; else $(CYGPATH_W) '$(srcdir)/src/json.cpp'; fi`
+
+workerdDummy-ParamParse.o: src/ParamParse.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-ParamParse.o -MD -MP -MF $(DEPDIR)/workerdDummy-ParamParse.Tpo -c -o workerdDummy-ParamParse.o `test -f 'src/ParamParse.cpp' || echo '$(srcdir)/'`src/ParamParse.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-ParamParse.Tpo $(DEPDIR)/workerdDummy-ParamParse.Po
+#	$(AM_V_CXX)source='src/ParamParse.cpp' object='workerdDummy-ParamParse.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-ParamParse.o `test -f 'src/ParamParse.cpp' || echo '$(srcdir)/'`src/ParamParse.cpp
+
+workerdDummy-ParamParse.obj: src/ParamParse.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-ParamParse.obj -MD -MP -MF $(DEPDIR)/workerdDummy-ParamParse.Tpo -c -o workerdDummy-ParamParse.obj `if test -f 'src/ParamParse.cpp'; then $(CYGPATH_W) 'src/ParamParse.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ParamParse.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-ParamParse.Tpo $(DEPDIR)/workerdDummy-ParamParse.Po
+#	$(AM_V_CXX)source='src/ParamParse.cpp' object='workerdDummy-ParamParse.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-ParamParse.obj `if test -f 'src/ParamParse.cpp'; then $(CYGPATH_W) 'src/ParamParse.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ParamParse.cpp'; fi`
+
+workerdDummy-UrlParser.o: src/UrlParser.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-UrlParser.o -MD -MP -MF $(DEPDIR)/workerdDummy-UrlParser.Tpo -c -o workerdDummy-UrlParser.o `test -f 'src/UrlParser.cpp' || echo '$(srcdir)/'`src/UrlParser.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-UrlParser.Tpo $(DEPDIR)/workerdDummy-UrlParser.Po
+#	$(AM_V_CXX)source='src/UrlParser.cpp' object='workerdDummy-UrlParser.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-UrlParser.o `test -f 'src/UrlParser.cpp' || echo '$(srcdir)/'`src/UrlParser.cpp
+
+workerdDummy-UrlParser.obj: src/UrlParser.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-UrlParser.obj -MD -MP -MF $(DEPDIR)/workerdDummy-UrlParser.Tpo -c -o workerdDummy-UrlParser.obj `if test -f 'src/UrlParser.cpp'; then $(CYGPATH_W) 'src/UrlParser.cpp'; else $(CYGPATH_W) '$(srcdir)/src/UrlParser.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-UrlParser.Tpo $(DEPDIR)/workerdDummy-UrlParser.Po
+#	$(AM_V_CXX)source='src/UrlParser.cpp' object='workerdDummy-UrlParser.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-UrlParser.obj `if test -f 'src/UrlParser.cpp'; then $(CYGPATH_W) 'src/UrlParser.cpp'; else $(CYGPATH_W) '$(srcdir)/src/UrlParser.cpp'; fi`
+
+workerdDummy-Config.o: src/Config.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Config.o -MD -MP -MF $(DEPDIR)/workerdDummy-Config.Tpo -c -o workerdDummy-Config.o `test -f 'src/Config.cpp' || echo '$(srcdir)/'`src/Config.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Config.Tpo $(DEPDIR)/workerdDummy-Config.Po
+#	$(AM_V_CXX)source='src/Config.cpp' object='workerdDummy-Config.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Config.o `test -f 'src/Config.cpp' || echo '$(srcdir)/'`src/Config.cpp
+
+workerdDummy-Config.obj: src/Config.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Config.obj -MD -MP -MF $(DEPDIR)/workerdDummy-Config.Tpo -c -o workerdDummy-Config.obj `if test -f 'src/Config.cpp'; then $(CYGPATH_W) 'src/Config.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Config.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Config.Tpo $(DEPDIR)/workerdDummy-Config.Po
+#	$(AM_V_CXX)source='src/Config.cpp' object='workerdDummy-Config.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Config.obj `if test -f 'src/Config.cpp'; then $(CYGPATH_W) 'src/Config.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Config.cpp'; fi`
+
+workerdDummy-KompexSQLiteDatabase.o: src/KompexSQLiteDatabase.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-KompexSQLiteDatabase.o -MD -MP -MF $(DEPDIR)/workerdDummy-KompexSQLiteDatabase.Tpo -c -o workerdDummy-KompexSQLiteDatabase.o `test -f 'src/KompexSQLiteDatabase.cpp' || echo '$(srcdir)/'`src/KompexSQLiteDatabase.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-KompexSQLiteDatabase.Tpo $(DEPDIR)/workerdDummy-KompexSQLiteDatabase.Po
+#	$(AM_V_CXX)source='src/KompexSQLiteDatabase.cpp' object='workerdDummy-KompexSQLiteDatabase.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-KompexSQLiteDatabase.o `test -f 'src/KompexSQLiteDatabase.cpp' || echo '$(srcdir)/'`src/KompexSQLiteDatabase.cpp
+
+workerdDummy-KompexSQLiteDatabase.obj: src/KompexSQLiteDatabase.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-KompexSQLiteDatabase.obj -MD -MP -MF $(DEPDIR)/workerdDummy-KompexSQLiteDatabase.Tpo -c -o workerdDummy-KompexSQLiteDatabase.obj `if test -f 'src/KompexSQLiteDatabase.cpp'; then $(CYGPATH_W) 'src/KompexSQLiteDatabase.cpp'; else $(CYGPATH_W) '$(srcdir)/src/KompexSQLiteDatabase.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-KompexSQLiteDatabase.Tpo $(DEPDIR)/workerdDummy-KompexSQLiteDatabase.Po
+#	$(AM_V_CXX)source='src/KompexSQLiteDatabase.cpp' object='workerdDummy-KompexSQLiteDatabase.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-KompexSQLiteDatabase.obj `if test -f 'src/KompexSQLiteDatabase.cpp'; then $(CYGPATH_W) 'src/KompexSQLiteDatabase.cpp'; else $(CYGPATH_W) '$(srcdir)/src/KompexSQLiteDatabase.cpp'; fi`
+
+workerdDummy-Params.o: src/Params.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Params.o -MD -MP -MF $(DEPDIR)/workerdDummy-Params.Tpo -c -o workerdDummy-Params.o `test -f 'src/Params.cpp' || echo '$(srcdir)/'`src/Params.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Params.Tpo $(DEPDIR)/workerdDummy-Params.Po
+#	$(AM_V_CXX)source='src/Params.cpp' object='workerdDummy-Params.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Params.o `test -f 'src/Params.cpp' || echo '$(srcdir)/'`src/Params.cpp
+
+workerdDummy-Params.obj: src/Params.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Params.obj -MD -MP -MF $(DEPDIR)/workerdDummy-Params.Tpo -c -o workerdDummy-Params.obj `if test -f 'src/Params.cpp'; then $(CYGPATH_W) 'src/Params.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Params.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Params.Tpo $(DEPDIR)/workerdDummy-Params.Po
+#	$(AM_V_CXX)source='src/Params.cpp' object='workerdDummy-Params.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Params.obj `if test -f 'src/Params.cpp'; then $(CYGPATH_W) 'src/Params.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Params.cpp'; fi`
+
+workerdDummy-Cookie.o: src/Cookie.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Cookie.o -MD -MP -MF $(DEPDIR)/workerdDummy-Cookie.Tpo -c -o workerdDummy-Cookie.o `test -f 'src/Cookie.cpp' || echo '$(srcdir)/'`src/Cookie.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Cookie.Tpo $(DEPDIR)/workerdDummy-Cookie.Po
+#	$(AM_V_CXX)source='src/Cookie.cpp' object='workerdDummy-Cookie.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Cookie.o `test -f 'src/Cookie.cpp' || echo '$(srcdir)/'`src/Cookie.cpp
+
+workerdDummy-Cookie.obj: src/Cookie.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-Cookie.obj -MD -MP -MF $(DEPDIR)/workerdDummy-Cookie.Tpo -c -o workerdDummy-Cookie.obj `if test -f 'src/Cookie.cpp'; then $(CYGPATH_W) 'src/Cookie.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Cookie.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-Cookie.Tpo $(DEPDIR)/workerdDummy-Cookie.Po
+#	$(AM_V_CXX)source='src/Cookie.cpp' object='workerdDummy-Cookie.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-Cookie.obj `if test -f 'src/Cookie.cpp'; then $(CYGPATH_W) 'src/Cookie.cpp'; else $(CYGPATH_W) '$(srcdir)/src/Cookie.cpp'; fi`
+
+workerdDummy-GeoIPTools.o: src/GeoIPTools.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-GeoIPTools.o -MD -MP -MF $(DEPDIR)/workerdDummy-GeoIPTools.Tpo -c -o workerdDummy-GeoIPTools.o `test -f 'src/GeoIPTools.cpp' || echo '$(srcdir)/'`src/GeoIPTools.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-GeoIPTools.Tpo $(DEPDIR)/workerdDummy-GeoIPTools.Po
+#	$(AM_V_CXX)source='src/GeoIPTools.cpp' object='workerdDummy-GeoIPTools.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-GeoIPTools.o `test -f 'src/GeoIPTools.cpp' || echo '$(srcdir)/'`src/GeoIPTools.cpp
+
+workerdDummy-GeoIPTools.obj: src/GeoIPTools.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-GeoIPTools.obj -MD -MP -MF $(DEPDIR)/workerdDummy-GeoIPTools.Tpo -c -o workerdDummy-GeoIPTools.obj `if test -f 'src/GeoIPTools.cpp'; then $(CYGPATH_W) 'src/GeoIPTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/GeoIPTools.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-GeoIPTools.Tpo $(DEPDIR)/workerdDummy-GeoIPTools.Po
+#	$(AM_V_CXX)source='src/GeoIPTools.cpp' object='workerdDummy-GeoIPTools.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-GeoIPTools.obj `if test -f 'src/GeoIPTools.cpp'; then $(CYGPATH_W) 'src/GeoIPTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/GeoIPTools.cpp'; fi`
+
+workerdDummy-KompexSQLiteStatement.o: src/KompexSQLiteStatement.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-KompexSQLiteStatement.o -MD -MP -MF $(DEPDIR)/workerdDummy-KompexSQLiteStatement.Tpo -c -o workerdDummy-KompexSQLiteStatement.o `test -f 'src/KompexSQLiteStatement.cpp' || echo '$(srcdir)/'`src/KompexSQLiteStatement.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-KompexSQLiteStatement.Tpo $(DEPDIR)/workerdDummy-KompexSQLiteStatement.Po
+#	$(AM_V_CXX)source='src/KompexSQLiteStatement.cpp' object='workerdDummy-KompexSQLiteStatement.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-KompexSQLiteStatement.o `test -f 'src/KompexSQLiteStatement.cpp' || echo '$(srcdir)/'`src/KompexSQLiteStatement.cpp
+
+workerdDummy-KompexSQLiteStatement.obj: src/KompexSQLiteStatement.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-KompexSQLiteStatement.obj -MD -MP -MF $(DEPDIR)/workerdDummy-KompexSQLiteStatement.Tpo -c -o workerdDummy-KompexSQLiteStatement.obj `if test -f 'src/KompexSQLiteStatement.cpp'; then $(CYGPATH_W) 'src/KompexSQLiteStatement.cpp'; else $(CYGPATH_W) '$(srcdir)/src/KompexSQLiteStatement.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-KompexSQLiteStatement.Tpo $(DEPDIR)/workerdDummy-KompexSQLiteStatement.Po
+#	$(AM_V_CXX)source='src/KompexSQLiteStatement.cpp' object='workerdDummy-KompexSQLiteStatement.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-KompexSQLiteStatement.obj `if test -f 'src/KompexSQLiteStatement.cpp'; then $(CYGPATH_W) 'src/KompexSQLiteStatement.cpp'; else $(CYGPATH_W) '$(srcdir)/src/KompexSQLiteStatement.cpp'; fi`
+
+workerdDummy-ParentDB.o: src/ParentDB.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-ParentDB.o -MD -MP -MF $(DEPDIR)/workerdDummy-ParentDB.Tpo -c -o workerdDummy-ParentDB.o `test -f 'src/ParentDB.cpp' || echo '$(srcdir)/'`src/ParentDB.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-ParentDB.Tpo $(DEPDIR)/workerdDummy-ParentDB.Po
+#	$(AM_V_CXX)source='src/ParentDB.cpp' object='workerdDummy-ParentDB.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-ParentDB.o `test -f 'src/ParentDB.cpp' || echo '$(srcdir)/'`src/ParentDB.cpp
+
+workerdDummy-ParentDB.obj: src/ParentDB.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerdDummy-ParentDB.obj -MD -MP -MF $(DEPDIR)/workerdDummy-ParentDB.Tpo -c -o workerdDummy-ParentDB.obj `if test -f 'src/ParentDB.cpp'; then $(CYGPATH_W) 'src/ParentDB.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ParentDB.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerdDummy-ParentDB.Tpo $(DEPDIR)/workerdDummy-ParentDB.Po
+#	$(AM_V_CXX)source='src/ParentDB.cpp' object='workerdDummy-ParentDB.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerdDummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerdDummy-ParentDB.obj `if test -f 'src/ParentDB.cpp'; then $(CYGPATH_W) 'src/ParentDB.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ParentDB.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

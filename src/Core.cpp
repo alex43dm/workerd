@@ -4,6 +4,8 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include "../config.h"
+
 #include <ctime>
 #include <cstdlib>
 
@@ -17,11 +19,11 @@
 #include "EBranch.h"
 
 #define CMD_SIZE 8192
-
+#ifndef DUMMY
 int HistoryManager::request_processed_ = 0;
 int HistoryManager::offer_processed_ = 0;
 int HistoryManager::social_processed_ = 0;
-
+#endif // DUMMY
 Core::Core()
 //    redirect_script_("/redirect")
 {
@@ -50,20 +52,21 @@ Core::Core()
         exit(1);
     }
     delete p;
-
+#ifndef DUMMY
     hm = new HistoryManager(tmpTableName);
     hm->initDB();
     hm->vretg = &resultRetargeting;
     //hm->RetargetingOfferStr = pDb->getSqlFile("requests/03.sql");
-
+#endif // DUMMY
     Log::info("[%ld]core start",tid);
 }
 
 Core::~Core()
 {
     delete []cmd;
-
+#ifndef DUMMY
     delete hm;
+    #endif // DUMMY
 }
 
 /** Функтор составляет ссылку перенаправления на предложение item.
@@ -130,6 +133,7 @@ std::string Core::Process(Params *prms)
 
     Log::gdb("[%ld]getInformer: done",tid);
 
+    #ifndef DUMMY
     //load all history async
     hm->getUserHistory(params);
 
@@ -187,6 +191,27 @@ std::string Core::Process(Params *prms)
                        last);
 
     }
+    #else
+    getOffers(items);
+    Log::gdb("[%ld]getOffers: %d done",tid, items.size());
+
+    for(auto i = items.begin(); i != items.end(); ++i)
+    {
+        Offer *p = (*i).second;
+        p->redirect_url =
+            Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
+                        boost::format("id=%s\ninf=%d\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
+                        % p->id_int
+                        % informer->id
+                        % p->gen()
+                        % p->url
+                        % Config::Instance()->server_ip_
+                        % params->location_
+                    ));
+        vOutPut.push_back(p);
+    }
+
+    #endif//DUMMY
 
     std::string ret;
     if (params->json_)
@@ -204,7 +229,7 @@ void Core::ProcessSaveResults()
 {
     request_processed_++;
     offer_processed_ += vOutPut.size();
-
+#ifndef DUMMY
     // Сохраняем выданные ссылки в базе данных
     //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
     if (!params->test_mode_ && informer)
@@ -224,7 +249,7 @@ void Core::ProcessSaveResults()
         Log::err("DB error: delete from %s table: %s", tmpTableName.c_str(), ex.GetString().c_str());
     }
     delete p;
-
+#endif // DUMMY
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
         if(o->second)
@@ -255,7 +280,10 @@ Informer *Core::getInformer()
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DB error: getOffers: %s: %s", ex.GetString().c_str(), cmd);
+        #ifdef DEBUG
+        printf("%s\n",cmd);
+        #endif // DEBUG
+        Log::err("DB error: getInformer: %s: %s", ex.GetString().c_str());
         delete pStmt;
         return 0;
     }
@@ -407,6 +435,7 @@ bool Core::getOffers(Offer::Map &result)
     Kompex::SQLiteStatement *pStmt;
     pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
 
+    #ifndef DUMMY
     sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
                      getGeo().c_str(),
                      informer->domainId,
@@ -416,6 +445,16 @@ bool Core::getOffers(Offer::Map &result)
                      getpid(),
                      tid,
                      informer->id);
+    #else
+    sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
+                     getGeo().c_str(),
+                     informer->domainId,
+                     informer->domainId,
+                     informer->accountId,
+                     informer->id,
+                     informer->capacity);
+    #endif
+
 #ifdef DEBUG
     printf("%s\n",cmd);
 #endif // DEBUG
@@ -423,11 +462,11 @@ bool Core::getOffers(Offer::Map &result)
     try
     {
         pStmt->Sql(cmd);
-        printf("%s\n",cmd);
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DB error: getOffers: %s: %s", ex.GetString().c_str(), cmd);
+        printf("%s\n", cmd);
+        Log::err("DB error: getOffers: %s", ex.GetString().c_str());
         delete pStmt;
         return false;
     }
@@ -600,14 +639,18 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     //size check
     if(result.size() < outLen)
     {
+        #ifndef DUMMY
         hm->clean = true;
+        #endif // DUMMY
         Log::warn("result size less then %d: clean history", outLen);
     }
 
     //check is all social
     if(all_social)
     {
+        #ifndef DUMMY
         hm->clean = true;
+        #endif // DUMMY
         Log::warn("all social: clean history");
     }
 
@@ -629,7 +672,9 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     }
 
     //user history view clean
+    #ifndef DUMMY
     hm->clean = true;
+    #endif // DUMMY
 
     if(FULL)
     {
