@@ -16,61 +16,18 @@
 
 #define THREAD_STACK_SIZE PTHREAD_STACK_MIN + 10 * 1024
 
-std::string time_t_to_string(time_t t);
-
-std::string convert (const boost::posix_time::ptime& t)
+std::string time_t_to_string(time_t t)
 {
-    ostringstream ss;
-    ss.exceptions(ios_base::failbit);
-
-    boost::date_time::time_facet<boost::posix_time::ptime, char>* facet
-        = new boost::date_time::time_facet<boost::posix_time::ptime, char>;
-    ss.imbue(locale(locale::classic(), facet));
-
-    facet->format("%a, %d-%b-%Y %T GMT");
-    ss.str("");
-    ss << t;
-    return ss.str();
+    std::stringstream sstr;
+    sstr << t;
+    return sstr.str();
 }
 
-CgiService::CgiService(int argc, char *argv[])
-    : argc(argc), argv(argv)
+CgiService::CgiService()
 {
-    std::string config = "/home/alex/Projects/worker/config.xml";
-    std::string sock_path;
-    int ret;
-    while ( (ret = getopt(argc,argv,"c:s:")) != -1)
-    {
-        switch (ret)
-        {
-        case 'c':
-            config = optarg;
-            break;
-        case 's':
-            sock_path = optarg;
-            break;
-        default:
-            printf("Error found! %s -c config_file -s socket_path\n",argv[0]);
-            ::exit(1);
-        };
-    };
-
-    cfg = Config::Instance();
-    cfg->LoadConfig(config);
-
-#ifndef DEBUG
-    new Server(cfg->lock_file_, cfg->pid_file_);
-#endif
-
-    if( sock_path.size() > 8 )
-    {
-        cfg->server_socket_path_ = sock_path;
-    }
 
     if (!GeoCity(cfg->geocity_path_.c_str()))
         Log::err("City database not found! City targeting will be disabled.");
-
-    RISinit();
 
     bcore = new BaseCore();
 
@@ -131,14 +88,6 @@ CgiService::~CgiService()
    delete bcore;
 }
 
-/*
-string CgiService::getenv(const char *name, const char *default_value)
-{
-    char *value = getenv(name);
-    return value? value : default_value;
-}
-*/
-
 void CgiService::Response(FCGX_Request *req,
                           const std::string &out,
                           const std::string &cookie)
@@ -156,55 +105,6 @@ void CgiService::Response(FCGX_Request *req, const std::string &out, int status,
                           const char *content_type, const string &cookie)
 {
     Response(req, out.c_str(), status, content_type, cookie);
-}
-
-bool CgiService::ConnectDatabase()
-{
-    Log::info("Connecting to %s / %s",
-              Config::Instance()->mongo_main_host_.c_str(),
-              Config::Instance()->mongo_main_db_.c_str());
-
-    try
-    {
-        if (Config::Instance()->mongo_main_set_.empty())
-            mongo::DB::addDatabase(
-                Config::Instance()->mongo_main_host_,
-                Config::Instance()->mongo_main_db_,
-                Config::Instance()->mongo_main_slave_ok_);
-        else
-            mongo::DB::addDatabase(
-                mongo::DB::ReplicaSetConnection(
-                    Config::Instance()->mongo_main_set_,
-                    Config::Instance()->mongo_main_host_),
-                    Config::Instance()->mongo_main_db_,
-                    Config::Instance()->mongo_main_slave_ok_);
-
-        if (Config::Instance()->mongo_log_set_.empty())
-            mongo::DB::addDatabase( "log",
-                                    Config::Instance()->mongo_log_host_,
-                                    Config::Instance()->mongo_log_db_,
-                                    Config::Instance()->mongo_log_slave_ok_);
-        else
-            mongo::DB::addDatabase( "log",
-                                    mongo::DB::ReplicaSetConnection(
-                                        Config::Instance()->mongo_log_set_,
-                                        Config::Instance()->mongo_log_host_),
-                                    Config::Instance()->mongo_log_db_,
-                                    Config::Instance()->mongo_log_slave_ok_);
-
-        // Проверяем доступность базы данных
-        mongo::DB db;
-        mongo::DB db_log("log");
-        db.findOne("domain.categories", mongo::Query());
-
-    }
-    catch (mongo::UserException &ex)
-    {
-        Log::err("Error connecting to mongo: %s", ex.what());
-        return false;
-    }
-
-    return true;
 }
 
 
@@ -362,27 +262,4 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
         Response(req, "", 503);
         Log::err("exception %s: name: %s while processing: %s", typeid(ex).name(), ex.what(), query.c_str());
     }
-}
-
-/** Все необходимые действия для инициализации модуля вынесены в отдельный метод. */
-void CgiService::RISinit()
-{
-
-    //подключаемся к mongo. операция критическая и без неё модуль не сможет работать.
-    if (!ConnectDatabase())
-    {
-        // Возвращаем 503 на все запросы до тех пор, пока не подключимся
-        while (!ConnectDatabase())
-            sleep(1);
-//            Response("Error connecting to database", 503);
-//        Response("", 200);
-    }
-
-}
-
-std::string time_t_to_string(time_t t)
-{
-    std::stringstream sstr;
-    sstr << t;
-    return sstr.str();
 }

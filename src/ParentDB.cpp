@@ -10,14 +10,61 @@
 ParentDB::ParentDB()
 {
     pdb = Config::Instance()->pDb->pDatabase;
+    fConnectedToMainDatabase = false;
+    ConnectMainDatabase();
 }
 
 ParentDB::~ParentDB()
 {
     //dtor
 }
+
+
+bool ParentDB::ConnectMainDatabase()
+{
+    if(fConnectedToMainDatabase)
+        return true;
+
+    Log::info("Connecting to %s / %s",
+              cfg->mongo_main_host_.c_str(),
+              cfg->mongo_main_db_.c_str());
+
+    try
+    {
+        if (Config::Instance()->mongo_main_set_.empty())
+            mongo::DB::addDatabase(
+                cfg->mongo_main_host_,
+                Config::Instance()->mongo_main_db_,
+                Config::Instance()->mongo_main_slave_ok_);
+        else
+            mongo::DB::addDatabase(
+                mongo::DB::ReplicaSetConnection(
+                    Config::Instance()->mongo_main_set_,
+                    Config::Instance()->mongo_main_host_),
+                    Config::Instance()->mongo_main_db_,
+                    Config::Instance()->mongo_main_slave_ok_);
+
+        // Проверяем доступность базы данных
+        mongo::DB db;
+        db.findOne("domain.categories", mongo::Query());
+    }
+    catch (mongo::UserException &ex)
+    {
+        Log::err("ConnectMainDatabase: Error connecting to mongo: %s", ex.what());
+        fConnectedToMainDatabase = false;
+        return false;
+    }
+
+    fConnectedToMainDatabase = true;
+
+    return true;
+}
+
 void ParentDB::loadRating(const std::string &id)
 {
+    if(!fConnectedToMainDatabase)
+        return;
+
     mongo::DB db;
     std::unique_ptr<mongo::DBClientCursor> cursor;
     Kompex::SQLiteStatement *pStmt;
@@ -93,6 +140,9 @@ void ParentDB::loadRating(const std::string &id)
 /** Загружает все товарные предложения из MongoDb */
 void ParentDB::OfferLoad(mongo::Query q_correct)
 {
+    if(!fConnectedToMainDatabase)
+        return;
+
     mongo::DB db;
     Kompex::SQLiteStatement *pStmt;
     char *pData;
@@ -282,6 +332,9 @@ long long ParentDB::insertAndGetAccountId(const std::string &accout)
 /** Загружает данные обо всех информерах */
 bool ParentDB::InformerLoadAll()
 {
+    if(!fConnectedToMainDatabase)
+        return false;
+
     mongo::DB db;
 
     std::unique_ptr<mongo::DBClientCursor> cursor = db.query("informer", mongo::Query());
@@ -366,6 +419,9 @@ bool ParentDB::InformerLoadAll()
 
 bool ParentDB::InformerUpdate(const std::string &id)
 {
+    if(!fConnectedToMainDatabase)
+        return false;
+
     mongo::DB db;
     std::unique_ptr<mongo::DBClientCursor> cursor = db.query("informer", QUERY("guid" << id));
     Kompex::SQLiteStatement *pStmt;
@@ -514,6 +570,9 @@ void ParentDB::updateRating(const std::string &id)
 */
 void ParentDB::CategoriesLoad()
 {
+    if(!fConnectedToMainDatabase)
+        return;
+
     mongo::DB db;
     Kompex::SQLiteStatement *pStmt;
     int i = 0;

@@ -26,7 +26,7 @@ class CgiService
 {
 
 public:
-     int socketId;
+    int socketId;
     /** Инициализирует сервис.
      *
      * Читает настройки из переменных окружения.
@@ -34,7 +34,7 @@ public:
      * Реально подключения к базам данных, RabbitMQ и другому происходит
      * при первом запросе в методе Serve().
      */
-    CgiService(int argc, char *argv[]);
+    CgiService();
     ~CgiService();
 
     /** Начало обработки поступающих от FastCgi (или CGI) сервера запросов.
@@ -71,23 +71,7 @@ private:
                   const std::string &cookie = "");
 
 
-    /** Создаёт подключения к базам данных.
-     *
-     * Настройки читаются конструктором класса из переменных окружения среды.*/
-    bool ConnectDatabase();
 
-    /** Возвращает значение переменной окружения name или default_value,
-     *  если значение не установлено.
-     *
-     *  \param name     переменная окружения.
-     *  \param default_value значение по умолчанию.*/
-    //std::string getenv(const char *name, const char *default_value);
-/*
-    char *getenv(const char *name)
-    {
-        return ::getenv(name);
-    }
-*/
     /** Обработка одного запроса.
      *
      * \param query     строка запроса (всё, что начинается после
@@ -101,17 +85,8 @@ private:
      */
     void ProcessRequest(FCGX_Request*, Core *);
 private:
-
-    int argc;
-    char **argv;
-
-    Config *cfg;
     BaseCore *bcore;
     pthread_t *threads;
-
-    /** Инициализация модуля. */
-    void RISinit();
-    void RedisInit();
 };
 
 #endif

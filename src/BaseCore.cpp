@@ -21,8 +21,14 @@
 
 BaseCore::BaseCore()
 {
+    fConnectedToLogDatabase = false;
+
     time_service_started_ = boost::posix_time::second_clock::local_time();
+
     pdb = new ParentDB();
+    //подключаемся к mongo
+    ConnectLogDatabase();
+
     LoadAllEntities();
     InitMessageQueue();
     InitMongoDB();
@@ -145,6 +151,40 @@ bool BaseCore::ProcessMQ()
     return false;
 }
 
+bool BaseCore::ConnectLogDatabase()
+{
+    if(fConnectedToLogDatabase)
+        return true;
+
+    Log::info("Connecting to %s / %s",
+              cfg->mongo_log_host_.c_str(),
+              cfg->mongo_log_db_.c_str());
+
+    try
+    {
+        if (Config::Instance()->mongo_log_set_.empty())
+            mongo::DB::addDatabase( "log",
+                                    Config::Instance()->mongo_log_host_,
+                                    Config::Instance()->mongo_log_db_,
+                                    Config::Instance()->mongo_log_slave_ok_);
+        else
+            mongo::DB::addDatabase( "log",
+                                    mongo::DB::ReplicaSetConnection(
+                                        Config::Instance()->mongo_log_set_,
+                                        Config::Instance()->mongo_log_host_),
+                                    Config::Instance()->mongo_log_db_,
+                                    Config::Instance()->mongo_log_slave_ok_);
+        fConnectedToLogDatabase = true;
+    }
+    catch (mongo::UserException &ex)
+    {
+        Log::err("Error connecting to mongo: %s", ex.what());
+        return false;
+    }
+
+    return true;
+}
+
 /*
 *  Загружает из основной базы данных следующие сущности:
 *
@@ -245,9 +285,7 @@ void BaseCore::InitMessageQueue()
 void BaseCore::InitMongoDB()
 {
     mongo::DB db("log");
-    const int K = 1000;
-    const int M = 1000 * K;
-    db.createCollection("log.impressions", 600*M, true, 1*M);
+    db.createCollection("log.impressions", 600*1024, true, 1014*1024);
 }
 
 /** Возвращает данные о состоянии службы

@@ -187,6 +187,49 @@ int main(int argc, char *argv[])
 {
     Log(LOG_LOCAL0);
 
-    CgiService(argc, argv).run();
+    std::string config = "config.xml";
+    std::string sock_path;
+    int ret;
+    bool PrintPidfile = false;
+
+    while ( (ret = getopt(argc,argv,"pc:s:")) != -1)
+    {
+        switch (ret)
+        {
+        case 'c':
+            config = optarg;
+            break;
+        case 's':
+            sock_path = optarg;
+            break;
+        case 'p':
+            PrintPidfile = true;
+            break;
+        default:
+            printf("Error found! %s -c config_file -s socket_path\n",argv[0]);
+            ::exit(1);
+        };
+    };
+
+
+    cfg = Config::Instance();
+    cfg->LoadConfig(config);
+
+    if(PrintPidfile)
+    {
+        std::cerr<<cfg->pid_file_<<std::endl;
+        ::exit(0);
+    }
+
+#ifndef DEBUG
+    new Server(cfg->lock_file_, cfg->pid_file_);
+#endif
+
+    if( sock_path.size() > 8 )
+    {
+        cfg->server_socket_path_ = sock_path;
+    }
+
+    CgiService().run();
     return 0;
 }
