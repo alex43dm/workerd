@@ -29,6 +29,10 @@ Core::Core()
 {
     tid = pthread_self();
 
+    sigset_t es;
+    sigfillset(&es);
+    pthread_sigmask(SIG_BLOCK, &es, NULL);
+
     cmd = new char[CMD_SIZE];
 
     pDb = Config::Instance()->pDb;

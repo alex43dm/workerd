@@ -32,21 +32,28 @@ Config::Config()
 
 bool Config::LoadConfig(const std::string fName)
 {
+    mFileName = fName;
+    return Load();
+}
+
+bool Config::Load()
+{
     TiXmlElement *mel, *mels;
 
+    Log::info("Config::Load");
+
     mIsInited = false;
-    mFileName = fName;
     mDoc = new TiXmlDocument(mFileName);
 
     if(!mDoc)
     {
-        std::cerr<<"does not found config file: "<<fName<<std::endl;
+        std::cerr<<"does not found config file: "<<mFileName<<std::endl;
         return mIsInited;
     }
 
     if(!mDoc->LoadFile())
     {
-        std::cerr<<"error load file: "<<fName<<std::endl;
+        std::cerr<<"error load file: "<<mFileName<<std::endl;
         ::exit(-1);
         return mIsInited;
     }
@@ -55,7 +62,7 @@ bool Config::LoadConfig(const std::string fName)
 
     if(!mRoot)
     {
-        std::cerr<<"does not found root section in file: "<<fName<<std::endl;
+        std::cerr<<"does not found root section in file: "<<mFileName<<std::endl;
         return mIsInited;
     }
 

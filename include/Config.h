@@ -88,6 +88,7 @@ public:
 
     static Config* Instance();
     bool LoadConfig(const std::string fName);
+    bool Load();
     virtual ~Config();
 
     bool to_bool(std::string const& s)

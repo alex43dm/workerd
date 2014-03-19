@@ -98,6 +98,7 @@ private:
     std::string toString(AMQPMessage *m);
     bool cmdParser(const std::string &cmd, std::string &offerId, std::string &campaignId);
     ParentDB *pdb;
+    static void signal_handler(int signum);
 };
 
 

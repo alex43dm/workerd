@@ -48,6 +48,14 @@ CgiService::CgiService()
     pthread_attr_init(attributes);
     pthread_attr_setstacksize(attributes, THREAD_STACK_SIZE);
 
+    /*
+    sigemptyset(&es); //BLOCK all signals
+
+    if (pthread_sigmask(SIG_BLOCK, &es, NULL) != 0)
+    {
+        Log::err("pthread_sigmask  error");
+    }
+*/
     int i;
     threads = new pthread_t[cfg->server_children_ + 1];
 

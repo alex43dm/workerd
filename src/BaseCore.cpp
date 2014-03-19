@@ -23,6 +23,18 @@ BaseCore::BaseCore()
 {
     fConnectedToLogDatabase = false;
 
+    struct sigaction actions;
+    sigemptyset(&actions.sa_mask);
+    actions.sa_flags = 0;
+    actions.sa_handler = signal_handler;
+
+    sigaction(SIGHUP,&actions,NULL);
+
+/*
+    sigset_t es;
+    sigfillset(&es);
+    pthread_sigmask(SIG_BLOCK, &es, NULL);
+*/
     time_service_started_ = boost::posix_time::second_clock::local_time();
 
     pdb = new ParentDB();
@@ -487,4 +499,13 @@ bool BaseCore::cmdParser(const std::string &cmd, std::string &offerId, std::stri
         return true;
     }
     return false;
+}
+
+void BaseCore::signal_handler(int signum)
+{
+	switch(signum)
+	{
+    case SIGHUP:
+        cfg->Load();
+	}
 }
