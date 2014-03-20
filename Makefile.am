@@ -104,10 +104,10 @@ $(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/tables; \
 $(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/requests; \
 $(MKDIR_P) $(1)/etc/init.d; \
 $(MKDIR_P) $(1)/usr/sbin; \
-$(SED) 's|/home/alex/Projects/worker|/$(1)/etc/$(bin_PROGRAMS)|' < ./config.xml > $(1)/etc/$(bin_PROGRAMS)/config-$(bin_PROGRAMS).xml; \
+$(SED) 's|/home/alex/Projects/worker|/etc/$(bin_PROGRAMS)|' < ./config.xml > $(1)/etc/$(bin_PROGRAMS)/config-$(bin_PROGRAMS).xml; \
 $(INSTALL) $(bin_PROGRAMS) $(1)/usr/sbin; \
 if [ $(MAKEINIT) -eq 1 ]; then \
-$(SED) 's|/etc/workerd/config.xml|/$(1)/etc/$(bin_PROGRAMS)/config-$(bin_PROGRAMS).xml|;s|/usr/sbin/workerd|/$(1)/usr/sbin/$(bin_PROGRAMS)|' < ./install/workerd > $(1)/etc/init.d/$(bin_PROGRAMS); \
+$(SED) 's|/etc/workerd/config.xml|/etc/$(bin_PROGRAMS)/config-$(bin_PROGRAMS).xml|;s|/usr/sbin/workerd|/usr/sbin/$(bin_PROGRAMS)|' < ./install/workerd > $(1)/etc/init.d/$(bin_PROGRAMS); \
 fi; \
 for p in $(sysconf_DATA); do \
 $(INSTALL_DATA) $$p "$(1)/etc/$(bin_PROGRAMS)/$$p" || exit $$?; \
