@@ -23,6 +23,8 @@ endif
 DEBDEP=bash (>= 2.05a-11), awk, procps (>= 1:2.0.7-8), sed (>= 3.02-8), grep (>= 2.4.2-3), coreutils (>= 5.0-5), libtinyxml2.6.2 (>=2.6.2), libsqlite3-0 (>=3.7.13), libfcgi0ldbl (>=2.4.0), geoip-database (>=20130213-1), rabbitmq-server (>=3.2.3), libboost-system1.49.0 (>=1.49.0), libboost-regex1.49.0 (>=1.49.0), libboost-thread1.49.0 (>=1.49.0), libboost-filesystem1.49.0 (>=1.49.0), libboost-date-time1.49.0 (>=1.49.0)
 else #DUMMY
 
+SUBDIRS = libs/libredis
+
 if DEBUG
 bin_PROGRAMS = workerd-dev
 workerd_dev_SOURCES=$(SRC_ALL)
@@ -35,17 +37,17 @@ workerd_CPPFLAGS=$(CMN_CPPFLAGS) -Ilibs/libredis
 workerd_LDADD=$(CMN_LDADD) libs/libredis/lib/libredis.a
 endif
 
-SUBDIRS = libs/libredis
-
 DEBDEP=bash (>= 2.05a-11), awk, procps (>= 1:2.0.7-8), sed (>= 3.02-8), grep (>= 2.4.2-3), coreutils (>= 5.0-5), libtinyxml2.6.2 (>=2.6.2), libsqlite3-0 (>=3.7.13), libfcgi0ldbl (>=2.4.0), sphinxsearch (>=2.1.5), geoip-database (>=20130213-1), rabbitmq-server (>=3.2.3), libboost-system1.49.0 (>=1.49.0), libboost-regex1.49.0 (>=1.49.0), libboost-thread1.49.0 (>=1.49.0), libboost-filesystem1.49.0 (>=1.49.0), libboost-date-time1.49.0 (>=1.49.0)
 endif #DUMMY
 
 if DEBUG
 AM_CFLAGS = -g -DDEBUG -Wall
 AM_CXXFLAGS = -g -DDEBUG -Wall
+MAKEINIT=0
 else
 AM_CFLAGS = -Ofast
 AM_CXXFLAGS = -Ofast
+MAKEINIT=1
 endif
 
 debian_BUILD = $(bin_PROGRAMS)-$(VERSION)
@@ -93,22 +95,22 @@ template/teaser.html
 
 install_f =\
 echo -n "install to $1"; \
-$(MKDIR_P) $(1)/etc/worker/template; \
-$(MKDIR_P) $(1)/etc/worker/db_dump; \
-$(MKDIR_P) $(1)/etc/worker/db_dump/schema; \
-$(MKDIR_P) $(1)/etc/worker/db_dump/post; \
-$(MKDIR_P) $(1)/etc/worker/db_dump/view; \
-$(MKDIR_P) $(1)/etc/worker/db_dump/tables; \
-$(MKDIR_P) $(1)/etc/worker/db_dump/requests; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/template; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/schema; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/post; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/view; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/tables; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/requests; \
 $(MKDIR_P) $(1)/etc/init.d; \
 $(MKDIR_P) $(1)/usr/sbin; \
-$(SED) 's|/home/alex/Projects/worker|/$(1)/etc/worker|' < ./config.xml > $(1)/etc/worker/config-$(bin_PROGRAMS).xml; \
+$(SED) 's|/home/alex/Projects/worker|/$(1)/etc/$(bin_PROGRAMS)|' < ./config.xml > $(1)/etc/$(bin_PROGRAMS)/config-$(bin_PROGRAMS).xml; \
 $(INSTALL) $(bin_PROGRAMS) $(1)/usr/sbin; \
-if ! $(DEBUG); then \
-$(SED) 's|/etc/workerd/config.xml|/$(1)/etc/worker/config-$(bin_PROGRAMS).xml|;s|/usr/sbin/workerd|/$(1)/usr/sbin/$(bin_PROGRAMS)|' < ./install/workerd > $(1)/etc/init.d/$(bin_PROGRAMS); \
+if [ $(MAKEINIT) -eq 1 ]; then \
+$(SED) 's|/etc/workerd/config.xml|/$(1)/etc/$(bin_PROGRAMS)/config-$(bin_PROGRAMS).xml|;s|/usr/sbin/workerd|/$(1)/usr/sbin/$(bin_PROGRAMS)|' < ./install/workerd > $(1)/etc/init.d/$(bin_PROGRAMS); \
 fi; \
 for p in $(sysconf_DATA); do \
-$(INSTALL_DATA) $$p "$(1)/etc/worker/$$p" || exit $$?; \
+$(INSTALL_DATA) $$p "$(1)/etc/$(bin_PROGRAMS)/$$p" || exit $$?; \
 done; \
 echo "..ok"
 
@@ -118,7 +120,7 @@ install: install-binPROGRAMS
 deb: $(bin_PROGRAMS)
 	rm -rf $(debian_BUILD)
 	$(MKDIR_P) $(debian_BUILD)/DEBIAN
-	echo "Package: worker">  $(debian_BUILD)/DEBIAN/control
+	echo "Package: $(bin_PROGRAMS)">  $(debian_BUILD)/DEBIAN/control
 	echo "Version: $(VERSION)" >> $(debian_BUILD)/DEBIAN/control
 	echo "Section: base" >> $(debian_BUILD)/DEBIAN/control
 	echo "Priority: optional" >> $(debian_BUILD)/DEBIAN/control

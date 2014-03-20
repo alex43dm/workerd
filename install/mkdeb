@@ -1,0 +1,20 @@
+#!/bin/sh
+aclocal -Im4
+autoconf
+automake --add-missing
+./configure
+make
+make deb
+make clean
+./configure --enable-debug
+make
+make deb
+make clean
+./configure --enable-dummy
+make
+make deb
+make clean
+./configure --enable-dummy --enable-debug
+make
+make deb
+make clean
