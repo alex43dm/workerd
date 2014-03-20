@@ -16,7 +16,7 @@ CONFIG="/etc/workerd/config.xml"
 DAEMON_OPTS="-c $CONFIG"
 NAME=workerd
 DESC="worker daemon"
-PID=/run/worker.pid
+PID=`$DAEMON -p`
 
 . /lib/lsb/init-functions
 
@@ -73,7 +73,7 @@ case "$1" in
 		;;
 
 	status)
-		status_of_proc -p $PID "$DAEMON" workerd
+		status_of_proc -p $PID "$DAEMON"
 		;;
 
 	*)

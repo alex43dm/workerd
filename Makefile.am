@@ -92,7 +92,7 @@ template/error.html \
 template/teaser.html
 
 install_f =\
-echo "install to $1"; \
+echo -n "install to $1"; \
 $(MKDIR_P) $(1)/etc/worker/template; \
 $(MKDIR_P) $(1)/etc/worker/db_dump; \
 $(MKDIR_P) $(1)/etc/worker/db_dump/schema; \
@@ -102,13 +102,15 @@ $(MKDIR_P) $(1)/etc/worker/db_dump/tables; \
 $(MKDIR_P) $(1)/etc/worker/db_dump/requests; \
 $(MKDIR_P) $(1)/etc/init.d; \
 $(MKDIR_P) $(1)/usr/sbin; \
-$(SED) 's/\/home\/alex\/Projects\/worker/\/$(1)\/etc\/worker/' < ./config.xml > $(1)/etc/worker/config-$(bin_PROGRAMS).xml; \
+$(SED) 's|/home/alex/Projects/worker|/$(1)/etc/worker|' < ./config.xml > $(1)/etc/worker/config-$(bin_PROGRAMS).xml; \
 $(INSTALL) $(bin_PROGRAMS) $(1)/usr/sbin; \
-$(SED) 's/\/etc\/workerd\/config.xml/\/$(1)/etc/worker/config-$(bin_PROGRAMS).xml/;s/\/usr\/sbin\/workerd/\/$(1)/usr/sbin/$(bin_PROGRAMS)/' < ./install/workerd > $(1)/etc/init.d/$(bin_PROGRAMS); \
-@list='$(sysconf_DATA)'; \
-for p in $$list; do \
+if ! $(DEBUG); then \
+$(SED) 's|/etc/workerd/config.xml|/$(1)/etc/worker/config-$(bin_PROGRAMS).xml|;s|/usr/sbin/workerd|/$(1)/usr/sbin/$(bin_PROGRAMS)|' < ./install/workerd > $(1)/etc/init.d/$(bin_PROGRAMS); \
+fi; \
+for p in $(sysconf_DATA); do \
 $(INSTALL_DATA) $$p "$(1)/etc/worker/$$p" || exit $$?; \
-done
+done; \
+echo "..ok"
 
 install: install-binPROGRAMS
 	@DOLLAR_SIGN@(call install_f,$(prefix))
