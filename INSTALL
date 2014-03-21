@@ -162,3 +162,12 @@ is something like `gnu-as' or `x' (for the X Window System).  The
 `README' should mention any `--enable-' and `--with-' options that the
 package recognizes.
 
+Debian build
+============
+   $./install/mkdeb 
+   output debian packages:
+	workerd-1.2-6.deb
+	workerd-dev-1.2-6.deb
+	workerd-dummy-1.2-6.deb
+	workerd-dummy-dev-1.2-6.deb
+

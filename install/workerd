@@ -16,7 +16,6 @@ CONFIG="/etc/workerd/config.xml"
 DAEMON_OPTS="-c $CONFIG"
 NAME=workerd
 DESC="worker daemon"
-PID=`$DAEMON -p`
 
 . /lib/lsb/init-functions
 
@@ -27,6 +26,8 @@ if [ ! -f $CONFIG ]; then
 fi
 
 test -x $DAEMON || exit 0
+
+PID=`$DAEMON -p -c $CONFIG`
 
 start() {
 		start-stop-daemon --start --quiet --pidfile $PID \
