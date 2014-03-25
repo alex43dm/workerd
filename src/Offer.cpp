@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "Offer.h"
 #include "Log.h"
 #include "json.h"
@@ -47,9 +49,9 @@ Offer::~Offer()
 
 std::string Offer::toJson() const
 {
-    std::stringstream json;
+    std::stringstream str_json;
 
-    json << "{" <<
+    str_json << "{" <<
          "\"id\": \"" << id_int << "\"," <<
          "\"title\": \"" << Json::Utils::Escape(title) << "\"," <<
          "\"description\": \"" << Json::Utils::Escape(description) << "\"," <<
@@ -63,7 +65,7 @@ std::string Offer::toJson() const
          "\"height\": \"" << height << "\"" <<
          "}";
 
-    return json.str();
+    return str_json.str();
 }
 
 long long int Offer::gen()

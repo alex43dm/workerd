@@ -1,5 +1,6 @@
 #include "CgiService.h"
 #include "Log.h"
+#include "Server.h"
 
 /** \mainpage workerd
 

@@ -13,6 +13,12 @@ unsigned long last_time_request_processed;
 unsigned long offer_processed_;
 unsigned long social_processed_;
 
+bool is_file_exist(const std::string &fileName)
+{
+    std::ifstream infile(fileName);
+    return infile.good();
+}
+
 // Global static pointer used to ensure a single instance of the class.
 Config* Config::mInstance = NULL;
 
@@ -40,7 +46,13 @@ bool Config::Load()
 {
     TiXmlElement *mel, *mels;
 
-    Log::info("Config::Load");
+    if(!is_file_exist(mFileName))
+    {
+        std::cerr<<"does not found config file: "<<mFileName<<std::endl;
+        ::exit(1);
+    }
+
+    Log::info("Config::Load: load file: %s",mFileName.c_str());
 
     mIsInited = false;
     mDoc = new TiXmlDocument(mFileName);
@@ -136,8 +148,10 @@ bool Config::Load()
     {
         if( (mel = mels->FirstChildElement("main")) )
         {
-            if( (mElem = mel->FirstChildElement("host")) && (mElem->GetText()) )
-                mongo_main_host_ = mElem->GetText();
+            for(mElem = mel->FirstChildElement("host"); mElem; mElem = mElem->NextSiblingElement("host"))
+            {
+                mongo_main_host_.push_back(mElem->GetText());
+            }
 
             if( (mElem = mel->FirstChildElement("db")) && (mElem->GetText()) )
                 mongo_main_db_ = mElem->GetText();
@@ -147,12 +161,20 @@ bool Config::Load()
 
             if( (mElem = mel->FirstChildElement("slave")) && (mElem->GetText()) )
                 mongo_main_slave_ok_ = strncmp(mElem->GetText(),"false", 5) > 0 ? false : true;
+
+            if( (mElem = mel->FirstChildElement("login")) && (mElem->GetText()) )
+                mongo_main_login_ = mElem->GetText();
+
+            if( (mElem = mel->FirstChildElement("passwd")) && (mElem->GetText()) )
+                mongo_main_passwd_ = mElem->GetText();
         }
 
         if( (mel = mels->FirstChildElement("log")) )
         {
-            if( (mElem = mel->FirstChildElement("host")) && (mElem->GetText()) )
-                mongo_log_host_ = mElem->GetText();
+            for(mElem = mel->FirstChildElement("host"); mElem; mElem = mElem->NextSiblingElement("host"))
+            {
+                mongo_log_host_.push_back(mElem->GetText());
+            }
 
             if( (mElem = mel->FirstChildElement("db")) && (mElem->GetText()) )
                 mongo_log_db_ = mElem->GetText();
@@ -162,6 +184,12 @@ bool Config::Load()
 
             if( (mElem = mel->FirstChildElement("slave")) && (mElem->GetText()) )
                 mongo_log_slave_ok_ = strncmp(mElem->GetText(),"false", 5) > 0 ? false : true;
+
+            if( (mElem = mel->FirstChildElement("login")) && (mElem->GetText()) )
+                mongo_log_login_ = mElem->GetText();
+
+            if( (mElem = mel->FirstChildElement("passwd")) && (mElem->GetText()) )
+                mongo_log_passwd_ = mElem->GetText();
         }
 
     }

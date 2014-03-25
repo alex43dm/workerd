@@ -33,6 +33,8 @@ CgiService::CgiService()
 
     FCGX_Init();
 
+    mongo::DB::ConnectLogDatabase();
+
     unlink(cfg->server_socket_path_.c_str());
 
     mode_t old_mode = umask(0);
@@ -100,6 +102,11 @@ void CgiService::Response(FCGX_Request *req,
                           const std::string &out,
                           const std::string &cookie)
 {
+    if(out.empty())
+    {
+        return;
+    }
+
     FCGX_FPrintF(req->out,"Content-type: text/html\r\n");
     FCGX_FPrintF(req->out,"Set-Cookie: %s\r\n", cookie.c_str());
     FCGX_FPrintF(req->out,"Status: 200 OK\r\n");

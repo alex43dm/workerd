@@ -57,7 +57,7 @@ Cookie::Cookie (const char * name) : name_(name),
 
 Cookie::Cookie (const char * name, const Credentials& credentials) : name_(name),
     value_(),
-    credentials_(credentials_)
+    credentials_(credentials)
 {}
 
 Cookie::Cookie (const char * name, const char * value) : name_(name),
@@ -77,7 +77,7 @@ Cookie::Cookie (const std::string& name) : name_(name),
 
 Cookie::Cookie (const std::string& name, const Credentials& credentials) : name_(name),
     value_(),
-    credentials_(credentials_)
+    credentials_(credentials)
 {}
 
 Cookie::Cookie (const std::string& name, const std::string& value) : name_(name),

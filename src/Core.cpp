@@ -228,20 +228,79 @@ std::string Core::Process(Params *prms)
 
     return ret;
 }
-
 void Core::ProcessSaveResults()
 {
     request_processed_++;
-    offer_processed_ += vOutPut.size();
-#ifndef DUMMY
+
     // Сохраняем выданные ссылки в базе данных
     //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
     if (!params->test_mode_ && informer)
-        hm->updateUserHistory(vOutPut, params, informer);
+    {
+
+        mongo::BSONObj keywords = mongo::BSONObjBuilder().
+#ifndef DUMMY
+                                  appendElements(hm->BSON_Keywords()).
+#endif // DUMMY
+                                  append("search", params->getSearch()).
+                                  append("context", params->getContext()).
+                                  obj();
+#ifndef DUMMY
+        hm->updateUserHistory(vOutPut, informer->RetargetingCount);
+#endif // DUMMY
+        try
+        {
+            mongo::DB db("log");
+
+            for(auto i = vOutPut.begin(); i != vOutPut.end(); ++i)
+            {
+                std::tm dt_tm;
+                dt_tm = boost::posix_time::to_tm(params->time_);
+                mongo::Date_t dt( (mktime(&dt_tm)) * 1000LLU);
+
+                Campaign *c = new Campaign((*i)->campaign_id);
+
+                mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
+                                        append("dt", dt).
+                                        append("id", (*i)->id).
+                                        append("id_int", (*i)->id_int).
+                                        append("title", (*i)->title).
+                                        append("inf", params->informer_id_).
+                                        append("inf_int", informer->id).
+                                        append("ip", params->ip_).
+                                        append("cookie", params->cookie_id_).
+                                        append("social", (*i)->social).
+                                        append("token", (*i)->token).
+                                        append("type", (*i)->type).
+                                        append("isOnClick", (*i)->isOnClick).
+                                        append("campaignId", c->guid).
+                                        append("campaignId_int", (*i)->campaign_id).
+                                        append("campaignTitle", c->title).
+                                        append("project", c->project).
+                                        append("country", (params->getCountry().empty()?"NOT FOUND":params->getCountry().c_str())).
+                                        append("region", (params->getRegion().empty()?"NOT FOUND":params->getRegion().c_str())).
+                                        append("keywords", keywords).
+                                        append("branch", (*i)->getBranch()).
+                                        append("conformity", "place").//(*i)->conformity).
+                                        append("matching", (*i)->matching).
+                                        obj();
+                delete c;
+
+                db.insert("log.impressions", record, true);
+
+                offer_processed_ ++;
+                if ((*i)->social) social_processed_ ++;
+            }
+        }
+        catch (mongo::DBException &ex)
+        {
+            Log::err("DBException: insert into log db: %s", ex.what());
+        }
+    }
 
     OutPutCampaignMap.clear();
 
-   Kompex::SQLiteStatement *p;
+#ifndef DUMMY
+    Kompex::SQLiteStatement *p;
     try
     {
         p = new Kompex::SQLiteStatement(pDb->pDatabase);
@@ -254,6 +313,7 @@ void Core::ProcessSaveResults()
     }
     delete p;
 #endif // DUMMY
+
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
         if(o->second)

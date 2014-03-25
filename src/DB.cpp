@@ -1,4 +1,5 @@
 #include "DB.h"
+#include "Config.h"
 
 mongo::DB::ConnectionOptionsMap mongo::DB::connection_options_map_;
 
@@ -114,62 +115,6 @@ mongo::ScopedDbConnection &mongo::DB::db()
     return *db_;
 }
 
-
-/** Вспомогательный метод, возвращающий значение поля field как int.
-    Реально значение может храниться как в int, так и в string.
-    Если ни одно преобразование не сработало, вернёт 0.
- */
-int mongo::DB::toInt(const BSONElement &element)
-{
-    switch (element.type())
-    {
-    case NumberInt:
-        return element.numberInt();
-    case String:
-        try
-        {
-            return boost::lexical_cast<int>(element.str());
-        }
-        catch (boost::bad_lexical_cast &)
-        {
-            return 0;
-        }
-    default:
-        return 0;
-    }
-}
-
-/** Вспомогательный метод, возвращающий значение поля field как float.
-    Реально значение может храниться как в int или double, так и в string.
-    Если ни одно преобразование не сработало, вернёт 0.
-
-	добавлено RealInvest Soft
- */
-float mongo::DB::toFloat(const BSONElement &element)
-{
-    switch (element.type())
-    {
-    case NumberInt:
-        return (float)element.numberInt();
-    case NumberDouble:
-        return (float)element.numberDouble();
-    case String:
-        try
-        {
-            return boost::lexical_cast<float>(element.str());
-        }
-        catch (boost::bad_lexical_cast &)
-        {
-            return 0;
-        }
-    default:
-        return 0;
-    }
-}
-
-
-
-
 // Все нижеследующие методы являются просто обёртками над методами
 // DBClientConnection, принимающие вместо параметра ns (namespace)
 // параметр coll (collection) и автоматически добавляющие к названию
@@ -192,69 +137,6 @@ void mongo::DB::insert( const std::string &coll, BSONObj obj, bool safe )
     if (safe)
         (*db_)->getLastError();
 }
-
-void mongo::DB::remove( const std::string &coll, Query obj, bool justOne,
-                        bool safe )
-{
-    (*db_)->remove(this->collection(coll), obj, justOne);
-    if (safe)
-        (*db_)->getLastError();
-}
-
-void mongo::DB::update( const std::string &coll, Query query, mongo::BSONObj obj,
-                        bool upsert, bool multi, bool safe)
-{
-    (*db_)->update(this->collection(coll), query, obj, upsert, multi);
-    if (safe)
-        (*db_)->getLastError();
-}
-
-mongo::BSONObj mongo::DB::findOne(const std::string &coll, Query query,
-                                  const mongo::BSONObj *fieldsToReturn, int queryOptions)
-{
-    if (options_->slave_ok)
-        queryOptions |= QueryOption_SlaveOk;
-    return (*db_)->findOne(this->collection(coll), query, fieldsToReturn,
-                           queryOptions);
-}
-
-std::unique_ptr<mongo::DBClientCursor> mongo::DB::query(const std::string &coll, Query query,
-        int nToReturn, int nToSkip,
-        const BSONObj *fieldsToReturn,
-        int queryOptions, int batchSize)
-{
-    if (options_->slave_ok)
-        queryOptions |= QueryOption_SlaveOk;
-    return unique_ptr<DBClientCursor>(
-               (*db_)->query(this->collection(coll), query, nToReturn, nToSkip,
-                             fieldsToReturn, queryOptions, batchSize).release());
-}
-
-unsigned long long mongo::DB::count(const std::string &coll,
-                                    const mongo::BSONObj& query, int options )
-{
-    if (options_->slave_ok)
-        options |= QueryOption_SlaveOk;
-    return (*db_)->count(this->collection(coll), query, options);
-}
-
-bool mongo::DB::createCollection(const std::string &coll, long long size,
-                                 bool capped, int max, mongo::BSONObj *info)
-{
-    return (*db_)->createCollection(this->collection(coll), size,
-                                    capped, max, info);
-}
-
-bool mongo::DB::dropCollection( const std::string &coll )
-{
-    return (*db_)->dropCollection(this->collection(coll));
-}
-
-bool mongo::DB::dropDatabase()
-{
-    return (*db_)->dropDatabase(database());
-}
-
 
 mongo::DB::ConnectionOptions *mongo::DB::options_by_name(const std::string &name)
 {
@@ -288,3 +170,38 @@ void mongo::DB::_addDatabase(const std::string &name,
     options->slave_ok = slave_ok;
     connection_options_map_[name] = options;
 }
+
+bool mongo::DB::ConnectLogDatabase()
+{
+//    if(fConnectedToLogDatabase)
+//        return true;
+
+    for(auto h = cfg->mongo_log_host_.begin(); h != cfg->mongo_log_host_.end(); ++h)
+    {
+        Log::info("Connecting to: %s",(*h).c_str());
+        try
+        {
+            if (cfg->mongo_log_set_.empty())
+                mongo::DB::addDatabase( "log",
+                                        *h,
+                                        cfg->mongo_log_db_,
+                                        cfg->mongo_log_slave_ok_);
+            else
+                mongo::DB::addDatabase( "log",
+                                        mongo::DB::ReplicaSetConnection(
+                                            cfg->mongo_log_set_,
+                                            *h),
+                                        cfg->mongo_log_db_,
+                                        cfg->mongo_log_slave_ok_);
+
+//        fConnectedToLogDatabase = true;
+        }
+        catch (mongo::UserException &ex)
+        {
+            Log::err("Error connecting to mongo: %s", ex.what());
+        }
+    }
+
+    return true;
+}
+

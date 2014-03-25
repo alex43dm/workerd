@@ -16,14 +16,18 @@ extern unsigned long social_processed_;
 class Config
 {
 public:
-    std::string mongo_main_host_;
+    std::vector<std::string> mongo_main_host_;
     std::string mongo_main_db_;
     std::string mongo_main_set_;
     bool mongo_main_slave_ok_;
-    std::string mongo_log_host_;
+    std::string mongo_main_login_;
+    std::string mongo_main_passwd_;
+    std::vector<std::string> mongo_log_host_;
     std::string mongo_log_db_;
     std::string mongo_log_set_;
     bool mongo_log_slave_ok_;
+    std::string mongo_log_login_;
+    std::string mongo_log_passwd_;
     std::string server_ip_;
     std::string redirect_script_;
     std::string geocity_path_;

@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <sstream>
 
+#include <mongo/util/net/hostandport.h>
+
 #include "../config.h"
 
 #include "Log.h"
@@ -21,7 +23,7 @@
 
 BaseCore::BaseCore()
 {
-    fConnectedToLogDatabase = false;
+//    fConnectedToLogDatabase = false;
 
     struct sigaction actions;
     sigemptyset(&actions.sa_mask);
@@ -29,21 +31,16 @@ BaseCore::BaseCore()
     actions.sa_handler = signal_handler;
 
     sigaction(SIGHUP,&actions,NULL);
+    sigaction(SIGPIPE,&actions,NULL);
 
-/*
-    sigset_t es;
-    sigfillset(&es);
-    pthread_sigmask(SIG_BLOCK, &es, NULL);
-*/
     time_service_started_ = boost::posix_time::second_clock::local_time();
 
     pdb = new ParentDB();
-    //подключаемся к mongo
-    ConnectLogDatabase();
 
     LoadAllEntities();
+
     InitMessageQueue();
-    InitMongoDB();
+    //InitMongoDB();
 }
 
 BaseCore::~BaseCore()
@@ -80,19 +77,19 @@ bool BaseCore::ProcessMQ()
                 mq_log_ = "BaseCore::ProcessMQ campaign: " + m->getRoutingKey();
                 if(m->getRoutingKey() == "campaign.update")
                 {
-                    Campaign::update(Config::Instance()->pDb->pDatabase, toString(m));
+                    pdb->CampaignUpdate(toString(m));
                 }
                 else if(m->getRoutingKey() == "campaign.delete")
                 {
-                    Campaign::remove(Config::Instance()->pDb->pDatabase, toString(m));
+                    pdb->CampaignRemove(toString(m));
                 }
                 else if(m->getRoutingKey() == "campaign.start")
                 {
-                    Campaign::startStop(Config::Instance()->pDb->pDatabase, toString(m), 1);
+                    pdb->CampaignStartStop(toString(m), 1);
                 }
                 else if(m->getRoutingKey() == "campaign.stop")
                 {
-                    Campaign::startStop(Config::Instance()->pDb->pDatabase, toString(m), 0);
+                    pdb->CampaignStartStop(toString(m), 0);
                 }
                 return true;
             }
@@ -163,39 +160,6 @@ bool BaseCore::ProcessMQ()
     return false;
 }
 
-bool BaseCore::ConnectLogDatabase()
-{
-    if(fConnectedToLogDatabase)
-        return true;
-
-    Log::info("Connecting to %s / %s",
-              cfg->mongo_log_host_.c_str(),
-              cfg->mongo_log_db_.c_str());
-
-    try
-    {
-        if (Config::Instance()->mongo_log_set_.empty())
-            mongo::DB::addDatabase( "log",
-                                    Config::Instance()->mongo_log_host_,
-                                    Config::Instance()->mongo_log_db_,
-                                    Config::Instance()->mongo_log_slave_ok_);
-        else
-            mongo::DB::addDatabase( "log",
-                                    mongo::DB::ReplicaSetConnection(
-                                        Config::Instance()->mongo_log_set_,
-                                        Config::Instance()->mongo_log_host_),
-                                    Config::Instance()->mongo_log_db_,
-                                    Config::Instance()->mongo_log_slave_ok_);
-        fConnectedToLogDatabase = true;
-    }
-    catch (mongo::UserException &ex)
-    {
-        Log::err("Error connecting to mongo: %s", ex.what());
-        return false;
-    }
-
-    return true;
-}
 
 /*
 *  Загружает из основной базы данных следующие сущности:
@@ -215,7 +179,7 @@ void BaseCore::LoadAllEntities()
     pdb->InformerLoadAll();
 
     //Загрузили все кампании
-    Campaign::loadAll(Config::Instance()->pDb->pDatabase);
+    pdb->CampaignsLoadAll();
 
     //Загрузили все предложения
     mongo::Query q;
@@ -296,8 +260,8 @@ void BaseCore::InitMessageQueue()
 */
 void BaseCore::InitMongoDB()
 {
-    mongo::DB db("log");
-    db.createCollection("log.impressions", 600*1024, true, 1014*1024);
+//    mongo::DB db("log");
+//    db.createCollection("log.impressions", 600*1024, true, 1014*1024);
 }
 
 /** Возвращает данные о состоянии службы
@@ -368,22 +332,14 @@ std::string BaseCore::Status()
         "</td></tr>";
     out << "<tr><td>Количество ниток: </td> <td>" << Config::Instance()->server_children_<< "</td></tr>";
 
-    try
-    {
-        mongo::DB db_main;
         out << "<tr><td>Основная база данных:</td> <td>" <<
-            db_main.server_host() << "/" << db_main.database() << "<br/>";
-        out << "slave_ok = " << (db_main.slave_ok()? "true" : "false");
-        if (db_main.replica_set().empty())
+            cfg->mongo_main_db_<< "/<br/>";
+        out << "slave_ok = " << (cfg->mongo_main_slave_ok_? "true" : "false");
+        if (cfg->mongo_main_set_.empty())
             out << " (no replica set)";
         else
-            out << " (replSet=" << db_main.replica_set() << ")";
+            out << " (replSet=" << cfg->mongo_main_set_ << ")";
         out << "</td></tr>";
-    }
-    catch (mongo::DB::NotRegistered &)
-    {
-        out << "Основная база не определена</td></tr>";
-    }
 
     out << "<tr><td>База данных Redis (краткосрочная история):</td> <td>" <<
         Config::Instance()->redis_short_term_history_host_ << ":";
@@ -427,23 +383,14 @@ std::string BaseCore::Status()
     out << "status = true";
     out << "</td></tr>\n";
 
-    try
-    {
-        mongo::DB db_log("log");
-        out << "<tr><td>База данных журналирования: </td> <td>" <<
-            db_log.server_host() << "/" << db_log.database() << "<br/>";
-        out << "slave_ok = " << (db_log.slave_ok()? "true" : "false");
-        if (db_log.replica_set().empty())
+        out << "<tr><td>База данных журналирования: </td> <td>" << cfg->mongo_log_db_ << "<br/>";
+        out << "slave_ok = " << (cfg->mongo_log_slave_ok_? "true" : "false");
+        if (cfg->mongo_log_set_.empty())
             out << " (no replica set)";
         else
-            out << " (replSet=" << db_log.replica_set() << ")";
+            out << " (replSet=" << cfg->mongo_log_set_ << ")";
         out << "</td></tr>";
 
-    }
-    catch (mongo::DB::NotRegistered &)
-    {
-        out << "База данных журналирования не определена</td></tr>";
-    }
 
     out << "<tr><td>Время запуска:</td> <td>" << time_service_started_ <<
         "</td></tr>" <<
@@ -507,5 +454,7 @@ void BaseCore::signal_handler(int signum)
 	{
     case SIGHUP:
         cfg->Load();
+    case SIGPIPE:
+        Log::err("sig pipe");
 	}
 }

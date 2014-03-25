@@ -22,11 +22,7 @@
 
 #define INSERTSTATMENT "INSERT INTO Offer (id) VALUES (%lu)"
 
-bool is_file_exist(const std::string &fileName)
-{
-    std::ifstream infile(fileName);
-    return infile.good();
-}
+bool is_file_exist(const std::string &fileName);
 
 DataBase::DataBase(bool create) :
     reopen(false),
@@ -54,7 +50,6 @@ bool DataBase::openDb()
     int flags;
 
     //load requests
-
 #ifdef DUMMY
     Config::Instance()->offerSqlStr = getSqlFile("requests/05.sql");
 #else
@@ -111,6 +106,7 @@ bool DataBase::openDb()
     }
     catch(Kompex::SQLiteException &ex)
     {
+        printf("cannt open sqlite database: %s error: %s\n",dbFileName.c_str(), ex.GetString().c_str());
         Log::err("DB(%s)  error: %s", dbFileName.c_str(), ex.GetString().c_str());
         exit(1);
     }

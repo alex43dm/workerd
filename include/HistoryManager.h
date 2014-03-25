@@ -8,6 +8,8 @@
 #include <boost/date_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 
+#include <mongo/bson/bson.h>
+
 #include "Offer.h"
 #include "Informer.h"
 #include "RedisClient.h"
@@ -53,7 +55,7 @@ public:
     //main methods
     void getUserHistory(Params *params);
     void sphinxProcess(Offer::Map &items);
-    bool updateUserHistory(const Offer::Vector &items, const Params *params, const Informer *informer);
+    bool updateUserHistory(const Offer::Vector &items, unsigned RetargetingCount);
 
     bool setDeprecatedOffers(const Offer::Vector &items);
     bool getDeprecatedOffers(std::string &);
@@ -82,6 +84,8 @@ public:
     bool isLongTerm(){return Config::Instance()->range_long_term_ > 0;}
     bool isContext(){return Config::Instance()->range_context_ > 0;}
     bool isSearch(){return Config::Instance()->range_search_ > 0;}
+
+    mongo::BSONObj BSON_Keywords();
 
 protected:
 private:

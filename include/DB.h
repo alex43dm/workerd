@@ -136,20 +136,7 @@ public:
      */
     ScopedDbConnection &db();
 
-
-    /** Вспомогательный метод, возвращающий значение поля field как int.
-        Реально значение может храниться как в int, так и в string.
-        Если ни одно преобразование не сработало, вернёт 0.
-     */
-    static int toInt(const BSONElement &element);
-
-    /** Вспомогательный метод, возвращающий значение поля field как float.
-        Реально значение может храниться как в int или double, так и в string.
-        Если ни одно преобразование не сработало, вернёт 0.
-
-    	добавлено RealInvest Soft
-     */
-    static float toFloat(const BSONElement &element);
+    static bool ConnectLogDatabase();
 
     // Все нижеследующие методы являются просто обёртками над методами
     // DBClientConnection, принимающие вместо параметра ns (namespace)
@@ -169,31 +156,6 @@ public:
 
     void insert( const string &coll, BSONObj obj, bool safe = false );
 
-    void remove( const string &coll, Query obj, bool justOne = 0,
-                 bool safe = false);
-
-    void update( const string &coll, Query query, BSONObj obj,
-                 bool upsert = 0, bool multi = 0, bool safe = false );
-
-    BSONObj findOne(const string &coll, Query query,
-                    const BSONObj *fieldsToReturn = 0, int queryOptions = 0);
-
-    std::unique_ptr<DBClientCursor> query(const string &coll, Query query,
-                                          int nToReturn = 0, int nToSkip = 0,
-                                          const BSONObj *fieldsToReturn = 0,
-                                          int queryOptions = 0, int batchSize = 0 );
-
-    unsigned long long count(const string &coll,
-                             const BSONObj& query = BSONObj(), int options=0 );
-
-    bool createCollection(const string &coll, long long size = 0,
-                          bool capped = false, int max = 0, BSONObj *info = 0);
-
-    bool dropCollection( const string &coll );
-
-    bool dropDatabase();
-
-
     /** Исключение, возникающее при попытке обратиться к незарегистированной
     базе данных */
     class NotRegistered : public std::exception
@@ -212,6 +174,7 @@ public:
 
 private:
     ScopedDbConnection *db_;
+    static bool fConnectedToLogDatabase;
 
 
 protected:

@@ -67,8 +67,6 @@ public:
     */
 
 private:
-    bool fConnectedToLogDatabase;
-
     void InitMessageQueue();
     void InitMongoDB();
     /** Создаёт подключения к базам данных.

@@ -7,6 +7,7 @@
 #include "Config.h"
 
 #include <fcgiapp.h>
+#include <mongo/client/dbclient_rs.h>
 
 class Core;
 
@@ -87,6 +88,10 @@ private:
 private:
     BaseCore *bcore;
     pthread_t *threads;
+    bool fConnectedToLogDatabase;
+
+    mongo::DBClientReplicaSet *monga_log;
+    bool ConnectLogDatabase();
 };
 
 #endif
