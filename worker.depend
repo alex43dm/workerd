@@ -113,7 +113,7 @@
 1392281869 /home/alex/Projects/worker/include/EBranch.h
 	<string>
 
-1395826949 /home/alex/Projects/worker/include/Config.h
+1395829220 /home/alex/Projects/worker/include/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
@@ -299,7 +299,7 @@
 	"Config.h"
 	"Log.h"
 
-1391065060 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
+1395827985 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -311,7 +311,7 @@
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 
-1392208043 source:/home/alex/Projects/worker/src/HistoryManagerShortTerm.cpp
+1395827071 source:/home/alex/Projects/worker/src/HistoryManagerShortTerm.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"

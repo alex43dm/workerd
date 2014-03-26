@@ -4,47 +4,53 @@
 <server>
     <!--IP сервера. Ссылка на редирект по рекламному предложению содержит в себе адрес сервера, который её создал-->
     <ip>127.0.0.1</ip>
-    <!--Название скрипта обработки редиректа-->
-    <redirect_script>/redirect</redirect_script>
-    <!--Путь к файлу базы данных MaxMind GeoIP City Edition-->
-    <geocity_path>/usr/share/GeoIP/GeoLiteCity.dat</geocity_path>
+    <lock_file>/tmp/worker.lock</lock_file>
+    <pid_file>/tmp/worker.pid</pid_file>
+    <user>alex</user>
     <!--путь к файлу сокета-->
     <socket_path>/tmp/workerd.sock</socket_path>
-    <!--количество ниток на обработку-->
+    <!--количество ниток-->
     <children>1</children>
+
     <!--путь к очереди сообщений-->
     <mq_path>guest:guest@localhost//</mq_path>
+
     <!--путь к фалу базы данных-->
-    <dbpath>/run/alex/mem.db</dbpath>
-    <!--dbpath>:memory:</dbpath-->
-    <!--путь к каталогу дампа sqlite базы-->
-    <db_dump_path>/home/alex/Projects/worker/db_dump</db_dump_path>
-    <!--путь к csv файлу содержимого таблицы GeoRerions-->
-    <db_geo_csv>/home/alex/Projects/worker/db_dump/UA_RU</db_geo_csv>
+    <sqlite>
+        <!--файл базы-->
+        <db>/run/alex/mem.db</db>
+        <!--db>:memory:</db-->
+        <!--путь к каталогу дампа sqlite базы-->
+        <schema>db_dump</schema>
+        <!--путь к csv файлу содержимого таблицы GeoRerions-->
+        <geo_csv>db_dump/UA_RU</geo_csv>
+    </sqlite>
+
+    <!--Путь к файлу базы данных MaxMind GeoIP City Edition-->
+    <geocity_path>/usr/share/GeoIP/GeoLiteCity.dat</geocity_path>
+
+    <cookie>
+        <name>yottos_unique_id</name>
+        <domain>.yottos.com.</domain>
+        <path>/</path>
+    </cookie>
+
+    <!--Название скрипта обработки редиректа-->
+    <redirect_script>/redirect</redirect_script>
     <!-- Шаблон информера с тизерами со следующими подстановками (существовавший шаблон):
         %1%	    CSS
 	%2%	    JSON для initads (предложения, которые должны показаться на первой странице)
 	%3%	    количество товаров на с транице
 	%4%	    ссылка на скрипт получения следующей порции предложений в jso-->
-    <template_teaser>/home/alex/Projects/worker/template/teaser.html</template_teaser>
+    <template_teaser>template/teaser.html</template_teaser>
     <!-- Шаблон информера с баннером со следующими подстановками:
 	 %1%	    CSS
 	 %2%	    swfobject
 	 %3%	    JSON initads-->
-    <template_banner>/home/alex/Projects/worker/template/banner.html</template_banner>
-    <template_error>/home/alex/Projects/worker/template/error.html</template_error>
-    <swfobject>/home/alex/Projects/worker/template/swfobject.js</swfobject>
+    <template_banner>template/banner.html</template_banner>
+    <template_error>template/error.html</template_error>
+    <swfobject>template/swfobject.js</swfobject>
 
-    <geoGity>/usr/share/GeoIP/GeoLiteCity.dat</geoGity>
-
-    <cookie_name>yottos_unique_id</cookie_name>
-    <cookie_domain>.yottos.com</cookie_domain>
-    <cookie_path>/</cookie_path>
-
-    <lock_file>/tmp/worker.lock</lock_file>
-    <pid_file>/tmp/worker.pid</pid_file>
-
-    <user>alex</user>
     <!--время обновление временных кампаний(HH:MM:SS)-->
     <time_update>00:15:00</time_update>
 </server>

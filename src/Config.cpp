@@ -83,7 +83,10 @@ bool Config::Load()
 
     if(!mDoc->LoadFile())
     {
-        std::cerr<<"error load file: "<<mFileName<<std::endl;
+        std::cerr<<"load file: "<<mFileName<<
+        " error: "<< mDoc->ErrorDesc()<<
+        " row: "<<mDoc->ErrorRow()<<
+        " col: "<<mDoc->ErrorCol()<<std::endl;
         ::exit(-1);
         return mIsInited;
     }
@@ -180,19 +183,22 @@ bool Config::Load()
             server_children_ = atoi(mel->GetText());
         }
 
-        if( (mel = mElem->FirstChildElement("dbpath")) && (mel->GetText()) )
+        if( (mel = mElem->FirstChildElement("sqlite")) )
         {
-            dbpath_ = mel->GetText();
-        }
+            if( (mels = mel->FirstChildElement("db")) && (mels->GetText()) )
+            {
+                dbpath_ = mels->GetText();
+            }
 
-        if( (mel = mElem->FirstChildElement("db_dump_path")) && (mel->GetText()) )
-        {
-            db_dump_path_ = mel->GetText();
-        }
+            if( (mels = mel->FirstChildElement("schema")) && (mels->GetText()) )
+            {
+                db_dump_path_ = cfgFilePath + mels->GetText();
+            }
 
-        if( (mel = mElem->FirstChildElement("db_geo_csv")) && (mel->GetText()) )
-        {
-            db_geo_csv_ = mel->GetText();
+            if( (mels = mel->FirstChildElement("geo_csv")) && (mels->GetText()) )
+            {
+                db_geo_csv_ = cfgFilePath + mels->GetText();
+            }
         }
 
         if( (mel = mElem->FirstChildElement("lock_file")) && (mel->GetText()) )
@@ -227,21 +233,21 @@ bool Config::Load()
 
 
         if( (mel = mElem->FirstChildElement("template_teaser")) && (mel->GetText()) )
-            template_teaser_ = getFileContents(mel->GetText());
+            template_teaser_ = getFileContents(cfgFilePath + mel->GetText());
         else
         {
             Log::warn("element template_teaser is not inited");
         }
 
         if( (mel = mElem->FirstChildElement("template_banner")) && (mel->GetText()) )
-            template_banner_ = getFileContents(mel->GetText());
+            template_banner_ = getFileContents(cfgFilePath + mel->GetText());
         else
         {
             Log::warn("element template_banner is not inited");
         }
 
         if( (mel = mElem->FirstChildElement("template_error")) && (mel->GetText()) )
-            template_error_ = getFileContents(mel->GetText());
+            template_error_ = getFileContents(cfgFilePath + mel->GetText());
         else
         {
             Log::warn("element template_error is not inited");
@@ -249,37 +255,33 @@ bool Config::Load()
 
 
         if( (mel = mElem->FirstChildElement("swfobject")) && (mel->GetText()) )
-            swfobject_ = getFileContents(mel->GetText());
+            swfobject_ = getFileContents(cfgFilePath + mel->GetText());
         else
         {
             Log::warn("element swfobject is not inited");
         }
 
-        if( (mel = mElem->FirstChildElement("geoGity")) && (mel->GetText()) )
-            geoGity_ = mel->GetText();
-        else
+        if( (mel = mElem->FirstChildElement("cookie")) )
         {
-            Log::warn("element geoGity is not inited");
-        }
+            if( (mels = mel->FirstChildElement("name")) && (mels->GetText()) )
+                cookie_name_ = mels->GetText();
+            else
+            {
+                Log::warn("element cookie_name is not inited");
+            }
+            if( (mels = mel->FirstChildElement("domain")) && (mels->GetText()) )
+                cookie_domain_ = mels->GetText();
+            else
+            {
+                Log::warn("element cookie_domain is not inited");
+            }
 
-        if( (mel = mElem->FirstChildElement("cookie_name")) && (mel->GetText()) )
-            cookie_name_ = mel->GetText();
-        else
-        {
-            Log::warn("element cookie_name is not inited");
-        }
-        if( (mel = mElem->FirstChildElement("cookie_domain")) && (mel->GetText()) )
-            cookie_domain_ = mel->GetText();
-        else
-        {
-            Log::warn("element cookie_domain is not inited");
-        }
-
-        if( (mel = mElem->FirstChildElement("cookie_path")) && (mel->GetText()) )
-            cookie_path_ = mel->GetText();
-        else
-        {
-            Log::warn("element cookie_path is not inited");
+            if( (mels = mel->FirstChildElement("path")) && (mels->GetText()) )
+                cookie_path_ = mels->GetText();
+            else
+            {
+                Log::warn("element cookie_path is not inited");
+            }
         }
     }
 
