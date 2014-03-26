@@ -23,6 +23,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
                 if (history_archive[ViewHistory]->zrank(key,(*it)->id_int) == -1)
                 {
                     history_archive[ViewHistory]->zadd(key,(*it)->uniqueHits - 1, (*it)->id_int);
+                    history_archive[ViewHistory]->expire(key, Config::Instance()->views_expire_);
                 }
                 else//if rank == -1
                 {

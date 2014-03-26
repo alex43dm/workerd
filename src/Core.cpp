@@ -228,12 +228,12 @@ std::string Core::Process(Params *prms)
 
     return ret;
 }
+
+// Сохраняем выданные ссылки в базе данных
 void Core::ProcessSaveResults()
 {
     request_processed_++;
 
-    // Сохраняем выданные ссылки в базе данных
-    //обновление deprecated (по оставшемуся количеству показов) и краткосрочной истории пользователя (по ключевым словам)
     if (!params->test_mode_ && informer)
     {
 
@@ -285,7 +285,7 @@ void Core::ProcessSaveResults()
                                         obj();
                 delete c;
 
-                db.insert("log.impressions", record, true);
+                db.insert(cfg->mongo_log_collection_, record, true);
 
                 offer_processed_ ++;
                 if ((*i)->social) social_processed_ ++;

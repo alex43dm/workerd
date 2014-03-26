@@ -1,39 +1,133 @@
 <?xml version="1.0"?>
 <root id="0">
-<!--IP сервера. Ссылка на редирект по рекламному предложению содержит в себе адрес сервера, который её создал-->
-<server_ip>127.0.0.1</server_ip>
-<!--Название скрипта обработки редиректа-->
-<redirect_script>/redirect</redirect_script>
-<!--Путь к файлу базы данных MaxMind GeoIP City Edition-->
-<geocity_path>/usr/share/GeoIP/GeoLiteCity.dat</geocity_path>
-<!--"Продолжительность жизни" ключей в базе краткосрочной истории-->
-<shortterm_expire>864000</shortterm_expire><!--24 hours default-->
-<!--"Продолжительность жизни" ключей в базе истории контекста страницы-->
-<views_expire>864000</views_expire><!--24 hours default-->
-<!--"Продолжительность жизни" ключей в базе истории просмотров пользователя-->
-<context_expire>864000</context_expire><!--24 hours default-->
-<!-- -->
-<retargeting_by_persents>50</retargeting_by_persents>
-<!--период жизни ретаргетинга(ЧЧ:ММ:СС)-->
-<retargeting_by_time>06:00:00</retargeting_by_time>
-<!--выдерживать уникальность кампаний-->
-<retargeting_unique_by_campaign>false</retargeting_unique_by_campaign>
+<!--настройки сервера-->
+<server>
+    <!--IP сервера. Ссылка на редирект по рекламному предложению содержит в себе адрес сервера, который её создал-->
+    <ip>127.0.0.1</ip>
+    <!--Название скрипта обработки редиректа-->
+    <redirect_script>/redirect</redirect_script>
+    <!--Путь к файлу базы данных MaxMind GeoIP City Edition-->
+    <geocity_path>/usr/share/GeoIP/GeoLiteCity.dat</geocity_path>
+    <!--путь к файлу сокета-->
+    <socket_path>/tmp/workerd.sock</socket_path>
+    <!--количество ниток на обработку-->
+    <children>1</children>
+    <!--путь к очереди сообщений-->
+    <mq_path>guest:guest@localhost//</mq_path>
+    <!--путь к фалу базы данных-->
+    <dbpath>/run/alex/mem.db</dbpath>
+    <!--dbpath>:memory:</dbpath-->
+    <!--путь к каталогу дампа sqlite базы-->
+    <db_dump_path>/home/alex/Projects/worker/db_dump</db_dump_path>
+    <!--путь к csv файлу содержимого таблицы GeoRerions-->
+    <db_geo_csv>/home/alex/Projects/worker/db_dump/UA_RU</db_geo_csv>
+    <!-- Шаблон информера с тизерами со следующими подстановками (существовавший шаблон):
+        %1%	    CSS
+	%2%	    JSON для initads (предложения, которые должны показаться на первой странице)
+	%3%	    количество товаров на с транице
+	%4%	    ссылка на скрипт получения следующей порции предложений в jso-->
+    <template_teaser>/home/alex/Projects/worker/template/teaser.html</template_teaser>
+    <!-- Шаблон информера с баннером со следующими подстановками:
+	 %1%	    CSS
+	 %2%	    swfobject
+	 %3%	    JSON initads-->
+    <template_banner>/home/alex/Projects/worker/template/banner.html</template_banner>
+    <template_error>/home/alex/Projects/worker/template/error.html</template_error>
+    <swfobject>/home/alex/Projects/worker/template/swfobject.js</swfobject>
 
-<!--Весовые коэффициенты
- умножается на максимальный рейтинг выборки
-        0 - отключить
-        1 - максимальный рейтинг
--->
-<range>
-    <!--соответствующих кратскосрочной истории-->
-    <short_term>0</short_term>
-    <!--соответствующих долгосрочной истории-->
-    <long_term>0</long_term>
-    <!--контексту страницы-->
-    <context>0</context>
+    <geoGity>/usr/share/GeoIP/GeoLiteCity.dat</geoGity>
+
+    <cookie_name>yottos_unique_id</cookie_name>
+    <cookie_domain>.yottos.com</cookie_domain>
+    <cookie_path>/</cookie_path>
+
+    <lock_file>/tmp/worker.lock</lock_file>
+    <pid_file>/tmp/worker.pid</pid_file>
+
+    <user>alex</user>
+    <!--время обновление временных кампаний(HH:MM:SS)-->
+    <time_update>00:15:00</time_update>
+</server>
+
+<!--ретаргетинг-->
+<retargeting>
+    <!--представление, в процентах, в исходящей выборке-->
+    <persents>50</persents>
+    <!--Redis-сервер с БД о Ретаргетинге-->
+    <redis>
+            <!--IP-адрес-->
+            <host>127.0.0.1</host>
+            <!--порт-->
+            <port>6380</port>
+    </redis>
+    <!--период жизни(ЧЧ:ММ:СС)-->
+    <ttl>06:00:00</ttl>
+    <!--выдерживать уникальность кампаний в исходящей выборке-->
+    <unique_by_campaign>false</unique_by_campaign>
+</retargeting>
+
+<!--история-->
+<history>
+    <!--история показа-->
+    <views>
+        <ttl>24:00:00</ttl>
+        <!--Redis-сервер с БД о истории показов пользователя-->
+        <redis>
+            <!--IP-адрес-->
+            <host>127.0.0.1</host>
+            <!--порт-->
+            <port>6377</port>
+        </redis>
+    </views>
+    <!--кратскосрочная история-->
+    <short_term>
+        <!--Весовая финкция(умножается на максимальный рейтинг выборки)
+                0 - отключить
+                1 - максимальный рейтинг
+        -->
+        <value>0</value>
+        <ttl>24:00:00</ttl>
+        <!--Redis-сервер с БД о краткосрочной истории пользователя-->
+        <redis>
+            <!--IP-адрес-->
+            <host>127.0.0.1</host>
+            <!--порт-->
+            <port>6379</port>
+        </redis>
+    </short_term>
+    <!--долгосрочная история-->
+    <long_term>
+        <!--Весовая финкция(умножается на максимальный рейтинг выборки)
+                0 - отключить
+                1 - максимальный рейтинг
+        -->
+        <value>0</value>
+        <!--Redis-сервер с БД о долгосрочной истории пользователя-->
+        <redis>
+            <!--IP-адрес-->
+            <host>127.0.0.1</host>
+            <!--порт-->
+            <port>6378</port>
+        </redis>
+    </long_term>
+    <!--контекст страницы-->
+    <context>
+        <!--Весовая финкция(умножается на максимальный рейтинг выборки)
+                0 - отключить
+                1 - максимальный рейтинг
+        -->
+        <value>0</value>
+        <!--"Продолжительность жизни" ключей в базе истории контекста страницы-->
+    </context>
     <!--поисковым запросам пользователя страницы-->
-    <search>1.2</search>
-</range>
+    <search>
+        <!--Весовая финкция(умножается на максимальный рейтинг выборки)
+                0 - отключить
+                1 - максимальный рейтинг
+        -->
+        <value>1</value>
+    </search>
+</history>
 
 <!--Параметры подключения к базам данных-->
 <mongo>
@@ -77,53 +171,10 @@
 
         <login></login>
         <passwd></passwd>
+
+        <collection>log.impressions</collection>
     </log>
 </mongo>
-<!--Redis-сервера-->
-<redis>
-    <!--Redis-сервер с БД о краткосрочной истории пользователя-->
-    <short_term_history>
-        <!--IP-адрес-->
-        <host>127.0.0.1</host>
-        <!--порт-->
-        <port>6379</port>
-    </short_term_history>
-    <!--Redis-сервер с БД о долгосрочной истории пользователя-->
-    <long_term_history>
-        <!--IP-адрес-->
-        <host>127.0.0.1</host>
-        <!--порт-->
-        <port>6378</port>
-    </long_term_history>
-    <!--Redis-сервер с БД о истории показов пользователя-->
-    <user_view_history>
-        <!--IP-адрес-->
-        <host>127.0.0.1</host>
-        <!--порт-->
-        <port>6377</port>
-    </user_view_history>
-    <!--Redis-сервер с БД о контексте страниц-->
-    <page_keywords>
-        <!--IP-адрес-->
-        <host>127.0.0.1</host>
-        <!--порт-->
-        <port>6376</port>
-    </page_keywords>
-    <!--Redis-сервер с БД о категориях-->
-    <category>
-        <!--IP-адрес-->
-        <host>127.0.0.1</host>
-        <!--порт-->
-        <port>6375</port>
-    </category>
-    <!--Redis-сервер с БД о Ретаргетинге-->
-    <retargeting>
-        <!--IP-адрес-->
-        <host>127.0.0.1</host>
-        <!--порт-->
-        <port>6380</port>
-    </retargeting>
-</redis>
 
 <sphinx>
     <!--host>213.186.121.76</host-->
@@ -143,49 +194,5 @@
         <!--minuswords>100</minuswords-->
     </fields>
 </sphinx>
-
-<!--настройки сервера-->
-<server>
-    <!--путь к файлу сокета-->
-    <socket_path>/tmp/workerd.sock</socket_path>
-    <!--количество ниток на обработку-->
-    <children>1</children>
-    <!--путь к очереди сообщений-->
-    <mq_path>guest:guest@localhost//</mq_path>
-    <!--путь к фалу базы данных-->
-    <dbpath>/run/alex/mem.db</dbpath>
-    <!--dbpath>:memory:</dbpath-->
-    <!--путь к каталогу дампа sqlite базы-->
-    <db_dump_path>/home/alex/Projects/worker/db_dump</db_dump_path>
-    <!--путь к csv файлу содержимого таблицы GeoRerions-->
-    <db_geo_csv>/home/alex/Projects/worker/db_dump/UA_RU</db_geo_csv>
-    <!-- Шаблон информера с тизерами со следующими подстановками (существовавший шаблон):
-        %1%	    CSS
-	%2%	    JSON для initads (предложения, которые должны показаться на первой странице)
-	%3%	    количество товаров на с транице
-	%4%	    ссылка на скрипт получения следующей порции предложений в jso-->
-    <template_teaser>/home/alex/Projects/worker/template/teaser.html</template_teaser>
-    <!-- Шаблон информера с баннером со следующими подстановками:
-	 %1%	    CSS
-	 %2%	    swfobject
-	 %3%	    JSON initads-->
-    <template_banner>/home/alex/Projects/worker/template/banner.html</template_banner>
-    <template_error>/home/alex/Projects/worker/template/error.html</template_error>
-    <swfobject>/home/alex/Projects/worker/template/swfobject.js</swfobject>
-
-    <geoGity>/usr/share/GeoIP/GeoLiteCity.dat</geoGity>
-    <cookie_name>yottos_unique_id</cookie_name>
-    <cookie_domain>.yottos.com</cookie_domain>
-    <cookie_path>/</cookie_path>
-<!--
-    <lock_file>/var/run/worker.lock</lock_file>
-    <pid_file>/var/run/worker.pid</pid_file>
--->
-    <lock_file>/tmp/worker.lock</lock_file>
-    <pid_file>/tmp/worker.pid</pid_file>
-    <user>alex</user>
-    <!--время обновление временных кампаний(HH:MM:SS)-->
-    <time_update>00:15:00</time_update>
-</server>
 
 </root>

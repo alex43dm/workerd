@@ -60,11 +60,11 @@ void HistoryManager::updateShortHistory(const std::string & query)
 {
     if(query.empty() && !updateShort)
         return;
-
+/*
     history_archive[ShortTerm]->zadd(key, currentDateToInt(), query);
     history_archive[ShortTerm]->expire(key, Config::Instance()->shortterm_expire_);
     if (history_archive[ShortTerm]->zcount(key) >= 3)
     {
         history_archive[ShortTerm]->zremrangebyrank(key, 0, 0);
-    }
+    }*/
 }

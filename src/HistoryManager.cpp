@@ -35,9 +35,6 @@ bool HistoryManager::initDB()
     history_archive[ViewHistory] = new RedisClient(cfg->redis_user_view_history_host_, cfg->redis_user_view_history_port_);
     history_archive[ViewHistory]->connect();
 
-    history_archive[Category] = new RedisClient(cfg->redis_category_host_, cfg->redis_category_port_);
-    history_archive[Category]->connect();
-
     history_archive[ShortTerm] = new RedisClient(cfg->redis_short_term_history_host_, cfg->redis_short_term_history_port_);
     history_archive[ShortTerm]->connect();
 
@@ -150,6 +147,7 @@ bool HistoryManager::updateUserHistory(
         const Offer::Vector &items,
         unsigned RetargetingCount)
 {
+    //обновление deprecated
     setDeprecatedOffers(items);
 
     RetargetingUpdate(items, RetargetingCount);

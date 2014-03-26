@@ -42,6 +42,24 @@ bool Config::LoadConfig(const std::string fName)
     return Load();
 }
 
+void Config::redisHostAndPort(TiXmlElement *p, std::string &host, std::string &port)
+{
+    TiXmlElement *t1, *t2;
+
+    if( (t1 = p->FirstChildElement("redis")) )
+    {
+        if( (t2 = t1->FirstChildElement("host")) && (t2->GetText()) )
+        {
+            host = t2->GetText();
+        }
+
+        if( (t2 = t1->FirstChildElement("port")) && (t2->GetText()) )
+        {
+            port = t2->GetText();
+        }
+    }
+}
+
 bool Config::Load()
 {
     TiXmlElement *mel, *mels;
@@ -79,70 +97,6 @@ bool Config::Load()
     }
 
     instanceId = atoi(mRoot->Attribute("id"));
-
-    //main config
-    if( (mElem = mRoot->FirstChildElement("server_ip")) && (mElem->GetText()) )
-    {
-        server_ip_ = mElem->GetText();
-    }
-
-    if( (mElem = mRoot->FirstChildElement("redirect_script")) && (mElem->GetText()) )
-    {
-        redirect_script_ = mElem->GetText();
-    }
-
-    if( (mElem = mRoot->FirstChildElement("geocity_path")) && (mElem->GetText()) )
-    {
-        geocity_path_ = mElem->GetText();
-    }
-
-    if( (mElem = mRoot->FirstChildElement("shortterm_expire")) && (mElem->GetText()) )
-    {
-        shortterm_expire_ = mElem->GetText();
-    }
-
-    if( (mElem = mRoot->FirstChildElement("views_expire")) && (mElem->GetText()) )
-    {
-        views_expire_ = mElem->GetText();
-    }
-
-    if( (mElem = mRoot->FirstChildElement("context_expire")) && (mElem->GetText()) )
-    {
-        context_expire_ = mElem->GetText();
-    }
-
-    if( (mElem = mRoot->FirstChildElement("folder_offer")) && (mElem->GetText()) )
-    {
-        folder_offer_ = mElem->GetText();
-    }
-
-    if( (mElem = mRoot->FirstChildElement("folder_informer")) && (mElem->GetText()) )
-    {
-        folder_informer_ = mElem->GetText();
-    }
-
-    if( (mElem = mRoot->FirstChildElement("retargeting_by_persents")) && (mElem->GetText()) )
-    {
-        retargeting_by_persents_ = strtol(mElem->GetText(),NULL,10);
-    }
-
-    if( (mElem = mRoot->FirstChildElement("retargeting_by_time")) && (mElem->GetText()) )
-    {
-        retargeting_by_time_ = getTime(mElem->GetText());
-    }
-    else
-    {
-        retargeting_by_time_ = 24*3600;
-    }
-
-    if( (mElem = mRoot->FirstChildElement("retargeting_unique_by_campaign")) && (mElem->GetText()) )
-    {
-        retargeting_unique_by_campaign_ = strncmp(mElem->GetText(),"false", 5) > 0 ? false : true;
-    }
-    else
-    {
-        retargeting_unique_by_campaign_ = false;
-    }
 
     if( (mels = mRoot->FirstChildElement("mongo")) )
     {
@@ -190,108 +144,72 @@ bool Config::Load()
 
             if( (mElem = mel->FirstChildElement("passwd")) && (mElem->GetText()) )
                 mongo_log_passwd_ = mElem->GetText();
+
+            if( (mElem = mel->FirstChildElement("collection")) && (mElem->GetText()) )
+                mongo_log_collection_ = mElem->GetText();
         }
 
     }
 
-    if( (mels = mRoot->FirstChildElement("redis")) )
-    {
-        if( (mel = mels->FirstChildElement("short_term_history")) )
-        {
-            if( (mElem = mel->FirstChildElement("host")) && (mElem->GetText()) )
-                redis_short_term_history_host_ = mElem->GetText();
 
-            if( (mElem = mel->FirstChildElement("port")) && (mElem->GetText()) )
-                redis_short_term_history_port_ = mElem->GetText();
-        }
-        if( (mel = mels->FirstChildElement("long_term_history")) )
-        {
-            if( (mElem = mel->FirstChildElement("host")) && (mElem->GetText()) )
-                redis_long_term_history_host_ = mElem->GetText();
-
-            if( (mElem = mel->FirstChildElement("port")) && (mElem->GetText()) )
-                redis_long_term_history_port_ = mElem->GetText();
-        }
-        if( (mel = mels->FirstChildElement("user_view_history")) )
-        {
-            if( (mElem = mel->FirstChildElement("host")) && (mElem->GetText()) )
-                redis_user_view_history_host_ = mElem->GetText();
-
-            if( (mElem = mel->FirstChildElement("port")) && (mElem->GetText()) )
-                redis_user_view_history_port_ = mElem->GetText();
-        }
-        if( (mel = mels->FirstChildElement("page_keywords")) )
-        {
-            if( (mElem = mel->FirstChildElement("host")) && (mElem->GetText()) )
-                redis_page_keywords_host_ = mElem->GetText();
-
-            if( (mElem = mel->FirstChildElement("port")) && (mElem->GetText()) )
-                redis_page_keywords_port_ = mElem->GetText();
-        }
-        if( (mel = mels->FirstChildElement("category")) )
-        {
-            if( (mElem = mel->FirstChildElement("host")) && (mElem->GetText()) )
-                redis_category_host_ = mElem->GetText();
-
-            if( (mElem = mel->FirstChildElement("port")) && (mElem->GetText()) )
-                redis_category_port_ = mElem->GetText();
-        }
-        if( (mel = mels->FirstChildElement("retargeting")) )
-        {
-            if( (mElem = mel->FirstChildElement("host")) && (mElem->GetText()) )
-                redis_retargeting_host_ = mElem->GetText();
-
-            if( (mElem = mel->FirstChildElement("port")) && (mElem->GetText()) )
-                redis_retargeting_port_ = mElem->GetText();
-        }
-
-    }
-
-    if( (mElem = mRoot->FirstChildElement("range")) )
-    {
-        if( (mel = mElem->FirstChildElement("short_term")) && (mel->GetText()) )
-            range_short_term_ = ::atof(mel->GetText());
-        if( (mel = mElem->FirstChildElement("long_term")) && (mel->GetText()) )
-            range_long_term_ = ::atof(mel->GetText());
-        if( (mel = mElem->FirstChildElement("context")) && (mel->GetText()) )
-            range_context_ = ::atof(mel->GetText());
-        if( (mel = mElem->FirstChildElement("search")) && (mel->GetText()) )
-            range_search_ = ::atof(mel->GetText());
-    }
-
-
+    //main config
     if( (mElem = mRoot->FirstChildElement("server")) )
     {
+        if( (mel = mElem->FirstChildElement("server_ip")) && (mel->GetText()) )
+        {
+            server_ip_ = mel->GetText();
+        }
+
+        if( (mel = mElem->FirstChildElement("redirect_script")) && (mel->GetText()) )
+        {
+            redirect_script_ = mel->GetText();
+        }
+
+        if( (mel = mElem->FirstChildElement("geocity_path")) && (mel->GetText()) )
+        {
+            geocity_path_ = mel->GetText();
+        }
+
         if( (mel = mElem->FirstChildElement("socket_path")) && (mel->GetText()) )
+        {
             server_socket_path_ = mel->GetText();
+        }
+
         if( (mel = mElem->FirstChildElement("children")) && (mel->GetText()) )
         {
             server_children_ = atoi(mel->GetText());
         }
+
         if( (mel = mElem->FirstChildElement("dbpath")) && (mel->GetText()) )
         {
             dbpath_ = mel->GetText();
         }
+
         if( (mel = mElem->FirstChildElement("db_dump_path")) && (mel->GetText()) )
         {
             db_dump_path_ = mel->GetText();
         }
+
         if( (mel = mElem->FirstChildElement("db_geo_csv")) && (mel->GetText()) )
         {
             db_geo_csv_ = mel->GetText();
         }
+
         if( (mel = mElem->FirstChildElement("lock_file")) && (mel->GetText()) )
         {
             lock_file_ = mel->GetText();
         }
+
         if( (mel = mElem->FirstChildElement("pid_file")) && (mel->GetText()) )
         {
             pid_file_ = mel->GetText();
         }
+
         if( (mel = mElem->FirstChildElement("mq_path")) && (mel->GetText()) )
         {
             mq_path_ = mel->GetText();
         }
+
         if( (mel = mElem->FirstChildElement("user")) && (mel->GetText()) )
         {
             user_ = mel->GetText();
@@ -301,6 +219,7 @@ bool Config::Load()
             Log::warn("element dbpath is not inited: :memory:");
             dbpath_ = ":memory:";
         }
+
         if( (mel = mElem->FirstChildElement("time_update")) && (mel->GetText()) )
         {
             time_update_ = getTime(mel->GetText());
@@ -355,6 +274,7 @@ bool Config::Load()
         {
             Log::warn("element cookie_domain is not inited");
         }
+
         if( (mel = mElem->FirstChildElement("cookie_path")) && (mel->GetText()) )
             cookie_path_ = mel->GetText();
         else
@@ -362,6 +282,86 @@ bool Config::Load()
             Log::warn("element cookie_path is not inited");
         }
     }
+
+    //retargeting config
+    if( (mElem = mRoot->FirstChildElement("retargeting")) )
+    {
+        if( (mel = mElem->FirstChildElement("persents")) && (mel->GetText()) )
+        {
+            retargeting_by_persents_ = strtol(mel->GetText(),NULL,10);
+        }
+
+        if( (mel = mElem->FirstChildElement("ttl")) && (mel->GetText()) )
+        {
+            retargeting_by_time_ = getTime(mel->GetText());
+        }
+        else
+        {
+            retargeting_by_time_ = 24*3600;
+        }
+
+        if( (mel = mElem->FirstChildElement("unique_by_campaign")) && (mel->GetText()) )
+        {
+            retargeting_unique_by_campaign_ = strncmp(mel->GetText(),"false", 5) > 0 ? false : true;
+        }
+        else
+        {
+            retargeting_unique_by_campaign_ = false;
+        }
+
+        redisHostAndPort(mElem, redis_retargeting_host_, redis_retargeting_port_);
+    }
+
+    //history
+    TiXmlElement *history, *section;
+    if( (history = mRoot->FirstChildElement("history")) )
+    {
+        //views
+        if( (section = history->FirstChildElement("views")) )
+        {
+            if( (mel = section->FirstChildElement("ttl")) && (mel->GetText()) )
+            {
+                views_expire_ = getTime(mel->GetText());
+            }
+            else
+            {
+                views_expire_ = 24*3600;
+            }
+
+            redisHostAndPort(section, redis_user_view_history_host_, redis_user_view_history_port_);
+        }
+        //short term
+        if( (section = history->FirstChildElement("short_term")) )
+        {
+            /*
+            if( (mel = section->FirstChildElement("ttl")) && (mel->GetText()) )
+            {
+                shortterm_expire_ = getTime(mel->GetText());
+            }
+            else
+            {
+                shortterm_expire_ = 24*3600;
+            }
+*/
+            if( (mel = section->FirstChildElement("value")) && (mel->GetText()) )
+            {
+                range_short_term_ = ::atof(mel->GetText());
+            }
+
+            redisHostAndPort(section, redis_short_term_history_host_, redis_short_term_history_port_);
+        }
+        //long term
+        if( (section = history->FirstChildElement("long_term")) )
+        {
+            if( (mel = section->FirstChildElement("value")) && (mel->GetText()) )
+            {
+                range_long_term_ = ::atof(mel->GetText());
+            }
+
+            redisHostAndPort(section, redis_long_term_history_host_, redis_long_term_history_port_);
+        }
+    }
+
 
     if( (mElem = mRoot->FirstChildElement("sphinx")) )
     {

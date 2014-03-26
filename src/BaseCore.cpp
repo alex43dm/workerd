@@ -344,7 +344,7 @@ std::string BaseCore::Status()
     out << "<tr><td>База данных Redis (краткосрочная история):</td> <td>" <<
         Config::Instance()->redis_short_term_history_host_ << ":";
     out << Config::Instance()->redis_short_term_history_port_;
-    out << "(TTL =" << Config::Instance()->shortterm_expire_ << ")<br/>";
+//    out << "(TTL =" << Config::Instance()->shortterm_expire_ << ")<br/>";
     out << "status = " << (Config::Instance()->range_short_term_ > 0 ? "true" : "false");
     out << "</td></tr>";
 
@@ -365,17 +365,17 @@ std::string BaseCore::Status()
     out << "<tr><td>База данных Redis (констекст страниц):</td> <td>" <<
         Config::Instance()->redis_long_term_history_host_ << ":";
     out << Config::Instance()->redis_long_term_history_port_;
-    out << "(TTL =" << Config::Instance()->context_expire_ << ")<br/>";
+//    out << "(TTL =" << Config::Instance()->context_expire_ << ")<br/>";
     out << "status = " << (Config::Instance()->range_context_ > 0 ? "true" : "false");
     out << "</td></tr>";
 
-    out << "<tr><td>База данных Redis (категорий):</td> <td>" <<
+/*    out << "<tr><td>База данных Redis (категорий):</td> <td>" <<
         Config::Instance()->redis_category_host_ << ":";
     out << Config::Instance()->redis_category_port_;
     out << "(TTL =0)<br/>";
     out << "status = false";
     out << "</td></tr>";
-
+*/
     out << "<tr><td>База данных Redis (ретаргетинг):</td> <td>" <<
         Config::Instance()->redis_retargeting_host_ << ":";
     out << Config::Instance()->redis_retargeting_port_;
