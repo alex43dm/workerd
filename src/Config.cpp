@@ -241,11 +241,21 @@ bool Config::Load()
             if( (mels = mel->FirstChildElement("schema")) && (mels->GetText()) )
             {
                 db_dump_path_ = cfgFilePath + mels->GetText();
+
+                if(!checkPath(db_dump_path_,false, mes))
+                {
+                    exit(mes);
+                }
             }
 
             if( (mels = mel->FirstChildElement("geo_csv")) && (mels->GetText()) )
             {
                 db_geo_csv_ = cfgFilePath + mels->GetText();
+
+                if(!checkPath(db_geo_csv_,false, mes))
+                {
+                    exit(mes);
+                }
             }
         }
 
