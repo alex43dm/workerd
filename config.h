@@ -5,7 +5,7 @@
 /* #undef AMQPCPP_OLD */
 
 /* dummy worker */
-/* #undef DUMMY */
+#define DUMMY 1
 
 /* Defined if the requested minimum BOOST version is satisfied */
 #define HAVE_BOOST 1
@@ -59,7 +59,7 @@
 #define HAVE_LIBRABBITMQ 1
 
 /* Define to 1 if you have the `sphinxclient' library (-lsphinxclient). */
-#define HAVE_LIBSPHINXCLIENT 1
+/* #undef HAVE_LIBSPHINXCLIENT */
 
 /* Define to 1 if you have the `sqlite3' library (-lsqlite3). */
 #define HAVE_LIBSQLITE3 1
@@ -114,7 +114,7 @@
 #define PACKAGE_NAME "workerd"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "workerd 1.1-44"
+#define PACKAGE_STRING "workerd 1.1-46"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "workerd"
@@ -123,7 +123,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.1-44"
+#define PACKAGE_VERSION "1.1-46"
 
 /* sqlite3_threadsafe was found */
 #define SQLITE_THREADSAFE 1
@@ -132,4 +132,4 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "1.1-44"
+#define VERSION "1.1-46"

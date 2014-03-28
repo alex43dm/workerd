@@ -24,6 +24,11 @@ void Log::err(const char* fmt, ... )
     FMTPARCE syslog(LOG_ERR, "%s", buffer);
 };
 
+void Log::err(const std::string &mes)
+{
+    syslog(LOG_ERR, "%s", mes.c_str());
+};
+
 void Log::warn(const char* fmt, ... )
 {
     FMTPARCE syslog(LOG_WARNING, "%s", buffer);

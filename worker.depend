@@ -6,7 +6,7 @@
 1386588626 /home/alex/Projects/worker/include/base64.h
 	<string>
 
-1395826542 source:/home/alex/Projects/worker/src/BaseCore.cpp
+1395837727 source:/home/alex/Projects/worker/src/BaseCore.cpp
 	"DB.h"
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
@@ -33,13 +33,14 @@
 	<string>
 	<utility>
 
-1395387884 /home/alex/Projects/worker/config.h
+1395908275 /home/alex/Projects/worker/config.h
 
-1391029722 /home/alex/Projects/worker/include/Log.h
+1395910111 /home/alex/Projects/worker/include/Log.h
 	<stdio.h>
 	<syslog.h>
 	<stdarg.h>
 	<pthread.h>
+	<string>
 
 1395673126 /home/alex/Projects/worker/include/BaseCore.h
 	"../config.h"
@@ -113,7 +114,7 @@
 1392281869 /home/alex/Projects/worker/include/EBranch.h
 	<string>
 
-1395829220 /home/alex/Projects/worker/include/Config.h
+1395990100 /home/alex/Projects/worker/include/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
@@ -236,11 +237,13 @@
 1387450434 /home/alex/Projects/worker/include/Server.h
 	<string>
 
-1395826945 source:/home/alex/Projects/worker/src/Config.cpp
+1395990791 source:/home/alex/Projects/worker/src/Config.cpp
 	<iostream>
 	<fstream>
+	<boost/filesystem.hpp>
 	<string.h>
 	<stdlib.h>
+	<pwd.h>
 	"Log.h"
 	"Config.h"
 	<assert.h>
@@ -250,7 +253,7 @@
 	<string.h>
 	<boost/date_time/posix_time/posix_time.hpp>
 
-1395669709 source:/home/alex/Projects/worker/src/DataBase.cpp
+1395832463 source:/home/alex/Projects/worker/src/DataBase.cpp
 	<iostream>
 	<algorithm>
 	<fstream>
@@ -342,10 +345,10 @@
 	"KompexSQLiteDatabase.h"
 	"KompexSQLiteException.h"
 
-1391029678 source:/home/alex/Projects/worker/src/Log.cpp
+1395909796 source:/home/alex/Projects/worker/src/Log.cpp
 	"Log.h"
 
-1395307872 source:/home/alex/Projects/worker/src/main.cpp
+1395989980 source:/home/alex/Projects/worker/src/main.cpp
 	"CgiService.h"
 	"Log.h"
 	"Server.h"
@@ -424,7 +427,7 @@
 	"Config.h"
 	"Log.h"
 
-1395816351 source:/home/alex/Projects/worker/src/Core.cpp
+1395830364 source:/home/alex/Projects/worker/src/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>

@@ -191,9 +191,11 @@ int main(int argc, char *argv[])
     std::string config = "config.xml";
     std::string sock_path;
     int ret;
-    bool PrintPidfile = false;
 
-    while ( (ret = getopt(argc,argv,"pc:s:")) != -1)
+    bool fPrintPidFile = false;
+    bool fTestConfig = false;
+
+    while ( (ret = getopt(argc,argv,"tpc:s:")) != -1)
     {
         switch (ret)
         {
@@ -204,7 +206,10 @@ int main(int argc, char *argv[])
             sock_path = optarg;
             break;
         case 'p':
-            PrintPidfile = true;
+            fPrintPidFile = true;
+            break;
+        case 't':
+            fTestConfig = true;
             break;
         default:
             printf("Error found! %s -c config_file -s socket_path\n",argv[0]);
@@ -216,7 +221,13 @@ int main(int argc, char *argv[])
     cfg = Config::Instance();
     cfg->LoadConfig(config);
 
-    if(PrintPidfile)
+    if(fTestConfig)
+    {
+        std::cerr<<"Config: Ok"<<std::endl;
+        ::exit(0);
+    }
+
+    if(fPrintPidFile)
     {
         std::cerr<<cfg->pid_file_<<std::endl;
         ::exit(0);

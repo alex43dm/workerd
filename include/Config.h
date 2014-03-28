@@ -28,37 +28,30 @@ public:
     bool mongo_log_slave_ok_;
     std::string mongo_log_login_;
     std::string mongo_log_passwd_;
-    std::string server_ip_;
-    std::string redirect_script_;
-    std::string geocity_path_;
+    std::string mongo_log_collection_;
+
     std::string redis_short_term_history_host_;
     std::string redis_short_term_history_port_;
     std::string redis_long_term_history_host_;
     std::string redis_long_term_history_port_;
     std::string redis_user_view_history_host_;
     std::string redis_user_view_history_port_;
-    std::string redis_page_keywords_host_;
-    std::string redis_page_keywords_port_;
-    std::string redis_category_host_;
-    std::string redis_category_port_;
-    std::string redis_retargeting_host_;
-    std::string redis_retargeting_port_;
-//    float range_query_;
+
+    int views_expire_;
+    //int shortterm_expire_;
+
     float range_short_term_;
     float range_long_term_;
     float range_context_;
     float range_search_;
-//    float range_on_places_;
-    std::string shortterm_expire_;
-    std::string views_expire_;
-    std::string context_expire_;
-    std::string folder_offer_;
-    std::string folder_informer_;
+
     //new params
+    std::string server_ip_;
+    std::string redirect_script_;
+    std::string geocity_path_;
     std::string server_socket_path_;
     int server_children_;
     std::string dbpath_;
-    std::string geoGity_;
     std::string cookie_name_;
     std::string cookie_domain_;
     std::string cookie_path_;
@@ -77,9 +70,13 @@ public:
     std::string lock_file_;
     std::string pid_file_;
     std::string user_;
+
     int retargeting_by_persents_;
     int retargeting_by_time_;
     bool retargeting_unique_by_campaign_;
+    std::string redis_retargeting_host_;
+    std::string redis_retargeting_port_;
+
     std::string template_teaser_;
     std::string template_banner_;
     std::string template_error_;
@@ -113,13 +110,19 @@ private:
     static Config* mInstance;
     Config();
     bool mIsInited;
+    std::string mes;
     std::string mFileName;
+    std::string cfgFilePath;
+
     TiXmlDocument *mDoc;
     TiXmlElement* mRoot;
     TiXmlElement* mElem;
 
     int getTime(const char *p);
     std::string getFileContents(const std::string &fileName);
+    void redisHostAndPort(TiXmlElement *p, std::string &host, std::string &port);
+    void exit(const std::string &mes);
+    bool checkPath(const std::string &path_, bool checkWrite, std::string &mes);
 };
 
 extern Config *cfg;

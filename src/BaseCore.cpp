@@ -333,62 +333,68 @@ std::string BaseCore::Status()
     out << "<tr><td>Количество ниток: </td> <td>" << Config::Instance()->server_children_<< "</td></tr>";
 
         out << "<tr><td>Основная база данных:</td> <td>" <<
-            cfg->mongo_main_db_<< "/<br/>";
-        out << "slave_ok = " << (cfg->mongo_main_slave_ok_? "true" : "false");
+            cfg->mongo_main_db_<< "/";
+        out << "<br/>slave_ok = " << (cfg->mongo_main_slave_ok_? "true" : "false");
+        out << "<br/>replica set=";
         if (cfg->mongo_main_set_.empty())
-            out << " (no replica set)";
+            out << "no set";
         else
-            out << " (replSet=" << cfg->mongo_main_set_ << ")";
+            out << cfg->mongo_main_set_;
         out << "</td></tr>";
 
     out << "<tr><td>База данных Redis (краткосрочная история):</td> <td>" <<
         Config::Instance()->redis_short_term_history_host_ << ":";
     out << Config::Instance()->redis_short_term_history_port_;
-//    out << "(TTL =" << Config::Instance()->shortterm_expire_ << ")<br/>";
-    out << "status = " << (Config::Instance()->range_short_term_ > 0 ? "true" : "false");
+//    out << "<br/>(TTL =" << Config::Instance()->shortterm_expire_ << ")";
+    out << "<br/>used = " << (Config::Instance()->range_short_term_ > 0 ? "true" : "false");
     out << "</td></tr>";
 
     out << "<tr><td>База данных Redis (долгосрочная история):</td> <td>" <<
         Config::Instance()->redis_long_term_history_host_ << ":";
     out << Config::Instance()->redis_long_term_history_port_;
-    out << "(TTL =0)<br/>";
-    out << "status = " << (Config::Instance()->range_long_term_ > 0 ? "true" : "false");
+    out << "</br>used = " << (Config::Instance()->range_long_term_ > 0 ? "true" : "false");
     out << "</td></tr>";
 
     out << "<tr><td>База данных Redis (история показов):</td> <td>" <<
         Config::Instance()->redis_user_view_history_host_ << ":";
     out << Config::Instance()->redis_user_view_history_port_;
-    out << "(TTL =" << Config::Instance()->views_expire_ << ")<br/>";
-    out << "status = true";
+    out << "</br>ttl =" << Config::Instance()->views_expire_;
+    out << "</br>used = true";
     out << "</td></tr>";
 
     out << "<tr><td>База данных Redis (констекст страниц):</td> <td>" <<
         Config::Instance()->redis_long_term_history_host_ << ":";
     out << Config::Instance()->redis_long_term_history_port_;
 //    out << "(TTL =" << Config::Instance()->context_expire_ << ")<br/>";
-    out << "status = " << (Config::Instance()->range_context_ > 0 ? "true" : "false");
+    out << "</br>used = " << (Config::Instance()->range_context_ > 0 ? "true" : "false");
     out << "</td></tr>";
 
 /*    out << "<tr><td>База данных Redis (категорий):</td> <td>" <<
         Config::Instance()->redis_category_host_ << ":";
     out << Config::Instance()->redis_category_port_;
     out << "(TTL =0)<br/>";
-    out << "status = false";
+    out << "used = false";
     out << "</td></tr>";
 */
     out << "<tr><td>База данных Redis (ретаргетинг):</td> <td>" <<
         Config::Instance()->redis_retargeting_host_ << ":";
     out << Config::Instance()->redis_retargeting_port_;
-    out << "(TTL =" << Config::Instance()->retargeting_by_time_ << ")<br/>";
-    out << "status = true";
+    out << "</br>ttl =" << Config::Instance()->retargeting_by_time_;
+    out << "</br>used = ";
+    #ifdef DUMMY
+    out<<"false";
+    #else
+    out<<"true";
+    #endif // DUMMY
     out << "</td></tr>\n";
 
-        out << "<tr><td>База данных журналирования: </td> <td>" << cfg->mongo_log_db_ << "<br/>";
-        out << "slave_ok = " << (cfg->mongo_log_slave_ok_? "true" : "false");
+        out << "<tr><td>База данных журналирования: </td> <td>" << cfg->mongo_log_db_;
+        out << "</br>slave_ok = " << (cfg->mongo_log_slave_ok_? "true" : "false");
+        out << "</br>replica set = ";
         if (cfg->mongo_log_set_.empty())
-            out << " (no replica set)";
+            out << " no ";
         else
-            out << " (replSet=" << cfg->mongo_log_set_ << ")";
+            out << cfg->mongo_log_set_;
         out << "</td></tr>";
 
 

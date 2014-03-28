@@ -79,10 +79,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = x86_64-unknown-linux-gnu
 host_triplet = x86_64-unknown-linux-gnu
-#bin_PROGRAMS = workerd$(EXEEXT)
-##bin_PROGRAMS = workerd-dummy$(EXEEXT)
-bin_PROGRAMS = workerd-dev$(EXEEXT)
-#bin_PROGRAMS = workerd-dummy-dev$(EXEEXT)
+##bin_PROGRAMS = workerd$(EXEEXT)
+#bin_PROGRAMS = workerd-dummy$(EXEEXT)
+#bin_PROGRAMS = workerd-dev$(EXEEXT)
+bin_PROGRAMS = workerd-dummy-dev$(EXEEXT)
 subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -137,15 +137,15 @@ am__objects_1 = workerd-base64.$(OBJEXT) workerd-Core.$(OBJEXT) \
 	workerd-HistoryManagerRetargeting.$(OBJEXT) \
 	workerd-KompexSQLiteStatement.$(OBJEXT) \
 	workerd-ParentDB.$(OBJEXT)
-#am_workerd_OBJECTS = $(am__objects_1)
+##am_workerd_OBJECTS = $(am__objects_1)
 workerd_OBJECTS = $(am_workerd_OBJECTS)
 am__DEPENDENCIES_1 =
 am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
-#workerd_DEPENDENCIES =  \
-#	$(am__DEPENDENCIES_2) \
-#	libs/libredis/lib/libredis.a
+##workerd_DEPENDENCIES =  \
+##	$(am__DEPENDENCIES_2) \
+##	libs/libredis/lib/libredis.a
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
@@ -184,11 +184,11 @@ am__objects_2 = workerd_dev-base64.$(OBJEXT) \
 	workerd_dev-HistoryManagerRetargeting.$(OBJEXT) \
 	workerd_dev-KompexSQLiteStatement.$(OBJEXT) \
 	workerd_dev-ParentDB.$(OBJEXT)
-am_workerd_dev_OBJECTS = $(am__objects_2)
+#am_workerd_dev_OBJECTS = $(am__objects_2)
 workerd_dev_OBJECTS = $(am_workerd_dev_OBJECTS)
-workerd_dev_DEPENDENCIES =  \
-	$(am__DEPENDENCIES_2) \
-	libs/libredis/lib/libredis.a
+#workerd_dev_DEPENDENCIES =  \
+#	$(am__DEPENDENCIES_2) \
+#	libs/libredis/lib/libredis.a
 am__workerd_dummy_SOURCES_DIST = src/base64.cpp src/Core.cpp \
 	src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp \
 	src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp \
@@ -216,10 +216,10 @@ am__objects_3 = workerd_dummy-base64.$(OBJEXT) \
 	workerd_dummy-GeoIPTools.$(OBJEXT) \
 	workerd_dummy-KompexSQLiteStatement.$(OBJEXT) \
 	workerd_dummy-ParentDB.$(OBJEXT)
-##am_workerd_dummy_OBJECTS = $(am__objects_3)
+#am_workerd_dummy_OBJECTS = $(am__objects_3)
 workerd_dummy_OBJECTS = $(am_workerd_dummy_OBJECTS)
-##workerd_dummy_DEPENDENCIES =  \
-##	$(am__DEPENDENCIES_2)
+#workerd_dummy_DEPENDENCIES =  \
+#	$(am__DEPENDENCIES_2)
 am__workerd_dummy_dev_SOURCES_DIST = src/base64.cpp src/Core.cpp \
 	src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp \
 	src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp \
@@ -252,11 +252,11 @@ am__objects_4 = workerd_dummy_dev-base64.$(OBJEXT) \
 	workerd_dummy_dev-GeoIPTools.$(OBJEXT) \
 	workerd_dummy_dev-KompexSQLiteStatement.$(OBJEXT) \
 	workerd_dummy_dev-ParentDB.$(OBJEXT)
-#am_workerd_dummy_dev_OBJECTS =  \
-#	$(am__objects_4)
+am_workerd_dummy_dev_OBJECTS =  \
+	$(am__objects_4)
 workerd_dummy_dev_OBJECTS = $(am_workerd_dummy_dev_OBJECTS)
-#workerd_dummy_dev_DEPENDENCIES =  \
-#	$(am__DEPENDENCIES_2)
+workerd_dummy_dev_DEPENDENCIES =  \
+	$(am__DEPENDENCIES_2)
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -471,7 +471,7 @@ INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LD = /usr/x86_64-pc-linux-gnu/bin/ld -m elf_x86_64
 LDFLAGS =  -lmongoclient -lboost_system
 LIBOBJS = 
-LIBS = -lrabbitmq -ltinyxml -lGeoIP -lsqlite3 -lfcgi -licudata -licui18n -licuuc -lmongoclient -lamqpcpp -lsphinxclient 
+LIBS = -lrabbitmq -ltinyxml -lGeoIP -lsqlite3 -lfcgi -licudata -licui18n -licuuc -lmongoclient -lamqpcpp 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
@@ -488,17 +488,17 @@ OTOOL64 =
 PACKAGE = workerd
 PACKAGE_BUGREPORT = wvdial@gmail.com
 PACKAGE_NAME = workerd
-PACKAGE_STRING = workerd 1.1-44
+PACKAGE_STRING = workerd 1.1-46
 PACKAGE_TARNAME = workerd
 PACKAGE_URL = 
-PACKAGE_VERSION = 1.1-44
+PACKAGE_VERSION = 1.1-46
 PATH_SEPARATOR = :
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = strip
-VERSION = 1.1-44
+VERSION = 1.1-46
 abs_builddir = /home/alex/Projects/worker
 abs_srcdir = /home/alex/Projects/worker
 abs_top_builddir = /home/alex/Projects/worker
@@ -557,23 +557,27 @@ SRC_ALL = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShort
 SRC_DUMMY = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/Offer.cpp src/CgiService.cpp src/EBranch.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
 CMN_CPPFLAGS = -std=c++11 -Iinclude
 CMN_LDADD = $(BOOST_DATE_TIME_LIBS) $(BOOST_FILESYSTEM_LIBS) $(BOOST_THREAD_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_REGEX_LIBS)
-#workerd_dummy_dev_SOURCES = $(SRC_DUMMY)
-#workerd_dummy_dev_CPPFLAGS = $(CMN_CPPFLAGS)
-#workerd_dummy_dev_LDADD = $(CMN_LDADD)
-##workerd_dummy_SOURCES = $(SRC_DUMMY)
-##workerd_dummy_CPPFLAGS = $(CMN_CPPFLAGS)
-##workerd_dummy_LDADD = $(CMN_LDADD)
-workerd_dev_SOURCES = $(SRC_ALL)
-workerd_dev_CPPFLAGS = $(CMN_CPPFLAGS) -Ilibs/libredis
-workerd_dev_LDADD = $(CMN_LDADD) libs/libredis/lib/libredis.a
-#workerd_SOURCES = $(SRC_ALL)
-#workerd_CPPFLAGS = $(CMN_CPPFLAGS) -Ilibs/libredis
-#workerd_LDADD = $(CMN_LDADD) libs/libredis/lib/libredis.a
-SUBDIRS = libs/libredis
+workerd_dummy_dev_SOURCES = $(SRC_DUMMY)
+workerd_dummy_dev_CPPFLAGS = $(CMN_CPPFLAGS)
+workerd_dummy_dev_LDADD = $(CMN_LDADD)
+#workerd_dummy_SOURCES = $(SRC_DUMMY)
+#workerd_dummy_CPPFLAGS = $(CMN_CPPFLAGS)
+#workerd_dummy_LDADD = $(CMN_LDADD)
+#DEBDEP = bash (>= 2.05a-11), awk, procps (>= 1:2.0.7-8), sed (>= 3.02-8), grep (>= 2.4.2-3), coreutils (>= 5.0-5), libtinyxml2.6.2 (>=2.6.2), libsqlite3-0 (>=3.7.13), libfcgi0ldbl (>=2.4.0), sphinxsearch (>=2.1.5), geoip-database (>=20130213-1), rabbitmq-server (>=3.2.3), libboost-system1.49.0 (>=1.49.0), libboost-regex1.49.0 (>=1.49.0), libboost-thread1.49.0 (>=1.49.0), libboost-filesystem1.49.0 (>=1.49.0), libboost-date-time1.49.0 (>=1.49.0)
+DEBDEP = bash (>= 2.05a-11), awk, procps (>= 1:2.0.7-8), sed (>= 3.02-8), grep (>= 2.4.2-3), coreutils (>= 5.0-5), libtinyxml2.6.2 (>=2.6.2), libsqlite3-0 (>=3.7.13), libfcgi0ldbl (>=2.4.0), geoip-database (>=20130213-1), rabbitmq-server (>=3.2.3), libboost-system1.49.0 (>=1.49.0), libboost-regex1.49.0 (>=1.49.0), libboost-thread1.49.0 (>=1.49.0), libboost-filesystem1.49.0 (>=1.49.0), libboost-date-time1.49.0 (>=1.49.0)
+#SUBDIRS = libs/libredis
+#workerd_dev_SOURCES = $(SRC_ALL)
+#workerd_dev_CPPFLAGS = $(CMN_CPPFLAGS) -Ilibs/libredis
+#workerd_dev_LDADD = $(CMN_LDADD) libs/libredis/lib/libredis.a
+##workerd_SOURCES = $(SRC_ALL)
+##workerd_CPPFLAGS = $(CMN_CPPFLAGS) -Ilibs/libredis
+##workerd_LDADD = $(CMN_LDADD) libs/libredis/lib/libredis.a
 #AM_CFLAGS = -Ofast
 AM_CFLAGS = -g -DDEBUG -Wall
 #AM_CXXFLAGS = -Ofast
 AM_CXXFLAGS = -g -DDEBUG -Wall
+#MAKEINIT = 1
+MAKEINIT = 0
 debian_BUILD = $(bin_PROGRAMS)-$(VERSION)
 dist_doc_DATA = README
 sysconf_DATA = \
@@ -616,23 +620,25 @@ template/error.html \
 template/teaser.html
 
 install_f = \
-echo "install to $1"; \
-$(MKDIR_P) $(1)/etc/worker/template; \
-$(MKDIR_P) $(1)/etc/worker/db_dump; \
-$(MKDIR_P) $(1)/etc/worker/db_dump/schema; \
-$(MKDIR_P) $(1)/etc/worker/db_dump/post; \
-$(MKDIR_P) $(1)/etc/worker/db_dump/view; \
-$(MKDIR_P) $(1)/etc/worker/db_dump/tables; \
-$(MKDIR_P) $(1)/etc/worker/db_dump/requests; \
+echo -n "install to $1"; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/template; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/schema; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/post; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/view; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/tables; \
+$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/requests; \
 $(MKDIR_P) $(1)/etc/init.d; \
 $(MKDIR_P) $(1)/usr/sbin; \
-$(SED) 's/\/home\/alex\/Projects\/worker/\/$(1)\/etc\/worker/' < ./config.xml > $(1)/etc/worker/config-$(bin_PROGRAMS).xml; \
+$(SED) 's|/home/alex/Projects/worker|/etc/$(bin_PROGRAMS)|' < ./config.xml > $(1)/etc/$(bin_PROGRAMS)/config-$(bin_PROGRAMS).xml; \
 $(INSTALL) $(bin_PROGRAMS) $(1)/usr/sbin; \
-$(SED) 's/\/etc\/workerd\/config.xml/\/$(1)/etc/worker/config-$(bin_PROGRAMS).xml/;s/\/usr\/sbin\/workerd/\/$(1)/usr/sbin/$(bin_PROGRAMS)/' < ./install/workerd > $(1)/etc/init.d/$(bin_PROGRAMS); \
-@list='$(sysconf_DATA)'; \
-for p in $$list; do \
-$(INSTALL_DATA) $$p "$(1)/etc/worker/$$p" || exit $$?; \
-done
+if [ $(MAKEINIT) -eq 1 ]; then \
+$(SED) 's|/etc/workerd/config.xml|/etc/$(bin_PROGRAMS)/config-$(bin_PROGRAMS).xml|;s|/usr/sbin/workerd|/usr/sbin/$(bin_PROGRAMS)|' < ./install/workerd > $(1)/etc/init.d/$(bin_PROGRAMS); \
+fi; \
+for p in $(sysconf_DATA); do \
+$(INSTALL_DATA) $$p "$(1)/etc/$(bin_PROGRAMS)/$$p" || exit $$?; \
+done; \
+echo "..ok"
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -2940,7 +2946,14 @@ install: install-binPROGRAMS
 deb: $(bin_PROGRAMS)
 	rm -rf $(debian_BUILD)
 	$(MKDIR_P) $(debian_BUILD)/DEBIAN
-	$(SED) 's/xversion/$(VERSION)/'< install/control >  $(debian_BUILD)/DEBIAN/control
+	echo "Package: $(bin_PROGRAMS)">  $(debian_BUILD)/DEBIAN/control
+	echo "Version: $(VERSION)" >> $(debian_BUILD)/DEBIAN/control
+	echo "Section: base" >> $(debian_BUILD)/DEBIAN/control
+	echo "Priority: optional" >> $(debian_BUILD)/DEBIAN/control
+	echo "Architecture: all" >> $(debian_BUILD)/DEBIAN/control
+	echo "Depends: $(DEBDEP)" >> $(debian_BUILD)/DEBIAN/control
+	echo "Maintainer: Alex D <wvdial@gmail.com>" >> $(debian_BUILD)/DEBIAN/control
+	echo "Description:  multithread demon, to return html(inframe) with offers. Runs on background and listen unix socket(config.xml) ready to http requests from nginx." >> $(debian_BUILD)/DEBIAN/control
 	$(call install_f,$(debian_BUILD))
 	for p in `find $(debian_BUILD) -type f -print | grep -v DEBIAN`; do \
 	md5sum $$p | $(SED) 's/$(debian_BUILD)\///'>>$(debian_BUILD)/DEBIAN/md5sum; \

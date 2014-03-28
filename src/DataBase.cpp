@@ -26,9 +26,9 @@ bool is_file_exist(const std::string &fileName);
 
 DataBase::DataBase(bool create) :
     reopen(false),
-    dbFileName(Config::Instance()->dbpath_),
-    dirName(Config::Instance()->db_dump_path_),
-    geoCsv(Config::Instance()->db_geo_csv_),
+    dbFileName(cfg->dbpath_),
+    dirName(cfg->db_dump_path_),
+    geoCsv(cfg->db_geo_csv_),
     create(create),
     pStmt(nullptr)
 {

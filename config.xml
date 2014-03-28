@@ -15,11 +15,10 @@
     <!--путь к очереди сообщений-->
     <mq_path>guest:guest@localhost//</mq_path>
 
-    <!--путь к фалу базы данных-->
+    <!--путь к фалу базы данных sqlite или :memory:-->
     <sqlite>
         <!--файл базы-->
         <db>/run/alex/mem.db</db>
-        <!--db>:memory:</db-->
         <!--путь к каталогу дампа sqlite базы-->
         <schema>db_dump</schema>
         <!--путь к csv файлу содержимого таблицы GeoRerions-->
@@ -37,19 +36,22 @@
 
     <!--Название скрипта обработки редиректа-->
     <redirect_script>/redirect</redirect_script>
-    <!-- Шаблон информера с тизерами со следующими подстановками (существовавший шаблон):
-        %1%	    CSS
-	%2%	    JSON для initads (предложения, которые должны показаться на первой странице)
-	%3%	    количество товаров на с транице
-	%4%	    ссылка на скрипт получения следующей порции предложений в jso-->
-    <template_teaser>template/teaser.html</template_teaser>
-    <!-- Шаблон информера с баннером со следующими подстановками:
-	 %1%	    CSS
-	 %2%	    swfobject
-	 %3%	    JSON initads-->
-    <template_banner>template/banner.html</template_banner>
-    <template_error>template/error.html</template_error>
-    <swfobject>template/swfobject.js</swfobject>
+
+    <templates>
+        <!-- Шаблон информера с тизерами со следующими подстановками (существовавший шаблон):
+            %1%	    CSS
+        %2%	    JSON для initads (предложения, которые должны показаться на первой странице)
+        %3%	    количество товаров на с транице
+        %4%	    ссылка на скрипт получения следующей порции предложений в jso-->
+        <teaser>template/teaser.html</teaser>
+        <!-- Шаблон информера с баннером со следующими подстановками:
+         %1%	    CSS
+         %2%	    swfobject
+         %3%	    JSON initads-->
+        <banner>template/banner.html</banner>
+        <error>template/error.html</error>
+        <swfobject>template/swfobject.js</swfobject>
+    </templates>
 
     <!--время обновление временных кампаний(HH:MM:SS)-->
     <time_update>00:15:00</time_update>
@@ -76,7 +78,7 @@
 <history>
     <!--история показа-->
     <views>
-        <ttl>24:00:00</ttl>
+        <ttl>10:00:00</ttl>
         <!--Redis-сервер с БД о истории показов пользователя-->
         <redis>
             <!--IP-адрес-->

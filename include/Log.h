@@ -6,6 +6,8 @@
 #include <stdarg.h>
 #include <pthread.h>
 
+#include <string>
+
 #define BUFLEN 2048
 #define FMTPARCE  char buffer[1024];\
   va_list args;\
@@ -33,6 +35,7 @@ public:
     virtual ~Log();
     static void log(int level, const char* fmt, ... );
     static void err(const char* fmt, ... );
+    static void err(const std::string &mes);
     static void warn(const char* fmt, ... );
     static void info(const char* fmt, ... );
     static void gdb(const char* fmt, ... );

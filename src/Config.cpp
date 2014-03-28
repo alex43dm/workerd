@@ -1,8 +1,11 @@
 #include <iostream>
 #include <fstream>
 
+#include <boost/filesystem.hpp>
+
 #include <string.h>
 #include <stdlib.h>
+#include <pwd.h>
 
 #include "Log.h"
 #include "Config.h"
@@ -60,14 +63,23 @@ void Config::redisHostAndPort(TiXmlElement *p, std::string &host, std::string &p
     }
 }
 
+void Config::exit(const std::string &mes)
+{
+    std::cerr<<mes<<std::endl;
+    Log::err(mes);
+    ::exit(1);
+}
+
 bool Config::Load()
 {
     TiXmlElement *mel, *mels;
+    boost::filesystem::path p;
 
-    if(!is_file_exist(mFileName))
+    p = boost::filesystem::path(mFileName);
+
+    if(!boost::filesystem::is_regular_file(p))
     {
-        std::cerr<<"does not found config file: "<<mFileName<<std::endl;
-        ::exit(1);
+        exit("does not regular file: "+mFileName);
     }
 
     Log::info("Config::Load: load file: %s",mFileName.c_str());
@@ -77,26 +89,34 @@ bool Config::Load()
 
     if(!mDoc)
     {
-        std::cerr<<"does not found config file: "<<mFileName<<std::endl;
-        return mIsInited;
+        exit("does not found config file: "+mFileName);
     }
 
     if(!mDoc->LoadFile())
     {
-        std::cerr<<"load file: "<<mFileName<<
-        " error: "<< mDoc->ErrorDesc()<<
-        " row: "<<mDoc->ErrorRow()<<
-        " col: "<<mDoc->ErrorCol()<<std::endl;
-        ::exit(-1);
-        return mIsInited;
+        exit("load file: "+mFileName+
+             " error: "+ mDoc->ErrorDesc()+
+             " row: "+std::to_string(mDoc->ErrorRow())+
+             " col: "+std::to_string(mDoc->ErrorCol()));
     }
+
+    if(p.has_parent_path())
+    {
+        cfgFilePath = p.parent_path().string() + "/";
+    }
+    else
+    {
+        cfgFilePath = "./";
+    }
+#ifdef DEBUG
+    std::cout<<"config path: "<<cfgFilePath<<std::endl;
+#endif // DEBUG
 
     mRoot = mDoc->FirstChildElement("root");
 
     if(!mRoot)
     {
-        std::cerr<<"does not found root section in file: "<<mFileName<<std::endl;
-        return mIsInited;
+        exit("does not found root section in file: "+mFileName);
     }
 
     instanceId = atoi(mRoot->Attribute("id"));
@@ -125,6 +145,10 @@ bool Config::Load()
             if( (mElem = mel->FirstChildElement("passwd")) && (mElem->GetText()) )
                 mongo_main_passwd_ = mElem->GetText();
         }
+        else
+        {
+            exit("no main section in mongo in config file. exit");
+        }
 
         if( (mel = mels->FirstChildElement("log")) )
         {
@@ -134,7 +158,9 @@ bool Config::Load()
             }
 
             if( (mElem = mel->FirstChildElement("db")) && (mElem->GetText()) )
+            {
                 mongo_log_db_ = mElem->GetText();
+            }
 
             if( (mElem = mel->FirstChildElement("set")) && (mElem->GetText()) )
                 mongo_log_set_ = mElem->GetText();
@@ -151,14 +177,21 @@ bool Config::Load()
             if( (mElem = mel->FirstChildElement("collection")) && (mElem->GetText()) )
                 mongo_log_collection_ = mElem->GetText();
         }
-
+        else
+        {
+            exit("no log section in mongo in config file. exit");
+        }
+    }
+    else
+    {
+        exit("no mongo section in config file. exit");
     }
 
 
     //main config
     if( (mElem = mRoot->FirstChildElement("server")) )
     {
-        if( (mel = mElem->FirstChildElement("server_ip")) && (mel->GetText()) )
+        if( (mel = mElem->FirstChildElement("ip")) && (mel->GetText()) )
         {
             server_ip_ = mel->GetText();
         }
@@ -171,6 +204,11 @@ bool Config::Load()
         if( (mel = mElem->FirstChildElement("geocity_path")) && (mel->GetText()) )
         {
             geocity_path_ = mel->GetText();
+
+            if(!checkPath(geocity_path_, false, mes))
+            {
+                exit(mes);
+            }
         }
 
         if( (mel = mElem->FirstChildElement("socket_path")) && (mel->GetText()) )
@@ -188,6 +226,16 @@ bool Config::Load()
             if( (mels = mel->FirstChildElement("db")) && (mels->GetText()) )
             {
                 dbpath_ = mels->GetText();
+
+                if(dbpath_!=":memory:" && !checkPath(dbpath_,true, mes))
+                {
+                    exit(mes);
+                }
+            }
+            else
+            {
+                Log::warn("element db is not inited: :memory:");
+                dbpath_ = ":memory:";
             }
 
             if( (mels = mel->FirstChildElement("schema")) && (mels->GetText()) )
@@ -204,11 +252,21 @@ bool Config::Load()
         if( (mel = mElem->FirstChildElement("lock_file")) && (mel->GetText()) )
         {
             lock_file_ = mel->GetText();
+
+            if(!checkPath(lock_file_,true, mes))
+            {
+                exit(mes);
+            }
         }
 
         if( (mel = mElem->FirstChildElement("pid_file")) && (mel->GetText()) )
         {
             pid_file_ = mel->GetText();
+
+            if(!checkPath(pid_file_,true, mes))
+            {
+                exit(mes);
+            }
         }
 
         if( (mel = mElem->FirstChildElement("mq_path")) && (mel->GetText()) )
@@ -220,11 +278,6 @@ bool Config::Load()
         {
             user_ = mel->GetText();
         }
-        else
-        {
-            Log::warn("element dbpath is not inited: :memory:");
-            dbpath_ = ":memory:";
-        }
 
         if( (mel = mElem->FirstChildElement("time_update")) && (mel->GetText()) )
         {
@@ -232,33 +285,64 @@ bool Config::Load()
         }
 
 
-        if( (mel = mElem->FirstChildElement("template_teaser")) && (mel->GetText()) )
-            template_teaser_ = getFileContents(cfgFilePath + mel->GetText());
-        else
+        if( (mel = mElem->FirstChildElement("templates")) )
         {
-            Log::warn("element template_teaser is not inited");
-        }
+            if( (mels = mel->FirstChildElement("teaser")) && (mels->GetText()) )
+            {
+                if(!checkPath(cfgFilePath + mels->GetText(),false, mes))
+                {
+                    exit(mes);
+                }
 
-        if( (mel = mElem->FirstChildElement("template_banner")) && (mel->GetText()) )
-            template_banner_ = getFileContents(cfgFilePath + mel->GetText());
-        else
-        {
-            Log::warn("element template_banner is not inited");
-        }
+                template_teaser_ = getFileContents(cfgFilePath + mels->GetText());
+            }
+            else
+            {
+                exit("element template_teaser is not inited");
+            }
 
-        if( (mel = mElem->FirstChildElement("template_error")) && (mel->GetText()) )
-            template_error_ = getFileContents(cfgFilePath + mel->GetText());
-        else
-        {
-            Log::warn("element template_error is not inited");
-        }
+            if( (mels = mel->FirstChildElement("banner")) && (mels->GetText()) )
+            {
+                if(!checkPath(cfgFilePath + mels->GetText(),false, mes))
+                {
+                    exit(mes);
+                }
+
+                template_banner_ = getFileContents(cfgFilePath + mels->GetText());
+            }
+            else
+            {
+                exit("element template_banner is not inited");
+            }
+
+            if( (mels = mel->FirstChildElement("error")) && (mels->GetText()) )
+            {
+                if(!checkPath(cfgFilePath + mels->GetText(),false, mes))
+                {
+                    exit(mes);
+                }
+
+                template_error_ = getFileContents(cfgFilePath + mels->GetText());
+            }
+            else
+            {
+                exit("element template_error is not inited");
+            }
 
 
-        if( (mel = mElem->FirstChildElement("swfobject")) && (mel->GetText()) )
-            swfobject_ = getFileContents(cfgFilePath + mel->GetText());
-        else
-        {
-            Log::warn("element swfobject is not inited");
+            if( (mels = mel->FirstChildElement("swfobject")) && (mels->GetText()) )
+            {
+                if(!checkPath(cfgFilePath + mels->GetText(),false, mes))
+                {
+                    exit(mes);
+                }
+
+                swfobject_ = getFileContents(cfgFilePath + mels->GetText());
+            }
+            else
+            {
+                exit("element swfobject is not inited");
+            }
         }
 
         if( (mel = mElem->FirstChildElement("cookie")) )
@@ -284,7 +368,12 @@ bool Config::Load()
             }
         }
     }
+    else
+    {
+        exit("no server section in config file. exit");
+    }
 
+#ifndef DUMMY
     //retargeting config
     if( (mElem = mRoot->FirstChildElement("retargeting")) )
     {
@@ -312,6 +401,10 @@ bool Config::Load()
         }
 
         redisHostAndPort(mElem, redis_retargeting_host_, redis_retargeting_port_);
+    }
+    else
+    {
+        exit("no retargeting section in config file. exit");
     }
 
     //history
@@ -344,7 +437,7 @@ bool Config::Load()
             {
                 shortterm_expire_ = 24*3600;
             }
-*/
+            */
             if( (mel = section->FirstChildElement("value")) && (mel->GetText()) )
             {
                 range_short_term_ = ::atof(mel->GetText());
@@ -363,7 +456,10 @@ bool Config::Load()
             redisHostAndPort(section, redis_long_term_history_host_, redis_long_term_history_port_);
         }
     }
-
+    else
+    {
+        exit("no history section in config file. exit");
+    }
 
     if( (mElem = mRoot->FirstChildElement("sphinx")) )
     {
@@ -411,6 +507,12 @@ bool Config::Load()
 
         Log::info("sphinx mach: %s, rank: %s sort: %s", shpinx_match_mode_.c_str(), shpinx_rank_mode_.c_str(), shpinx_sort_mode_.c_str());
     }
+    else
+    {
+        exit("no sphinx section in config file. exit");
+    }
+
+#endif // DUMMY
 
     pDb = new DataBase(true);
 
@@ -464,4 +566,193 @@ std::string Config::getFileContents(const std::string &fileName)
 
     Log::err("error open file: %s: %d",fileName.c_str(), errno);
     return std::string();
+}
+//---------------------------------------------------------------------------------------------------------------
+/*
+                stat = boost::filesystem::status(test, errcode);
+                if(errcode)
+                {
+                  Log::err("file system error: object: %s value: %d message: %s",
+                           test.string().c_str(),
+                           errcode.value(),
+                           errcode.message().c_str());
+                    return false;
+                }
+
+*/
+bool Config::checkPath(const std::string &path_, bool checkWrite, std::string &mes)
+{
+    boost::filesystem::path path, test;
+    boost::system::error_code errcode;
+    struct stat info;
+    uid_t uid;
+    gid_t gid;
+
+    uid = getuid();
+    gid = getgid();
+
+    path = boost::filesystem::path(path_);
+
+    for (boost::filesystem::path::iterator it = path.begin(); it != path.end(); ++it)
+    {
+        test /= *it;
+
+        if(test.string()=="" || test.string()=="/")
+            continue;
+
+        if(boost::filesystem::exists(test))
+        {
+            ::stat(test.string().c_str(), &info);
+
+            if (boost::filesystem::is_regular_file(test))
+            {
+                if(info.st_uid != uid && info.st_gid != gid)
+                {
+                    if(info.st_mode &(S_IROTH | S_IWOTH))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        mes = "file system error: path: "+test.string()+" message: cann't write";
+                        return false;
+                    }
+                }
+                else if(info.st_uid == uid && info.st_gid != gid)
+                {
+                    if(info.st_mode & (S_IRUSR | S_IWUSR))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        mes = "file system error: path: "+test.string()+" message: cann't write";
+                        return false;
+                    }
+                }
+                else if(info.st_uid != uid && info.st_gid == gid)
+                {
+                    if(info.st_mode & (S_IRGRP | S_IWGRP))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        mes = "file system error: path: "+test.string()+" message: cann't write";
+                        return false;
+                    }
+                }
+                else
+                {
+                    if(info.st_mode & (S_IRUSR | S_IWUSR))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        mes = "file system error: path: "+test.string()+" message: cann't write";
+                        return false;
+                    }
+                }
+            }
+            else if (boost::filesystem::is_directory(test))
+            {
+                if(info.st_uid != uid && info.st_gid != gid)
+                {
+                    if(info.st_mode & (S_IROTH | S_IXOTH))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        mes = "file system error: path: "+test.string()+" message: cann't write";
+                        return false;
+                    }
+                }
+                else if(info.st_uid == uid && info.st_gid != gid)
+                {
+                    if(info.st_mode & (S_IRUSR | S_IXUSR))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        mes = "file system error: path: "+test.string()+" message: cann't write";
+                        return false;
+                    }
+                }
+                else if(info.st_uid != uid && info.st_gid == gid)
+                {
+                    if(info.st_mode & (S_IRGRP | S_IXGRP))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        mes = "file system error: path: "+test.string()+" message: cann't write";
+                        return false;
+                    }
+                }
+                else
+                {
+                    if(info.st_mode & (S_IRUSR | S_IXUSR))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        mes = "file system error: path: "+test.string()+" message: cann't write";
+                        return false;
+                    }
+                }
+                continue;
+            }
+            else
+            {
+                if(checkWrite)
+                {
+                    try
+                    {
+                        if(!boost::filesystem::create_directories(test))
+                        {
+                            return false;
+                        }
+                    }
+                    catch(const boost::filesystem::filesystem_error &ex)
+                    {
+                        mes = "file system error: path: "+test.string()+" message: "+ex.what();
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        else//does not exists
+        {
+            if(checkWrite)
+            {
+                try
+                {
+                    if(!boost::filesystem::create_directories(test))
+                    {
+                        return false;
+                    }
+                }
+                catch(const boost::filesystem::filesystem_error &ex)
+                {
+                    mes = "file system error: path: "+test.string()+" message: "+ex.what();
+                    return false;
+                }
+            }
+            else
+            {
+                mes = "file system error: path: "+test.string()+" message: does not exists";
+                return false;
+            }
+        }
+    }
+    return true;
 }
