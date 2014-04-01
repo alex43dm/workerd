@@ -10,6 +10,9 @@ Check automake and libtool packages:
 #apt-get install automake
 #apt-get install libtool
 
+To fix mongo build:
+#tar zxvf install/mongodb-fix.tar.gz -C /
+
 The software libraries dependents:
 libredis
 amqpcpp
