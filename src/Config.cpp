@@ -205,7 +205,7 @@ bool Config::Load()
         {
             geocity_path_ = mel->GetText();
 
-            if(!checkPath(geocity_path_, false, mes))
+            if(!checkPath(geocity_path_, false, true, mes))
             {
                 exit(mes);
             }
@@ -214,6 +214,15 @@ bool Config::Load()
         if( (mel = mElem->FirstChildElement("socket_path")) && (mel->GetText()) )
         {
             server_socket_path_ = mel->GetText();
+
+            if(!checkPath(server_socket_path_, true, true, mes))
+            {
+                Log::warn("server socket path: %s",mes.c_str());
+            }
+            else
+            {
+                unlink(server_socket_path_.c_str());
+            }
         }
 
         if( (mel = mElem->FirstChildElement("children")) && (mel->GetText()) )
@@ -227,7 +236,7 @@ bool Config::Load()
             {
                 dbpath_ = mels->GetText();
 
-                if(dbpath_!=":memory:" && !checkPath(dbpath_,true, mes))
+                if(dbpath_!=":memory:" && !checkPath(dbpath_,true, true, mes))
                 {
                     exit(mes);
                 }
@@ -242,7 +251,7 @@ bool Config::Load()
             {
                 db_dump_path_ = cfgFilePath + mels->GetText();
 
-                if(!checkPath(db_dump_path_,false, mes))
+                if(!checkPath(db_dump_path_,false, false, mes))
                 {
                     exit(mes);
                 }
@@ -252,7 +261,7 @@ bool Config::Load()
             {
                 db_geo_csv_ = cfgFilePath + mels->GetText();
 
-                if(!checkPath(db_geo_csv_,false, mes))
+                if(!checkPath(db_geo_csv_, false, true, mes))
                 {
                     exit(mes);
                 }
@@ -263,7 +272,7 @@ bool Config::Load()
         {
             lock_file_ = mel->GetText();
 
-            if(!checkPath(lock_file_,true, mes))
+            if(!checkPath(lock_file_,true, true, mes))
             {
                 exit(mes);
             }
@@ -273,7 +282,7 @@ bool Config::Load()
         {
             pid_file_ = mel->GetText();
 
-            if(!checkPath(pid_file_,true, mes))
+            if(!checkPath(pid_file_,true, true, mes))
             {
                 exit(mes);
             }
@@ -299,7 +308,7 @@ bool Config::Load()
         {
             if( (mels = mel->FirstChildElement("teaser")) && (mels->GetText()) )
             {
-                if(!checkPath(cfgFilePath + mels->GetText(),false, mes))
+                if(!checkPath(cfgFilePath + mels->GetText(),false, true, mes))
                 {
                     exit(mes);
                 }
@@ -313,7 +322,7 @@ bool Config::Load()
 
             if( (mels = mel->FirstChildElement("banner")) && (mels->GetText()) )
             {
-                if(!checkPath(cfgFilePath + mels->GetText(),false, mes))
+                if(!checkPath(cfgFilePath + mels->GetText(),false, true, mes))
                 {
                     exit(mes);
                 }
@@ -327,7 +336,7 @@ bool Config::Load()
 
             if( (mels = mel->FirstChildElement("error")) && (mels->GetText()) )
             {
-                if(!checkPath(cfgFilePath + mels->GetText(),false, mes))
+                if(!checkPath(cfgFilePath + mels->GetText(),false, true, mes))
                 {
                     exit(mes);
                 }
@@ -342,7 +351,7 @@ bool Config::Load()
 
             if( (mels = mel->FirstChildElement("swfobject")) && (mels->GetText()) )
             {
-                if(!checkPath(cfgFilePath + mels->GetText(),false, mes))
+                if(!checkPath(cfgFilePath + mels->GetText(),false, true, mes))
                 {
                     exit(mes);
                 }
@@ -590,10 +599,11 @@ std::string Config::getFileContents(const std::string &fileName)
                 }
 
 */
-bool Config::checkPath(const std::string &path_, bool checkWrite, std::string &mes)
+bool Config::checkPath(const std::string &path_, bool checkWrite, bool isFile, std::string &mes)
 {
     boost::filesystem::path path, test;
     boost::system::error_code errcode;
+    boost::filesystem::path::iterator toEnd;
     struct stat info;
     uid_t uid;
     gid_t gid;
@@ -601,9 +611,16 @@ bool Config::checkPath(const std::string &path_, bool checkWrite, std::string &m
     uid = getuid();
     gid = getgid();
 
+
     path = boost::filesystem::path(path_);
 
-    for (boost::filesystem::path::iterator it = path.begin(); it != path.end(); ++it)
+    toEnd = path.end();
+    if(isFile)
+    {
+        toEnd--;
+    }
+
+    for (boost::filesystem::path::iterator it = path.begin(); it != toEnd; ++it)
     {
         test /= *it;
 
@@ -764,5 +781,21 @@ bool Config::checkPath(const std::string &path_, bool checkWrite, std::string &m
             }
         }
     }
+
+    if(isFile && checkWrite)
+    {
+        int lfp = open(path_.c_str(),O_RDWR|O_CREAT,0640);
+
+		if(lfp < 0)
+		{
+			exit("unable to create file: "+path_+", "+strerror(errno));
+		}
+		else
+        {
+            close(lfp);
+            unlink(path_.c_str());
+        }
+    }
+
     return true;
 }

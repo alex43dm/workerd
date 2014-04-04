@@ -122,7 +122,7 @@ private:
     std::string getFileContents(const std::string &fileName);
     void redisHostAndPort(TiXmlElement *p, std::string &host, std::string &port);
     void exit(const std::string &mes);
-    bool checkPath(const std::string &path_, bool checkWrite, std::string &mes);
+    bool checkPath(const std::string &path_, bool checkWrite, bool isFile, std::string &mes);
 };
 
 extern Config *cfg;

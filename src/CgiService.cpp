@@ -35,8 +35,6 @@ CgiService::CgiService()
 
     mongo::DB::ConnectLogDatabase();
 
-    unlink(cfg->server_socket_path_.c_str());
-
     mode_t old_mode = umask(0);
     socketId = FCGX_OpenSocket(cfg->server_socket_path_.c_str(), cfg->server_children_);
     if(socketId < 0)
