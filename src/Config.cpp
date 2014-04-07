@@ -784,7 +784,7 @@ bool Config::checkPath(const std::string &path_, bool checkWrite, bool isFile, s
 
     if(isFile && checkWrite)
     {
-        int lfp = open(path_.c_str(),O_RDWR|O_CREAT,0640);
+        int lfp = open((path_+"test").c_str(),O_RDWR|O_CREAT,0640);
 
 		if(lfp < 0)
 		{
@@ -793,7 +793,7 @@ bool Config::checkPath(const std::string &path_, bool checkWrite, bool isFile, s
 		else
         {
             close(lfp);
-            unlink(path_.c_str());
+            unlink((path_+"test").c_str());
         }
     }
 

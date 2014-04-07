@@ -19,7 +19,7 @@ Campaign::Campaign(long long _id) :
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
 
     sqlite3_snprintf(sizeof(buf),buf,
-            "SELECT c.guid,c.title,c.project,c.social,c.valid FROM Campaign AS c \
+            "SELECT c.guid,c.title,c.project,c.social,c.valid,c.showCoverage FROM Campaign AS c \
             WHERE c.id=%lld;", _id);
 
     try
@@ -33,6 +33,7 @@ Campaign::Campaign(long long _id) :
             project = pStmt->GetColumnString(2);
             social = pStmt->GetColumnInt(3) ? true : false;
             valid = pStmt->GetColumnInt(4) ? true : false;
+            setType(pStmt->GetColumnString(5));
         }
     }
     catch(Kompex::SQLiteException &ex)
@@ -51,7 +52,7 @@ void Campaign::info(std::vector<Campaign*> &res)
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
 
     sqlite3_snprintf(sizeof(buf),buf,
-            "SELECT c.title,c.valid,c.social,count(ofr.campaignId) FROM Campaign AS c \
+            "SELECT c.title,c.valid,c.social,count(ofr.campaignId),c.showCoverage FROM Campaign AS c \
             LEFT JOIN Offer AS ofr ON c.id=ofr.campaignId \
             GROUP BY ofr.campaignId;");
 
@@ -66,6 +67,7 @@ void Campaign::info(std::vector<Campaign*> &res)
             c->valid = pStmt->GetColumnInt(1) ? true : false;
             c->social = pStmt->GetColumnInt(2) ? true : false;
             c->offersCount = pStmt->GetColumnInt(3);
+            c->setType(pStmt->GetColumnString(4));
             res.push_back(c);
         }
     }

@@ -696,14 +696,14 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
 
         bzero(pData,sz);
         sqlite3_snprintf(sz,pData,
-                         "%lld,'%q','%q','%q',%d, %d,'%q',%d,%d)",
+                         "%lld,'%q','%q','%q',%d,%d,%d,%d,%d)",
                          long_id,
                          id.c_str(),
                          x.getStringField("title"),
                          x.getStringField("project"),
                          x.getBoolField("social") ? 1 : 0,
                          o.isValid(),
-                         o.getStringField("showCoverage"),
+                         Campaign::typeConv(o.getStringField("showCoverage")),
                          x.getField("impressionsPerDayLimit").numberInt(),
                          o.getBoolField("retargeting") ? 1 : 0
                         );
@@ -1120,7 +1120,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
                              project='%q', \
                              social=%d, \
                              valid=%d, \
-                             showCoverage='%q', \
+                             showCoverage=%d, \
                              impressionsPerDayLimit=%d, \
                              retargeting=%d \
                              WHERE id=%lld;",
@@ -1128,7 +1128,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
                              x.getStringField("project"),
                              x.getBoolField("social") ? 1 : 0,
                              o.isValid(),
-                             o.getStringField("showCoverage"),
+                             Campaign::typeConv(o.getStringField("showCoverage")),
                              x.getField("impressionsPerDayLimit").numberInt(),
                              long_id,
                              o.getBoolField("retargeting") ? 1 : 0);

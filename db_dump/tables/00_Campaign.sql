@@ -7,7 +7,7 @@ project VARCHAR(70),
 social SMALLINT,
 valid SMALLINT,
 impressionsPerDayLimit SMALLINT,
-showCoverage VARCHAR(35),
+showCoverage SMALLINT,
 retargeting SMALLINT,
 UNIQUE (id) ON CONFLICT IGNORE,
 UNIQUE (guid) ON CONFLICT IGNORE
