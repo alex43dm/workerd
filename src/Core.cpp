@@ -586,8 +586,13 @@ std::string Core::OffersToHtml(const Offer::Vector &items, const std::string &ur
 {
     std::string informer_html;
 
+    if(items.size() == 0)
+    {
+        return std::string();
+    }
+
     //для отображения передаётся или один баннер, или вектор тизеров. это и проверяем
-    if (items.size() > 0 && (*items.begin())->isBanner)
+    if( (*items.begin())->type == Offer::Type::banner )
     {
         // Получаем HTML-код информера для отображение баннера
         informer_html =
@@ -636,7 +641,7 @@ std::string Core::OffersToJson(const Offer::Vector &items) const
  */
 bool Core::checkBannerSize(const Offer *offer)
 {
-    if (offer->isBanner)
+    if (offer->type == Offer::Type::banner)
     {
         if (offer->width != informer->width_banner || offer->height != informer->height_banner)
         {
@@ -674,7 +679,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     RISResult.clear();
 
     //sort by rating
-    for(auto i = items.begin(); i != items.end(); ++i)
+    for(auto i = items.begin(); i != items.end(); i++)
     {
         resultAll.insert(Offer::PairRate((*i).second->rating, (*i).second));
     }
@@ -690,6 +695,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
         else if((*i).second->type == Offer::Type::banner)
         {
             RISResult.push_back((*i).second);
+            Log::gdb("banner get");
             goto links_make;
         }
         //add if all not social and not social offer(skip social)

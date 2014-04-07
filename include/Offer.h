@@ -17,7 +17,7 @@ class Offer
 {
 public:
     typedef std::map <const long long,Offer*> Map;
-    typedef std::map <const float,Offer*, std::greater<float>> MapRate;
+    typedef std::multimap <const float,Offer*, std::greater<float>> MapRate;
     typedef std::map <const long long,Offer*>::iterator it;
     typedef std::map <const long long,Offer*>::const_iterator cit;
     typedef std::pair<const float,Offer*> PairRate;
@@ -25,33 +25,32 @@ public:
     typedef std::vector <Offer*> Vector;
     typedef std::vector <Offer*>::iterator itV;
 
-    typedef enum{ banner, teazer, unknown } Type;
+    typedef enum { banner, teazer, unknown } Type;
     /// Структура для хранения информации о рекламном предложении.
-        std::string id;             ///< ID предложения
-        long long id_int;                 ///< ID предложения
-        std::string title;          ///< Заголовок
-        std::string price;          ///< Цена
-        std::string description;    ///< Описание
-        std::string url;            ///< URL перехода на предложение
-        std::string image_url;      ///< URL картинки
-        std::string swf;            ///< URL Flash
-        long long campaign_id;    ///< ID кампании, к которой относится предложение
-        bool valid;                 ///< Является ли запись действительной.
-        bool isOnClick;             ///< Реклама по кликам или показам
-        Type type;			///< тип РП
-        std::string conformity;		///< тип соответствия РП и запроса, изменяеться после выбора РП из индекса
-        EBranchL branch;			///< ветка алгоритма по которой было выбрано РП
-        std::string matching;       ///< Фраза соответствия
-        float rating;				///< рейтинг РП
-        bool retargeting;
-        int uniqueHits;				///< максимальное количество показов одному пользователю
-        int height;					///< высота РП (имеет значение для баннеров)
-        int width;					///< ширина РП (имеет значение для баннеров)
-        bool social;
-        bool isBanner;
-        long long int token_int;
-        std::string token;          ///< Токен для проверки ссылки
-        std::string redirect_url;   ///< Cсылка перенаправления
+    std::string id;             ///< ID предложения
+    long long id_int;                 ///< ID предложения
+    std::string title;          ///< Заголовок
+    std::string price;          ///< Цена
+    std::string description;    ///< Описание
+    std::string url;            ///< URL перехода на предложение
+    std::string image_url;      ///< URL картинки
+    std::string swf;            ///< URL Flash
+    long long campaign_id;    ///< ID кампании, к которой относится предложение
+    bool valid;                 ///< Является ли запись действительной.
+    bool isOnClick;             ///< Реклама по кликам или показам
+    Type type;			///< тип РП
+    std::string conformity;		///< тип соответствия РП и запроса, изменяеться после выбора РП из индекса
+    EBranchL branch;			///< ветка алгоритма по которой было выбрано РП
+    std::string matching;       ///< Фраза соответствия
+    float rating;				///< рейтинг РП
+    bool retargeting;
+    int uniqueHits;				///< максимальное количество показов одному пользователю
+    int height;					///< высота РП (имеет значение для баннеров)
+    int width;					///< ширина РП (имеет значение для баннеров)
+    bool social;
+    long long int token_int;
+    std::string token;          ///< Токен для проверки ссылки
+    std::string redirect_url;   ///< Cсылка перенаправления
 
     //Offer(){};
 
@@ -77,13 +76,13 @@ public:
 
     //bool operator==(const Offer &other) const { return this->id_int == other.id_int; }
     //bool operator<(const Offer &other) const { return rating < other.rating; }
-/*
-    bool operator<(const Offer *x1, const Offer *x2)
-    {
-        return x1->rating > x2->rating;
-    }
-*/
-    static Type typeFromString(const std::string stype)
+    /*
+        bool operator<(const Offer *x1, const Offer *x2)
+        {
+            return x1->rating > x2->rating;
+        }
+    */
+    static Type typeFromString(const std::string &stype)
     {
         if(stype == "banner")
             return Type::banner;
@@ -94,11 +93,15 @@ public:
 
     static Type typeFromInt(int stype)
     {
-        if(stype == 0)
+        switch(stype)
+        {
+        case 0:
             return Type::banner;
-        if(stype == 1)
+        case 1:
             return Type::teazer;
-        return Type::unknown;
+        default:
+            return Type::unknown;
+        }
     }
 
     // Каждому элементу просмотра присваиваем уникальный токен
@@ -106,19 +109,11 @@ public:
 
     std::string toJson() const;
     bool setBranch(const  EBranchT tbranch);
-    std::string getBranch(){ return (int)branch < (int)EBranchL::LMAX ? EBranchL2String[(int)branch] : ""; };
-};
-
-class OfferExistByType
-{
-    Offer::Type type;
-public:
-    OfferExistByType(Offer::Type t):type(t){}
-
-    bool operator()(const Offer *temp)
+    std::string getBranch()
     {
-            return temp->type == type;
-    }
+        return (int)branch < (int)EBranchL::LMAX ? EBranchL2String[(int)branch] : "";
+    };
 };
 
 #endif // OFFER_H
+

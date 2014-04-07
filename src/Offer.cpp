@@ -15,7 +15,7 @@ Offer::Offer(const std::string &id,
              long long campaign_id,
              bool valid,
              bool isOnClick,
-             int type,
+             int type_int,
              float rating,
              bool retargeting,
              int uniqueHits,
@@ -31,14 +31,13 @@ Offer::Offer(const std::string &id,
     campaign_id(campaign_id),
     valid(valid),
     isOnClick(isOnClick),
-    type(typeFromInt(type)),
+    type(typeFromInt(type_int)),
     branch(EBranchL::LMAX),
     rating(rating),
     retargeting(retargeting),
     uniqueHits(uniqueHits),
     height(height),
-    width(width),
-    isBanner(this->type==Offer::Type::banner)
+    width(width)
 {
 }
 
