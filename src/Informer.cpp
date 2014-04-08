@@ -6,14 +6,14 @@ Informer::Informer(long id) :
 }
 
 Informer::Informer(long id, int capacity, const std::string &bannersCss,
-                   const std::string &teasersCss, long domainId, long accountId, int rtgPercentage) :
+                   const std::string &teasersCss, long domainId, long accountId)://, int rtgPercentage) :
     id(id),
     capacity(capacity),
     bannersCss(bannersCss),
     teasersCss(teasersCss),
     domainId(domainId),
     accountId(accountId),
-    rtgPercentage(rtgPercentage),
+//    rtgPercentage(rtgPercentage),
     RetargetingCount(0)
 {
 }

@@ -278,7 +278,10 @@ Cookie::Credentials::secure ()
 std::string
 Cookie::Credentials::to_string () const
 {
-    return "expires=" + expires_() + "; path=" + path_() + "; domain=" + authority_();
+//    return "Max-Age=\"" + expires_() + "\"; Path=\"" + path_() + "\"; Domain=\"" + authority_()+"\"";
+//    return "Max-Age=\"31536000\"; Path=\"" + path_() + "\"; Domain=\"" + authority_()+"\"";
+    return "Path=" + path_() +"; Version=1; Max-Age=31536000; Domain=" + authority_()+"; HttpOnly;";
+    //return "Path=\"" + path_() + "\"; Domain=\"" + authority_()+"\"";
 }
 
 

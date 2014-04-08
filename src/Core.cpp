@@ -369,16 +369,17 @@ Informer *Core::getInformer()
                                      pStmt->GetColumnString(2),
                                      pStmt->GetColumnString(3),
                                      pStmt->GetColumnInt64(4),
-                                     pStmt->GetColumnInt64(5),
-                                     pStmt->GetColumnInt(6)
+                                     pStmt->GetColumnInt64(5)
+                //                     pStmt->GetColumnInt(6)
                                     );
 
-            if(!informer->rtgPercentage)
+//            if(!informer->rtgPercentage){
                 informer->RetargetingCount  =
                 informer->capacity * Config::Instance()->retargeting_by_persents_ / 100;
-            else
-                informer->RetargetingCount  =
-                informer->capacity * informer->rtgPercentage / 100;
+  //          }else{
+    //            informer->RetargetingCount  =
+      //          informer->capacity * informer->rtgPercentage / 100;
+  //            }
             break;
         }
     }

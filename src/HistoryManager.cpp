@@ -56,6 +56,7 @@ void HistoryManager::getUserHistory(Params *_params)
 
     params = _params;
     key = params->getUserKey();
+    Log::gdb("key: %s",key.c_str());
 
     getDeprecatedOffersAsync();
 

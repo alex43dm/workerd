@@ -97,19 +97,23 @@ CgiService::~CgiService()
 }
 
 void CgiService::Response(FCGX_Request *req,
-                          const std::string &out,
+                          const std::string &content,
                           const std::string &cookie)
 {
-    if(out.empty())
+    if(content.empty())
     {
         return;
     }
 
+    FCGX_FPrintF(req->out,"Status: 200 OK\r\n");
     FCGX_FPrintF(req->out,"Content-type: text/html\r\n");
     FCGX_FPrintF(req->out,"Set-Cookie: %s\r\n", cookie.c_str());
-    FCGX_FPrintF(req->out,"Status: 200 OK\r\n");
+    FCGX_FPrintF(req->out,"Pragma: no-cache\r\n");
+    FCGX_FPrintF(req->out,"Expires: Fri, 01 Jan 1990 00:00:00 GMT\r\n");
+    FCGX_FPrintF(req->out,"Cache-Control: no-cache, must-revalidate, no-cache=\"Set-Cookie\", private\r\n");
+    FCGX_FPrintF(req->out,"\r\n");
+    FCGX_FPrintF(req->out,"%s\r\n", content.c_str());
     FCGX_FFlush(req->out);
-    FCGX_FPrintF(req->out,"\r\n%s\n", out.c_str());
     FCGX_Finish_r(req);
 }
 
@@ -160,7 +164,7 @@ void *CgiService::Serve(void *data)
 void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
 {
     char *tmp_str = nullptr;
-    std::string query, ip, script_name, visitor_cookie;
+    std::string query, ip, script_name, cookie_value;
 
 
     if (!(tmp_str = FCGX_GetParam("QUERY_STRING", req->envp)))
@@ -203,11 +207,24 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
     tmp_str = nullptr;
     if (!(tmp_str = FCGX_GetParam("HTTP_COOKIE", req->envp)))
     {
-        Log::warn("cookie is not set");
+        Log::warn("HTTP_COOKIE is not set");
     }
     else
     {
-        visitor_cookie = std::string(tmp_str);
+        std::string resp = std::string(tmp_str);
+        std::vector<std::string> strs;
+        boost::split(strs, resp, boost::is_any_of(";"));
+
+        for (unsigned int i=0; i<strs.size(); i++)
+        {
+            if(strs[i].find(cfg->cookie_name_) != string::npos)
+            {
+                std::vector<std::string> name_value;
+                boost::split(name_value, strs[i], boost::is_any_of("="));
+                if (name_value.size() == 2)
+                    cookie_value = name_value[1];
+            }
+        }
     }
 
     UrlParser url(query);
@@ -222,25 +239,12 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
     std::string exclude = url.param("exclude");
     boost::split(excluded_offers, exclude, boost::is_any_of("_"));
 
-    string cookie_name = cfg->cookie_name_;
-    string cookie_value = time_t_to_string(time(NULL));
-
-
-    std::vector<std::string> strs;
-    boost::split(strs, visitor_cookie, boost::is_any_of(";"));
-
-    for (unsigned int i=0; i<strs.size(); i++)
+    if(cookie_value.empty())
     {
-        if(strs[i].find(cookie_name) != string::npos)
-        {
-            std::vector<std::string> name_value;
-            boost::split(name_value, strs[i], boost::is_any_of("="));
-            if (name_value.size() == 2)
-                cookie_value = name_value[1];
-        }
+        cookie_value = time_t_to_string(time(NULL));
     }
 
-    ClearSilver::Cookie c = ClearSilver::Cookie(cookie_name,
+    ClearSilver::Cookie c = ClearSilver::Cookie(cfg->cookie_name_,
                       cookie_value,
                       ClearSilver::Cookie::Credentials(
                                 ClearSilver::Cookie::Authority(cfg->cookie_domain_),

@@ -25,7 +25,7 @@ public:
         std::string teasersCss;                 //Стиль CSS РБ для отображения тизеров
         long domainId;
         long accountId;
-        unsigned rtgPercentage;
+        //unsigned rtgPercentage;
         unsigned RetargetingCount;
 
         bool blocked;                           //Статус активности РБ
@@ -38,7 +38,7 @@ public:
         int width_banner;                       //Ширина отображаемых банеров
 
     Informer(long id);
-    Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss, long , long, int);
+    Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss, long , long);//, int);
     virtual ~Informer();
 
     bool is_null() const
