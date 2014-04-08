@@ -514,6 +514,7 @@ bool Core::getOffers(Offer::Map &result)
                      getpid(),
                      tid,
                      informer->id);
+                    hm->getDeprecatedOffersAsyncWait();
     #else
     sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
                      getGeo().c_str(),
