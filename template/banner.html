@@ -53,7 +53,7 @@ function init() {
  		if(ads[i]) 
   			adsView+=ads[i]; 
   	} 
-  	document.getElementById('adsContainer').innerHTML = adsView;\n
+  	document.getElementById('adsContainer').innerHTML = adsView;
 	if(initads[0]['swf'].indexOf(".swf")==(initads[0]['swf'].length-4)){ 
 		var url = initads[0]['url'];
 		swfobject.embedSWF(initads[0]['swf'], "adsContainer",  "100%%",  "100%%", "9.0.0", "http://cdnt.yottos.com/getmyad/banner/expressinstall.swf", {redirectUrl:url,link1:url,clickTAG:url}, {menu:"false", wmode:"transparent",quality:"high",play:"true",loop:"true"});
