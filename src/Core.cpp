@@ -156,7 +156,7 @@ std::string Core::Process(Params *prms)
     RISAlgorithm(items, vRIS, informer->capacity);
     Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
 
-    if (vRIS.size() < (u_int)informer->capacity && (*vRIS.begin())->type != Offer::Type::banner)
+    if (vRIS.size() && vRIS.size() < (u_int)informer->capacity && (*vRIS.begin())->type != Offer::Type::banner)
     {
         hm->clean = true;
     }
@@ -506,7 +506,10 @@ bool Core::getOffers(Offer::Map &result)
                      getGeo().c_str(),
                      informer->domainId,
                      informer->domainId,
+                     informer->domainId,
                      informer->accountId,
+                     informer->accountId,
+                     informer->id,
                      informer->id,
                      getpid(),
                      tid,
