@@ -3,12 +3,12 @@
 <!--настройки сервера-->
 <server>
     <!--IP сервера. Ссылка на редирект по рекламному предложению содержит в себе адрес сервера, который её создал-->
-    <ip>127.0.0.1</ip>
-    <lock_file>/tmp/worker.lock</lock_file>
-    <pid_file>/tmp/worker.pid</pid_file>
+    <ip>10.0.0.122</ip>
+    <lock_file>/tmp/workerd/lock</lock_file>
+    <pid_file>/tmp/workerd/pid</pid_file>
     <user>alex</user>
     <!--путь к файлу сокета-->
-    <socket_path>/tmp/workerd.sock</socket_path>
+    <socket_path>/tmp/workerd/sock</socket_path>
     <!--количество ниток-->
     <children>1</children>
 
@@ -29,8 +29,8 @@
     <geocity_path>/usr/share/GeoIP/GeoLiteCity.dat</geocity_path>
 
     <cookie>
-        <name>yottos_unique_id</name>
-        <domain>.yottos.com.</domain>
+        <name>YSID</name>
+        <domain>helpers.com.ua</domain>
         <path>/</path>
     </cookie>
 
