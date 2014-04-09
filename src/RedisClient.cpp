@@ -83,13 +83,23 @@ bool RedisClient::getRange(const std::string &key,
                 Log::err("redis getRange: false: %s", reply_data);
             }
             else if(RT_BULK == reply_type)
-                ret += std::string(reply_data, reply_len) + ",";
+            {
+                if(!ret.empty())
+                {
+                    ret += "," + std::string(reply_data, reply_len);
+                }
+                else
+                {
+                    ret += std::string(reply_data, reply_len);
+                }
+            }
+
         }
     }
-
+/*
     if (!ret.empty())
         ret.erase(std::prev(ret.end()));
-
+*/
     Batch_free(batch);
 
     return true;
@@ -163,7 +173,7 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
     }
 
     bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZREVRANGE %s 0 -1\r\n", key.c_str());
+    snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s 0 -1\r\n", key.c_str());
 
     batch = Batch_new();
     Batch_write(batch, cmd, strlen(cmd), 1);
@@ -186,8 +196,7 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
         int level;
 
         pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-        sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO %s(id) VALUES(@id);",tableName.c_str());
-        pStmt->Sql(cmd);
+        //pStmt->Sql(cmd);
 
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
@@ -197,11 +206,17 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
             }
             else if(RT_BULK == reply_type)
             {
+                    Log::gdb("redis cmd: getRange: %s", reply_data);
                     try
                     {
-                        pStmt->BindInt64(1, strtol(reply_data,NULL,10));
-                        pStmt->Execute();
-                        pStmt->Reset();
+                        sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO %s(id) VALUES(%ld);",
+                                         tableName.c_str(),
+                                         strtol(reply_data,NULL,10));
+                        //pStmt->BindInt64(1, );
+                        //pStmt->Execute();
+                        //pStmt->Reset();
+                        pStmt->SqlStatement(cmd);
+
                         cnt++;
                     }
                     catch(Kompex::SQLiteException &ex)
@@ -215,7 +230,7 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
 
     Batch_free(batch);
     delete pStmt;
-
+/*
     Kompex::SQLiteStatement *p;
     p = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
     try
@@ -228,8 +243,8 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
         Log::err("DB error: REINDEX table: %s: %s",tableName.c_str(), ex.GetString().c_str());
     }
     delete p;
-
-//    Log::gdb("loaded %d", cnt);
+*/
+    Log::gdb("loaded %d", cnt);
     return true;
 }
 
@@ -406,7 +421,7 @@ int RedisClient::zscore(const std::string &key, long id)
             {
                 Log::err("redis cmd: zscore false: %s", reply_data);
             }
-            else if(reply_type == RT_INTEGER)
+            else if(reply_type == RT_BULK)
             {
                 ret = strtol(reply_data,NULL,10);
                 break;
