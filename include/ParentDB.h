@@ -38,7 +38,7 @@ public:
 private:
     bool fConnectedToMainDatabase;
     Kompex::SQLiteDatabase *pdb;
-    char buf[8192];
+    char buf[262144];
     mongo::DBClientReplicaSet *monga_main;
 
 
