@@ -403,7 +403,7 @@ bool ParentDB::InformerLoadAll()
                          capacity,
                          0
 //                         x.getIntField("rtgPercentage") > 0 ? x.getIntField("rtgPercentage") : 0
-                         );
+                        );
         try
         {
             pStmt->SqlStatement(buf);
@@ -469,7 +469,7 @@ bool ParentDB::InformerUpdate(const std::string &id)
         domainId = insertAndGetDomainId(x.getStringField("domain"));
         accountId = insertAndGetAccountId(x.getStringField("user"));
 
-               sqlite3_snprintf(sizeof(buf),buf,
+        sqlite3_snprintf(sizeof(buf),buf,
                          "UPDATE Informer SET\
                          title='%q',\
                          bannersCss='%q',\
@@ -499,7 +499,7 @@ bool ParentDB::InformerUpdate(const std::string &id)
                          capacity,
                          0,//x.getIntField("rtgPercentage"),
                          long_id
-                         );
+                        );
         try
         {
             pStmt->SqlStatement(buf);
@@ -531,14 +531,14 @@ void ParentDB::InformerRemove(const std::string &id)
     pStmt = new Kompex::SQLiteStatement(pdb);
     pStmt->BeginTransaction();
     sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Informer WHERE guid='%s';",id.c_str());
-        try
-        {
-            pStmt->SqlStatement(buf);
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            logDb(ex);
-        }
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
 
@@ -643,9 +643,9 @@ void ParentDB::GeoRerionsAdd(const std::string &country, const std::string &regi
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
 
     sqlite3_snprintf(sizeof(buf),buf,
-            "INSERT INTO GeoLiteCity(locId,country,city) SELECT max(locId)+1,'%q','%q' FROM GeoLiteCity;",
-            country.c_str(),
-            region.c_str());
+                     "INSERT INTO GeoLiteCity(locId,country,city) SELECT max(locId)+1,'%q','%q' FROM GeoLiteCity;",
+                     country.c_str(),
+                     region.c_str());
     try
     {
         pStmt->SqlStatement(buf);
@@ -831,24 +831,51 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
                 logDb(ex);
             }
 
-            accounts_allowed += "'"+acnt+"',";
+            if(accounts_allowed.empty())
+            {
+                accounts_allowed += "'"+acnt+"'";
+            }
+            else
+            {
+                accounts_allowed += ",'"+acnt+"'";
+            }
         }
 
-
-        accounts_allowed = accounts_allowed.substr(0, accounts_allowed.size()-1);
-        bzero(buf,sizeof(buf));
-        sqlite3_snprintf(sizeof(buf),buf,
-                         "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) \
-                         SELECT %lld,id,1 FROM Accounts WHERE name IN(%s)",
-                         long_id, accounts_allowed.c_str()
-                        );
-        try
+        if(accounts_allowed.size())
         {
-            pStmt->SqlStatement(buf);
+            bzero(buf,sizeof(buf));
+            sqlite3_snprintf(sizeof(buf),buf,
+                             "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) \
+                             SELECT %lld,id,1 FROM Accounts WHERE name IN(%s)",
+                             long_id, accounts_allowed.c_str()
+                            );
+            try
+            {
+                pStmt->SqlStatement(buf);
+            }
+            catch(Kompex::SQLiteException &ex)
+            {
+                logDb(ex);
+            }
         }
-        catch(Kompex::SQLiteException &ex)
+        else
         {
-            logDb(ex);
+            if(o.getObjectField("allowed").hasElement("accounts"))
+            {
+                bzero(buf,sizeof(buf));
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1)",
+                                 long_id
+                                );
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+            }
         }
 
         // Множества информеров, аккаунтов и доменов, на которых запрещен показ
@@ -867,25 +894,53 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
                 logDb(ex);
             }
 
-            accounts_ignored += "'"+acnt+"',";
+            if(accounts_ignored.empty())
+            {
+                accounts_ignored += "'"+acnt+"'";
+            }
+            else
+            {
+                accounts_ignored += ",'"+acnt+"'";
+            }
         }
 
-        accounts_ignored = accounts_ignored.substr(0, accounts_ignored.size()-1);
-        bzero(buf,sizeof(buf));
-        sqlite3_snprintf(sizeof(buf),buf,
-                         "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) \
-                         SELECT %lld,id,0 FROM Accounts WHERE name IN(%s);",
-                         long_id, accounts_ignored.c_str()
-                        );
-        try
+        if(accounts_ignored.size())
         {
-            pStmt->SqlStatement(buf);
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            logDb(ex);
+            bzero(buf,sizeof(buf));
+            sqlite3_snprintf(sizeof(buf),buf,
+                             "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) \
+                             SELECT %lld,id,0 FROM Accounts WHERE name IN(%s);",
+                             long_id, accounts_ignored.c_str()
+                            );
+            try
+            {
+                pStmt->SqlStatement(buf);
+            }
+            catch(Kompex::SQLiteException &ex)
+            {
+                logDb(ex);
+            }
         }
 
+        else
+        {
+            if(o.getObjectField("ignored").hasElement("accounts"))
+            {
+                bzero(buf,sizeof(buf));
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,0)",
+                                 long_id
+                                );
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+            }
+        }
 
         //------------------------domains-----------------------
 
@@ -1043,14 +1098,14 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
         }
 
- // Тематические категории, к которым относится кампания
+// Тематические категории, к которым относится кампания
         std::string catAll;
         it = o.getObjectField("categories");
         while (it.more())
         {
             std::string cat = it.next().str();
             sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Categories(id,guid) VALUES(%lli,'%q');",
-            cats, cat.c_str());
+                             cats, cat.c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -1126,14 +1181,14 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
                              impressionsPerDayLimit=%d, \
                              retargeting=%d \
                              WHERE id=%lld;",
-                             x.getStringField("title"),
-                             x.getStringField("project"),
-                             x.getBoolField("social") ? 1 : 0,
-                             o.isValid(),
-                             Campaign::typeConv(o.getStringField("showCoverage")),
-                             x.getField("impressionsPerDayLimit").numberInt(),
-                             long_id,
-                             o.getBoolField("retargeting") ? 1 : 0);
+                         x.getStringField("title"),
+                         x.getStringField("project"),
+                         x.getBoolField("social") ? 1 : 0,
+                         o.isValid(),
+                         Campaign::typeConv(o.getStringField("showCoverage")),
+                         x.getField("impressionsPerDayLimit").numberInt(),
+                         long_id,
+                         o.getBoolField("retargeting") ? 1 : 0);
         try
         {
             pStmt->SqlStatement(buf);
@@ -1503,7 +1558,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
         }
 
- // Тематические категории, к которым относится кампания
+// Тематические категории, к которым относится кампания
         sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Categories WHERE id_cam=%lld;",long_id);
         try
         {
@@ -1520,7 +1575,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         {
             std::string cat = it.next().str();
             sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Categories(id,guid) VALUES(%lli,'%q');",
-            cats, cat.c_str());
+                             cats, cat.c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -1551,7 +1606,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
 
     delete pStmt;
 
-    Log::info("campaign %lld updated",long_id);
+    Log::info("campaign %s updated",aCampaignId.c_str());
 }
 
 
@@ -1606,14 +1661,14 @@ void ParentDB::CampaignRemove(const std::string &aCampaignId)
     pStmt = new Kompex::SQLiteStatement(pdb);
     pStmt->BeginTransaction();
     sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign WHERE guid='%s';",aCampaignId.c_str());
-        try
-        {
-            pStmt->SqlStatement(buf);
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            logDb(ex);
-        }
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
 

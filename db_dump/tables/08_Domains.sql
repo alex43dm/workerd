@@ -5,3 +5,4 @@ name VARCHAR(2048),
 UNIQUE (name),
 UNIQUE (name) ON CONFLICT IGNORE
 );
+INSERT INTO Domains(name) VALUES('');

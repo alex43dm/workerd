@@ -28,3 +28,4 @@ CREATE INDEX IF NOT EXISTS idx_Informer_guid ON Informer (guid);
 CREATE INDEX IF NOT EXISTS idx_Informer_domainId ON Informer (domainId);
 CREATE INDEX IF NOT EXISTS idx_Informer_accountId ON Accounts (id);
 
+INSERT INTO Informer(id,guid,domainId,accountId,title) VALUES(1,'',1,1,'');
