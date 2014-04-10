@@ -1,7 +1,6 @@
 #include "ParentDB.h"
 #include "Log.h"
 #include "KompexSQLiteStatement.h"
-#include "KompexSQLiteException.h"
 #include "json.h"
 #include "Config.h"
 #include "Offer.h"
@@ -65,7 +64,7 @@ bool ParentDB::ConnectMainDatabase()
     }
     catch (mongo::UserException &ex)
     {
-        Log::err("Error connecting to mongo: %s", ex.what());
+        Log::err("ParentDB mongo error: %s", ex.what());
         return false;
     }
 
@@ -105,7 +104,7 @@ void ParentDB::loadRating(const std::string &id)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Offers::loadReting DELETE FROM Informer2OfferRating error: %s", ex.GetString().c_str());
+            logDb(ex);
         }
     }
 
@@ -136,7 +135,7 @@ void ParentDB::loadRating(const std::string &id)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Offers::loadReting insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
         }
     }
@@ -225,7 +224,7 @@ void ParentDB::OfferLoad(mongo::Query q_correct)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Offers::_loadFromQuery insert(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
             skipped++;
         }
 
@@ -260,7 +259,7 @@ void ParentDB::OfferRemove(const std::string &id)
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("Offer::remove(%s) error: %s", buf, ex.GetString().c_str());
+        logDb(ex);
     }
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
@@ -285,7 +284,7 @@ long long ParentDB::insertAndGetDomainId(const std::string &domain)
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("ParentDB::insertAndGetDomainId insert(%s) error: %s", buf, ex.GetString().c_str());
+        logDb(ex);
     }
 
     try
@@ -299,7 +298,7 @@ long long ParentDB::insertAndGetDomainId(const std::string &domain)
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("ParentDB::insertAndGetDomainId insert(%s) error: %s", buf, ex.GetString().c_str());
+        logDb(ex);
     }
     pStmt->FreeQuery();
     return domainId;
@@ -320,7 +319,7 @@ long long ParentDB::insertAndGetAccountId(const std::string &accout)
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("ParentDB::insertAndGetAccountId insert(%s) error: %s", buf, ex.GetString().c_str());
+        logDb(ex);
     }
 
     try
@@ -334,7 +333,7 @@ long long ParentDB::insertAndGetAccountId(const std::string &accout)
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("ParentDB::insertAndGetAccountId insert(%s) error: %s", buf, ex.GetString().c_str());
+        logDb(ex);
     }
     pStmt->FreeQuery();
     return accountId;
@@ -411,7 +410,7 @@ bool ParentDB::InformerLoadAll()
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Informer::_loadFromQuery insert error: %s", ex.GetString().c_str());
+            logDb(ex);
             skipped++;
         }
         i++;
@@ -507,7 +506,7 @@ bool ParentDB::InformerUpdate(const std::string &id)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Informer::_loadFromQuery insert error: %s", ex.GetString().c_str());
+            logDb(ex);
         }
     }
 
@@ -538,7 +537,7 @@ void ParentDB::InformerRemove(const std::string &id)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Informer::remove(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
@@ -566,7 +565,7 @@ void ParentDB::updateRating(const std::string &id)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Informer::remove(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
@@ -605,7 +604,7 @@ void ParentDB::CategoriesLoad()
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("CategoriesLoad insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
             catAll += "'"+cat+"',";
         }
@@ -623,7 +622,7 @@ void ParentDB::CategoriesLoad()
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("CategoriesLoad insert(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
 
     }
@@ -653,10 +652,14 @@ void ParentDB::GeoRerionsAdd(const std::string &country, const std::string &regi
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("GeoRerions::add %s error: %s", buf, ex.GetString().c_str());
+        logDb(ex);
     }
 }
 
+void ParentDB::logDb(const Kompex::SQLiteException &ex) const
+{
+    Log::err("ParentDB::logDb request:(%s) error: %s", buf, ex.GetString().c_str());
+}
 /** \brief  Закгрузка всех рекламных кампаний из базы данных  Mongo
 
  */
@@ -713,7 +716,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
         //------------------------geoTargeting-----------------------
         mongo::BSONObjIterator it = o.getObjectField("geoTargeting");
@@ -758,8 +761,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("campaign load all insert error: %s", buf);
-            ex.Show();
+            logDb(ex);
         }
 
         //------------------------informers-----------------------
@@ -783,7 +785,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("campaign load all insert error: %s", buf); ex.Show();
+            logDb(ex);
         }
 
         bzero(buf,sizeof(buf));
@@ -807,7 +809,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("campaign load all insert error: %s", buf); ex.Show();
+            logDb(ex);
         }
 
         //------------------------accounts-----------------------
@@ -826,7 +828,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
 
             accounts_allowed += "'"+acnt+"',";
@@ -846,7 +848,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("campaign load all insert error: %s", buf); ex.Show();
+            logDb(ex);
         }
 
         // Множества информеров, аккаунтов и доменов, на которых запрещен показ
@@ -862,7 +864,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
 
             accounts_ignored += "'"+acnt+"',";
@@ -881,7 +883,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("campaign load all insert error: %s", buf); ex.Show();
+            logDb(ex);
         }
 
 
@@ -901,7 +903,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
 
             domains_allowed += "'"+acnt+"',";
@@ -922,7 +924,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
         }
 
@@ -940,7 +942,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
 
             domains_ignored += "'"+acnt+"',";
@@ -961,7 +963,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
         }
 
@@ -984,7 +986,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
 
             bzero(buf,sizeof(buf));
@@ -1001,7 +1003,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
         }
 
@@ -1022,7 +1024,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
 
             sqlite3_snprintf(sizeof(buf),buf,
@@ -1037,7 +1039,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
         }
 
@@ -1056,7 +1058,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("campaign load all insert error: %s", buf); ex.Show();
+                logDb(ex);
             }
             catAll += "'"+cat+"',";
         }
@@ -1071,7 +1073,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("campaign load all insert error: %s", buf); ex.Show();
+            logDb(ex);
         }
 
         i++;
@@ -1138,7 +1140,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
         //------------------------geoTargeting-----------------------
         sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM geoTargeting WHERE id_cam=%lld;",long_id);
@@ -1148,7 +1150,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll update(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
 
         mongo::BSONObjIterator it = o.getObjectField("geoTargeting");
@@ -1193,7 +1195,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
 
         //------------------------informers-----------------------
@@ -1204,7 +1206,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll update(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
         // Множества информеров, аккаунтов и доменов, на которых разрешён показ
         std::string informers_allowed;
@@ -1225,7 +1227,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
 
         bzero(buf,sizeof(buf));
@@ -1249,7 +1251,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
 
         //------------------------accounts-----------------------
@@ -1260,7 +1262,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll update(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
         // Множества информеров, аккаунтов и доменов, на которых разрешён показ
         std::string accounts_allowed;
@@ -1276,7 +1278,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
 
             accounts_allowed += "'"+acnt+"',";
@@ -1296,7 +1298,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
 
         // Множества информеров, аккаунтов и доменов, на которых запрещен показ
@@ -1312,7 +1314,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
 
             accounts_ignored += "'"+acnt+"',";
@@ -1331,7 +1333,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
 
 
@@ -1351,7 +1353,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
 
             domains_allowed += "'"+acnt+"',";
@@ -1372,7 +1374,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
         }
 
@@ -1390,7 +1392,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
 
             domains_ignored += "'"+acnt+"',";
@@ -1411,7 +1413,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
         }
 
@@ -1423,7 +1425,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll update(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
 
         it = o.getObjectField("daysOfWeek");
@@ -1444,7 +1446,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
 
             bzero(buf,sizeof(buf));
@@ -1461,7 +1463,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
         }
 
@@ -1482,7 +1484,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
 
             sqlite3_snprintf(sizeof(buf),buf,
@@ -1497,7 +1499,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Campaign::loadAll insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
         }
 
@@ -1509,7 +1511,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::loadAll update(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
 
         std::string catAll;
@@ -1526,7 +1528,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("CategoriesLoad insert(%s) error: %s", buf, ex.GetString().c_str());
+                logDb(ex);
             }
             catAll += "'"+cat+"',";
         }
@@ -1541,7 +1543,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("CategoriesLoad insert(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
     }
     pStmt->CommitTransaction();
@@ -1580,7 +1582,7 @@ void ParentDB::CampaignStartStop(const std::string &aCampaignId, int StartStop)
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("Campaign::start update(%s) error: %s", buf, ex.GetString().c_str());
+        logDb(ex);
     }
 
     pStmt->CommitTransaction();
@@ -1610,7 +1612,7 @@ void ParentDB::CampaignRemove(const std::string &aCampaignId)
         }
         catch(Kompex::SQLiteException &ex)
         {
-            Log::err("Campaign::remove(%s) error: %s", buf, ex.GetString().c_str());
+            logDb(ex);
         }
     pStmt->CommitTransaction();
     pStmt->FreeQuery();

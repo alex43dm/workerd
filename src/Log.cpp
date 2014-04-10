@@ -21,7 +21,14 @@ void Log::log(int level, const char* fmt, ... )
 
 void Log::err(const char* fmt, ... )
 {
-    FMTPARCE syslog(LOG_ERR, "%s", buffer);
+    char buffer[BUFLEN];
+    va_list args;
+
+    va_start (args, fmt);
+    vsprintf (buffer,fmt, args);
+    va_end (args);
+
+    syslog(LOG_ERR, "%s", buffer);
 };
 
 void Log::err(const std::string &mes)

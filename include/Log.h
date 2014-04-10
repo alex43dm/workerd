@@ -9,7 +9,7 @@
 #include <string>
 
 #define BUFLEN 2048
-#define FMTPARCE  char buffer[1024];\
+#define FMTPARCE  char buffer[BUFLEN];\
   va_list args;\
   va_start (args, fmt);\
   vsprintf (buffer,fmt, args);\
