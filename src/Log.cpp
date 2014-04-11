@@ -17,8 +17,7 @@ Log::~Log()
 void Log::err(const char* fmt, ... )
 {
     va_list args;
-    int len = vsnprintf( NULL, 0, fmt, args );
-    char* buffer = new char[len];
+    char* buffer = new char[BUFLEN];
 
     va_start (args, fmt);
     vsprintf(buffer, fmt, args);
@@ -36,8 +35,7 @@ void Log::err(const std::string &mes)
 void Log::warn(const char* fmt, ... )
 {
     va_list args;
-    int len = vsnprintf( NULL, 0, fmt, args );
-    char* buffer = new char[len];
+    char* buffer = new char[BUFLEN];
 
     va_start (args, fmt);
     vsprintf(buffer, fmt, args);
@@ -50,8 +48,7 @@ void Log::warn(const char* fmt, ... )
 void Log::info(const char* fmt, ... )
 {
     va_list args;
-    int len = vsnprintf( NULL, 0, fmt, args );
-    char* buffer = new char[len];
+    char* buffer = new char[BUFLEN];
 
     va_start (args, fmt);
     vsprintf(buffer, fmt, args);
@@ -65,8 +62,7 @@ void Log::gdb(const char* fmt, ... )
 {
 #ifdef DEBUG
     va_list args;
-    int len = vsnprintf( NULL, 0, fmt, args );
-    char* buffer = new char[len];
+    char* buffer = new char[BUFLEN];
 
     va_start (args, fmt);
     vsprintf(buffer, fmt, args);

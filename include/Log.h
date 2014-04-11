@@ -8,7 +8,7 @@
 
 #include <string>
 
-#define BUFLEN 2048
+#define BUFLEN 1024*1024*1024
 #define FMTPARCE  char buffer[BUFLEN];\
   va_list args;\
   va_start (args, fmt);\
