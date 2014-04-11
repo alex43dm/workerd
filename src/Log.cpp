@@ -14,21 +14,18 @@ Log::~Log()
     closelog();
 }
 
-void Log::log(int level, const char* fmt, ... )
-{
-    FMTPARCE syslog(level, "%s", buffer);
-};
-
 void Log::err(const char* fmt, ... )
 {
-    char buffer[BUFLEN];
     va_list args;
+    int len = vsnprintf( NULL, 0, fmt, args );
+    char* buffer = new char[len];
 
     va_start (args, fmt);
-    vsprintf (buffer,fmt, args);
+    vsprintf(buffer, fmt, args);
     va_end (args);
 
     syslog(LOG_ERR, "%s", buffer);
+    delete buffer;
 };
 
 void Log::err(const std::string &mes)
@@ -38,17 +35,44 @@ void Log::err(const std::string &mes)
 
 void Log::warn(const char* fmt, ... )
 {
-    FMTPARCE syslog(LOG_WARNING, "%s", buffer);
+    va_list args;
+    int len = vsnprintf( NULL, 0, fmt, args );
+    char* buffer = new char[len];
+
+    va_start (args, fmt);
+    vsprintf(buffer, fmt, args);
+    va_end (args);
+
+    syslog(LOG_WARNING, "%s", buffer);
+    delete buffer;
 };
 
 void Log::info(const char* fmt, ... )
 {
-    FMTPARCE syslog(LOG_INFO, "%s", buffer);
+    va_list args;
+    int len = vsnprintf( NULL, 0, fmt, args );
+    char* buffer = new char[len];
+
+    va_start (args, fmt);
+    vsprintf(buffer, fmt, args);
+    va_end (args);
+
+    syslog(LOG_INFO, "%s", buffer);
+    delete buffer;
 };
 
 void Log::gdb(const char* fmt, ... )
 {
 #ifdef DEBUG
-    FMTPARCE syslog(LOG_DEBUG, "[%ld] %s", pthread_self(), buffer);
+    va_list args;
+    int len = vsnprintf( NULL, 0, fmt, args );
+    char* buffer = new char[len];
+
+    va_start (args, fmt);
+    vsprintf(buffer, fmt, args);
+    va_end (args);
+
+    syslog(LOG_DEBUG, "%s", buffer);
+    delete buffer;
 #endif // DEBUG
 };

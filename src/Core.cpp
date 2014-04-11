@@ -439,6 +439,8 @@ std::string Core::getGeo()
 
     if(params->getCountry().size() || params->getRegion().size())
     {
+        Log::gdb("country: %s region: %s",params->getCountry().c_str(),params->getRegion().c_str());
+
         if(params->getRegion().size())
         {
             try
