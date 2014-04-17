@@ -1139,10 +1139,16 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             {
                 logDb(ex);
             }
-            catAll += "'"+cat+"',";
+            if(catAll.empty())
+            {
+                catAll += "'"+cat+"'";
+            }
+            else
+            {
+                catAll += ",'"+cat+"'";
+            }
         }
 
-        catAll = catAll.substr(0, catAll.size()-1);
         sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Campaign2Categories(id_cam,id_cat) \
                          SELECT %lld,cat.id FROM Categories AS cat WHERE cat.guid IN(%s);",
                          long_id,catAll.c_str());
@@ -1157,6 +1163,18 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
 
         i++;
     }
+
+    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Categories WHERE id_cam IN (SELECT id FROM Campaign WHERE showCoverage=1);");
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
 
