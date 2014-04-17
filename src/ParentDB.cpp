@@ -722,9 +722,16 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         mongo::BSONObjIterator it = o.getObjectField("geoTargeting");
         std::string country_targeting;
         while (it.more())
-            country_targeting += "'" + it.next().str() + "',";
-
-        country_targeting = country_targeting.substr(0, country_targeting.size()-1);
+        {
+            if(country_targeting.empty())
+            {
+                country_targeting += "'"+it.next().str()+"'";
+            }
+            else
+            {
+                country_targeting += ",'"+it.next().str()+"'";
+            }
+        }
 
         //------------------------regionTargeting-----------------------
         it = o.getObjectField("regionTargeting");
@@ -734,10 +741,17 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             std::string rep = it.next().str();
             GeoRerionsAdd("", rep);
             boost::replace_all(rep,"'", "''");
-            region_targeting += "'" + rep + "',";
+
+            if(region_targeting.empty())
+            {
+                region_targeting += "'"+rep+"'";
+            }
+            else
+            {
+                region_targeting += ",'"+rep+"'";
+            }
         }
 
-        region_targeting = region_targeting.substr(0, region_targeting.size()-1);
         if(region_targeting.size())
         {
             sqlite3_snprintf(sizeof(buf),buf,
@@ -748,11 +762,21 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
         else
         {
-            sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO geoTargeting(id_cam,id_geo) \
-                              SELECT %lld,locId FROM GeoLiteCity WHERE country IN(%s) AND city='';",
-                             long_id, country_targeting.c_str()
-                            );
+            if(country_targeting.size())
+            {
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO geoTargeting(id_cam,id_geo) \
+                                  SELECT %lld,locId FROM GeoLiteCity WHERE country IN(%s) AND city='';",
+                                 long_id, country_targeting.c_str()
+                                );
+            }
+            else
+            {
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO geoTargeting(id_cam,id_geo) VALUES(%lld,1);",
+                                 long_id
+                                );
+            }
         }
 
         try

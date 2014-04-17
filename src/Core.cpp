@@ -123,7 +123,8 @@ std::string Core::Process(Params *prms)
 {
     Offer::Vector vRIS;
 
-    Log::gdb("[%ld]Core::Process start",tid);
+    Log::gdb("Core::Process start");
+    Log::gdb("search: %s",prms->getSearch().c_str());
     boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = boost::posix_time::microsec_clock::local_time();
 
@@ -453,14 +454,17 @@ std::string Core::getGeo()
                 pStmt->Sql(cmd);
                 if(pStmt->GetDataCount())
                 {
-                    geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-        INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND reg.city='"+params->getRegion()+"'";
+                    geo =
+                    "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+                    INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND reg.city='"+params->getRegion()+"'";
                 }
                 else if(params->getCountry().size())
                 {
 
-                    geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.country='"+params->getCountry()+"' AND reg.city='')";
+                    geo =
+                    "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+                    INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId \
+                    AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND reg.city='')";
                 }
                 pStmt->FreeQuery();
             }
@@ -473,8 +477,10 @@ std::string Core::getGeo()
         else if(params->getCountry().size())
         {
 
-            geo = "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.country='"+params->getCountry()+"' AND reg.city='')";
+            geo =
+            "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId \
+            AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND reg.city='')";
         }
     }
     return geo;
