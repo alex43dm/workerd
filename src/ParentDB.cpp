@@ -668,8 +668,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
 {
 //    mongo::MongoDB db;
     Kompex::SQLiteStatement *pStmt;
-    char *pData;
-    int sz, i = 0, cats = 0;
+    int i = 0, cats = 0;
 
     pStmt = new Kompex::SQLiteStatement(pdb);
 
@@ -691,15 +690,10 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         long long long_id = x.getField("guid_int").numberLong();
 
         bzero(buf,sizeof(buf));
-        snprintf(buf,sizeof(buf),"INSERT INTO Campaign(id,guid,title,project,social,valid,showCoverage,impressionsPerDayLimit,retargeting) VALUES(");
-
-        sz = strlen(buf);
-        pData = buf + sz;
-        sz = sizeof(buf) - sz;
-
-        bzero(pData,sz);
-        sqlite3_snprintf(sz,pData,
-                         "%lld,'%q','%q','%q',%d,%d,%d,%d,%d)",
+        sqlite3_snprintf(sizeof(buf),buf,
+                         "INSERT INTO Campaign\
+                         (id,guid,title,project,social,valid,showCoverage,impressionsPerDayLimit,retargeting) \
+                         VALUES(%lld,'%q','%q','%q',%d,%d,%d,%d,%d);",
                          long_id,
                          id.c_str(),
                          x.getStringField("title"),
@@ -1214,23 +1208,20 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
         long_id = x.getField("guid_int").numberLong();
 
         bzero(buf,sizeof(buf));
-        sqlite3_snprintf(sizeof(buf),buf,"UPDATE Campaign SET \
-                             title='%q', \
-                             project='%q', \
-                             social=%d, \
-                             valid=%d, \
-                             showCoverage=%d, \
-                             impressionsPerDayLimit=%d, \
-                             retargeting=%d \
-                             WHERE id=%lld;",
+                sqlite3_snprintf(sizeof(buf),buf,
+                         "INSERT OR REPLACE INTO Campaign\
+                         (id,guid,title,project,social,valid,showCoverage,impressionsPerDayLimit,retargeting) \
+                         VALUES(%lld,'%q','%q','%q',%d,%d,%d,%d,%d);",
+                         long_id,
+                         id.c_str(),
                          x.getStringField("title"),
                          x.getStringField("project"),
                          x.getBoolField("social") ? 1 : 0,
                          o.isValid(),
                          Campaign::typeConv(o.getStringField("showCoverage")),
                          x.getField("impressionsPerDayLimit").numberInt(),
-                         long_id,
-                         o.getBoolField("retargeting") ? 1 : 0);
+                         o.getBoolField("retargeting") ? 1 : 0
+                        );
         try
         {
             pStmt->SqlStatement(buf);
