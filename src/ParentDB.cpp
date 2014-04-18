@@ -699,7 +699,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
                          x.getStringField("title"),
                          x.getStringField("project"),
                          x.getBoolField("social") ? 1 : 0,
-                         o.isValid(),
+                         o.isValid() ? 1 : 0,
                          Campaign::typeConv(o.getStringField("showCoverage")),
                          x.getField("impressionsPerDayLimit").numberInt(),
                          o.getBoolField("retargeting") ? 1 : 0
@@ -1203,6 +1203,12 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
 
     auto cursor = monga_main->query(cfg->mongo_main_db_ +".campaign", QUERY("guid" << aCampaignId));
 
+    if(!cursor->itcount())
+    {
+        CampaignRemove(aCampaignId);
+        return;
+    }
+
     pStmt->BeginTransaction();
     while (cursor->more())
     {
@@ -1228,7 +1234,7 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
                          x.getStringField("title"),
                          x.getStringField("project"),
                          x.getBoolField("social") ? 1 : 0,
-                         o.isValid(),
+                         o.isValid() ? 1 : 0,
                          Campaign::typeConv(o.getStringField("showCoverage")),
                          x.getField("impressionsPerDayLimit").numberInt(),
                          o.getBoolField("retargeting") ? 1 : 0
