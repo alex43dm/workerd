@@ -1043,14 +1043,25 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         // Дни недели, в которые осуществляется показ
         it = o.getObjectField("daysOfWeek");
         int day;
+
+        int startShowTimeHours = o.getFieldDotted("startShowTime.hours").numberLong();
+        int startShowTimeMinutes = o.getFieldDotted("startShowTime.minutes").numberLong();
+        int endShowTimeHours = o.getFieldDotted("endShowTime.hours").numberLong();
+        int endShowTimeMinutes = o.getFieldDotted("endShowTime.minutes").numberLong();
+
+        if(startShowTimeHours == 0 && startShowTimeMinutes == 0 &&endShowTimeHours == 0 && endShowTimeMinutes == 0)
+        {
+            endShowTimeHours = 24;
+        }
+
         if (!it.more())
         {
             bzero(buf,sizeof(buf));
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,null,%d,%d,1)",
                              long_id,
-                             o.getFieldDotted("startShowTime.hours").numberLong(),
-                             o.getFieldDotted("startShowTime.minutes").numberLong()
+                             startShowTimeHours,
+                             startShowTimeMinutes
                             );
 
             try
@@ -1066,8 +1077,8 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,null,%d,%d,0)",
                              long_id,
-                             o.getFieldDotted("endShowTime.hours").numberLong(),
-                             o.getFieldDotted("endShowTime.minutes").numberLong()
+                             endShowTimeHours,
+                             endShowTimeMinutes
                             );
 
             try
@@ -1087,8 +1098,8 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1)",
                              long_id, day,
-                             o.getFieldDotted("startShowTime.hours").numberLong(),
-                             o.getFieldDotted("startShowTime.minutes").numberLong()
+                             startShowTimeHours,
+                             startShowTimeMinutes
                             );
 
             try
@@ -1103,8 +1114,8 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,0)",
                              long_id, day,
-                             o.getFieldDotted("endShowTime.hours").numberLong(),
-                             o.getFieldDotted("endShowTime.minutes").numberLong()
+                             endShowTimeHours,
+                             endShowTimeMinutes
                             );
             try
             {
