@@ -1044,10 +1044,10 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         it = o.getObjectField("daysOfWeek");
         int day;
 
-        int startShowTimeHours = o.getFieldDotted("startShowTime.hours").numberLong();
-        int startShowTimeMinutes = o.getFieldDotted("startShowTime.minutes").numberLong();
-        int endShowTimeHours = o.getFieldDotted("endShowTime.hours").numberLong();
-        int endShowTimeMinutes = o.getFieldDotted("endShowTime.minutes").numberLong();
+        int startShowTimeHours = o.getFieldDotted("startShowTime.hours").numberInt();
+        int startShowTimeMinutes = o.getFieldDotted("startShowTime.minutes").numberInt();
+        int endShowTimeHours = o.getFieldDotted("endShowTime.hours").numberInt();
+        int endShowTimeMinutes = o.getFieldDotted("endShowTime.minutes").numberInt();
 
         if(startShowTimeHours == 0 && startShowTimeMinutes == 0 &&endShowTimeHours == 0 && endShowTimeMinutes == 0)
         {
@@ -1202,12 +1202,6 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
     pStmt = new Kompex::SQLiteStatement(pdb);
 
     auto cursor = monga_main->query(cfg->mongo_main_db_ +".campaign", QUERY("guid" << aCampaignId));
-
-    if(!cursor->itcount())
-    {
-        CampaignRemove(aCampaignId);
-        return;
-    }
 
     pStmt->BeginTransaction();
     while (cursor->more())
@@ -1535,14 +1529,25 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
 
         it = o.getObjectField("daysOfWeek");
         int day;
+
+        int startShowTimeHours = o.getFieldDotted("startShowTime.hours").numberInt();
+        int startShowTimeMinutes = o.getFieldDotted("startShowTime.minutes").numberInt();
+        int endShowTimeHours = o.getFieldDotted("endShowTime.hours").numberInt();
+        int endShowTimeMinutes = o.getFieldDotted("endShowTime.minutes").numberInt();
+
+        if(startShowTimeHours == 0 && startShowTimeMinutes == 0 &&endShowTimeHours == 0 && endShowTimeMinutes == 0)
+        {
+            endShowTimeHours = 24;
+        }
+
         if (!it.more())
         {
             bzero(buf,sizeof(buf));
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,null,%d,%d,1)",
                              long_id,
-                             o.getFieldDotted("startShowTime.hours").numberLong(),
-                             o.getFieldDotted("startShowTime.minutes").numberLong()
+                             startShowTimeHours,
+                             startShowTimeMinutes
                             );
 
             try
@@ -1558,8 +1563,8 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,null,%d,%d,0)",
                              long_id,
-                             o.getFieldDotted("endShowTime.hours").numberLong(),
-                             o.getFieldDotted("endShowTime.minutes").numberLong()
+                             endShowTimeHours,
+                             endShowTimeMinutes
                             );
 
             try
@@ -1579,8 +1584,8 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1)",
                              long_id, day,
-                             o.getFieldDotted("startShowTime.hours").numberLong(),
-                             o.getFieldDotted("startShowTime.minutes").numberLong()
+                             startShowTimeHours,
+                             startShowTimeMinutes
                             );
 
             try
@@ -1595,8 +1600,8 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,0)",
                              long_id, day,
-                             o.getFieldDotted("endShowTime.hours").numberLong(),
-                             o.getFieldDotted("endShowTime.minutes").numberLong()
+                             endShowTimeHours,
+                             endShowTimeMinutes
                             );
             try
             {
@@ -1607,7 +1612,6 @@ void ParentDB::CampaignUpdate(const std::string &aCampaignId)
                 logDb(ex);
             }
         }
-
 // Тематические категории, к которым относится кампания
         sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Categories WHERE id_cam=%lld;",long_id);
         try
