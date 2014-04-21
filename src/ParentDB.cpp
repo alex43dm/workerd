@@ -1041,91 +1041,101 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
 
         // Дни недели, в которые осуществляется показ
-        it = o.getObjectField("daysOfWeek");
-        int day;
+        int day,startShowTimeHours,startShowTimeMinutes,endShowTimeHours,endShowTimeMinutes;
 
-        int startShowTimeHours = o.getFieldDotted("startShowTime.hours").numberInt();
-        int startShowTimeMinutes = o.getFieldDotted("startShowTime.minutes").numberInt();
-        int endShowTimeHours = o.getFieldDotted("endShowTime.hours").numberInt();
-        int endShowTimeMinutes = o.getFieldDotted("endShowTime.minutes").numberInt();
+        mongo::BSONObj bstartTime = o.getObjectField("startShowTime");
+        mongo::BSONObj bendTime = o.getObjectField("endShowTime");
 
-        if(startShowTimeHours == 0 && startShowTimeMinutes == 0 &&endShowTimeHours == 0 && endShowTimeMinutes == 0)
+        startShowTimeHours = strtol(bstartTime.getStringField("hours"),NULL,10);
+        startShowTimeMinutes = strtol(bstartTime.getStringField("minutes"),NULL,10);
+        endShowTimeHours = strtol(bendTime.getStringField("hours"),NULL,10);
+        endShowTimeMinutes = strtol(bendTime.getStringField("minutes"),NULL,10);
+
+        if(startShowTimeHours == 0 &&
+        startShowTimeMinutes == 0 &&
+        endShowTimeHours == 0 &&
+        endShowTimeMinutes == 0)
         {
             endShowTimeHours = 24;
         }
 
-        if (!it.more())
+        if(o.getObjectField("daysOfWeek").isEmpty())
         {
-            bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,null,%d,%d,1)",
-                             long_id,
-                             startShowTimeHours,
-                             startShowTimeMinutes
-                            );
+            for(day = 1; day < 8; day++)
+            {
+                bzero(buf,sizeof(buf));
+                sqlite3_snprintf(sizeof(buf),buf,
+                "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1);",
+                long_id, day,
+                startShowTimeHours,
+                startShowTimeMinutes
+                                );
 
-            try
-            {
-                pStmt->SqlStatement(buf);
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                logDb(ex);
-            }
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
 
-            bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,null,%d,%d,0)",
-                             long_id,
-                             endShowTimeHours,
-                             endShowTimeMinutes
-                            );
-
-            try
-            {
-                pStmt->SqlStatement(buf);
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,0);",
+                                 long_id, day,
+                                 endShowTimeHours,
+                                 endShowTimeMinutes
+                                );
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
             }
-            catch(Kompex::SQLiteException &ex)
+        }
+        else
+        {
+            it = o.getObjectField("daysOfWeek");
+            while (it.more())
             {
-                logDb(ex);
+                day = it.next().numberInt();
+                bzero(buf,sizeof(buf));
+                sqlite3_snprintf(sizeof(buf),buf,
+                "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1);",
+                long_id, day,
+                startShowTimeHours,
+                startShowTimeMinutes
+                                );
+
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,0);",
+                                 long_id, day,
+                                 endShowTimeHours,
+                                 endShowTimeMinutes
+                                );
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
             }
         }
 
-        while (it.more())
-        {
-            day = it.next().numberInt();
-            bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1)",
-                             long_id, day,
-                             startShowTimeHours,
-                             startShowTimeMinutes
-                            );
-
-            try
-            {
-                pStmt->SqlStatement(buf);
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                logDb(ex);
-            }
-
-            sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,0)",
-                             long_id, day,
-                             endShowTimeHours,
-                             endShowTimeMinutes
-                            );
-            try
-            {
-                pStmt->SqlStatement(buf);
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                logDb(ex);
-            }
-        }
 
 // Тематические категории, к которым относится кампания
         std::string catAll;
