@@ -160,7 +160,7 @@ std::string Core::Process(Params *prms)
     if (vRIS.size() && vRIS.size() < (u_int)informer->capacity && (*vRIS.begin())->type != Offer::Type::banner)
     {
         hm->clean = true;
-        Log::gdb("clean offer hostory");
+        Log::gdb("clean offer hostory: by vRIS");
     }
 
     informer->RetargetingCount = vOutPut.size();
@@ -727,7 +727,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
         #ifndef DUMMY
         hm->clean = true;
         #endif // DUMMY
-        Log::warn("result size less then %d: clean history", outLen);
+        Log::warn("RISAlgorithm: result size less then %d: clean history", outLen);
     }
 
     //check is all social
@@ -736,7 +736,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
         #ifndef DUMMY
         hm->clean = true;
         #endif // DUMMY
-        Log::warn("all social: clean history");
+        Log::warn("RISAlgorithm: all social: clean history");
     }
 
     //add teaser when teaser unique id and with company unique and rating > 0
@@ -759,7 +759,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     //user history view clean
     #ifndef DUMMY
     hm->clean = true;
-    Log::warn("clean offer history");
+    Log::warn("RISAlgorithm: clean offer history");
     #endif // DUMMY
 
     if(FULL)
