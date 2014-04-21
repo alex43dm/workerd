@@ -44,7 +44,7 @@ INNER JOIN(
             (
                 (c1.Hour = cast(strftime('%H','now','localtime') AS INT) AND c1.startStop=0)
                 AND
-                (c1.Min <= cast(strftime('%M','now','localtime') AS INT) AND c1.startStop=0)
+                (c1.Min >= cast(strftime('%M','now','localtime') AS INT) AND c1.startStop=0)
             )
         )
 ) AS cx ON co.id_cam=cx.id_cam
