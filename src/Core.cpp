@@ -160,6 +160,7 @@ std::string Core::Process(Params *prms)
     if (vRIS.size() && vRIS.size() < (u_int)informer->capacity && (*vRIS.begin())->type != Offer::Type::banner)
     {
         hm->clean = true;
+        Log::gdb("clean offer hostory");
     }
 
     informer->RetargetingCount = vOutPut.size();
@@ -758,6 +759,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     //user history view clean
     #ifndef DUMMY
     hm->clean = true;
+    Log::warn("clean offer history");
     #endif // DUMMY
 
     if(FULL)
