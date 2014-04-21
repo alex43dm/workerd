@@ -755,13 +755,13 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
             OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
     }
-
+/*
     //user history view clean
     #ifndef DUMMY
     hm->clean = true;
     Log::warn("RISAlgorithm: clean offer history");
     #endif // DUMMY
-
+*/
     if(FULL)
     {
         goto links_make;

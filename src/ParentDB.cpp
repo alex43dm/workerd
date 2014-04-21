@@ -794,7 +794,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         bzero(buf,sizeof(buf));
         sqlite3_snprintf(sizeof(buf),buf,
                          "INSERT INTO Campaign2Informer(id_cam,id_inf,allowed) \
-                         SELECT %lld,id,1 FROM Informer WHERE guid IN(%s)",
+                         SELECT %lld,id,1 FROM Informer WHERE guid IN(%s);",
                          long_id, informers_allowed.c_str()
                         );
         try
@@ -818,7 +818,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         bzero(buf,sizeof(buf));
         sqlite3_snprintf(sizeof(buf),buf,
                          "INSERT INTO Campaign2Informer(id_cam,id_inf,allowed) \
-                         SELECT %lld,id,0 FROM Informer WHERE guid IN(%s)",
+                         SELECT %lld,id,0 FROM Informer WHERE guid IN(%s);",
                          long_id, informers_ignored.c_str()
                         );
         try
@@ -831,7 +831,6 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
 
         //------------------------accounts-----------------------
-
         // Множества информеров, аккаунтов и доменов, на которых разрешён показ
         std::string accounts_allowed;
         it = o.getObjectField("allowed").getObjectField("accounts");
@@ -839,7 +838,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         {
             bzero(buf,sizeof(buf));
             std::string acnt = it.next().str();
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name) VALUES('%q')",acnt.c_str());
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name) VALUES('%q');",acnt.c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -859,14 +858,18 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             }
         }
 
+
         if(accounts_allowed.size())
         {
+
             bzero(buf,sizeof(buf));
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) \
-                             SELECT %lld,id,1 FROM Accounts WHERE name IN(%s)",
-                             long_id, accounts_allowed.c_str()
-                            );
+                             SELECT %lld,id,1 FROM Accounts WHERE name IN(%s);",
+                             long_id, accounts_allowed.c_str());
+
+            Log::gdb("accounts: %s",buf);
+
             try
             {
                 pStmt->SqlStatement(buf);
@@ -882,7 +885,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             {
                 bzero(buf,sizeof(buf));
                 sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1)",
+                                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
                                  long_id
                                 );
                 try
@@ -946,7 +949,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
             {
                 bzero(buf,sizeof(buf));
                 sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,0)",
+                                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,0);",
                                  long_id
                                 );
                 try
@@ -961,7 +964,6 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         }
 
         //------------------------domains-----------------------
-
         // Множества информеров, аккаунтов и доменов, на которых разрешён показ
         std::string domains_allowed;
         it = o.getObjectField("allowed").getObjectField("domains");
@@ -969,7 +971,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         {
             bzero(buf,sizeof(buf));
             std::string acnt = it.next().str();
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q')",acnt.c_str());
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q');",acnt.c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -979,16 +981,22 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
                 logDb(ex);
             }
 
-            domains_allowed += "'"+acnt+"',";
+            if(domains_allowed.empty())
+            {
+                domains_allowed += "'"+acnt+"'";
+            }
+            else
+            {
+                domains_allowed += ",'"+acnt+"'";
+            }
         }
 
-        domains_allowed = domains_allowed.substr(0, domains_allowed.size()-1);
         if(domains_allowed.size())
         {
             bzero(buf,sizeof(buf));
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO Campaign2Domains(id_cam,id_dom,allowed) \
-                             SELECT %lld,id,1 FROM Domains WHERE name IN(%s)",
+                             SELECT %lld,id,1 FROM Domains WHERE name IN(%s);",
                              long_id, domains_allowed.c_str()
                             );
             try
@@ -1008,7 +1016,7 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
         {
             bzero(buf,sizeof(buf));
             std::string acnt = it.next().str();
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q')",acnt.c_str());
+            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q');",acnt.c_str());
             try
             {
                 pStmt->SqlStatement(buf);
@@ -1018,16 +1026,22 @@ void ParentDB::CampaignsLoadAll(mongo::Query q_correct)
                 logDb(ex);
             }
 
-            domains_ignored += "'"+acnt+"',";
+            if(domains_ignored.empty())
+            {
+                domains_ignored += "'"+acnt+"'";
+            }
+            else
+            {
+                domains_ignored += ",'"+acnt+"'";
+            }
         }
 
-        domains_ignored = domains_ignored.substr(0, domains_ignored.size()-1);
         if(domains_ignored.size())
         {
             bzero(buf,sizeof(buf));
             sqlite3_snprintf(sizeof(buf),buf,
                              "INSERT INTO Campaign2Domains(id_cam,id_dom,allowed) \
-                             SELECT %lld,id,0 FROM Domains WHERE name IN(%s)",
+                             SELECT %lld,id,0 FROM Domains WHERE name IN(%s);",
                              long_id, domains_ignored.c_str()
                             );
             try

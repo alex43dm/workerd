@@ -78,6 +78,7 @@ bool BaseCore::ProcessMQ()
                 if(m->getRoutingKey() == "campaign.update")
                 {
                     pdb->CampaignUpdate(toString(m));
+                    Config::Instance()->pDb->postDataLoad();
                 }
                 else if(m->getRoutingKey() == "campaign.delete")
                 {
