@@ -25,12 +25,10 @@ public:
 
     /** \brief Загружает информацию в локальную бд
         обо всех кампаниях если фильтр - по умолчанию
-        или о тех что заданы в фильтре
-        \param[in] фильтр mongo
+        или о кампании что задана в фильтре
+        \param[in] id кампании
     */
-    void CampaignsLoadAll(mongo::Query=mongo::Query());
-    /** \brief Обновить информацию в локальной бд (параметр 1) о кампании (параметр 2)*/
-    void CampaignUpdate(const std::string &aCampaignId);
+    void CampaignLoad(const std::string &aCampaignId = std::string());
     /** \brief Остановить/запустить(парамерт 3) кампанию(параметр 2) guid*/
     void CampaignStartStop(const std::string &aCampaignId, int StartStop);
     /** \brief Удалить кампанию(параметр 2) из локальной бд(параметр 1)*/

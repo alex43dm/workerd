@@ -196,7 +196,6 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
         int level;
 
         pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-        //pStmt->Sql(cmd);
 
         while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
@@ -206,15 +205,11 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
             }
             else if(RT_BULK == reply_type)
             {
-                    Log::gdb("redis cmd: getRange: %s", reply_data);
                     try
                     {
                         sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO %s(id) VALUES(%ld);",
                                          tableName.c_str(),
                                          strtol(reply_data,NULL,10));
-                        //pStmt->BindInt64(1, );
-                        //pStmt->Execute();
-                        //pStmt->Reset();
                         pStmt->SqlStatement(cmd);
 
                         cnt++;

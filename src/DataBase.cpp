@@ -195,11 +195,11 @@ void DataBase::postDataLoad()
 {
     try
     {
-        pStmt->BeginTransaction();
+        //pStmt->BeginTransaction();
 
         readDir(dirName + "/post");
 
-        pStmt->CommitTransaction();
+        //pStmt->CommitTransaction();
     }
     catch(Kompex::SQLiteException &ex)
     {

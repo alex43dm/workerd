@@ -77,7 +77,7 @@ bool BaseCore::ProcessMQ()
                 mq_log_ = "BaseCore::ProcessMQ campaign: " + m->getRoutingKey();
                 if(m->getRoutingKey() == "campaign.update")
                 {
-                    pdb->CampaignUpdate(toString(m));
+                    pdb->CampaignLoad(toString(m));
                     Config::Instance()->pDb->postDataLoad();
                 }
                 else if(m->getRoutingKey() == "campaign.delete")
@@ -180,7 +180,7 @@ void BaseCore::LoadAllEntities()
     pdb->InformerLoadAll();
 
     //Загрузили все кампании
-    pdb->CampaignsLoadAll();
+    pdb->CampaignLoad();
 
     //Загрузили все предложения
     mongo::Query q;
