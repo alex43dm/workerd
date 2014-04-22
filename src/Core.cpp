@@ -803,12 +803,26 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
         }
     }
 
-    //expand to return size
-    for(p = result.begin(); RISResult.size() < outLen && p != result.end(); ++p)
+    if(FULL)
     {
-        RISResult.push_back(*p);
-        OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+        goto links_make;
     }
+
+    //expand to return size
+      while(RISResult.size() < outLen)
+     {
+         for(p = result.begin(); RISResult.size() < outLen && p != result.end(); ++p)
+         {
+             RISResult.push_back(*p);
+             OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+         }
+     }
+
+     //user history view clean
+     #ifndef DUMMY
+     hm->clean = true;
+     Log::warn("RISAlgorithm: clean offer history");
+     #endif // DUMMY
 
 links_make:
     //redirect links make
