@@ -7,3 +7,4 @@ FOREIGN KEY(id_dom) REFERENCES Domains(id)
 );
 CREATE INDEX IF NOT EXISTS idx_Categories2Domain_id_cat ON Categories2Domain (id_cat);
 CREATE INDEX IF NOT EXISTS idx_Categories2Domain_id_dom ON Categories2Domain (id_dom);
+CREATE INDEX IF NOT EXISTS idx_Categories2Domain_id_dom_id_cat ON Categories2Domain (id_cat,id_dom);
