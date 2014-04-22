@@ -2,6 +2,8 @@
 #include <fstream>
 
 #include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <string.h>
 #include <stdlib.h>
@@ -300,7 +302,10 @@ bool Config::Load()
 
         if( (mel = mElem->FirstChildElement("time_update")) && (mel->GetText()) )
         {
-            time_update_ = getTime(mel->GetText());
+            boost::regex timeRegex("(\\d+):(\\d+):(\\d+)");
+            boost::smatch tres;
+            boost::regex_match(std::string(mel->GetText()),  tres, timeRegex);
+            time_update_ = boost::lexical_cast<int>(tres[2]);
         }
 
 

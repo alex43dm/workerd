@@ -71,17 +71,28 @@ CgiService::CgiService()
 
 void CgiService::run()
 {
+    boost::posix_time::ptime now;
+    bool loaded = false;
    //main loop
-    for(int i=0;;i++)
+    for(;;)
     {
-        //todo make lock on mq read
+        //read mq and process
         bcore->ProcessMQ();
-        sleep(1);
-        if( i >= Config::Instance()->time_update_ )
+
+        now = boost::posix_time::second_clock::local_time();
+        if( now.time_of_day().minutes() % Config::Instance()->time_update_ == 0
+           && !loaded)
         {
             bcore->ReloadAllEntities();
-            i = 0;
+            loaded = true;
         }
+        else if( now.time_of_day().minutes() % Config::Instance()->time_update_ != 0
+                && loaded )
+        {
+            loaded = false;
+        }
+
+        sleep(1);
     }
 }
 
