@@ -692,6 +692,11 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
 
     RISResult.clear();
 
+    if(items.size() == 0)
+    {
+        return;
+    }
+
     //sort by rating
     for(auto i = items.begin(); i != items.end(); i++)
     {
@@ -844,6 +849,11 @@ links_make:
 void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen)
 {
     RISResult.clear();
+
+    if(result.size() == 0)
+    {
+        return;
+    }
 
     //add teaser when teaser unique id and with company unique and rating > 0
     for(auto p = result.begin(); p != result.end(); ++p)
