@@ -24,7 +24,7 @@ void Log::err(const char* fmt, ... )
     va_end (args);
 
     syslog(LOG_ERR, "%s", buffer);
-    delete buffer;
+    delete []buffer;
 };
 
 void Log::err(const std::string &mes)
@@ -42,7 +42,7 @@ void Log::warn(const char* fmt, ... )
     va_end (args);
 
     syslog(LOG_WARNING, "%s", buffer);
-    delete buffer;
+    delete []buffer;
 };
 
 void Log::info(const char* fmt, ... )
@@ -55,7 +55,7 @@ void Log::info(const char* fmt, ... )
     va_end (args);
 
     syslog(LOG_INFO, "%s", buffer);
-    delete buffer;
+    delete []buffer;
 };
 
 void Log::gdb(const char* fmt, ... )
@@ -69,6 +69,6 @@ void Log::gdb(const char* fmt, ... )
     va_end (args);
 
     syslog(LOG_DEBUG, "%s", buffer);
-    delete buffer;
+    delete []buffer;
 #endif // DEBUG
 };
