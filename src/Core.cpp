@@ -316,14 +316,15 @@ void Core::ProcessSaveResults()
         Log::err("DB error: delete from %s table: %s", tmpTableName.c_str(), ex.GetString().c_str());
     }
 #endif // DUMMY
-
+/*
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
         if(o->second)
             delete o->second;
         items.erase(o);
     }
-
+*/
+    items.clear();
     result.clear();
     resultRetargeting.clear();
 
@@ -452,8 +453,10 @@ std::string Core::getGeo()
                 sqlite3_snprintf(CMD_SIZE, cmd,"SELECT geo.id_cam FROM geoTargeting AS geo \
                 INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND reg.city='%q';",
                                  params->getRegion().c_str());
+
                 pStmt->Sql(cmd);
-                if(pStmt->GetDataCount())
+
+                if(pStmt->GetDataCount() > 0)
                 {
                     geo =
                     "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
@@ -465,7 +468,7 @@ std::string Core::getGeo()
                     geo =
                     "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
                     INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId \
-                    AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND reg.city='')";
+                    AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND (reg.city='' OR reg.city='NOT FOUND'))";
                 }
                 pStmt->FreeQuery();
             }
@@ -481,7 +484,7 @@ std::string Core::getGeo()
             geo =
             "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
             INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId \
-            AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND reg.city='')";
+            AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND (reg.city='' OR reg.city='NOT FOUND'))";
         }
     }
     return geo;

@@ -1,3 +1,6 @@
+#include <vector>
+#include <boost/algorithm/string.hpp>
+
 #include "ParentDB.h"
 #include "Log.h"
 #include "KompexSQLiteStatement.h"
@@ -639,22 +642,40 @@ void ParentDB::CategoriesLoad()
 void ParentDB::GeoRerionsAdd(const std::string &country, const std::string &region)
 {
     Kompex::SQLiteStatement *pStmt;
+    std::vector<std::string> val;
 
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
 
-    sqlite3_snprintf(sizeof(buf),buf,
-                     "INSERT INTO GeoLiteCity(locId,country,city) SELECT max(locId)+1,'%q','%q' FROM GeoLiteCity;",
-                     country.c_str(),
-                     region.c_str());
-    try
+    boost::split(val, country, boost::is_any_of(","));
+
+    for(unsigned i=0; i < val.size(); i++)
     {
-        pStmt->SqlStatement(buf);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        logDb(ex);
+        sqlite3_snprintf(sizeof(buf),buf,
+                         "SELECT locId FROM GeoLiteCity WHERE country=%s AND city='%q';",
+                         val[i].size() > 0 ? val[i].c_str() : "''",
+                         region.c_str());
+        try
+        {
+            pStmt->SqlStatement(buf);
+
+            if(pStmt->GetDataCount() == 0)
+            {
+                sqlite3_snprintf(sizeof(buf),buf,
+                             "INSERT INTO GeoLiteCity(locId,country,city) \
+                         SELECT max(locId)+1,%s,'%q' FROM GeoLiteCity;",
+                             val[i].size() > 0 ? val[i].c_str() : "''",
+                             region.c_str());
+                pStmt->SqlStatement(buf);
+            }
+
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            logDb(ex);
+        }
     }
 }
+
 
 void ParentDB::logDb(const Kompex::SQLiteException &ex) const
 {
@@ -754,7 +775,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         while (it.more())
         {
             std::string rep = it.next().str();
-            GeoRerionsAdd("", rep);
+            GeoRerionsAdd(country_targeting, rep);
             boost::replace_all(rep,"'", "''");
 
             if(region_targeting.empty())
