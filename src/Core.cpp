@@ -158,7 +158,7 @@ std::string Core::Process(Params *prms)
     RISAlgorithm(items, vRIS, informer->capacity);
     Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
 
-    if(vRIS.size()==0 || (vRIS.size() < (u_int)informer->capacity && (*vRIS.begin())->type != Offer::Type::banner))
+    if(vRIS.size() == 0 || (vRIS.size() < (u_int)informer->capacity && (*vRIS.begin())->type != Offer::Type::banner))
     {
         hm->clean = true;
         Log::gdb("clean offer hostory: by vRIS");
@@ -168,6 +168,12 @@ std::string Core::Process(Params *prms)
             getOffers(items,true);
             Log::gdb("[%ld]getAllOffers: %d done",tid, items.size());
         }
+    }
+
+    if(items.size() == (u_int)informer->capacity)
+    {
+        hm->clean = true;
+        Log::info("clean offer hostory: by items size == capacity");
     }
 
     informer->RetargetingCount = vOutPut.size();

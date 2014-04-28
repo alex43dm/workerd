@@ -2,7 +2,7 @@ dnl Process this file with autoconf
 
 dnl AC_INIT([workerd], m4_esyscmd([echo -n $(git describe --tags --long | sed "s/v\([0-9]\.[0-9]-.*\)-.*/\1/")]), [wvdial@gmail.com])
 
-AC_INIT([workerd], [0.1.3.2], [wvdial@gmail.com])
+AC_INIT([workerd], [1.3.2], [wvdial@gmail.com])
 
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE
