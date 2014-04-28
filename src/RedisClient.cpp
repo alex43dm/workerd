@@ -239,7 +239,7 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
     }
     delete p;
 */
-    Log::gdb("loaded %d", cnt);
+    Log::gdb("RedisClient::getRange: loaded %d", cnt);
     return true;
 }
 

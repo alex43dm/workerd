@@ -45,8 +45,8 @@ AM_CFLAGS = -g -DDEBUG -Wall
 AM_CXXFLAGS = -g -DDEBUG -Wall
 MAKEINIT=0
 else
-AM_CFLAGS = -Ofast
-AM_CXXFLAGS = -Ofast
+AM_CFLAGS = -march=corei7 -O2
+AM_CXXFLAGS = -march=corei7 -O2
 MAKEINIT=1
 endif
 
@@ -60,6 +60,7 @@ db_dump/requests/01.sql \
 db_dump/requests/05.sql \
 db_dump/requests/04.sql \
 db_dump/requests/03.sql \
+db_dump/requests/all.sql \
 db_dump/UA_RU \
 db_dump/tables/11_GeoCountries.sql \
 db_dump/tables/00_Campaign.sql \

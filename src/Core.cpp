@@ -151,7 +151,8 @@ std::string Core::Process(Params *prms)
 
     //ris algorithm
     hm->getRetargetingAsyncWait();
-    RISAlgorithmRetagreting(resultRetargeting, vOutPut, informer->RetargetingCount);
+    RISAlgorithmRetagreting(resultRetargeting, vOutPut,
+                            vRIS.size() == (u_int)informer->capacity ? informer->RetargetingCount : informer->capacity);
     Log::gdb("[%ld]RISAlgorithmRetagreting: vOutPut %ld done",tid, vOutPut.size());
 
     RISAlgorithm(items, vRIS, informer->capacity);
@@ -161,6 +162,12 @@ std::string Core::Process(Params *prms)
     {
         hm->clean = true;
         Log::gdb("clean offer hostory: by vRIS");
+
+        if(vRIS.size() == 0 && vOutPut.size() == 0)
+        {
+            getOffers(items,true);
+            Log::gdb("[%ld]getAllOffers: %d done",tid, items.size());
+        }
     }
 
     informer->RetargetingCount = vOutPut.size();
@@ -505,28 +512,44 @@ bool Core::getAllOffers(Offer::Map &ret)
     return getOffers(ret);
 }
 */
-bool Core::getOffers(Offer::Map &result)
+bool Core::getOffers(Offer::Map &result, bool getAll)
 {
-    boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
-    startTime = boost::posix_time::microsec_clock::local_time();
-
     Kompex::SQLiteStatement *pStmt;
     pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
 
     #ifndef DUMMY
-    sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
-                     getGeo().c_str(),
-                     informer->domainId,
-                     informer->domainId,
-                     informer->domainId,
-                     informer->accountId,
-                     informer->accountId,
-                     informer->id,
-                     informer->id,
-                     getpid(),
-                     tid,
-                     informer->id);
-                    hm->getDeprecatedOffersAsyncWait();
+    if(!getAll)
+    {
+        sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
+                         getGeo().c_str(),
+                         informer->domainId,
+                         informer->domainId,
+                         informer->domainId,
+                         informer->accountId,
+                         informer->accountId,
+                         informer->id,
+                         informer->id,
+                         getpid(),
+                         tid,
+                         informer->id);
+                        hm->getDeprecatedOffersAsyncWait();
+    }
+    else
+    {
+        sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStrAll.c_str(),
+                         getGeo().c_str(),
+                         informer->domainId,
+                         informer->domainId,
+                         informer->domainId,
+                         informer->accountId,
+                         informer->accountId,
+                         informer->id,
+                         informer->id,
+                         getpid(),
+                         tid,
+                         informer->id,
+                         informer->capacity);
+    }
     #else
     sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
                      getGeo().c_str(),
@@ -552,7 +575,7 @@ bool Core::getOffers(Offer::Map &result)
         delete pStmt;
         return false;
     }
-//    Log::info("[%ld]exec: %s",tid, to_simple_string(microsec_clock::local_time() - startTime).c_str());
+
     try
     {
         teasersCount = 0;

@@ -88,7 +88,7 @@ private:
     Offer::Vector result, resultRetargeting;
     Offer::Map items;
 
-    bool getOffers(Offer::Map &result);
+    bool getOffers(Offer::Map &result, bool getAll=false);
     Informer *getInformer();
     void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen);
 

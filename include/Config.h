@@ -83,7 +83,7 @@ public:
     std::string swfobject_;
     int time_update_;
     std::string mq_path_;
-    std::string offerSqlStr, informerSqlStr, retargetingOfferSqlStr;
+    std::string offerSqlStr, informerSqlStr, retargetingOfferSqlStr, offerSqlStrAll;
 
     DataBase *pDb;
 
