@@ -545,8 +545,6 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
                          informer->accountId,
                          informer->id,
                          informer->id,
-                         getpid(),
-                         tid,
                          informer->id,
                          informer->capacity);
     }
