@@ -11,7 +11,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
 {
     if(clean)
     {
-        return history_archive[ViewHistory]->del(key);
+        history_archive[ViewHistory]->del(key);
     }
 
     for(auto it = items.begin(); it != items.end(); ++it)
@@ -51,7 +51,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
  */
 bool HistoryManager::getDeprecatedOffers(std::string &rr)
 {
-
+    clean = false;
     if(!history_archive[ViewHistory]->getRange(key , 0, -1, rr))
     {
         Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
