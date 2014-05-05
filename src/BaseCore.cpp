@@ -62,19 +62,24 @@ std::string BaseCore::toString(AMQPMessage *m)
     return std::string(pMes,len);
 }
 
+#define MAXCOUNT 1000
+
 bool BaseCore::ProcessMQ()
 {
+    AMQPMessage *m;
+    int stopCount;
+
     time_mq_check_ = boost::posix_time::second_clock::local_time();
     try
     {
         {
             // Проверка сообщений campaign.#
             mq_campaign_->Get(AMQP_NOACK);
-            AMQPMessage *m = mq_campaign_->getMessage();
-            if (m->getMessageCount() > -1)
+            m = mq_campaign_->getMessage();
+            stopCount = MAXCOUNT;
+            while(m->getMessageCount() > -1 && stopCount--)
             {
                 Log::gdb("BaseCore::ProcessMQ campaign: %s",m->getRoutingKey().c_str());
-                mq_log_ = "BaseCore::ProcessMQ campaign: " + m->getRoutingKey();
                 if(m->getRoutingKey() == "campaign.update")
                 {
                     pdb->CampaignLoad(toString(m));
@@ -92,18 +97,18 @@ bool BaseCore::ProcessMQ()
                 {
                     pdb->CampaignStartStop(toString(m), 0);
                 }
-                return true;
+                m = mq_campaign_->getMessage();
             }
         }
         {
             // Проверка сообщений advertise.#
             std::string m1, ofrId, cmgId;
             mq_advertise_->Get(AMQP_NOACK);
-            AMQPMessage *m = mq_advertise_->getMessage();
-            if (m->getMessageCount() > -1)
+            m = mq_advertise_->getMessage();
+            stopCount = MAXCOUNT;
+            while(m->getMessageCount() > -1 && stopCount--)
             {
                 Log::gdb("BaseCore::ProcessMQ advertise: %s",m->getRoutingKey().c_str());
-                mq_log_ = "BaseCore::ProcessMQ advertise: " + m->getRoutingKey();
                 m1 = toString(m);
                 if(m->getRoutingKey() == "advertise.update")
                 {
@@ -126,17 +131,17 @@ bool BaseCore::ProcessMQ()
                     }
                 }
 
-                return true;
+                m = mq_advertise_->getMessage();
             }
         }
         {
             // Проверка сообщений informer.#
             mq_informer_->Get(AMQP_NOACK);
-            AMQPMessage *m = mq_informer_->getMessage();
-            if (m->getMessageCount() > -1)
+            m = mq_informer_->getMessage();
+            stopCount = MAXCOUNT;
+            while(m->getMessageCount() > -1 && stopCount--)
             {
                 Log::gdb("BaseCore::ProcessMQ informer: %s",m->getRoutingKey().c_str());
-                mq_log_ = "BaseCore::ProcessMQ informer: " + m->getRoutingKey();
                 if(m->getRoutingKey() == "informer.update")
                 {
                     pdb->InformerUpdate(toString(m));
@@ -150,7 +155,7 @@ bool BaseCore::ProcessMQ()
                     pdb->loadRating(toString(m));
                 }
 
-                return true;
+                m = mq_informer_->getMessage();
             }
         }
     }
@@ -432,7 +437,7 @@ std::string BaseCore::Status()
     // Журнал сообщений AMQP
     out << "<p>Журнал AMQP: </p>"
         "<table>";
-    out << "<tr><td>Последнее сообщение:</td><td>"<< mq_log_<< "</td></tr>";
+//    out << "<tr><td>Последнее сообщение:</td><td>"<< mq_log_<< "</td></tr>";
     out << "<tr><td>Последняя проверка сообщений:</td><td>"<< time_mq_check_ <<"</td><tr>"
         "</table>";
     out << "</body>";
