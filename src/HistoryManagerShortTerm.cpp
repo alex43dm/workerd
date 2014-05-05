@@ -5,25 +5,24 @@
 //----------------------------short term---------------------------------------
 void HistoryManager::getShortTerm()
 {
-    getHistoryByType(HistoryType::ShortTerm, vshortTerm);
+    std::string strSH = history_archive[HistoryType::ShortTerm]->get(key);
 
-    for (auto i=vshortTerm.begin(); i != vshortTerm.end(); ++i)
+    if(strSH.empty())
     {
-        std::string strSH = *i;
-        if (!strSH.empty() && Config::Instance()->range_short_term_ > 0)
+        Log::warn("HistoryManager::%s empty",__func__);
+    }
+    else if(Config::Instance()->range_short_term_ > 0)
+    {
+        std::string q = getKeywordsString(strSH);
+        if (!q.empty())
         {
-            std::string q = getKeywordsString(strSH);
-            if (!q.empty())
-            {
-                lock();
-                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_short_term_,EBranchT::T3));
-                unlock();
-            }
+            lock();
+            stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_short_term_,EBranchT::T3));
+            unlock();
         }
     }
-#ifdef DEBUG
-    Log::info("[%ld]HistoryManager::getShortTerm : done",tid);
-#endif // DEBUG
+
+    Log::gdb("[%ld]HistoryManager::getShortTerm : done",tid);
 }
 
 void *HistoryManager::getShortTermEnv(void *data)
@@ -60,11 +59,11 @@ void HistoryManager::updateShortHistory(const std::string & query)
 {
     if(query.empty() && !updateShort)
         return;
-/*
-    history_archive[ShortTerm]->zadd(key, currentDateToInt(), query);
-    history_archive[ShortTerm]->expire(key, Config::Instance()->shortterm_expire_);
-    if (history_archive[ShortTerm]->zcount(key) >= 3)
-    {
-        history_archive[ShortTerm]->zremrangebyrank(key, 0, 0);
-    }*/
+    /*
+        history_archive[ShortTerm]->zadd(key, currentDateToInt(), query);
+        history_archive[ShortTerm]->expire(key, Config::Instance()->shortterm_expire_);
+        if (history_archive[ShortTerm]->zcount(key) >= 3)
+        {
+            history_archive[ShortTerm]->zremrangebyrank(key, 0, 0);
+        }*/
 }

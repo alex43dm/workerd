@@ -11,19 +11,15 @@ class RedisClient
 {
     public:
         int timeOutMSec;
+        int expireTime;
 
-        RedisClient(const std::string &host, const std::string &port);
+        RedisClient(const std::string &host, const std::string &port, int expireTime);
         virtual ~RedisClient();
 
         bool connect();
 
         bool isConnected() const;
-/*
-        bool addVal(const std::string &key, const std::string &member)
-        {
-            return _addVal(key, currentDateToInt(), member );
-        }
-*/
+
         bool getRange(const std::string &key,
               int start,
               int stop,
@@ -42,12 +38,16 @@ class RedisClient
         bool zadd(const std::string &key, int64_t score, const std::string &q);
         int zscore(const std::string &key, long id);
         bool zincrby(const std::string &key, long id, int inc);
-        bool expire(const std::string &key, int time);
+        bool expire(const std::string &key, long time);
         bool expire(const std::string &key, const std::string &time);
         bool del(const std::string &key);
         int zcount(const std::string &key) const;
         int zcount(const std::string &key, long Min, long Max) const;
         bool zremrangebyrank(const std::string &key, int start, int stop);
+
+        //string methods
+        bool set(const std::string &key, const std::string &val, long expireSeconds = 0);
+        std::string get(const std::string &key);
 
     protected:
     private:

@@ -106,7 +106,7 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &v, unsigned len)
     int viewTime = 0;
 
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-    pStmt->BeginTransaction();
+    //pStmt->BeginTransaction();
 
     for(unsigned i = 0; i < len && i < v.size(); i++)
     {
@@ -150,7 +150,7 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &v, unsigned len)
         }
     }//for
 
-    pStmt->CommitTransaction();
+    //pStmt->CommitTransaction();
     pStmt->FreeQuery();
     delete pStmt;
 
@@ -165,7 +165,7 @@ void HistoryManager::RetargetingClear()
     char buf[8192];
 
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-    pStmt->BeginTransaction();
+ //   pStmt->BeginTransaction();
 
     try
     {
@@ -179,7 +179,7 @@ void HistoryManager::RetargetingClear()
         Log::err("HistoryManager::RetargetingClear(%s) error: %s", buf, ex.GetString().c_str());
     }
 
-    pStmt->CommitTransaction();
+//    pStmt->CommitTransaction();
     pStmt->FreeQuery();
     delete pStmt;
 

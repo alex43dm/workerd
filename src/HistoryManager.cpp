@@ -2,6 +2,8 @@
 #include "Config.h"
 #include "Log.h"
 
+#define REDIS_TIMEOUT 3 * 24 * 3600
+
 HistoryManager::HistoryManager(const std::string &tmpTableName):
     tmpTable(tmpTableName)
 {
@@ -32,16 +34,16 @@ bool HistoryManager::initDB()
 
     Config *cfg = Config::Instance();
 
-    history_archive[ViewHistory] = new RedisClient(cfg->redis_user_view_history_host_, cfg->redis_user_view_history_port_);
+    history_archive[ViewHistory] = new RedisClient(cfg->redis_user_view_history_host_, cfg->redis_user_view_history_port_,Config::Instance()->views_expire_);
     history_archive[ViewHistory]->connect();
 
-    history_archive[ShortTerm] = new RedisClient(cfg->redis_short_term_history_host_, cfg->redis_short_term_history_port_);
+    history_archive[ShortTerm] = new RedisClient(cfg->redis_short_term_history_host_, cfg->redis_short_term_history_port_,REDIS_TIMEOUT);
     history_archive[ShortTerm]->connect();
 
-    history_archive[LongTerm] = new RedisClient(cfg->redis_long_term_history_host_, cfg->redis_long_term_history_port_);
+    history_archive[LongTerm] = new RedisClient(cfg->redis_long_term_history_host_, cfg->redis_long_term_history_port_,REDIS_TIMEOUT);
     history_archive[LongTerm]->connect();
 
-    history_archive[Retargeting] = new RedisClient(cfg->redis_retargeting_host_, cfg->redis_retargeting_port_);
+    history_archive[Retargeting] = new RedisClient(cfg->redis_retargeting_host_, cfg->redis_retargeting_port_,REDIS_TIMEOUT);
     history_archive[Retargeting]->connect();
 
     return true;

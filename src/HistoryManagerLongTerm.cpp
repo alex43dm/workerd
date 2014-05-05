@@ -5,25 +5,24 @@
 //----------------------------long term---------------------------------------
 void HistoryManager::getLongTerm()
 {
-    getHistoryByType(HistoryType::LongTerm, vlongTerm);
+    std::string strSH = history_archive[HistoryType::LongTerm]->get(key);
 
-    for (auto i=vlongTerm.begin(); i != vlongTerm.end(); ++i)
+    if(strSH.empty())
     {
-        std::string strSH = *i;
-        if (!strSH.empty())
+        Log::warn("HistoryManager::%s empty",__func__);
+    }
+    else if(Config::Instance()->range_long_term_ > 0)
+    {
+        std::string q = getKeywordsString(strSH);
+        if (!q.empty())
         {
-            std::string q = getKeywordsString(strSH);
-            if (!q.empty() && Config::Instance()->range_long_term_ > 0)
-            {
-                lock();
-                stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_long_term_,EBranchT::T5));
-                unlock();
-            }
+            lock();
+            stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_long_term_,EBranchT::T5));
+            unlock();
         }
     }
-#ifdef DEBUG
-    Log::info("[%ld]HistoryManager::getLongTerm : done",tid);
-#endif // DEBUG
+
+    Log::gdb("[%ld]HistoryManager::getLongTerm : done",tid);
 }
 
 void *HistoryManager::getLongTermEnv(void *data)
