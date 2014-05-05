@@ -233,10 +233,18 @@ std::string Core::Process(Params *prms)
     #endif//DUMMY
 
     std::string ret;
-    if (params->json_)
-        ret = OffersToJson(vOutPut);
+
+    if(!vOutPut.empty())
+    {
+        if (params->json_)
+            ret = OffersToJson(vOutPut);
+        else
+            ret = OffersToHtml(vOutPut, params->getUrl());
+    }
     else
-        ret = OffersToHtml(vOutPut, params->getUrl());
+    {
+        ret = cfg->template_error_;
+    }
 //printf("%s\n",ret.c_str());
 
     Log::info("[%ld]core time: %s %d",tid, boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime).c_str(), vOutPut.size());
@@ -757,12 +765,12 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     teasersMediumRating /= teasersCount;
 
     //size check
-    if(result.size() < outLen)
+    if(result.size() <= outLen)
     {
         #ifndef DUMMY
         hm->clean = true;
         #endif // DUMMY
-        Log::warn("RISAlgorithm: result size less then %d: clean history", outLen);
+        Log::warn("RISAlgorithm: result size less or equal %d: clean history", result.size());
     }
 
     //check is all social
