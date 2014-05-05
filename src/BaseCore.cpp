@@ -156,7 +156,7 @@ bool BaseCore::ProcessMQ()
                 {
                     pdb->loadRating(toString(m));
                 }
-                mq_advertise_->Get(AMQP_NOACK);
+                mq_informer_->Get(AMQP_NOACK);
                 m = mq_informer_->getMessage();
             }
         }

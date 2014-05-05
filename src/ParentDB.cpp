@@ -147,7 +147,7 @@ void ParentDB::loadRating(const std::string &id)
     pStmt->FreeQuery();
     delete pStmt;
 
-    Log::info("Rating loaded");
+    Log::info("Rating: %s loaded",id.c_str());
 }
 
 /** Загружает все товарные предложения из MongoDb */
