@@ -52,11 +52,6 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
     Executor *executor;
     Kompex::SQLiteStatement *pStmt;
 
-    if( !exists(key) )
-    {
-        return true;
-    }
-
     bzero(cmd,CMD_SIZE);
     snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s 0 -1\r\n", key.c_str());
 
