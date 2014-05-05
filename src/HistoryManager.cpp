@@ -35,16 +35,12 @@ bool HistoryManager::initDB()
     Config *cfg = Config::Instance();
 
     history_archive[ViewHistory] = new RedisClient(cfg->redis_user_view_history_host_, cfg->redis_user_view_history_port_,Config::Instance()->views_expire_);
-    history_archive[ViewHistory]->connect();
 
     history_archive[ShortTerm] = new RedisClient(cfg->redis_short_term_history_host_, cfg->redis_short_term_history_port_,REDIS_TIMEOUT);
-    history_archive[ShortTerm]->connect();
 
     history_archive[LongTerm] = new RedisClient(cfg->redis_long_term_history_host_, cfg->redis_long_term_history_port_,REDIS_TIMEOUT);
-    history_archive[LongTerm]->connect();
 
     history_archive[Retargeting] = new RedisClient(cfg->redis_retargeting_host_, cfg->redis_retargeting_port_,REDIS_TIMEOUT);
-    history_archive[Retargeting]->connect();
 
     return true;
 }
@@ -214,10 +210,5 @@ void HistoryManager::unlock()
 */
 bool HistoryManager::getDBStatus(HistoryType t)
 {
-    if(!history_archive[t]->isConnected())
-    {
-        Log::err("HistoryManager::getDBStatus HistoryType: %d error: %s", (int)t, Module_last_error(module));
-        return false;
-    }
     return true;
 }

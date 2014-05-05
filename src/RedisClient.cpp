@@ -16,7 +16,7 @@ RedisClient::RedisClient(const std::string &host, const std::string &port, int e
     expireTime(expireTime),
     host(host),
     port(port),
-    isConnected_(false)
+    connection(NULL)
 {
     //ctor
     cmd = new char[CMD_SIZE];
@@ -26,102 +26,122 @@ RedisClient::~RedisClient()
 {
     //dtor
     delete []cmd;
-    if(isConnected_)
-    {
-        Connection_free(connection);
-    }
+
 }
 
-bool RedisClient::connect()
+bool RedisClient::start(const std::string &Command)
 {
-    isConnected_ = false;
+    finish();
+
     connection = Connection_new((host + ":" + port).c_str());
     if(connection==NULL)
     {
-        Log::err("redis cannot connect to %s port %s", host.c_str(), port.c_str());
+        Log::err("RedisClient::connect error connect to %s port %s", host.c_str(), port.c_str());
         return false;
     }
-    isConnected_ = true;
+
+    bzero(cmd,CMD_SIZE);
+    int ret = snprintf(cmd, CMD_SIZE, "%s\r\n", Command.c_str());
+
+    batch = Batch_new();
+    Batch_write(batch, cmd, ret, 1);
+
+    executor = Executor_new();
+    Executor_add(executor, connection, batch);
+
+    if(Executor_execute(executor, timeOutMSec) <= 0)
+    {
+        Log::err("RedisClient::%s %s false",__func__,Command.c_str());
+        return false;
+    }
+
     return true;
+}
+
+bool RedisClient::finish()
+{
+    if(connection!=NULL)
+    {
+        Connection_free(connection);
+        connection = NULL;
+
+        if(executor)
+        {
+            Executor_free(executor);
+        }
+
+        if(batch)
+        {
+            Batch_free(batch);
+        }
+
+        return true;
+    }
+    return false;
 }
 
 bool RedisClient::getRange(const std::string &key, const std::string &tableName)
 {
     int cnt = 0;
-    Batch *batch;
-    Executor *executor;
     Kompex::SQLiteStatement *pStmt;
 
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s 0 -1\r\n", key.c_str());
-
-    batch = Batch_new();
-    Batch_write(batch, cmd, strlen(cmd), 1);
-
-    executor = Executor_new();
-    Executor_add(executor, connection, batch);
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
+    if(!start("ZREVRANGEBYSCORE "+key+" 0 -1"))
     {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
         return false;
     }
-    else
+
+    pStmt = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
+
+    while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
     {
-        ReplyType reply_type;
-        char *reply_data;
-        size_t reply_len;
-        int level;
-
-        pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-
-        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        if(reply_type == RT_ERROR)
         {
-            if(reply_type == RT_ERROR)
+            Log::err("RedisClient::%s cmd: getRange: %s",__func__,reply_data);
+        }
+        else if(RT_BULK == reply_type)
+        {
+            try
             {
-                Log::err("redis cmd: getRange false: %s", reply_data);
+                sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO %s(id) VALUES(%ld);",
+                                 tableName.c_str(),
+                                 strtol(reply_data,NULL,10));
+                pStmt->SqlStatement(cmd);
+
+                cnt++;
             }
-            else if(RT_BULK == reply_type)
+            catch(Kompex::SQLiteException &ex)
             {
-                    try
-                    {
-                        sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO %s(id) VALUES(%ld);",
-                                         tableName.c_str(),
-                                         strtol(reply_data,NULL,10));
-                        pStmt->SqlStatement(cmd);
-
-                        cnt++;
-                    }
-                    catch(Kompex::SQLiteException &ex)
-                    {
-                        Log::err("SQLiteTmpTable::insert(%s) error: %s", ex.GetString().c_str());
-                    }
-
+                Log::err("SQLiteTmpTable::insert(%s) error: %s", ex.GetString().c_str());
             }
+
+        }
+        else
+        {
+            Log::warn("RedisClient::%s getRange: %s",__func__,reply_data);
         }
     }
 
-    Batch_free(batch);
+    finish();
+
     delete pStmt;
-/*
-    Kompex::SQLiteStatement *p;
-    p = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-    try
-    {
-        sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_%s_id;",tableName.c_str());
-        p->SqlStatement(cmd);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        Log::err("DB error: REINDEX table: %s: %s",tableName.c_str(), ex.GetString().c_str());
-    }
-    delete p;
-*/
-    Log::gdb("RedisClient::getRange: loaded %d", cnt);
-    return true;
+    /*
+        Kompex::SQLiteStatement *p;
+        p = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+        try
+        {
+            sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_%s_id;",tableName.c_str());
+            p->SqlStatement(cmd);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            Log::err("DB error: REINDEX table: %s: %s",tableName.c_str(), ex.GetString().c_str());
+        }
+        delete p;
+    */
+    Log::gdb("RedisClient::%s: loaded %d",__func__,cnt);
+    return status;
 }
+
 
 
 bool RedisClient::getRange(const std::string &key,
@@ -130,52 +150,25 @@ bool RedisClient::getRange(const std::string &key,
                            std::string &ret)
 {
 
-    Batch *batch;
-    Executor *executor;
-
-    if( !exists(key) )
+    if(!RedisClient::start("ZREVRANGE "+key+" "+std::to_string(start)+" "+std::to_string(stop)))
     {
-        Log::warn("redis no key: %s", key.c_str());
-        return true;
-    }
-
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZREVRANGE %s %d %d\r\n", key.c_str(), start, stop);
-
-    batch = Batch_new();
-    Batch_write(batch, cmd, strlen(cmd), 1);
-
-    executor = Executor_new();
-    Executor_add(executor, connection, batch);
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
-    {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
         return false;
     }
-    else
+
+    while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
     {
-        ReplyType reply_type;
-        char *reply_data;
-        size_t reply_len;
-        int level;
-        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        if(reply_type == RT_ERROR)
         {
-            if(reply_type == RT_ERROR)
-            {
-                Log::err("redis getRange: false: %s", reply_data);
-            }
-            else if(RT_BULK == reply_type)
-                ret += std::string(reply_data, reply_len) + ",";
+            Log::err("redis getRange: false: %s", reply_data);
         }
+        else if(RT_BULK == reply_type)
+            ret += std::string(reply_data, reply_len) + ",";
     }
 
     if (!ret.empty())
         ret.erase(std::prev(ret.end()));
 
-    Batch_free(batch);
+    finish();
 
     return true;
 }
@@ -185,464 +178,215 @@ bool RedisClient::getRange(const std::string &key,
                            int stop,
                            std::list<std::string> &ret)
 {
-    bool vret = false;
-    Batch *batch;
-    Executor *executor;
-
-    if( !exists(key) )
+    if(!RedisClient::start("ZREVRANGE "+key+" "+std::to_string(start)+" "+std::to_string(stop)))
     {
-        return true;
-    }
-
-    bzero(cmd,CMD_SIZE);
-    int rrr = snprintf(cmd, CMD_SIZE, "ZREVRANGE %s %d %d\r\n", key.c_str(), start, stop);
-
-    batch = Batch_new();
-    Batch_write(batch, cmd, rrr, 1);
-
-    executor = Executor_new();
-    Executor_add(executor, connection, batch);
-    int rr = Executor_execute(executor, timeOutMSec);
-
-    if(rr <= 0)
-    {
-        Log::err("redis cmd false: %s",cmd);
-    }
-    else
-    {
-        ReplyType reply_type;
-        char *reply_data;
-        size_t reply_len;
-        int level;
-        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
-        {
-            if(reply_type == RT_ERROR)
-            {
-                Log::err("redis cmd: getRange false: %s", reply_data);
-            }
-            else if(RT_BULK == reply_type)
-            {
-                ret.push_back(std::string(reply_data, reply_len));
-            }
-
-        }
-        vret = true;
-    }
-
-    Executor_free(executor);
-    Batch_free(batch);
-
-    return vret;
-}
-
-bool RedisClient::_addVal(const std::string &key, double score, const std::string &member)
-{
-    Batch *batch = Batch_new();
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZADD %s %f %s\r\n", key.c_str(), score, member.c_str());
-    Batch_write(batch, cmd, strlen(cmd), 1);
-
-//    printf("cmd: %s\n", cmd);
-
-    Executor *executor = Executor_new();
-    Executor_add(executor, connection, batch);
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
-    {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
         return false;
     }
 
-    Batch_free(batch);
-
-    return false;
-}
-
-bool RedisClient::isConnected() const
-{
-    bool ret = false;
-    Batch *batch = Batch_new();
-
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "PING\r\n");
-    Batch_write(batch, cmd, strlen(cmd), 1);
-
-    Executor *executor = Executor_new();
-    Executor_add(executor, connection, batch);
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
-    {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
-        return false;
-    }
-    //read out replies
-    ReplyType reply_type;
-    char *reply_data;
-    size_t reply_len;
-    int level;
     while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
     {
         if(reply_type == RT_ERROR)
         {
-            Log::err("redis cmd: isConnected false: %s", reply_data);
+            Log::err("redis cmd: getRange false: %s", reply_data);
         }
-        else if(reply_type == RT_OK)
+        else if(RT_BULK == reply_type)
         {
-            std::string ans = std::string(reply_data);
-            if(ans.compare(0, 4, "PONG") == 0){ ret = true; break; }
+            ret.push_back(std::string(reply_data, reply_len));
         }
+
     }
 
-    Batch_free(batch);
-    return ret;
+    return finish();
 }
 
 bool RedisClient::exists(const std::string &key)
 {
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "EXISTS %s\r\n", key.c_str());
-    return execCmd(cmd);
+    return execCmd("EXISTS "+key);
 }
 
 long int RedisClient::zrank(const std::string &key, long id)
 {
     long int ret;
-    Batch *batch;
-    Executor *executor;
-
     ret = -1;
 
-    batch= Batch_new();
-
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZRANK %s %ld\r\n", key.c_str(), id);
-    Batch_write(batch, cmd, strlen(cmd), 1);
-
-    executor = Executor_new();
-    Executor_add(executor, connection, batch);
-
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
+    if(!RedisClient::start("ZRANK "+key+" "+std::to_string(id)))
     {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
-        return ret;
+        return false;
     }
-    else
+
+    while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
     {
-        ReplyType reply_type;
-        char *reply_data;
-        size_t reply_len;
-        int level;
-        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        if(reply_type == RT_ERROR)
         {
-            if(reply_type == RT_ERROR)
-            {
-                Log::err("redis cmd: zrank false: %s",reply_data);
-            }
-            else if(reply_type == RT_INTEGER)
-            {
-                ret = strtol(reply_data,NULL,10);
-                break;
-            }
+            Log::err("redis cmd: zrank false: %s",reply_data);
+        }
+        else if(reply_type == RT_INTEGER)
+        {
+            ret = strtol(reply_data,NULL,10);
+            break;
         }
     }
-
-    Batch_free(batch);
+    finish();
     return ret;
 }
 
 bool RedisClient::zadd(const std::string &key, int64_t score, long id)
 {
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZADD %s %ld %ld\r\n", key.c_str(), score, id);
-    execCmd(cmd);
-
+    execCmd("ZADD "+key+" "+std::to_string(score)+" "+std::to_string(id));
     return expire(key, expireTime);
 }
 
 bool RedisClient::zadd(const std::string &key, int64_t score, const std::string &q)
 {
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZADD %s %ld %s\r\n", key.c_str(), score, q.c_str());
-    execCmd(cmd);
-
+    execCmd("ZADD "+key+" "+std::to_string(score)+" "+q);
     return expire(key, expireTime);
 }
 
 int RedisClient::zscore(const std::string &key, long id)
 {
     int ret;
-    Batch *batch;
-    Executor *executor;
-
     ret = -1;
 
-    batch= Batch_new();
-
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZSCORE %s %ld\r\n", key.c_str(), id);
-    Batch_write(batch, cmd, strlen(cmd), 1);
-
-    executor = Executor_new();
-    Executor_add(executor, connection, batch);
-
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
+    if(!RedisClient::start("ZSCORE "+key+" "+std::to_string(id)))
     {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
-        return ret;
+        return false;
     }
-    else
+    while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
     {
-        ReplyType reply_type;
-        char *reply_data;
-        size_t reply_len;
-        int level;
-        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        if(reply_type == RT_ERROR)
         {
-            if(reply_type == RT_ERROR)
-            {
-                Log::err("redis cmd: zscore false: %s", reply_data);
-            }
-            else if(reply_type == RT_INTEGER)
-            {
-                ret = strtol(reply_data,NULL,10);
-                break;
-            }
+            Log::err("redis cmd: zscore false: %s", reply_data);
+        }
+        else if(reply_type == RT_INTEGER)
+        {
+            ret = strtol(reply_data,NULL,10);
+            break;
         }
     }
-
-    Batch_free(batch);
+    finish();
     return ret;
 }
 
 bool RedisClient::zincrby(const std::string &key, long id, int inc)
 {
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZINCRBY %s %d %ld\r\n", key.c_str(), inc, id);
-    return execCmd(cmd);
+    return execCmd("ZINCRBY "+key+" "+std::to_string(inc)+" "+std::to_string(id));
 }
 
 bool RedisClient::expire(const std::string &key, long time)
 {
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "EXPIRE %s %ld\r\n", key.c_str(), time);
-    return execCmd(cmd);
+    return execCmd("EXPIRE "+key+" "+std::to_string(time));
 }
 
 bool RedisClient::expire(const std::string &key, const std::string &time)
 {
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "EXPIRE %s %s\r\n", key.c_str(), time.c_str());
-    return execCmd(cmd);
+    return execCmd("EXPIRE "+key+" "+time);
 }
 
 bool RedisClient::execCmd(const std::string &cmd)
 {
-    Batch *batch;
-    Executor *executor;
-
-    batch= Batch_new();
-
-    Batch_write(batch, cmd.c_str(), cmd.size(), 1);
-
-    executor = Executor_new();
-    Executor_add(executor, connection, batch);
-
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
+    if(!start(cmd))
     {
-        Log::err("redis cmd false: %s",cmd.c_str());
-        Batch_free(batch);
         return false;
     }
-    else
+
+    while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
     {
-        ReplyType reply_type;
-        char *reply_data;
-        size_t reply_len;
-        int level;
-        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        if(reply_type == RT_ERROR)
         {
-            if(reply_type == RT_ERROR)
-            {
-                Log::err("redis cmd: %s false: %s",cmd.c_str(), reply_data);
-            }
-            else if(reply_type == RT_INTEGER)
-            {
+            Log::err("redis cmd: %s false: %s",cmd.c_str(), reply_data);
+        }
+        else if(reply_type == RT_INTEGER)
+        {
 //                ret = strtol(reply_data,NULL,10);
-                break;
-            }
+            break;
         }
     }
-
-    Batch_free(batch);
+    finish();
     return true;
 }
 
 bool RedisClient::del(const std::string &key)
 {
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "DEL %s\r\n", key.c_str());
-    return execCmd(cmd);
+    return execCmd("DEL "+key);
 }
 
-int RedisClient::zcount(const std::string &key) const
+int RedisClient::zcount(const std::string &key)
 {
     int ret;
-    Batch *batch;
-    Executor *executor;
-
     ret = -1;
 
-    batch= Batch_new();
-
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZSCORE %s 0 +inf\r\n", key.c_str());
-    Batch_write(batch, cmd, strlen(cmd), 1);
-
-    executor = Executor_new();
-    Executor_add(executor, connection, batch);
-
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
+    if(!start("ZSCORE "+key+" 0 +inf"))
     {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
-        return ret;
+        return false;
     }
-    else
+    while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
     {
-        ReplyType reply_type;
-        char *reply_data;
-        size_t reply_len;
-        int level;
-        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        if(reply_type == RT_ERROR)
         {
-            if(reply_type == RT_ERROR)
-            {
-                Log::err("redis cmd: zcount false: %s",reply_data);
-            }
-            else if(reply_type == RT_INTEGER)
-            {
-                ret = strtol(reply_data,NULL,10);
-                break;
-            }
+            Log::err("redis cmd: zcount false: %s",reply_data);
+        }
+        else if(reply_type == RT_INTEGER)
+        {
+            ret = strtol(reply_data,NULL,10);
+            break;
         }
     }
-
-    Batch_free(batch);
+    finish();
     return ret;
 }
 
-int RedisClient::zcount(const std::string &key, long Min, long Max) const
+int RedisClient::zcount(const std::string &key, long Min, long Max)
 {
     int ret;
-    Batch *batch;
-    Executor *executor;
-
     ret = -1;
 
-    batch= Batch_new();
-
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZSCORE %s %ld %ld\r\n", key.c_str(), Min, Max);
-    Batch_write(batch, cmd, strlen(cmd), 1);
-
-    executor = Executor_new();
-    Executor_add(executor, connection, batch);
-
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
+    if(!start("ZSCORE "+key+" "+std::to_string(Min)+" "+std::to_string(Max)))
     {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
-        return ret;
+        return false;
     }
-    else
+
+    while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
     {
-        ReplyType reply_type;
-        char *reply_data;
-        size_t reply_len;
-        int level;
-        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        if(reply_type == RT_ERROR)
         {
-            if(reply_type == RT_ERROR)
-            {
-                Log::err("redis cmd: zcount false: %s",reply_data);
-            }
-            else if(reply_type == RT_INTEGER)
-            {
-                ret = strtol(reply_data,NULL,10);
-                break;
-            }
+            Log::err("redis cmd: zcount false: %s",reply_data);
+        }
+        else if(reply_type == RT_INTEGER)
+        {
+            ret = strtol(reply_data,NULL,10);
+            break;
         }
     }
-
-    Batch_free(batch);
+    finish();
     return ret;
 }
 
 bool RedisClient::zremrangebyrank(const std::string &key, int start, int stop)
 {
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZREMRANGEBYRANK %s %d %d\r\n", key.c_str(), start, stop);
-    return execCmd(cmd);
+    return execCmd("ZREMRANGEBYRANK "+key+" "+std::to_string(start)+" "+std::to_string(stop));
 }
 
 bool RedisClient::set(const std::string &key, const std::string &val, long expireSeconds)
 {
-    bzero(cmd,CMD_SIZE);
     if(expireSeconds)
     {
-        snprintf(cmd, CMD_SIZE, "SET %s %s EX %ld\r\n", key.c_str(), base64_encode(val).c_str(), expireSeconds);
+        return execCmd("SET "+key+" "+base64_encode(val)+" EX "+std::to_string(expireSeconds));
     }
     else
     {
-        snprintf(cmd, CMD_SIZE, "SET %s %s\r\n", base64_encode(key).c_str(), val.c_str());
+        return execCmd("SET "+key+" "+base64_encode(val));
     }
-
-    execCmd(cmd);
-
-    return true;
 }
 
 std::string RedisClient::get(const std::string &key)
 {
     std::string ret;
 
-    Batch *batch = Batch_new();
-
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "GET %s\r\n", key.c_str());
-    Batch_write(batch, cmd, strlen(cmd), 1);
-
-    Executor *executor = Executor_new();
-    Executor_add(executor, connection, batch);
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
+    if(!start("GET "+key))
     {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
         return std::string();
     }
-    //read out replies
-    ReplyType reply_type;
-    char *reply_data;
-    size_t reply_len;
-    int level;
+
     while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
     {
         if(reply_type == RT_ERROR)
@@ -655,6 +399,6 @@ std::string RedisClient::get(const std::string &key)
         }
     }
 
-    Batch_free(batch);
+    finish();
     return ret;
 }
