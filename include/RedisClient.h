@@ -16,6 +16,10 @@ class RedisClient
         RedisClient(const std::string &host, const std::string &port, int expireTime);
         virtual ~RedisClient();
 
+        bool connect();
+
+        bool isConnected() const;
+
         bool getRange(const std::string &key,
               int start,
               int stop,
@@ -37,8 +41,8 @@ class RedisClient
         bool expire(const std::string &key, long time);
         bool expire(const std::string &key, const std::string &time);
         bool del(const std::string &key);
-        int zcount(const std::string &key);
-        int zcount(const std::string &key, long Min, long Max);
+        int zcount(const std::string &key) const;
+        int zcount(const std::string &key, long Min, long Max) const;
         bool zremrangebyrank(const std::string &key, int start, int stop);
 
         //string methods
@@ -49,22 +53,12 @@ class RedisClient
     private:
         std::string host;
         std::string port;
+        bool isConnected_;
         char *cmd;
         Connection *connection;
-        Batch *batch;
-        Executor *executor;
-        bool status;
-        ReplyType reply_type;
-        char *reply_data;
-        size_t reply_len;
-        int level;
 
-
-        //bool _addVal(const std::string &key, double score, const std::string &member);
+        bool _addVal(const std::string &key, double score, const std::string &member);
         bool execCmd(const std::string &cmd);
-
-        bool start(const std::string &Command);
-        bool finish();
 };
 
 #endif // REDISCLIENT_H
