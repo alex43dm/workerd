@@ -97,6 +97,8 @@ bool BaseCore::ProcessMQ()
                 {
                     pdb->CampaignStartStop(toString(m), 0);
                 }
+
+                mq_campaign_->Get(AMQP_NOACK);
                 m = mq_campaign_->getMessage();
             }
         }
@@ -130,7 +132,7 @@ bool BaseCore::ProcessMQ()
                         pdb->OfferRemove(ofrId);
                     }
                 }
-
+                mq_advertise_->Get(AMQP_NOACK);
                 m = mq_advertise_->getMessage();
             }
         }
@@ -154,7 +156,7 @@ bool BaseCore::ProcessMQ()
                 {
                     pdb->loadRating(toString(m));
                 }
-
+                mq_advertise_->Get(AMQP_NOACK);
                 m = mq_informer_->getMessage();
             }
         }
