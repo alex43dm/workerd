@@ -169,11 +169,13 @@ void DataBase::readDir(const std::string &dname)
         if(strstr(sql_name->d_name, ".sql") != NULL)
         {
             files.push_back(dname + "/" + sql_name->d_name);
-            Log::info("DataBase::readDir: add file: %s", sql_name->d_name);
+            Log::gdb("DataBase::readDir: add file: %s", sql_name->d_name);
         }
         else
         {
+            #ifdef DEBUG
             Log::warn("DataBase::readDir: file %s does not included!", sql_name->d_name);
+            #endif // DEBUG
         }
     }
     closedir(dir);
@@ -270,7 +272,7 @@ bool DataBase::runSqlFile(const std::string &file)
     }
 
     free(buf);
-    Log::err("DataBase::runSqlFile: run %s", file.c_str());
+    Log::gdb("DataBase::runSqlFile: run %s", file.c_str());
     return true;
 }
 
