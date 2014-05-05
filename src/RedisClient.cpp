@@ -309,7 +309,7 @@ bool RedisClient::isConnected() const
 bool RedisClient::exists(const std::string &key)
 {
     bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "EXISTS '%s'\r\n", key.c_str());
+    snprintf(cmd, CMD_SIZE, "EXISTS %s\r\n", key.c_str());
     return execCmd(cmd);
 }
 

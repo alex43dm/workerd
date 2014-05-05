@@ -166,7 +166,7 @@ std::string Core::Process(Params *prms)
         if(vRIS.size() == 0 && vOutPut.size() == 0)
         {
             getOffers(items,true);
-            Log::gdb("[%ld]getAllOffers: %d done",tid, items.size());
+            Log::warn("[%ld]second request getAllOffers: %d",tid, items.size());
         }
     }
 
