@@ -1311,7 +1311,14 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
 
     delete pStmt;
 
-    Log::info("Loaded %d campaigns",i);
+    if(!aCampaignId.empty())
+    {
+        Log::info("Loaded campaign: %s",aCampaignId.c_str());
+    }
+    else
+    {
+        Log::info("Loaded %d campaigns",i);
+    }
 }
 
 /** \brief  Обновление кампании из базы данных  Mongo
