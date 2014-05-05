@@ -19,7 +19,7 @@ ofrs.height,
 ofrs.width,
 ca.social
 FROM Offer AS ofrs
-INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
+INNER JOIN Campaign AS ca ON ofrs.campaignId=ca.id
 INNER JOIN CampaignNow AS cn ON ca.id=cn.id
 		%s
 INNER JOIN (
@@ -52,7 +52,6 @@ INNER JOIN (
         WHERE (c2id.id_inf=%lld OR c2id.id_inf=1) AND c2id.allowed=0
 ) AS c ON ca.id=c.id
 LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=%lld AND ofrs.id=iret.id_ofr
-WHERE ofrs.valid=1
 ORDER BY rating DESC
 LIMIT %d
 ;
