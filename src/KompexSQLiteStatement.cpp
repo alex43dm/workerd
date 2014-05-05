@@ -302,6 +302,7 @@ int SQLiteStatement::GetColumnBytes16(int column) const
 	return sqlite3_column_bytes16(mStatement, column);
 }
 
+/*  
 const char *SQLiteStatement::GetColumnDatabaseName(int column) const
 {
 	CheckStatement();
@@ -341,7 +342,6 @@ const char *SQLiteStatement::GetColumnOriginName(int column) const
 
 	return sqlite3_column_origin_name(mStatement, column);
 }
-
 wchar_t *SQLiteStatement::GetColumnOriginName16(int column) const
 {
 	CheckStatement();
@@ -349,7 +349,7 @@ wchar_t *SQLiteStatement::GetColumnOriginName16(int column) const
 
 	return (wchar_t*)sqlite3_column_origin_name16(mStatement, column);
 }
-
+*/
 const char *SQLiteStatement::GetColumnDeclaredDatatype(int column) const
 {
 	CheckStatement();
@@ -378,6 +378,7 @@ int SQLiteStatement::GetColumnBytes16(const std::string &column) const
 	return sqlite3_column_bytes16(mStatement, GetAssignedColumnNumber(column));
 }
 
+/*  
 const char *SQLiteStatement::GetColumnDatabaseName(const std::string &column) const
 {
 	AssignColumnNumberToColumnName();
@@ -407,13 +408,12 @@ const char *SQLiteStatement::GetColumnOriginName(const std::string &column) cons
 	AssignColumnNumberToColumnName();
 	return sqlite3_column_origin_name(mStatement, GetAssignedColumnNumber(column));
 }
-
 wchar_t *SQLiteStatement::GetColumnOriginName16(const std::string &column) const
 {
 	AssignColumnNumberToColumnName();
 	return (wchar_t*)sqlite3_column_origin_name16(mStatement, GetAssignedColumnNumber(column));
 }
-
+*/
 const char *SQLiteStatement::GetColumnDeclaredDatatype(const std::string &column) const
 {
 	AssignColumnNumberToColumnName();
@@ -617,10 +617,10 @@ void SQLiteStatement::GetTableColumnMetadata(const std::string &tableName, const
 
 	int notnull, primaryKey, autoInc;
 	const char *dataType, *collSeq;
-
+/*  
 	if(sqlite3_table_column_metadata(mDatabase->GetDatabaseHandle(), 0, tableName.c_str(), columnName.c_str(), &dataType, &collSeq, &notnull, &primaryKey, &autoInc))
 		KOMPEX_EXCEPT(sqlite3_errmsg(mDatabase->GetDatabaseHandle()));
-
+*/
 	std::cout << "TableColumnMetadata:" << std::endl;
 	std::cout << "data type: " << dataType << std::endl;
 	std::cout << "collation sequence: " << primaryKey << std::endl;
