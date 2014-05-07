@@ -140,7 +140,7 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &v, unsigned len)
             {
                 sqlite3_snprintf(sizeof(buf),buf,
                                  "INSERT INTO Retargeting(id,offerId,uniqueHits,viewTime) VALUES(%lli,%lli,%d,%lli);",
-                                 params->getUserKeyLong(), v[i]->id_int, v[i]->uniqueHits,std::time(0));
+                                 params->getUserKeyLong(), v[i]->id_int, v[i]->uniqueHits-1,std::time(0));
             }
             pStmt->SqlStatement(buf);
         }
