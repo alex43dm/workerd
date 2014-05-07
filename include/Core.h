@@ -82,7 +82,7 @@ private:
     std::map<long,long> OutPutCampaignMap;
 
     char *cmd;
-    float teasersMediumRating;
+    float teasersMediumRating,teasersMaxRating;
     std::string tmpTableName;
     Offer::Vector vOutPut;
     Offer::Vector result, resultRetargeting;

@@ -240,6 +240,62 @@ bool RedisClient::getRange(const std::string &key,
     return vret;
 }
 
+
+bool RedisClient::getRange(const std::string &key,
+                           int start,
+                           int stop,
+                           std::list<long> &ret)
+{
+    bool vret = false;
+    Batch *batch;
+    Executor *executor;
+
+    if( !exists(key) )
+    {
+        return true;
+    }
+
+    bzero(cmd,CMD_SIZE);
+    int rrr = snprintf(cmd, CMD_SIZE, "ZREVRANGE %s %d %d\r\n", key.c_str(), start, stop);
+
+    batch = Batch_new();
+    Batch_write(batch, cmd, rrr, 1);
+
+    executor = Executor_new();
+    Executor_add(executor, connection, batch);
+    int rr = Executor_execute(executor, timeOutMSec);
+
+    if(rr <= 0)
+    {
+        Log::err("redis cmd false: %s",cmd);
+    }
+    else
+    {
+        ReplyType reply_type;
+        char *reply_data;
+        size_t reply_len;
+        int level;
+        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        {
+            if(reply_type == RT_ERROR)
+            {
+                Log::err("redis cmd: getRange false: %s", reply_data);
+            }
+            else if(RT_BULK == reply_type)
+            {
+                ret.push_back(strtol(reply_data,NULL,10));
+            }
+
+        }
+        vret = true;
+    }
+
+    Executor_free(executor);
+    Batch_free(batch);
+
+    return vret;
+}
+
 bool RedisClient::_addVal(const std::string &key, double score, const std::string &member)
 {
     Batch *batch = Batch_new();
@@ -309,7 +365,7 @@ bool RedisClient::isConnected() const
 bool RedisClient::exists(const std::string &key)
 {
     bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "EXISTS '%s'\r\n", key.c_str());
+    snprintf(cmd, CMD_SIZE, "EXISTS %s\r\n", key.c_str());
     return execCmd(cmd);
 }
 
@@ -402,7 +458,6 @@ int RedisClient::zscore(const std::string &key, long id)
     if(rr <= 0)
     {
         Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
         return ret;
     }
     else
@@ -467,7 +522,6 @@ bool RedisClient::execCmd(const std::string &cmd)
     if(rr <= 0)
     {
         Log::err("redis cmd false: %s",cmd.c_str());
-        Batch_free(batch);
         return false;
     }
     else

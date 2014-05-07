@@ -26,49 +26,46 @@
 #include "KompexSQLitePrerequisites.h"
 
 namespace Kompex
-{
-//! Exception class for sqlite and KompexSQLiteWrapper errors
-class _SQLiteWrapperExport SQLiteException
-{
-public:
-    //! Overloaded constructor
-    SQLiteException(const std::string &filename, unsigned int line, std::string errDescription = ""):
-        mErrorDescription(errDescription),
-        mFilename(filename),
-        mLine(line)
-    {
-    }
+{	
+	//! Exception class for sqlite and KompexSQLiteWrapper errors
+	class _SQLiteWrapperExport SQLiteException
+	{
+	public:
+		//! Overloaded constructor
+		SQLiteException(const std::string &filename, unsigned int line, std::string errDescription = ""):
+		mErrorDescription(errDescription),
+		mFilename(filename),
+		mLine(line)
+		{
+		}
+		
+		//! Overloaded constructor
+		SQLiteException(const std::string &filename, unsigned int line, const char *errDescription = ""):
+		mErrorDescription(std::string(errDescription)),
+		mFilename(filename),
+		mLine(line)
+		{
+		}
 
-    //! Overloaded constructor
-    SQLiteException(const std::string &filename, unsigned int line, const char *errDescription = ""):
-        mErrorDescription(std::string(errDescription)),
-        mFilename(filename),
-        mLine(line)
-    {
-    }
+		//! Shows all error information.\n
+		//! Output: std::cerr
+		inline void Show() const {std::cerr << "file: " << mFilename << "\nline: " << mLine << "\nerror: " << mErrorDescription << std::endl;}
+		//! Get all error information as std::string
+		std::string GetString() const 
+		{
+			std::stringstream strStream;
+			strStream << "file: " << mFilename << "\nline: " << mLine << "\nerror: " << std::string(mErrorDescription) << "\n";
+			return strStream.str();
+		}
 
-    //! Shows all error information.\n
-    //! Output: std::cerr
-    inline void Show() const
-    {
-        std::cerr << "file: " << mFilename << "\nline: " << mLine << "\nerror: " << mErrorDescription << std::endl;
-    }
-    //! Get all error information as std::string
-    std::string GetString() const
-    {
-        std::stringstream strStream;
-        strStream << "file: " << mFilename << "\nline: " << mLine << "\nerror: " << std::string(mErrorDescription) << "\n";
-        return strStream.str();
-    }
-
-private:
-    //! Error description
-    std::string mErrorDescription;
-    //! Filename in which the error occured
-    std::string mFilename;
-    //! Line number in which the error occured
-    unsigned int mLine;
-};
+	private:
+		//! Error description
+		std::string mErrorDescription;
+		//! Filename in which the error occured
+		std::string mFilename;
+		//! Line number in which the error occured
+		unsigned int mLine;
+	};
 };
 
 #endif // KompexSQLiteException_H

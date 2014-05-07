@@ -54,7 +54,7 @@ public:
 
     //main methods
     void getUserHistory(Params *params);
-    void sphinxProcess(Offer::Map &items);
+    void sphinxProcess(Offer::Map &items, float teasersMaxRating);
     bool updateUserHistory(const Offer::Vector &items, unsigned RetargetingCount);
 
     bool setDeprecatedOffers(const Offer::Vector &items);
@@ -63,6 +63,7 @@ public:
     bool getDeprecatedOffersAsync();
     bool getDeprecatedOffersAsyncWait();
     bool clearDeprecatedOffers();
+    bool setTailOffers(const Offer::Map &items);
 
     bool getLongTermAsync();
     bool getLongTermAsyncWait();
@@ -104,9 +105,8 @@ private:
                 thrGetRetargetingAsync,
                 thrGetPageKeywordsAsync;
 
-    std::list<std::string> vshortTerm;
-    std::list<std::string> vlongTerm;
-    std::list<std::string> vretageting;
+    std::list<std::string> vshortTerm, vlongTerm, vretageting;
+    std::list<long> mtailOffers;
 
     bool getHistoryByType(HistoryType type, std::list<std::string> &rr);
     boost::int64_t currentDateToInt();

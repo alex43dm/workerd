@@ -30,8 +30,8 @@ namespace Kompex
 {
 
 SQLiteStatement::SQLiteStatement(SQLiteDatabase *db):
-	mStatement(0),
 	mDatabase(db),
+	mStatement(0),
 	mTransactionID(0),
 	mIsColumnNumberAssignedToColumnName(false)
 {
@@ -302,7 +302,7 @@ int SQLiteStatement::GetColumnBytes16(int column) const
 	return sqlite3_column_bytes16(mStatement, column);
 }
 
-/*  
+/*
 const char *SQLiteStatement::GetColumnDatabaseName(int column) const
 {
 	CheckStatement();
@@ -378,7 +378,7 @@ int SQLiteStatement::GetColumnBytes16(const std::string &column) const
 	return sqlite3_column_bytes16(mStatement, GetAssignedColumnNumber(column));
 }
 
-/*  
+/*
 const char *SQLiteStatement::GetColumnDatabaseName(const std::string &column) const
 {
 	AssignColumnNumberToColumnName();
@@ -611,23 +611,6 @@ void SQLiteStatement::GetTable(const std::string &sql, unsigned short consoleOut
 	sqlite3_free_table(result);
 }
 
-void SQLiteStatement::GetTableColumnMetadata(const std::string &tableName, const std::string &columnName) const
-{
-	CheckDatabase();
-
-	int notnull, primaryKey, autoInc;
-	const char *dataType, *collSeq;
-/*  
-	if(sqlite3_table_column_metadata(mDatabase->GetDatabaseHandle(), 0, tableName.c_str(), columnName.c_str(), &dataType, &collSeq, &notnull, &primaryKey, &autoInc))
-		KOMPEX_EXCEPT(sqlite3_errmsg(mDatabase->GetDatabaseHandle()));
-*/
-	std::cout << "TableColumnMetadata:" << std::endl;
-	std::cout << "data type: " << dataType << std::endl;
-	std::cout << "collation sequence: " << primaryKey << std::endl;
-	std::cout << "not null: " << notnull << std::endl;
-	std::cout << "primary key: " << primaryKey << std::endl;
-	std::cout << "auto increment: " << autoInc << std::endl;
-}
 
 void SQLiteStatement::ClearBindings() const
 {

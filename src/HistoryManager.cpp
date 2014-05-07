@@ -93,11 +93,16 @@ void HistoryManager::getUserHistory(Params *_params)
     if(isShortTerm())
         getShortTermAsync();
 }
-void HistoryManager::sphinxProcess(Offer::Map &items)
+
+void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
 {
 
     if(!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
     {
+        for(auto i = mtailOffers.begin(); i != mtailOffers.end(); ++i)
+        {
+            items[*i]->rating = items[*i]->rating + teasersMaxRating;
+        }
         return;
     }
 
@@ -114,6 +119,12 @@ void HistoryManager::sphinxProcess(Offer::Map &items)
     sphinx->processKeywords(stringQuery, items);
 
     sphinx->cleanFilter();
+
+    for(auto i = mtailOffers.begin(); i != mtailOffers.end(); ++i)
+    {
+        items[*i]->rating = items[*i]->rating + teasersMaxRating;
+    }
+
 }
 
 
@@ -124,16 +135,16 @@ void HistoryManager::sphinxProcess(Offer::Map &items)
 */
 mongo::BSONObj HistoryManager::BSON_Keywords()
 {
-        std::list<std::string>::iterator it;
-        mongo::BSONArrayBuilder b1,b2;//,b3;
+    std::list<std::string>::iterator it;
+    mongo::BSONArrayBuilder b1,b2;//,b3;
 
-        for (it=vshortTerm.begin() ; it != vshortTerm.end(); ++it )
-            b1.append(*it);
-        mongo::BSONArray shortTermArray = b1.arr();
+    for (it=vshortTerm.begin() ; it != vshortTerm.end(); ++it )
+        b1.append(*it);
+    mongo::BSONArray shortTermArray = b1.arr();
 
-        for (it=vlongTerm.begin() ; it != vlongTerm.end(); ++it )
-            b2.append(*it);
-        mongo::BSONArray longTermArray = b2.arr();
+    for (it=vlongTerm.begin() ; it != vlongTerm.end(); ++it )
+        b2.append(*it);
+    mongo::BSONArray longTermArray = b2.arr();
 //        for (it=vkeywords.begin() ; it != vkeywords.end(); ++it )
 //            b3.append(*it);
 //        mongo::BSONArray contextTermArray = b3.arr();
@@ -147,8 +158,8 @@ mongo::BSONObj HistoryManager::BSON_Keywords()
 }
 
 bool HistoryManager::updateUserHistory(
-        const Offer::Vector &items,
-        unsigned RetargetingCount)
+    const Offer::Vector &items,
+    unsigned RetargetingCount)
 {
     //обновление deprecated
     setDeprecatedOffers(items);
@@ -158,6 +169,12 @@ bool HistoryManager::updateUserHistory(
     vshortTerm.clear();
     vlongTerm.clear();
     vretageting.clear();
+
+    if(mtailOffers.size())
+    {
+        history_archive[ViewHistory]->del(key+"-inv");
+        mtailOffers.clear();
+    }
 
     stringQuery.clear();
 

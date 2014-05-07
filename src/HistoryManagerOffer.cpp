@@ -66,11 +66,23 @@ bool HistoryManager::getDeprecatedOffers()
     if(!history_archive[ViewHistory]->getRange(key, tmpTable))
     {
         Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
-        return false;
     }
-#ifdef DEBUG
-    Log::info("[%ld]HistoryManager::getDeprecatedOffers: done",tid);
-#endif // DEBUG
+
+    if(!history_archive[ViewHistory]->getRange(key+"-inv", 0, -1, mtailOffers))
+    {
+        Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
+    }
+
+    Log::gdb("[%ld]HistoryManager::getDeprecatedOffers: done",tid);
+    return true;
+}
+
+bool HistoryManager::setTailOffers(const Offer::Map &items)
+{
+    for(auto it = items.begin(); it != items.end(); ++it)
+    {
+        history_archive[ViewHistory]->zadd(key+"-inv", 1, (*it).first);
+    }
     return true;
 }
 

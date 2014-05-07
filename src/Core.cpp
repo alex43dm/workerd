@@ -146,7 +146,7 @@ std::string Core::Process(Params *prms)
     Log::gdb("[%ld]getOffers: %d done",tid, items.size());
 
     //wait all history load
-    hm->sphinxProcess(items);
+    hm->sphinxProcess(items, teasersMaxRating);
     Log::gdb("[%ld]sphinxProcess: done",tid);
 
     //ris algorithm
@@ -157,24 +157,6 @@ std::string Core::Process(Params *prms)
 
     RISAlgorithm(items, vRIS, informer->capacity);
     Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
-
-    if(vRIS.size() == 0 || (vRIS.size() < (u_int)informer->capacity && (*vRIS.begin())->type != Offer::Type::banner))
-    {
-        hm->clean = true;
-        Log::gdb("clean offer hostory: by vRIS");
-
-        if(vRIS.size() == 0 && vOutPut.size() == 0)
-        {
-            getOffers(items,true);
-            Log::warn("[%ld]second request getAllOffers: %d",tid, items.size());
-        }
-    }
-
-    if(items.size() == (u_int)informer->capacity)
-    {
-        hm->clean = true;
-        Log::info("clean offer hostory: by items size == capacity");
-    }
 
     informer->RetargetingCount = vOutPut.size();
 
@@ -269,6 +251,17 @@ void Core::ProcessSaveResults()
                                   obj();
 #ifndef DUMMY
         hm->updateUserHistory(vOutPut, informer->RetargetingCount);
+        //cycle view
+        if(items.size() <= (u_int)informer->capacity * 2)
+        {
+            Log::gdb("set tail");
+            for(auto i = vOutPut.begin(); i != vOutPut.end(); ++i)
+            {
+                items.erase((*i)->id_int);
+            }
+
+            hm->setTailOffers(items);
+        }
 #endif // DUMMY
         try
         {
@@ -592,6 +585,7 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
     {
         teasersCount = 0;
         teasersMediumRating = 0;
+        teasersMaxRating = 0;
         while(pStmt->FetchRow())
         {
             Offer *off = new Offer(pStmt->GetColumnString(1),
@@ -617,6 +611,11 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
 
             if(!off->social)
                 all_social = false;
+
+            if(off->rating > teasersMaxRating)
+            {
+                teasersMaxRating = off->rating;
+            }
 
             result.insert(Offer::Pair(off->id_int,off));
         }

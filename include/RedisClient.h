@@ -20,16 +20,9 @@ class RedisClient
 
         bool isConnected() const;
 
-        bool getRange(const std::string &key,
-              int start,
-              int stop,
-              std::string &ret);
-
-        bool getRange(const std::string &key,
-              int start,
-              int stop,
-              std::list<std::string> &ret);
-
+        bool getRange(const std::string &key,int start,int stop,std::string &ret);
+        bool getRange(const std::string &key, int start, int stop,std::list<std::string> &ret);
+        bool getRange(const std::string &key, int start, int stop, std::list<long> &ret);
         bool getRange(const std::string &key, const std::string &tName);
 
         bool exists(const std::string &key);
