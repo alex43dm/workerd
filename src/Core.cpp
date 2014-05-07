@@ -250,7 +250,6 @@ void Core::ProcessSaveResults()
                                   append("context", params->getContext()).
                                   obj();
 #ifndef DUMMY
-        hm->updateUserHistory(vOutPut, informer->RetargetingCount);
         //cycle view
         if(items.size() <= (u_int)informer->capacity * 2)
         {
@@ -259,9 +258,11 @@ void Core::ProcessSaveResults()
             {
                 items.erase((*i)->id_int);
             }
-
+            hm->clean = true;
             hm->setTailOffers(items);
         }
+
+        hm->updateUserHistory(vOutPut, informer->RetargetingCount);
 #endif // DUMMY
         try
         {
