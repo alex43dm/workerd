@@ -32,6 +32,16 @@ boost_threads
 boost_datetime
 boost_regex
 
+Configuration
+-------------------------------
+$libtoolize
+$autoheader
+$automake --add-missing
+$aclocal
+$autoconf
+$./configure
+$make
+
 Compilation
 -------------------------------
 The simplest way to compile this package is to enter the source code
