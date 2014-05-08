@@ -51,14 +51,14 @@ bool DataBase::openDb()
 
     //load requests
 #ifdef DUMMY
-    Config::Instance()->offerSqlStr = getSqlFile("requests/05.sql");
+    Config::Instance()->offerSqlStr = getSqlFile(dirName + "/requests/05.sql");
 #else
-    Config::Instance()->offerSqlStr = getSqlFile("requests/01.sql");
+    Config::Instance()->offerSqlStr = getSqlFile(dirName + "/requests/01.sql");
 #endif
 
-    Config::Instance()->offerSqlStrAll = getSqlFile("requests/all.sql");
-    Config::Instance()->informerSqlStr = getSqlFile("requests/04.sql");
-    Config::Instance()->retargetingOfferSqlStr = getSqlFile("requests/03.sql");
+    Config::Instance()->offerSqlStrAll = getSqlFile(dirName + "/requests/all.sql");
+    Config::Instance()->informerSqlStr = getSqlFile(dirName + "/requests/04.sql");
+    Config::Instance()->retargetingOfferSqlStr = getSqlFile(dirName + "/requests/03.sql");
 
     try
     {
@@ -81,11 +81,13 @@ bool DataBase::openDb()
 
         flags = SQLITE_OPEN_READWRITE;
 
-        reopen = is_file_exist(dbFileName);
-
-        if(!reopen)
+        if(dbFileName != ":memory:")
         {
-            flags |= SQLITE_OPEN_CREATE;
+            reopen = is_file_exist(dbFileName);
+            if(!reopen)
+            {
+                flags |= SQLITE_OPEN_CREATE;
+            }
         }
 
         pDatabase = new Kompex::SQLiteDatabase(dbFileName, flags, NULL);//SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | | SQLITE_OPEN_FULLMUTEX
