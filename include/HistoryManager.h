@@ -90,7 +90,7 @@ public:
 
 protected:
 private:
-    std::string key;
+    std::string key, key_inv;
     Params *params;
     Module *module;
     std::map<HistoryType, RedisClient *> history_archive;

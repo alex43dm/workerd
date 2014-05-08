@@ -58,6 +58,7 @@ void HistoryManager::getUserHistory(Params *_params)
 
     params = _params;
     key = params->getUserKey();
+    key_inv = key+"-inv";
     Log::gdb("key: %s",key.c_str());
 
     getDeprecatedOffersAsync();
@@ -172,7 +173,7 @@ bool HistoryManager::updateUserHistory(
 
     if(mtailOffers.size())
     {
-        history_archive[ViewHistory]->del(key+"-inv");
+        history_archive[ViewHistory]->del(key_inv);
         mtailOffers.clear();
     }
 

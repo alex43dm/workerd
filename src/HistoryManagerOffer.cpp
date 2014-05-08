@@ -68,7 +68,7 @@ bool HistoryManager::getDeprecatedOffers()
         Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
     }
 
-    if(!history_archive[ViewHistory]->getRange(key+"-inv", 0, -1, mtailOffers))
+    if(!history_archive[ViewHistory]->getRange(key_inv, 0, -1, mtailOffers))
     {
         Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
     }
@@ -81,7 +81,7 @@ bool HistoryManager::setTailOffers(const Offer::Map &items)
 {
     for(auto it = items.begin(); it != items.end(); ++it)
     {
-        history_archive[ViewHistory]->zadd(key+"-inv", 1, (*it).first);
+        history_archive[ViewHistory]->zadd(key_inv, 1, (*it).first);
     }
     return true;
 }
@@ -117,4 +117,3 @@ bool HistoryManager::getDeprecatedOffersAsyncWait()
 //    Log::gdb("HistoryManager::getDeprecatedOffersAsyncWait return");
     return true;
 }
-
