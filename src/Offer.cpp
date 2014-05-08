@@ -20,7 +20,10 @@ Offer::Offer(const std::string &id,
              bool retargeting,
              int uniqueHits,
              int height,
-             int width):
+             int width,
+             bool social,
+             std::string campaign_guid):
+    id(id),
     id_int(id_int),
     title(title),
     price(price),
@@ -32,12 +35,14 @@ Offer::Offer(const std::string &id,
     valid(valid),
     isOnClick(isOnClick),
     type(typeFromInt(type_int)),
-    branch(EBranchL::LMAX),
+    branch(EBranchL::L30),
     rating(rating),
     retargeting(retargeting),
     uniqueHits(uniqueHits),
     height(height),
-    width(width)
+    width(width),
+    social(social),
+    campaign_guid(campaign_guid)
 {
 }
 
@@ -50,19 +55,23 @@ std::string Offer::toJson() const
 {
     std::stringstream str_json;
 
-    str_json << "{" <<
-         "\"id\": \"" << id_int << "\"," <<
-         "\"title\": \"" << Json::Utils::Escape(title) << "\"," <<
-         "\"description\": \"" << Json::Utils::Escape(description) << "\"," <<
-         "\"price\": \"" << Json::Utils::Escape(price) << "\"," <<
-         "\"image\": \"" << Json::Utils::Escape(image_url) << "\"," <<
-         "\"swf\": \"" << Json::Utils::Escape(swf) << "\"," <<
-         "\"url\": \"" << Json::Utils::Escape(redirect_url) << "\"," <<
-         "\"token\": \"" << Json::Utils::Escape(token) << "\"," <<
-         "\"rating\": \"" << rating << "\"," <<
-         "\"width\": \"" << width << "\"," <<
-         "\"height\": \"" << height << "\"" <<
-         "}";
+    str_json << "{\n" <<
+         "\t\"id\": \"" << id_int << "\",\n" <<
+         "\t\"guid\": \"" << id << "\",\n" <<
+         "\t\"title\": \"" << Json::Utils::Escape(title) << "\",\n" <<
+         "\t\"description\": \"" << Json::Utils::Escape(description) << "\",\n" <<
+         "\t\"price\": \"" << Json::Utils::Escape(price) << "\",\n" <<
+         "\t\"image\": \"" << Json::Utils::Escape(image_url) << "\",\n" <<
+         "\t\"swf\": \"" << Json::Utils::Escape(swf) << "\",\n" <<
+         "\t\"url\": \"" << Json::Utils::Escape(redirect_url) << "\",\n" <<
+         "\t\"token\": \"" << Json::Utils::Escape(token) << "\",\n" <<
+         "\t\"rating\": \"" << rating << "\",\n" <<
+         "\t\"width\": \"" << width << "\",\n" <<
+         "\t\"height\": \"" << height << "\",\n" <<
+         "\t\"campaign_id\": \"" << campaign_id << "\",\n" <<
+         "\t\"campaign_guid\": \"" << campaign_guid << "\",\n" <<
+         "\t\"branch\": \"" << getBranch() << "\"\n" <<
+         "}\n";
 
     return str_json.str();
 }

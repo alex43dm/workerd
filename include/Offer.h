@@ -48,6 +48,8 @@ public:
     int height;					///< высота РП (имеет значение для баннеров)
     int width;					///< ширина РП (имеет значение для баннеров)
     bool social;
+    std::string campaign_guid;
+
     long long int token_int;
     std::string token;          ///< Токен для проверки ссылки
     std::string redirect_url;   ///< Cсылка перенаправления
@@ -70,7 +72,9 @@ public:
           bool retargeting,
           int uniqueHits,
           int height,
-          int width);
+          int width,
+          bool social,
+          std::string campaign_guid);
 
     virtual ~Offer();
 
@@ -104,14 +108,27 @@ public:
         }
     }
 
+    static std::string typeToString(const Type &stype)
+    {
+        switch(stype)
+        {
+            case Type::banner:
+                return "banner";
+            case Type::teazer:
+                return "teazer";
+            default:
+                return "unknown";
+        }
+    }
+
     // Каждому элементу просмотра присваиваем уникальный токен
     long long int gen();
 
     std::string toJson() const;
     bool setBranch(const  EBranchT tbranch);
-    std::string getBranch()
+    std::string getBranch() const
     {
-        return (int)branch < (int)EBranchL::LMAX ? EBranchL2String[(int)branch] : "";
+        return EBranchL2String(branch);
     };
 };
 

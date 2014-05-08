@@ -17,13 +17,14 @@ ofrs.retargeting,
 ofrs.uniqueHits,
 ofrs.height,
 ofrs.width,
-ca.social
+ca.social,
+ca.guid
 FROM Offer AS ofrs
 INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
 INNER JOIN CampaignNow AS cn ON ca.id=cn.id
 		%s
 INNER JOIN (
-        SELECT c2c.id_cam AS id 
+        SELECT c2c.id_cam AS id
         FROM Campaign2Categories AS c2c
         INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat AND ct2d.id_dom=%lld
         UNION ALL

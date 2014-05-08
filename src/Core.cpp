@@ -605,11 +605,10 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
                                    pStmt->GetColumnBool(12),
                                    pStmt->GetColumnInt(13),
                                    pStmt->GetColumnInt(14),
-                                   pStmt->GetColumnInt(15)
+                                   pStmt->GetColumnInt(15),
+                                   pStmt->GetColumnBool(16),
+                                   pStmt->GetColumnString(17)
                                   );
-            off->social = pStmt->GetColumnBool(16);
-            off->branch = EBranchL::L30;
-
             if(!off->social)
                 all_social = false;
 

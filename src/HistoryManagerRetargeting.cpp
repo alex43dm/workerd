@@ -47,9 +47,10 @@ void HistoryManager::getRetargeting()
                                    pStmt->GetColumnBool(12),
                                    pStmt->GetColumnInt(13),
                                    pStmt->GetColumnInt(14),
-                                   pStmt->GetColumnInt(15)
+                                   pStmt->GetColumnInt(15),
+                                   pStmt->GetColumnBool(16),
+                                   pStmt->GetColumnString(17)
                                   );
-            off->social = pStmt->GetColumnBool(16);
 
             vretg->push_back(off);
         }

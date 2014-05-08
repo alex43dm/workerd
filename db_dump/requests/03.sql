@@ -14,7 +14,8 @@ ofrs.retargeting,
 ofrs.uniqueHits,
 ofrs.height,
 ofrs.width,
-ca.social
+ca.social,
+ca.guid
 FROM Offer AS ofrs
 INNER JOIN Campaign AS ca ON ca.retargeting=1 AND ofrs.campaignId=ca.id
 LEFT JOIN Retargeting AS ret ON ret.id=%lli AND ret.uniqueHits <= 0 AND ofrs.id = ret.offerId
