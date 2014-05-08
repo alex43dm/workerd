@@ -277,8 +277,15 @@ void BaseCore::InitMessageQueue()
 */
 void BaseCore::InitMongoDB()
 {
-    mongo::DB db("log.impressions");
-    db.createCollection("log.impressions", 600*1024, true, 1014*1024);
+    try
+    {
+        mongo::DB db("log.impressions");
+        db.createCollection("log.impressions", 600*1024, true, 1014*1024);
+    }
+    catch(mongo::DBException &ex)
+    {
+        Log::err("BaseCore::%s insert into log db: %s",__func__,ex.what());
+    }
 }
 
 /** Возвращает данные о состоянии службы
