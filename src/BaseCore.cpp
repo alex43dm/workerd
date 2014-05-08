@@ -80,6 +80,8 @@ bool BaseCore::ProcessMQ()
             while(m->getMessageCount() > -1 && stopCount--)
             {
                 Log::gdb("BaseCore::ProcessMQ campaign: %s",m->getRoutingKey().c_str());
+                mq_log_ = "BaseCore::ProcessMQ campaign: " + m->getRoutingKey();
+
                 if(m->getRoutingKey() == "campaign.update")
                 {
                     pdb->CampaignLoad(toString(m));
@@ -111,6 +113,8 @@ bool BaseCore::ProcessMQ()
             while(m->getMessageCount() > -1 && stopCount--)
             {
                 Log::gdb("BaseCore::ProcessMQ advertise: %s",m->getRoutingKey().c_str());
+                mq_log_ = "BaseCore::ProcessMQ advertise: " + m->getRoutingKey();
+
                 m1 = toString(m);
                 if(m->getRoutingKey() == "advertise.update")
                 {
@@ -144,6 +148,8 @@ bool BaseCore::ProcessMQ()
             while(m->getMessageCount() > -1 && stopCount--)
             {
                 Log::gdb("BaseCore::ProcessMQ informer: %s",m->getRoutingKey().c_str());
+                mq_log_ = "BaseCore::ProcessMQ informer: " + m->getRoutingKey();
+
                 if(m->getRoutingKey() == "informer.update")
                 {
                     pdb->InformerUpdate(toString(m));
@@ -164,6 +170,7 @@ bool BaseCore::ProcessMQ()
     catch (AMQPException &ex)
     {
         Log::err("AMQPException: %s", ex.getMessage().c_str());
+        mq_log_ = "error";
     }
     return false;
 }
@@ -439,7 +446,7 @@ std::string BaseCore::Status()
     // Журнал сообщений AMQP
     out << "<p>Журнал AMQP: </p>"
         "<table>";
-//    out << "<tr><td>Последнее сообщение:</td><td>"<< mq_log_<< "</td></tr>";
+    out << "<tr><td>Последнее сообщение:</td><td>"<< mq_log_<< "</td></tr>";
     out << "<tr><td>Последняя проверка сообщений:</td><td>"<< time_mq_check_ <<"</td><tr>"
         "</table>";
     out << "</body>";
