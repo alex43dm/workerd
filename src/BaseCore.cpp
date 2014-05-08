@@ -40,7 +40,6 @@ BaseCore::BaseCore()
     LoadAllEntities();
 
     InitMessageQueue();
-    InitMongoDB();
 }
 
 BaseCore::~BaseCore()
@@ -270,21 +269,6 @@ void BaseCore::InitMessageQueue()
     catch (AMQPException &ex)
     {
         Log::err("Error in AMPQ init: %s, Feature will be disabled.", ex.getMessage().c_str());
-    }
-}
-
-/** Подготовка базы данных MongoDB.
-*/
-void BaseCore::InitMongoDB()
-{
-    try
-    {
-        mongo::DB db("log.impressions");
-        db.createCollection("log.impressions", 600*1024, true, 1014*1024);
-    }
-    catch(mongo::DBException &ex)
-    {
-        Log::err("BaseCore::%s insert into log db: %s",__func__,ex.what());
     }
 }
 

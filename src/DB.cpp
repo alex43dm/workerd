@@ -17,20 +17,20 @@ mongo::DB::DB(const std::string &name) :
         db_ = new ScopedDbConnection(options_->server_host, socketTimeout);
     else
     {
-      db_ = new ScopedDbConnection(
-                  mongo::ConnectionString(mongo::ConnectionString::SET,
-                                   options_->server_host,
-                                   options_->replica_set), socketTimeout);
+        db_ = new ScopedDbConnection(
+            mongo::ConnectionString(mongo::ConnectionString::SET,
+                                    options_->server_host,
+                                    options_->replica_set), socketTimeout);
     }
 #else
     if (options_->replica_set.empty())
         db_ = ScopedDbConnection::getScopedDbConnection(options_->server_host, socketTimeout);
     else
     {
-      db_ = ScopedDbConnection::getScopedDbConnection(
+        db_ = ScopedDbConnection::getScopedDbConnection(
                   mongo::ConnectionString(mongo::ConnectionString::SET,
-                                   options_->server_host,
-                                   options_->replica_set), socketTimeout);
+                                          options_->server_host,
+                                          options_->replica_set), socketTimeout);
     }
 #endif // MONGO_2
 }
@@ -150,10 +150,10 @@ mongo::DB::ConnectionOptions *mongo::DB::options_by_name(const std::string &name
 
 /** Добавляет настройки подключения */
 void mongo::DB::_addDatabase(const std::string &name,
-                                    const std::string &server_host,
-                                    const std::string &database,
-                                    const std::string &replica_set,
-                                    bool slave_ok)
+                             const std::string &server_host,
+                             const std::string &database,
+                             const std::string &replica_set,
+                             bool slave_ok)
 {
     ConnectionOptions *options = options_by_name(name);
     if (!options)
@@ -170,6 +170,10 @@ void mongo::DB::_addDatabase(const std::string &name,
     options->slave_ok = slave_ok;
     connection_options_map_[name] = options;
 }
+
+/** Создаёт подключения к базе данных логирования.
+ *
+ * Настройки читаются конструктором класса из переменных окружения среды.*/
 
 bool mongo::DB::ConnectLogDatabase()
 {
@@ -194,6 +198,9 @@ bool mongo::DB::ConnectLogDatabase()
                                         cfg->mongo_log_db_,
                                         cfg->mongo_log_slave_ok_);
 
+            /** Подготовка базы данных MongoDB.*/
+            mongo::DB db("log");
+            db.createCollection("log.impressions", 600*1024, true, 1014*1024);
 //        fConnectedToLogDatabase = true;
         }
         catch (mongo::UserException &ex)

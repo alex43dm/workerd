@@ -68,12 +68,6 @@ public:
 
 private:
     void InitMessageQueue();
-    void InitMongoDB();
-    /** Создаёт подключения к базам данных.
-     *
-     * Настройки читаются конструктором класса из переменных окружения среды.*/
-    bool ConnectLogDatabase();
-
 
  /// Время запуска службы
     boost::posix_time::ptime time_service_started_,time_mq_check_;
