@@ -223,13 +223,13 @@ int main(int argc, char *argv[])
 
     if(fTestConfig)
     {
-        std::cerr<<"Config: Ok"<<std::endl;
+        std::cout<<"Config: Ok"<<std::endl;
         ::exit(0);
     }
 
     if(fPrintPidFile)
     {
-        std::cerr<<cfg->pid_file_<<std::endl;
+        std::cout<<cfg->pid_file_<<std::endl;
         ::exit(0);
     }
 
