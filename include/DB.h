@@ -119,6 +119,14 @@ public:
     /** Возвращает полное название коллекции */
     std::string collection(const std::string &collection);
 
+    bool createCollection(const string &coll, long long size = 0,
+                          bool capped = false, int max = 0, BSONObj *info = 0) {
+        return (*db_)->createCollection(this->collection(coll), size,
+                                     capped, max, info);
+    }
+
+
+
     /** Название используемой базы данных */
     std::string &database();
 

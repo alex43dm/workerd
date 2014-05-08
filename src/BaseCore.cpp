@@ -40,7 +40,7 @@ BaseCore::BaseCore()
     LoadAllEntities();
 
     InitMessageQueue();
-    //InitMongoDB();
+    InitMongoDB();
 }
 
 BaseCore::~BaseCore()
@@ -277,8 +277,8 @@ void BaseCore::InitMessageQueue()
 */
 void BaseCore::InitMongoDB()
 {
-//    mongo::DB db("log");
-//    db.createCollection("log.impressions", 600*1024, true, 1014*1024);
+    mongo::DB db("log.impressions");
+    db.createCollection("log.impressions", 600*1024, true, 1014*1024);
 }
 
 /** Возвращает данные о состоянии службы
