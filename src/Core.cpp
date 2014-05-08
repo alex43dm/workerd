@@ -287,7 +287,7 @@ void Core::ProcessSaveResults()
                                         append("cookie", params->cookie_id_).
                                         append("social", (*i)->social).
                                         append("token", (*i)->token).
-                                        append("type", (*i)->type).
+                                        append("type", Offer::typeToString((*i)->type)).
                                         append("isOnClick", (*i)->isOnClick).
                                         append("campaignId", c->guid).
                                         append("campaignId_int", (*i)->campaign_id).
