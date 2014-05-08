@@ -285,7 +285,8 @@ std::string DataBase::getSqlFile(const std::string &file)
 
     if( (fd = open((dirName + "/" + file).c_str(), O_RDONLY))<2 )
     {
-        throw "error open: " + dirName + "/" + file;
+        Log::err("error open file: %s/%s",dirName.c_str(),file.c_str());
+        ::exit(1);
     }
     ssize_t sz = fileSize(fd);
     char *buf = (char*)malloc(sz);
