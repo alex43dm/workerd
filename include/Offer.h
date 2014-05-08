@@ -115,7 +115,7 @@ public:
             case Type::banner:
                 return "banner";
             case Type::teazer:
-                return "teazer";
+                return "teaser";
             default:
                 return "unknown";
         }
