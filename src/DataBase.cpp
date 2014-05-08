@@ -51,14 +51,14 @@ bool DataBase::openDb()
 
     //load requests
 #ifdef DUMMY
-    Config::Instance()->offerSqlStr = getSqlFile(dirName + "/requests/05.sql");
+    Config::Instance()->offerSqlStr = getSqlFile("requests/05.sql");
 #else
-    Config::Instance()->offerSqlStr = getSqlFile(dirName + "/requests/01.sql");
+    Config::Instance()->offerSqlStr = getSqlFile("requests/01.sql");
 #endif
 
-    Config::Instance()->offerSqlStrAll = getSqlFile(dirName + "/requests/all.sql");
-    Config::Instance()->informerSqlStr = getSqlFile(dirName + "/requests/04.sql");
-    Config::Instance()->retargetingOfferSqlStr = getSqlFile(dirName + "/requests/03.sql");
+    Config::Instance()->offerSqlStrAll = getSqlFile("requests/all.sql");
+    Config::Instance()->informerSqlStr = getSqlFile("requests/04.sql");
+    Config::Instance()->retargetingOfferSqlStr = getSqlFile("requests/03.sql");
 
     try
     {
