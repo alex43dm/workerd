@@ -472,14 +472,16 @@ int RedisClient::zscore(const std::string &key, long id)
             {
                 Log::err("redis cmd: zscore false: %s", reply_data);
             }
-            else if(reply_type == RT_INTEGER)
+            else
             {
-                ret = strtol(reply_data,NULL,10);
-                break;
+                if(reply_type == RT_BULK)
+                {
+                    ret = atoi(reply_data); 
+                    break;
+                }
             }
         }
     }
-
     Batch_free(batch);
     return ret;
 }

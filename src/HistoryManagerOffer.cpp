@@ -16,8 +16,8 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
 
     for(auto it = items.begin(); it != items.end(); ++it)
     {
-        if ((*it)->uniqueHits != -1)
-        {
+        if ((*it)->uniqueHits > 0)
+        {   
             if (history_archive[ViewHistory]->exists(key))
             {
                 if (history_archive[ViewHistory]->zrank(key,(*it)->id_int) > 0) //if rank == -1

@@ -92,10 +92,10 @@ Core::~Core()
 */
 class GenerateRedirectLink
 {
-    long long informerId;
+    std::string informerId;
     std::string location_;
 public:
-    GenerateRedirectLink( long long &informerId,
+    GenerateRedirectLink( std::string &informerId,
                           const std::string &location)
         : informerId(informerId),
           location_(location) { }
@@ -105,7 +105,7 @@ public:
         p->redirect_url =
             Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
                         boost::format("id=%s\ninf=%d\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
-                        % p->id_int
+                        % p->id
                         % informerId
                         % p->gen()
                         % p->url
@@ -201,9 +201,9 @@ std::string Core::Process(Params *prms)
         Offer *p = (*i).second;
         p->redirect_url =
             Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
-                        boost::format("id=%s\ninf=%d\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
-                        % p->id_int
-                        % informer->id
+                        boost::format("id=%s\ninf=%s\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
+                        % p->id
+                        % params->informer_id_
                         % p->gen()
                         % p->url
                         % Config::Instance()->server_ip_
@@ -872,9 +872,9 @@ links_make:
     {
         (*p)->redirect_url =
             Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
-                        boost::format("id=%s\ninf=%d\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
-                        % (*p)->id_int
-                        % informer->id
+                        boost::format("id=%s\ninf=%s\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
+                        % (*p)->id
+                        % params->informer_id_
                         % (*p)->gen()
                         % (*p)->url
                         % Config::Instance()->server_ip_
@@ -969,9 +969,9 @@ make_return:
     {
         (*p)->redirect_url =
             Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
-                        boost::format("id=%s\ninf=%d\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
-                        % (*p)->id_int
-                        % informer->id
+                        boost::format("id=%s\ninf=%s\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
+                        % (*p)->id
+                        % params->informer_id_
                         % (*p)->gen()
                         % (*p)->url
                         % Config::Instance()->server_ip_
