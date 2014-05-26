@@ -300,9 +300,10 @@ void Core::ProcessSaveResults()
                                         append("conformity", "place").//(*i)->conformity).
                                         append("matching", (*i)->matching).
                                         obj();
-                delete c;
 
                 db.insert(cfg->mongo_log_collection_, record, true);
+
+                delete c;
 
                 offer_processed_ ++;
                 if ((*i)->social) social_processed_ ++;
@@ -331,14 +332,15 @@ void Core::ProcessSaveResults()
         Log::err("DB error: delete from %s table: %s", tmpTableName.c_str(), ex.GetString().c_str());
     }
 #endif // DUMMY
-/*
+
+
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
         if(o->second)
             delete o->second;
         items.erase(o);
     }
-*/
+
     items.clear();
     result.clear();
     resultRetargeting.clear();

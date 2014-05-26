@@ -65,9 +65,8 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
 
     executor = Executor_new();
     Executor_add(executor, connection, batch);
-    int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
-    if(rr <= 0)
+
+    if(Executor_execute(executor, timeOutMSec) <= 0)
     {
         Log::err("redis cmd false: %s",cmd);
         Batch_free(batch);
@@ -109,6 +108,7 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
     }
 
     Batch_free(batch);
+    Executor_free(executor);
     delete pStmt;
 /*
     Kompex::SQLiteStatement *p;
@@ -476,7 +476,7 @@ int RedisClient::zscore(const std::string &key, long id)
             {
                 if(reply_type == RT_BULK)
                 {
-                    ret = atoi(reply_data); 
+                    ret = atoi(reply_data);
                     break;
                 }
             }

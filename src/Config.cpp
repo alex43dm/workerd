@@ -303,9 +303,16 @@ bool Config::Load()
         if( (mel = mElem->FirstChildElement("time_update")) && (mel->GetText()) )
         {
             boost::regex timeRegex("(\\d+):(\\d+):(\\d+)");
-            boost::smatch tres;
-            boost::regex_match(std::string(mel->GetText()),  tres, timeRegex);
-            time_update_ = boost::lexical_cast<int>(tres[2]);
+            boost::cmatch tres;
+            if(boost::regex_match(mel->GetText(),  tres, timeRegex))
+            {
+                time_update_ = std::atoi(tres[2].first);//only seconds
+            }
+            else
+            {
+                exit(std::string(__func__)+": no time match in config.xml element: time_update");
+            }
+
         }
 
 
@@ -433,6 +440,12 @@ bool Config::Load()
 
     //history
     TiXmlElement *history, *section;
+
+    range_short_term_ = 0.0;
+    range_long_term_ = 0.0;
+    range_context_ = 0.0;
+    range_search_ = 0.0;
+
     if( (history = mRoot->FirstChildElement("history")) )
     {
         //views
@@ -519,12 +532,16 @@ bool Config::Load()
 
         if((mel = mElem->FirstChildElement("fields")))
         {
-            sphinx_field_names_ = (const char**)malloc(sizeof(const char**));
+
+            sphinx_field_len_ = 0;
+            for(mElem = mel->FirstChildElement(); mElem; mElem = mElem->NextSiblingElement(),sphinx_field_len_++);
+
+            sphinx_field_names_ = (const char**)malloc(sphinx_field_len_ * sizeof(const char*));
             sphinx_field_weights_ = (int *)malloc(sizeof(int*));
             sphinx_field_len_ = 0;
             for(mElem = mel->FirstChildElement(); mElem; mElem = mElem->NextSiblingElement(),sphinx_field_len_++)
             {
-                sphinx_field_names_[sphinx_field_len_] = mElem->Value();
+                sphinx_field_names_[sphinx_field_len_] = strdup(mElem->Value());
                 sphinx_field_weights_[sphinx_field_len_] = atoi(mElem->GetText());
             }
         }

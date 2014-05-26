@@ -6,6 +6,9 @@
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
 
+Campaign()
+{
+}
 /** \brief  Конструктор
 
     \param id        Идентификатор рекламной кампании
@@ -19,14 +22,14 @@ Campaign::Campaign(long long _id) :
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
 
     sqlite3_snprintf(sizeof(buf),buf,
-            "SELECT c.guid,c.title,c.project,c.social,c.valid,c.showCoverage FROM Campaign AS c \
-            WHERE c.id=%lld;", _id);
+                     "SELECT c.guid,c.title,c.project,c.social,c.valid,c.showCoverage FROM Campaign AS c \
+            WHERE c.id=%lld LIMIT 1;", _id);
 
     try
     {
         pStmt->Sql(buf);
 
-        while(pStmt->FetchRow())
+        if(pStmt->FetchRow())
         {
             guid = pStmt->GetColumnString(0);
             title = pStmt->GetColumnString(1);
@@ -43,6 +46,12 @@ Campaign::Campaign(long long _id) :
 
     pStmt->FreeQuery();
 }
+
+Campaign::~Campaign()
+{
+
+}
+
 //-------------------------------------------------------------------------------------------------------
 void Campaign::info(std::vector<Campaign*> &res)
 {
@@ -52,7 +61,7 @@ void Campaign::info(std::vector<Campaign*> &res)
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
 
     sqlite3_snprintf(sizeof(buf),buf,
-            "SELECT c.title,c.valid,c.social,count(ofr.campaignId),c.showCoverage FROM Campaign AS c \
+                     "SELECT c.title,c.valid,c.social,count(ofr.campaignId),c.showCoverage FROM Campaign AS c \
             LEFT JOIN Offer AS ofr ON c.id=ofr.campaignId \
             GROUP BY ofr.campaignId;");
 
@@ -78,3 +87,44 @@ void Campaign::info(std::vector<Campaign*> &res)
 
     pStmt->FreeQuery();
 }
+
+showCoverage Campaign::typeConv(const std::string &t)
+{
+    if( t == "all")
+    {
+        return showCoverage::all;
+    }
+    else if( t == "allowed")
+    {
+        return showCoverage::allowed;
+    }
+    else if( t == "thematic")
+    {
+        return showCoverage::thematic;
+    }
+    else
+    {
+        return showCoverage::all;
+    }
+}
+
+void Campaign::setType(const std::string &t)
+{
+    if( t == "all")
+    {
+        type = showCoverage::all;
+    }
+    else if( t == "allowed")
+    {
+        type = showCoverage::allowed;
+    }
+    else if( t == "thematic")
+    {
+        type = showCoverage::thematic;
+    }
+    else
+    {
+        type = showCoverage::all;
+    }
+}
+

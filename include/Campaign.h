@@ -25,53 +25,14 @@ public:
     showCoverage type;
     int offersCount;
 
-    Campaign(){};
+    Campaign();
     Campaign(long long id);
-
-    static showCoverage typeConv(const std::string &t)
-    {
-        if( t == "all")
-        {
-            return showCoverage::all;
-        }
-        else if( t == "allowed")
-        {
-            return showCoverage::allowed;
-        }
-        else if( t == "thematic")
-        {
-            return showCoverage::thematic;
-        }
-        else
-        {
-            return showCoverage::all;
-        }
-    }
-
-    void setType(const std::string &t)
-    {
-        if( t == "all")
-        {
-            type = showCoverage::all;
-        }
-        else if( t == "allowed")
-        {
-            type = showCoverage::allowed;
-        }
-        else if( t == "thematic")
-        {
-            type = showCoverage::thematic;
-        }
-        else
-        {
-            type = showCoverage::all;
-        }
-    }
+    virtual ~Campaign();
 
     static std::string getName(long long campaign_id);
     static void info(std::vector<Campaign*> &res);
-
-private:
+    static showCoverage typeConv(const std::string &t);
+    void setType(const std::string &t);
 };
 
 #endif // CAMPAIGN_H

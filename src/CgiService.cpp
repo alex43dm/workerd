@@ -67,6 +67,7 @@ CgiService::CgiService()
         }
     }
     pthread_attr_destroy(attributes);
+    free(attributes);
 }
 
 void CgiService::run()
