@@ -26,8 +26,7 @@ std::string time_t_to_string(time_t t)
 CgiService::CgiService()
 {
 
-    if (!GeoCity(cfg->geocity_path_.c_str()))
-        Log::err("City database not found! City targeting will be disabled.");
+    geoip = GeoIPTools::Instance();
 
     bcore = new BaseCore();
 

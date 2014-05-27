@@ -6,7 +6,7 @@
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
 
-Campaign()
+Campaign::Campaign()
 {
 }
 /** \brief  Конструктор
@@ -45,6 +45,7 @@ Campaign::Campaign(long long _id) :
     }
 
     pStmt->FreeQuery();
+    delete pStmt;
 }
 
 Campaign::~Campaign()
@@ -86,6 +87,7 @@ void Campaign::info(std::vector<Campaign*> &res)
     }
 
     pStmt->FreeQuery();
+    delete pStmt;
 }
 
 showCoverage Campaign::typeConv(const std::string &t)

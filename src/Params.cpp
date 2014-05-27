@@ -22,8 +22,8 @@ Params &Params::ip(const std::string &ip)
     struct in_addr ipval;
 
     ip_ = ip;
-    country_ = country_code_by_addr(ip_);
-    region_ = region_code_by_addr(ip_);
+    country_ = geoip->country_code_by_addr(ip_);
+    region_ = geoip->region_code_by_addr(ip_);
 
     if(inet_pton(AF_INET, ip_.c_str(), &ipval))
     {

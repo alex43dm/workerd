@@ -1,49 +1,38 @@
+#include "Config.h"
 #include "GeoIPTools.h"
 
-/** Возвращает объект GeoIP для определения страны по ip */
-GeoIP *GeoCountry()
+GeoIPTools* GeoIPTools::mInstance = NULL;
+
+GeoIPTools::GeoIPTools()
 {
-    static GeoIP *geo = 0;
-    if (geo)
-        return geo;
-    geo = GeoIP_new(GEOIP_MEMORY_CACHE);
-    return geo;
+    mGeoCountry = GeoIP_new(GEOIP_MEMORY_CACHE);
+    mGeoCity = GeoIP_open(cfg->geocity_path_.c_str(), GEOIP_MEMORY_CACHE);
 }
 
-/** Возвращает объект GeoIP для определения города по ip.
-
-    При первом вызове пытается открыть файл с базой данных, указанный в
-    параметре ``filename``. Если ``filename`` не задан
- */
-GeoIP *GeoCity(const char *filename)
+GeoIPTools::~GeoIPTools()
 {
-    static GeoIP *geo = 0;
-    static bool open_failed = false;
-
-    if (open_failed)
-        return 0;
-    if (geo)
-        return geo;
-
-    if (filename)
-        geo = GeoIP_open(filename, GEOIP_MEMORY_CACHE);
-    else
-        geo = GeoIP_open("/usr/share/GeoIP/GeoLiteCity.dat",
-                         GEOIP_MEMORY_CACHE);
-    open_failed = geo? false : true;
-    return geo;
+    GeoIP_delete(mGeoCountry);
 }
+
+GeoIPTools* GeoIPTools::Instance()
+{
+    if (!mInstance)   // Only allow one instance of class to be generated.
+        mInstance = new GeoIPTools();
+
+    return mInstance;
+}
+
 
 /** Возвращает двухбуквенный код страны по ``ip``.
     Если по какой-либо причине страну определить не удалось, возвращается
     пустая строка
 */
-std::string country_code_by_addr(const std::string &ip)
+std::string GeoIPTools::country_code_by_addr(const std::string &ip)
 {
-    if (!GeoCountry())
+    if (!mGeoCountry)
         return "";
 
-    const char *country = GeoIP_country_code_by_addr(GeoCountry(), ip.c_str());
+    const char *country = GeoIP_country_code_by_addr(mGeoCountry, ip.c_str());
     return country? country : "";
 }
 
@@ -52,12 +41,12 @@ std::string country_code_by_addr(const std::string &ip)
     Если по какой-либо причине область определить не удалось, возвращается
     пустая строка.
 */
-std::string region_code_by_addr(const std::string &ip)
+std::string GeoIPTools::region_code_by_addr(const std::string &ip)
 {
-    if (!GeoCity())
+    if (!mGeoCity)
         return "";
 
-    GeoIPRecord *record = GeoIP_record_by_addr(GeoCity(), ip.c_str());
+    GeoIPRecord *record = GeoIP_record_by_addr(mGeoCity, ip.c_str());
     if (!record)
         return "";
 
@@ -66,12 +55,12 @@ std::string region_code_by_addr(const std::string &ip)
     return region_name? region_name : "";
 }
 
-std::string city_code_by_addr(const std::string &ip)
+std::string GeoIPTools::city_code_by_addr(const std::string &ip)
 {
-    if (!GeoCity())
+    if (!mGeoCity)
         return "";
 
-    GeoIPRecord *record = GeoIP_record_by_addr(GeoCity(), ip.c_str());
+    GeoIPRecord *record = GeoIP_record_by_addr(mGeoCity, ip.c_str());
     if (!record)
         return "";
 

@@ -121,7 +121,7 @@
 	<tinyxml.h>
 	"DataBase.h"
 
-1401108768 source:/home/alex/Projects/worker/src/Campaign.cpp
+1401171433 source:/home/alex/Projects/worker/src/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
 	"Campaign.h"
 	"Log.h"
@@ -136,7 +136,7 @@
 	<iostream>
 	"KompexSQLitePrerequisites.h"
 
-1401108490 source:/home/alex/Projects/worker/src/CgiService.cpp
+1401173346 source:/home/alex/Projects/worker/src/CgiService.cpp
 	<boost/algorithm/string.hpp>
 	"DB.h"
 	"Log.h"
@@ -162,7 +162,7 @@
 	<map>
 	<string>
 
-1388392311 /home/alex/Projects/worker/include/GeoIPTools.h
+1401175327 /home/alex/Projects/worker/include/GeoIPTools.h
 	<GeoIP.h>
 	<GeoIPCity.h>
 	<string>
@@ -284,7 +284,8 @@
 1401090474 source:/home/alex/Projects/worker/src/EBranch.cpp
 	"EBranch.h"
 
-1391670818 source:/home/alex/Projects/worker/src/GeoIPTools.cpp
+1401175412 source:/home/alex/Projects/worker/src/GeoIPTools.cpp
+	"Config.h"
 	"GeoIPTools.h"
 
 1391676801 source:/home/alex/Projects/worker/src/GeoRerions.cpp
@@ -351,10 +352,11 @@
 1398326535 source:/home/alex/Projects/worker/src/Log.cpp
 	"Log.h"
 
-1399529976 source:/home/alex/Projects/worker/src/main.cpp
+1401173672 source:/home/alex/Projects/worker/src/main.cpp
 	"CgiService.h"
 	"Log.h"
 	"Server.h"
+	"GeoIPTools.h"
 
 1399549954 source:/home/alex/Projects/worker/src/Offer.cpp
 	<sstream>
@@ -368,7 +370,7 @@
 	"Log.h"
 	"Config.h"
 
-1394612717 source:/home/alex/Projects/worker/src/Params.cpp
+1401172939 source:/home/alex/Projects/worker/src/Params.cpp
 	<sstream>
 	<boost/algorithm/string/trim.hpp>
 	<boost/regex/icu.hpp>
@@ -388,7 +390,7 @@
 	"Config.h"
 	"Offer.h"
 
-1401110946 source:/home/alex/Projects/worker/src/RedisClient.cpp
+1401181063 source:/home/alex/Projects/worker/src/RedisClient.cpp
 	<strings.h>
 	<string.h>
 	"RedisClient.h"
@@ -432,7 +434,7 @@
 	"Config.h"
 	"Log.h"
 
-1401111604 source:/home/alex/Projects/worker/src/Core.cpp
+1401175770 source:/home/alex/Projects/worker/src/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>

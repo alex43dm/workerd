@@ -47,6 +47,7 @@ bool RedisClient::connect()
 
 bool RedisClient::getRange(const std::string &key, const std::string &tableName)
 {
+    bool vret = false;
     int cnt = 0;
     Batch *batch;
     Executor *executor;
@@ -60,28 +61,27 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
     bzero(cmd,CMD_SIZE);
     snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s 0 -1\r\n", key.c_str());
 
+    executor = Executor_new();
     batch = Batch_new();
     Batch_write(batch, cmd, strlen(cmd), 1);
-
-    executor = Executor_new();
     Executor_add(executor, connection, batch);
 
-    if(Executor_execute(executor, timeOutMSec) <= 0)
+    int rr = Executor_execute(executor, timeOutMSec);
+
+    if( rr <= 0)
     {
         Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
-        return false;
+        vret = false;
     }
     else
     {
         ReplyType reply_type;
         char *reply_data;
         size_t reply_len;
-        int level;
 
         pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
 
-        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        while(Batch_next_reply(batch, &reply_type, &reply_data, &reply_len))
         {
             if(reply_type == RT_ERROR)
             {
@@ -102,14 +102,18 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
                     {
                         Log::err("SQLiteTmpTable::insert(%s) error: %s", ex.GetString().c_str());
                     }
-
             }
         }
+
+        delete pStmt;
+
+        vret = true;
     }
+
+//    Reply_free_final();
 
     Batch_free(batch);
     Executor_free(executor);
-    delete pStmt;
 /*
     Kompex::SQLiteStatement *p;
     p = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
@@ -125,7 +129,7 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
     delete p;
 */
     Log::gdb("RedisClient::getRange: loaded %d", cnt);
-    return true;
+    return vret;
 }
 
 

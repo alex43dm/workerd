@@ -338,7 +338,7 @@ void Core::ProcessSaveResults()
     {
         if(o->second)
             delete o->second;
-        items.erase(o);
+//        items.erase(o);
     }
 
     items.clear();
@@ -347,7 +347,6 @@ void Core::ProcessSaveResults()
 
     vOutPut.clear();
 
-    //items.clear();
     if(informer)
         delete informer;
 }
