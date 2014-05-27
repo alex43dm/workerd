@@ -64,6 +64,9 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
     executor = Executor_new();
     batch = Batch_new();
     Batch_write(batch, cmd, strlen(cmd), 1);
+
+//    batch->write_buffer
+
     Executor_add(executor, connection, batch);
 
     int rr = Executor_execute(executor, timeOutMSec);
@@ -110,7 +113,6 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
         vret = true;
     }
 
-//    Reply_free_final();
 
     Batch_free(batch);
     Executor_free(executor);

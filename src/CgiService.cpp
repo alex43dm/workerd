@@ -129,10 +129,16 @@ void CgiService::Response(FCGX_Request *req,
 }
 
 
-void CgiService::Response(FCGX_Request *req, const std::string &out, int status,
-                          const char *content_type, const string &cookie)
+void CgiService::Response(FCGX_Request *req, unsigned status)
 {
-    Response(req, out.c_str(), status, content_type, cookie);
+    if(req && req->out)
+    {
+        FCGX_FPrintF(req->out,"Status: %d OK\r\n",status);
+        FCGX_FPrintF(req->out,"Content-type: text/html\r\n");
+        FCGX_FPrintF(req->out,"\r\n\r\n");
+        FCGX_FFlush(req->out);
+        FCGX_Finish_r(req);
+    }
 }
 
 
@@ -167,6 +173,8 @@ void *CgiService::Serve(void *data)
 
         csrv->ProcessRequest(&request, core);
     }
+
+    delete core;
 
     return nullptr;
 }
@@ -287,7 +295,7 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
     }
     catch (std::exception const &ex)
     {
-        Response(req, "", 503);
         Log::err("exception %s: name: %s while processing: %s", typeid(ex).name(), ex.what(), query.c_str());
+        Response(req, 503);
     }
 }

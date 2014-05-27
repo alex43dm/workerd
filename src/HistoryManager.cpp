@@ -100,9 +100,15 @@ void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
 
     if(!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
     {
-        for(auto i = mtailOffers.begin(); i != mtailOffers.end(); ++i)
+        if(mtailOffers.size())
         {
-            items[*i]->rating = items[*i]->rating + teasersMaxRating;
+            for(auto i = mtailOffers.begin(); i != mtailOffers.end(); ++i)
+            {
+                if(items[*i])
+                {
+                    items[*i]->rating = items[*i]->rating + teasersMaxRating;
+                }
+            }
         }
         return;
     }

@@ -67,9 +67,7 @@ private:
      * \param content_type Заголовок "Content-Type".
      * \param cookie    Заголовок "Set-Cookie". Параметр передается в виде обертки Cookie
      */
-    void Response(FCGX_Request *stream, const std::string &out, int status,
-                  const char *content_type = "text/html",
-                  const std::string &cookie = "");
+    void Response(FCGX_Request *stream, unsigned status);
 
 
 
