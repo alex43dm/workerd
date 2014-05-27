@@ -738,7 +738,10 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     //sort by rating
     for(auto i = items.begin(); i != items.end(); i++)
     {
-        resultAll.insert(Offer::PairRate((*i).second->rating, (*i).second));
+        if((*i).second)
+        {
+            resultAll.insert(Offer::PairRate((*i).second->rating, (*i).second));
+        }
     }
 
     //vector by rating
