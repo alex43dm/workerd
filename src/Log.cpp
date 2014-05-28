@@ -1,3 +1,9 @@
+#include "stdlib.h"
+#include "stdio.h"
+#include "string.h"
+
+#include <ostream>
+
 #include "Log.h"
 
 extern char *__progname;
@@ -72,3 +78,63 @@ void Log::gdb(const char* fmt, ... )
     delete []buffer;
 #endif // DEBUG
 };
+
+int Log::sync()
+{
+    if (buffer_.length())
+    {
+        syslog(priority_, "%s",buffer_.c_str());
+        buffer_.erase();
+        //priority_ = LOG_DEBUG; // default to debug for each message
+    }
+    return 0;
+}
+
+int Log::overflow(int c)
+{
+    if (c != EOF)
+    {
+        buffer_ += static_cast<char>(c);
+    }
+    else
+    {
+        sync();
+    }
+    return c;
+}
+
+std::ostream& operator<< (std::ostream& os, const LogPriority& log_priority)
+{
+    static_cast<Log *>(os.rdbuf())->priority_ = (int)log_priority;
+    return os;
+}
+
+int Log::parseLine(char* line)
+{
+    int i = strlen(line);
+    while (*line < '0' || *line > '9') line++;
+    line[i-3] = '\0';
+    i = atoi(line);
+    return i;
+}
+
+
+int Log::memUsage()
+{
+    FILE* file = fopen("/proc/self/status", "r");
+    int result = -1;
+    char line[128];
+
+
+    while (fgets(line, 128, file) != NULL)
+    {
+        if (strncmp(line, "VmSize:", 7) == 0)
+        {
+            result = parseLine(line);
+            break;
+        }
+    }
+    fclose(file);
+    return result;
+}
+

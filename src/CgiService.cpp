@@ -91,7 +91,7 @@ void CgiService::run()
         {
             loaded = false;
         }
-
+        Log::info("VmSize: %d", Log::memUsage());
         sleep(1);
     }
 }

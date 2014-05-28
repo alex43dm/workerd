@@ -188,7 +188,8 @@ GeoIPTools *geoip;
 
 int main(int argc, char *argv[])
 {
-    Log(LOG_LOCAL0);
+    //Log(LOG_LOCAL0);
+    std::clog.rdbuf(new Log(LOG_LOCAL0));
 
     std::string config = "config.xml";
     std::string sock_path;

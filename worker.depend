@@ -35,12 +35,13 @@
 
 1399448396 /home/alex/Projects/worker/config.h
 
-1397222477 /home/alex/Projects/worker/include/Log.h
+1401270828 /home/alex/Projects/worker/include/Log.h
 	<stdio.h>
 	<syslog.h>
 	<stdarg.h>
 	<pthread.h>
 	<string>
+	<streambuf>
 
 1399559741 /home/alex/Projects/worker/include/BaseCore.h
 	"../config.h"
@@ -349,10 +350,11 @@
 	"KompexSQLiteDatabase.h"
 	"KompexSQLiteException.h"
 
-1398326535 source:/home/alex/Projects/worker/src/Log.cpp
+1401271180 source:/home/alex/Projects/worker/src/Log.cpp
+	<ostream>
 	"Log.h"
 
-1401173672 source:/home/alex/Projects/worker/src/main.cpp
+1401271040 source:/home/alex/Projects/worker/src/main.cpp
 	"CgiService.h"
 	"Log.h"
 	"Server.h"
@@ -429,7 +431,7 @@
 	"Config.h"
 	"XXXSearcher.h"
 
-1401192500 source:/home/alex/Projects/worker/src/HistoryManager.cpp
+1401266386 source:/home/alex/Projects/worker/src/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"

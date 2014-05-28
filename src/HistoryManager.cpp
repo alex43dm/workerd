@@ -198,16 +198,19 @@ bool HistoryManager::getHistoryByType(HistoryType type, std::list<std::string> &
 {
     if(!history_archive[type]->exists(key))
     {
-        Log::gdb("[%ld]%s::%s: %s no history", tid, typeid(this).name(),__func__,EnumHistoryTypeStrings[type]);
+        std::clog <<LogPriority::Debug<< "["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<EnumHistoryTypeStrings[type]<<":no history"<< std::endl;
+//        Log::gdb("[%ld]%s::%s: %s no history", tid, typeid(this).name(),__func__,EnumHistoryTypeStrings[type]);
         return false;
     }
     else if(!history_archive[type]->getRange(key, 0, -1, rr))
     {
-        Log::err("[%ld]%s::%s %s: %s", tid, typeid(this).name(), __func__,EnumHistoryTypeStrings[type], Module_last_error(module));
+        std::clog<<LogPriority::Err<< "["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<EnumHistoryTypeStrings[type]<<":"<< Module_last_error(module) << std::endl;
+        //Log::err("[%ld]%s::%s %s: %s", tid, typeid(this).name(), __func__,EnumHistoryTypeStrings[type], Module_last_error(module));
     }
     else
     {
-        Log::warn("[%ld]%s::%s: %s no history", tid, typeid(this).name(),__func__,EnumHistoryTypeStrings[type]);
+        std::clog<<LogPriority::Warning<< "["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<EnumHistoryTypeStrings[type]<<":no history"<< std::endl;
+//        Log::warn("[%ld]%s::%s: %s no history", tid, typeid(this).name(),__func__,EnumHistoryTypeStrings[type]);
     }
 
     return true;

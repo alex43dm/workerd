@@ -27,7 +27,12 @@ typedef enum
     Retargeting
 } HistoryType;
 
-
+/*
+const char * getTextEnumHistory( int enumVal )
+{
+  return EnumHistoryTypeStrings[enumVal];
+}
+*/
 class HistoryManager : public ParamParse
 {
 public:
