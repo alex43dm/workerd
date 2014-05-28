@@ -76,10 +76,11 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
         ReplyType reply_type;
         char *reply_data;
         size_t reply_len;
+        int level;
 
         pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
 
-        while(Batch_next_reply(batch, &reply_type, &reply_data, &reply_len))
+        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
         {
             if(reply_type == RT_ERROR)
             {
