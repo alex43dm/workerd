@@ -35,7 +35,7 @@
 
 1399448396 /home/alex/Projects/worker/config.h
 
-1401270828 /home/alex/Projects/worker/include/Log.h
+1401279129 /home/alex/Projects/worker/include/Log.h
 	<stdio.h>
 	<syslog.h>
 	<stdarg.h>
@@ -137,7 +137,7 @@
 	<iostream>
 	"KompexSQLitePrerequisites.h"
 
-1401192057 source:/home/alex/Projects/worker/src/CgiService.cpp
+1401311933 source:/home/alex/Projects/worker/src/CgiService.cpp
 	<boost/algorithm/string.hpp>
 	"DB.h"
 	"Log.h"
@@ -182,7 +182,7 @@
 	"DataBase.h"
 	"HistoryManager.h"
 
-1394608622 /home/alex/Projects/worker/include/Params.h
+1401311568 /home/alex/Projects/worker/include/Params.h
 	<sstream>
 	<string>
 	<boost/date_time.hpp>
@@ -350,7 +350,10 @@
 	"KompexSQLiteDatabase.h"
 	"KompexSQLiteException.h"
 
-1401271180 source:/home/alex/Projects/worker/src/Log.cpp
+1401279088 source:/home/alex/Projects/worker/src/Log.cpp
+	"stdlib.h"
+	"stdio.h"
+	"string.h"
 	<ostream>
 	"Log.h"
 
@@ -431,12 +434,12 @@
 	"Config.h"
 	"XXXSearcher.h"
 
-1401266386 source:/home/alex/Projects/worker/src/HistoryManager.cpp
+1401311901 source:/home/alex/Projects/worker/src/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 
-1401197968 source:/home/alex/Projects/worker/src/Core.cpp
+1401285893 source:/home/alex/Projects/worker/src/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>

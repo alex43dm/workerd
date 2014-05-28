@@ -63,9 +63,12 @@ void HistoryManager::getUserHistory(Params *_params)
     key_inv = key+"-inv";
     Log::gdb("key: %s",key.c_str());
 
-    getDeprecatedOffersAsync();
+    if(!params->newClient)
+    {
+        getDeprecatedOffersAsync();
 
-    getRetargetingAsync();
+        getRetargetingAsync();
+    }
 
     //Запрос по запросам к поисковикам
     if(isSearch())
@@ -90,10 +93,10 @@ void HistoryManager::getUserHistory(Params *_params)
         }
     }
 
-    if(isLongTerm())
+    if(isLongTerm() && !params->newClient)
         getLongTermAsync();
 
-    if(isShortTerm())
+    if(isShortTerm() && !params->newClient)
         getShortTermAsync();
 }
 
@@ -117,10 +120,10 @@ void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
 
     sphinx->makeFilter(items);
 
-    if(isShortTerm())
+    if(isShortTerm() && !params->newClient)
         getShortTermAsyncWait();
 
-    if(isLongTerm())
+    if(isLongTerm() && !params->newClient)
         getLongTermAsyncWait();
 
     Log::gdb("[%ld]sphinx get history: done",tid);

@@ -16,12 +16,6 @@
 
 #define THREAD_STACK_SIZE PTHREAD_STACK_MIN + 10 * 1024
 
-std::string time_t_to_string(time_t t)
-{
-    std::stringstream sstr;
-    sstr << t;
-    return sstr.str();
-}
 
 CgiService::CgiService()
 {
@@ -258,17 +252,7 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
     std::string exclude = url.param("exclude");
     boost::split(excluded_offers, exclude, boost::is_any_of("_"));
 
-    if(cookie_value.empty())
-    {
-        cookie_value = time_t_to_string(time(NULL));
-    }
 
-    ClearSilver::Cookie c = ClearSilver::Cookie(cfg->cookie_name_,
-                      cookie_value,
-                      ClearSilver::Cookie::Credentials(
-                                ClearSilver::Cookie::Authority(cfg->cookie_domain_),
-                                ClearSilver::Cookie::Path(cfg->cookie_path_),
-                            ClearSilver::Cookie::Expires(boost::posix_time::second_clock::local_time() + boost::gregorian::years(1))));
     try
     {
         Params prm = Params()
@@ -290,6 +274,15 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
         std::string result;
 
         result = core->Process(&prm);
+
+
+        ClearSilver::Cookie c = ClearSilver::Cookie(cfg->cookie_name_,
+                      prm.getCookieId(),
+                      ClearSilver::Cookie::Credentials(
+                                ClearSilver::Cookie::Authority(cfg->cookie_domain_),
+                                ClearSilver::Cookie::Path(cfg->cookie_path_),
+                            ClearSilver::Cookie::Expires(boost::posix_time::second_clock::local_time() + boost::gregorian::years(1))));
+
         Response(req, result, c.to_string());
         core->ProcessSaveResults();
     }

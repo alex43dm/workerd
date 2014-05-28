@@ -11,7 +11,7 @@
 #include "Log.h"
 
 
-Params::Params() : test_mode_(false), json_(false)
+Params::Params() : newClient(false), test_mode_(false), json_(false)
 {
     time_ = boost::posix_time::second_clock::local_time();
 }
@@ -36,10 +36,21 @@ Params &Params::ip(const std::string &ip)
 
     return *this;
 }
+std::string time_t_to_string(time_t t)
+{
+    std::stringstream sstr;
+    sstr << t;
+    return sstr.str();
+}
 
 /// ID посетителя, взятый из cookie
 Params &Params::cookie_id(const std::string &cookie_id)
 {
+    if(cookie_id.empty())
+    {
+        cookie_id_ = std::to_string(::time(NULL));
+        newClient = true;
+    }
 
     cookie_id_ = cookie_id;
     key_long = key_long << 32;

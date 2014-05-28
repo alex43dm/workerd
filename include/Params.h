@@ -98,6 +98,7 @@ public:
     std::string getContext() const;
     std::string getSearch() const;
     std::string getUrl() const;
+    bool newClient;
 
     friend class Core;
     friend class GenerateToken;
