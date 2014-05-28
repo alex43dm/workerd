@@ -69,6 +69,10 @@ void HistoryManager::getUserHistory(Params *_params)
 
         getRetargetingAsync();
     }
+    else
+    {
+        std::clog<<"["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<"no history for: "<<key<<std::endl;
+    }
 
     //Запрос по запросам к поисковикам
     if(isSearch())

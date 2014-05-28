@@ -220,7 +220,7 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
     tmp_str = nullptr;
     if (!(tmp_str = FCGX_GetParam("HTTP_COOKIE", req->envp)))
     {
-        Log::warn("HTTP_COOKIE is not set");
+        //Log::warn("HTTP_COOKIE is not set");
     }
     else
     {
