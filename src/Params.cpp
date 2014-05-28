@@ -56,10 +56,10 @@ Params &Params::cookie_id(const std::string &cookie_id)
     }
     else
     {
+        cookie_id_ = cookie_id;
         newClient = false;
     }
 
-    cookie_id_ = cookie_id;
     key_long = key_long << 32;
     key_long = key_long | strtol(cookie_id_.c_str(),NULL,10);
     return *this;
