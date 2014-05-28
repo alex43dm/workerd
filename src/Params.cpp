@@ -11,7 +11,10 @@
 #include "Log.h"
 
 
-Params::Params() : newClient(false), test_mode_(false), json_(false)
+Params::Params() :
+    newClient(false),
+    test_mode_(false),
+    json_(false)
 {
     time_ = boost::posix_time::second_clock::local_time();
 }
@@ -50,6 +53,10 @@ Params &Params::cookie_id(const std::string &cookie_id)
     {
         cookie_id_ = std::to_string(::time(NULL));
         newClient = true;
+    }
+    else
+    {
+        newClient = false;
     }
 
     cookie_id_ = cookie_id;

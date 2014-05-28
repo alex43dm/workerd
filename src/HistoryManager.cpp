@@ -93,11 +93,14 @@ void HistoryManager::getUserHistory(Params *_params)
         }
     }
 
-    if(isLongTerm() && !params->newClient)
-        getLongTermAsync();
+    if(!params->newClient)
+    {
+        if(isLongTerm())
+            getLongTermAsync();
 
-    if(isShortTerm() && !params->newClient)
-        getShortTermAsync();
+        if(isShortTerm())
+            getShortTermAsync();
+    }
 }
 
 void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)

@@ -70,27 +70,24 @@ bool HistoryManager::getDeprecatedOffers(std::string &rr)
 
 bool HistoryManager::getDeprecatedOffers()
 {
-    if(!history_archive[ViewHistory]->exists(key))
+    if(history_archive[ViewHistory]->exists(key))
     {
-        Log::gdb("[%ld]%s::%s: no history", tid, typeid(this).name(),__func__);
-        return false;
-    }
-    else if(!history_archive[ViewHistory]->getRange(key, tmpTable))
-    {
-        Log::err("[%ld]%s::%s error: %s", tid, typeid(this).name(), __func__, Module_last_error(module));
+        if(!history_archive[ViewHistory]->getRange(key, tmpTable))
+        {
+            Log::err("[%ld]%s::%s error: %s for key: %s", tid, typeid(this).name(), __func__, Module_last_error(module), key.c_str());
+        }
     }
     else
     {
-        Log::warn("[%ld]%s::%s: no history",tid, typeid(this).name(),__func__);
+        Log::warn("[%ld]%s::%s: no history for key: %s",tid, typeid(this).name(),__func__, key.c_str());
     }
 
-    if(!history_archive[ViewHistory]->exists(key_inv))
+    if(history_archive[ViewHistory]->exists(key_inv))
     {
-        return true;
-    }
-    else if(!history_archive[ViewHistory]->getRange(key_inv, 0, -1, mtailOffers))
-    {
-        Log::err("[%ld]%s::%s error: %s", tid, typeid(this).name(), __func__,Module_last_error(module));
+        if(!history_archive[ViewHistory]->getRange(key_inv, 0, -1, mtailOffers))
+        {
+            Log::err("[%ld]%s::%s error: %s", tid, typeid(this).name(), __func__,Module_last_error(module));
+        }
     }
 
     Log::gdb("[%ld]%s::%s: done",tid, typeid(this).name(), __func__);
