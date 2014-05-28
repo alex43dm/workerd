@@ -17,7 +17,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
     for(auto it = items.begin(); it != items.end(); ++it)
     {
         if ((*it)->uniqueHits > 0)
-        {   
+        {
             if (history_archive[ViewHistory]->exists(key))
             {
                 if (history_archive[ViewHistory]->zrank(key,(*it)->id_int) > 0) //if rank == -1
@@ -52,6 +52,13 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
 bool HistoryManager::getDeprecatedOffers(std::string &rr)
 {
     clean = false;
+
+    if(!history_archive[ViewHistory]->exists(key))
+    {
+        //Log::err("%s::%s error: %s", typeid(this),__func__,Module_last_error(module));
+        return false;
+    }
+
     if(!history_archive[ViewHistory]->getRange(key , 0, -1, rr))
     {
         Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
@@ -63,17 +70,30 @@ bool HistoryManager::getDeprecatedOffers(std::string &rr)
 
 bool HistoryManager::getDeprecatedOffers()
 {
-    if(!history_archive[ViewHistory]->getRange(key, tmpTable))
+    if(!history_archive[ViewHistory]->exists(key))
     {
-        Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
+        Log::gdb("[%ld]%s::%s: no history", tid, typeid(this).name(),__func__);
+        return false;
+    }
+    else if(!history_archive[ViewHistory]->getRange(key, tmpTable))
+    {
+        Log::err("[%ld]%s::%s error: %s", tid, typeid(this).name(), __func__, Module_last_error(module));
+    }
+    else
+    {
+        Log::warn("[%ld]%s::%s: no history",tid, typeid(this).name(),__func__);
     }
 
-    if(!history_archive[ViewHistory]->getRange(key_inv, 0, -1, mtailOffers))
+    if(!history_archive[ViewHistory]->exists(key_inv))
     {
-        Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
+        return true;
+    }
+    else if(!history_archive[ViewHistory]->getRange(key_inv, 0, -1, mtailOffers))
+    {
+        Log::err("[%ld]%s::%s error: %s", tid, typeid(this).name(), __func__,Module_last_error(module));
     }
 
-    Log::gdb("[%ld]HistoryManager::getDeprecatedOffers: done",tid);
+    Log::gdb("[%ld]%s::%s: done",tid, typeid(this).name(), __func__);
     return true;
 }
 

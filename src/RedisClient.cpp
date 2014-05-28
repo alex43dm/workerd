@@ -53,11 +53,6 @@ bool RedisClient::getRange(const std::string &key, const std::string &tableName)
     Executor *executor;
     Kompex::SQLiteStatement *pStmt;
 
-    if( !exists(key) )
-    {
-        return true;
-    }
-
     bzero(cmd,CMD_SIZE);
     snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s 0 -1\r\n", key.c_str());
 
@@ -144,12 +139,6 @@ bool RedisClient::getRange(const std::string &key,
     Batch *batch;
     Executor *executor;
 
-    if( !exists(key) )
-    {
-        Log::warn("redis no key: %s", key.c_str());
-        return true;
-    }
-
     bzero(cmd,CMD_SIZE);
     snprintf(cmd, CMD_SIZE, "ZREVRANGE %s %d %d\r\n", key.c_str(), start, stop);
 
@@ -199,11 +188,6 @@ bool RedisClient::getRange(const std::string &key,
     bool vret = false;
     Batch *batch;
     Executor *executor;
-
-    if( !exists(key) )
-    {
-        return true;
-    }
 
     bzero(cmd,CMD_SIZE);
     int rrr = snprintf(cmd, CMD_SIZE, "ZREVRANGE %s %d %d\r\n", key.c_str(), start, stop);
@@ -255,11 +239,6 @@ bool RedisClient::getRange(const std::string &key,
     bool vret = false;
     Batch *batch;
     Executor *executor;
-
-    if( !exists(key) )
-    {
-        return true;
-    }
 
     bzero(cmd,CMD_SIZE);
     int rrr = snprintf(cmd, CMD_SIZE, "ZREVRANGE %s %d %d\r\n", key.c_str(), start, stop);

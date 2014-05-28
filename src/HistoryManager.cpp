@@ -4,6 +4,8 @@
 
 #define REDIS_TIMEOUT 3 * 24 * 3600
 
+static const char * EnumHistoryTypeStrings[] = {"ShortTerm", "LongTerm", "ViewHistory", "Category","Retargeting"};
+
 HistoryManager::HistoryManager(const std::string &tmpTableName):
     tmpTable(tmpTableName)
 {
@@ -194,11 +196,18 @@ bool HistoryManager::updateUserHistory(
  */
 bool HistoryManager::getHistoryByType(HistoryType type, std::list<std::string> &rr)
 {
-
-    if(!history_archive[type]->getRange(key , 0, -1, rr))
+    if(!history_archive[type]->exists(key))
     {
-        Log::err("HistoryManager::getHistoryByType error: %s", Module_last_error(module));
+        Log::gdb("[%ld]%s::%s: %s no history", tid, typeid(this).name(),__func__,EnumHistoryTypeStrings[type]);
         return false;
+    }
+    else if(!history_archive[type]->getRange(key, 0, -1, rr))
+    {
+        Log::err("[%ld]%s::%s %s: %s", tid, typeid(this).name(), __func__,EnumHistoryTypeStrings[type], Module_last_error(module));
+    }
+    else
+    {
+        Log::warn("[%ld]%s::%s: %s no history", tid, typeid(this).name(),__func__,EnumHistoryTypeStrings[type]);
     }
 
     return true;
