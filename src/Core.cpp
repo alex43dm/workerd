@@ -70,7 +70,7 @@ Core::~Core()
     delete []cmd;
 #ifndef DUMMY
     delete hm;
-    #endif // DUMMY
+#endif // DUMMY
 }
 
 /** Функтор составляет ссылку перенаправления на предложение item.
@@ -138,7 +138,7 @@ std::string Core::Process(Params *prms)
 
     Log::gdb("[%ld]getInformer: done",tid);
 
-    #ifndef DUMMY
+#ifndef DUMMY
     //load all history async
     hm->getUserHistory(params);
 
@@ -162,7 +162,7 @@ std::string Core::Process(Params *prms)
 
     //merge
     if( (vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner) ||
-       (vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner) )
+            (vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner) )
     {
         if( vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner )
         {
@@ -171,8 +171,8 @@ std::string Core::Process(Params *prms)
         else if( vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner )
         {
             vOutPut.insert(vOutPut.begin(),
-                       vRIS.begin(),
-                       vRIS.begin()+1);
+                           vRIS.begin(),
+                           vRIS.begin()+1);
         }
     }
     else
@@ -192,7 +192,7 @@ std::string Core::Process(Params *prms)
                        last);
 
     }
-    #else
+#else
     getOffers(items);
     Log::gdb("[%ld]getOffers: %d done",tid, items.size());
 
@@ -212,7 +212,7 @@ std::string Core::Process(Params *prms)
         vOutPut.push_back(p);
     }
 
-    #endif//DUMMY
+#endif//DUMMY
 
     std::string ret;
 
@@ -364,9 +364,9 @@ Informer *Core::getInformer()
     }
     catch(Kompex::SQLiteException &ex)
     {
-        #ifdef DEBUG
+#ifdef DEBUG
         printf("%s\n",cmd);
-        #endif // DEBUG
+#endif // DEBUG
         Log::err("DB error: getInformer: %s: %s", ex.GetString().c_str());
         delete pStmt;
         return 0;
@@ -374,13 +374,13 @@ Informer *Core::getInformer()
 
     try
     {
-/*
-        if(pStmt->GetNumberOfRows())
-        {
-            Log::err("no informer id: %s",params->informer_id_.c_str());
-            return 0;
-        }
-*/
+        /*
+                if(pStmt->GetNumberOfRows())
+                {
+                    Log::err("no informer id: %s",params->informer_id_.c_str());
+                    return 0;
+                }
+        */
         while(pStmt->FetchRow())
         {
             informer =  new Informer(pStmt->GetColumnInt64(0),
@@ -389,16 +389,16 @@ Informer *Core::getInformer()
                                      pStmt->GetColumnString(3),
                                      pStmt->GetColumnInt64(4),
                                      pStmt->GetColumnInt64(5)
-                //                     pStmt->GetColumnInt(6)
+                                     //                     pStmt->GetColumnInt(6)
                                     );
 
 //            if(!informer->rtgPercentage){
-                informer->RetargetingCount  =
+            informer->RetargetingCount  =
                 informer->capacity * Config::Instance()->retargeting_by_persents_ / 100;
-  //          }else{
-    //            informer->RetargetingCount  =
-      //          informer->capacity * informer->rtgPercentage / 100;
-  //            }
+            //          }else{
+            //            informer->RetargetingCount  =
+            //          informer->capacity * informer->rtgPercentage / 100;
+            //            }
             break;
         }
     }
@@ -475,14 +475,14 @@ std::string Core::getGeo()
                 if(pStmt->GetDataCount() > 0)
                 {
                     geo =
-                    "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+                        "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
                     INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND reg.city='"+params->getRegion()+"'";
                 }
                 else if(params->getCountry().size())
                 {
 
                     geo =
-                    "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+                        "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
                     INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId \
                     AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND (reg.city='' OR reg.city='NOT FOUND'))";
                 }
@@ -498,7 +498,7 @@ std::string Core::getGeo()
         {
 
             geo =
-            "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+                "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
             INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId \
             AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND (reg.city='' OR reg.city='NOT FOUND'))";
         }
@@ -526,7 +526,7 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
     Kompex::SQLiteStatement *pStmt;
     pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
 
-    #ifndef DUMMY
+#ifndef DUMMY
     if(!getAll)
     {
         sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
@@ -541,7 +541,7 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
                          getpid(),
                          tid,
                          informer->id);
-                        hm->getDeprecatedOffersAsyncWait();
+        hm->getDeprecatedOffersAsyncWait();
     }
     else
     {
@@ -557,7 +557,7 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
                          informer->id,
                          informer->capacity);
     }
-    #else
+#else
     sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
                      getGeo().c_str(),
                      informer->domainId,
@@ -565,7 +565,7 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
                      informer->accountId,
                      informer->id,
                      informer->capacity);
-    #endif
+#endif
 
 #ifdef DEBUG
     printf("%s\n",cmd);
@@ -727,11 +727,13 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     Offer::itV p;
     Offer::Vector result;
     Offer::MapRate resultAll;
+    unsigned loopCount;
 
     RISResult.clear();
 
-    if(items.size() == 0)
+    if(items.size() == 0 && (0 >= outLen && outLen > 1024))
     {
+        std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "error items size: "<<items.size()<<" outLen: "<<outLen<<std::endl;
         return;
     }
 
@@ -770,18 +772,18 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     //size check
     if(result.size() <= outLen)
     {
-        #ifndef DUMMY
+#ifndef DUMMY
         hm->clean = true;
-        #endif // DUMMY
+#endif // DUMMY
         Log::warn("RISAlgorithm: result size less or equal %d: clean history", result.size());
     }
 
     //check is all social
     if(all_social)
     {
-        #ifndef DUMMY
+#ifndef DUMMY
         hm->clean = true;
-        #endif // DUMMY
+#endif // DUMMY
         Log::warn("RISAlgorithm: all social: clean history");
     }
 
@@ -801,13 +803,13 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
             OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
     }
-/*
-    //user history view clean
-    #ifndef DUMMY
-    hm->clean = true;
-    Log::warn("RISAlgorithm: clean offer history");
-    #endif // DUMMY
-*/
+    /*
+        //user history view clean
+        #ifndef DUMMY
+        hm->clean = true;
+        Log::warn("RISAlgorithm: clean offer history");
+        #endif // DUMMY
+    */
     if(FULL)
     {
         goto links_make;
@@ -855,20 +857,18 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     }
 
     //expand to return size
-      while(RISResult.size() < outLen)
-     {
-         for(p = result.begin(); RISResult.size() < outLen && p != result.end(); ++p)
-         {
-             RISResult.push_back(*p);
-             OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
-         }
-     }
+    loopCount = RISResult.size();
+    for(p = result.begin(); loopCount < outLen && p != result.end(); ++p, loopCount++)
+    {
+        RISResult.push_back(*p);
+        OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+    }
 
-     //user history view clean
-     #ifndef DUMMY
-     hm->clean = true;
-     Log::warn("RISAlgorithm: clean offer history");
-     #endif // DUMMY
+    //user history view clean
+#ifndef DUMMY
+    hm->clean = true;
+    Log::warn("RISAlgorithm: clean offer history");
+#endif // DUMMY
 
 links_make:
     //redirect links make
@@ -908,8 +908,8 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
         }
 
         if(!OutPutCampaignMap.count((*p)->campaign_id)
-            && (*p)->rating > 0.0
-            && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+                && (*p)->rating > 0.0
+                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
             if(RISResult.size() < outLen)
             {
@@ -929,7 +929,7 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
         for(auto p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
         {
             if(!OutPutCampaignMap.count((*p)->campaign_id)
-               && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+                    && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
             {
                 if(RISResult.size() < outLen)
                 {
@@ -983,3 +983,4 @@ make_return:
                     ));
     }
 }
+
