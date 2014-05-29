@@ -1,6 +1,8 @@
 #include "HistoryManager.h"
 #include "Config.h"
 #include "Log.h"
+#include "KompexSQLiteStatement.h"
+#include "KompexSQLiteException.h"
 
 bool HistoryManager::clearDeprecatedOffers()
 {
@@ -68,13 +70,38 @@ bool HistoryManager::getDeprecatedOffers(std::string &rr)
     return true;
 }
 
+#define CMD_SIZE 4096
+
 bool HistoryManager::getDeprecatedOffers()
 {
+    std::list<std::string> offers;
+    char * cmd = new char[CMD_SIZE];
+
     if(history_archive[ViewHistory]->exists(key))
     {
-        if(!history_archive[ViewHistory]->getRange(key, tmpTable))
+        if(!history_archive[ViewHistory]->getRange(key, 0, -1, offers))
         {
             Log::err("[%ld]%s::%s error: %s for key: %s", tid, typeid(this).name(), __func__, Module_last_error(module), key.c_str());
+        }
+        else
+        {
+            Kompex::SQLiteStatement *pStmt;
+            pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+            try
+            {
+                for( auto i = offers.begin(); i != offers.end(); ++i)
+                {
+                    sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO %s(id) VALUES(%s);",
+                                     tmpTable.c_str(),
+                                     (*i).c_str());
+                    pStmt->SqlStatement(cmd);
+                }
+            }
+            catch(Kompex::SQLiteException &ex)
+            {
+                std::clog<<"["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<" : "<<ex.GetString()<<std::endl;
+            }
+            delete pStmt;
         }
     }
     else
@@ -89,6 +116,8 @@ bool HistoryManager::getDeprecatedOffers()
             Log::err("[%ld]%s::%s error: %s", tid, typeid(this).name(), __func__,Module_last_error(module));
         }
     }
+
+    delete []cmd;
 
     Log::gdb("[%ld]%s::%s: done",tid, typeid(this).name(), __func__);
     return true;

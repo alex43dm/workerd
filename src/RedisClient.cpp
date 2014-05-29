@@ -6,8 +6,6 @@
 #include "Log.h"
 #include "Config.h"
 #include "base64.h"
-#include "KompexSQLiteStatement.h"
-#include "KompexSQLiteException.h"
 
 #define CMD_SIZE 4096
 
@@ -45,92 +43,6 @@ bool RedisClient::connect()
     return true;
 }
 
-bool RedisClient::getRange(const std::string &key, const std::string &tableName)
-{
-    bool vret = false;
-    int cnt = 0;
-    Batch *batch;
-    Executor *executor;
-    Kompex::SQLiteStatement *pStmt;
-
-    bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s 0 -1\r\n", key.c_str());
-
-    executor = Executor_new();
-    batch = Batch_new();
-    Batch_write(batch, cmd, strlen(cmd), 1);
-
-//    batch->write_buffer
-
-    Executor_add(executor, connection, batch);
-
-    int rr = Executor_execute(executor, timeOutMSec);
-
-    if( rr <= 0)
-    {
-        Log::err("redis cmd false: %s",cmd);
-        vret = false;
-    }
-    else
-    {
-        ReplyType reply_type;
-        char *reply_data;
-        size_t reply_len;
-        int level;
-
-        pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-
-        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
-        {
-            if(reply_type == RT_ERROR)
-            {
-                Log::err("redis cmd: getRange false: %s", reply_data);
-            }
-            else if(RT_BULK == reply_type)
-            {
-                    try
-                    {
-                        sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO %s(id) VALUES(%ld);",
-                                         tableName.c_str(),
-                                         strtol(reply_data,NULL,10));
-                        pStmt->SqlStatement(cmd);
-
-                        cnt++;
-                    }
-                    catch(Kompex::SQLiteException &ex)
-                    {
-                        Log::err("SQLiteTmpTable::insert(%s) error: %s", ex.GetString().c_str());
-                    }
-            }
-        }
-
-        delete pStmt;
-
-        vret = true;
-    }
-
-
-    Batch_free(batch);
-    Executor_free(executor);
-/*
-    Kompex::SQLiteStatement *p;
-    p = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-    try
-    {
-        sqlite3_snprintf(CMD_SIZE, cmd, "REINDEX idx_%s_id;",tableName.c_str());
-        p->SqlStatement(cmd);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        Log::err("DB error: REINDEX table: %s: %s",tableName.c_str(), ex.GetString().c_str());
-    }
-    delete p;
-*/
-    Log::gdb("RedisClient::getRange: loaded %d", cnt);
-    return vret;
-}
-
-
 bool RedisClient::getRange(const std::string &key,
                            int start,
                            int stop,
@@ -141,7 +53,7 @@ bool RedisClient::getRange(const std::string &key,
     Executor *executor;
 
     bzero(cmd,CMD_SIZE);
-    snprintf(cmd, CMD_SIZE, "ZREVRANGE %s %d %d\r\n", key.c_str(), start, stop);
+    snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s %d %d\r\n", key.c_str(), start, stop);
 
     batch = Batch_new();
     Batch_write(batch, cmd, strlen(cmd), 1);
@@ -191,7 +103,7 @@ bool RedisClient::getRange(const std::string &key,
     Executor *executor;
 
     bzero(cmd,CMD_SIZE);
-    int rrr = snprintf(cmd, CMD_SIZE, "ZREVRANGE %s %d %d\r\n", key.c_str(), start, stop);
+    int rrr = snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s %d %d\r\n", key.c_str(), start, stop);
 
     batch = Batch_new();
     Batch_write(batch, cmd, rrr, 1);
@@ -242,7 +154,7 @@ bool RedisClient::getRange(const std::string &key,
     Executor *executor;
 
     bzero(cmd,CMD_SIZE);
-    int rrr = snprintf(cmd, CMD_SIZE, "ZREVRANGE %s %d %d\r\n", key.c_str(), start, stop);
+    int rrr = snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s %d %d\r\n", key.c_str(), start, stop);
 
     batch = Batch_new();
     Batch_write(batch, cmd, rrr, 1);

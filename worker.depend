@@ -137,7 +137,7 @@
 	<iostream>
 	"KompexSQLitePrerequisites.h"
 
-1401311933 source:/home/alex/Projects/worker/src/CgiService.cpp
+1401315187 source:/home/alex/Projects/worker/src/CgiService.cpp
 	<boost/algorithm/string.hpp>
 	"DB.h"
 	"Log.h"
@@ -202,7 +202,7 @@
 	"XXXSearcher.h"
 	"Config.h"
 
-1399301858 /home/alex/Projects/worker/include/RedisClient.h
+1401355577 /home/alex/Projects/worker/include/RedisClient.h
 	<string>
 	<vector>
 	<list>
@@ -302,24 +302,26 @@
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 
-1399272044 source:/home/alex/Projects/worker/src/HistoryManagerLongTerm.cpp
+1401341875 source:/home/alex/Projects/worker/src/HistoryManagerLongTerm.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 
-1401265357 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
-	"HistoryManager.h"
-	"Config.h"
-	"Log.h"
-
-1399549730 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
+1401353116 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 
-1399272033 source:/home/alex/Projects/worker/src/HistoryManagerShortTerm.cpp
+1401341965 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
+	"HistoryManager.h"
+	"Config.h"
+	"Log.h"
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+
+1401341926 source:/home/alex/Projects/worker/src/HistoryManagerShortTerm.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -375,7 +377,7 @@
 	"Log.h"
 	"Config.h"
 
-1401172939 source:/home/alex/Projects/worker/src/Params.cpp
+1401315691 source:/home/alex/Projects/worker/src/Params.cpp
 	<sstream>
 	<boost/algorithm/string/trim.hpp>
 	<boost/regex/icu.hpp>
@@ -395,15 +397,13 @@
 	"Config.h"
 	"Offer.h"
 
-1401283317 source:/home/alex/Projects/worker/src/RedisClient.cpp
+1401355716 source:/home/alex/Projects/worker/src/RedisClient.cpp
 	<strings.h>
 	<string.h>
 	"RedisClient.h"
 	"Log.h"
 	"Config.h"
 	"base64.h"
-	"KompexSQLiteStatement.h"
-	"KompexSQLiteException.h"
 
 1398673444 source:/home/alex/Projects/worker/src/Server.cpp
 	<fstream>
@@ -434,7 +434,7 @@
 	"Config.h"
 	"XXXSearcher.h"
 
-1401311901 source:/home/alex/Projects/worker/src/HistoryManager.cpp
+1401342022 source:/home/alex/Projects/worker/src/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"

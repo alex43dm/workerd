@@ -401,6 +401,7 @@ void Connection_read_data(Connection *connection, int ordinal)
 			Connection_abort(connection, "unexpected result parser result, rpres: %d", rp_res);
 			return;
 		}
+		Reply_free(reply);
 	}
 }
 
@@ -524,13 +525,14 @@ int Executor_execute(Executor *executor, int timeout_ms)
 
 	//determine max endtime based on timeout
 	struct timespec tm;
+	int i;
 	clock_gettime(CLOCK_MONOTONIC, &tm);
 	DEBUG(("Executor start_tm_ms: %3.2f\n", TIMESPEC_TO_MS(tm)));
 	executor->end_tm_ms = TIMESPEC_TO_MS(tm) + ((float)timeout_ms);
 	DEBUG(("Executor end_tm_ms: %3.2f\n", executor->end_tm_ms));
 
 	executor->numevents = 0;
-	for(int i = 0; i < executor->numpairs; i++) {
+	for(i = 0; i < executor->numpairs; i++) {
 		struct _Pair *pair = &executor->pairs[i];
 		Connection_execute_start(pair->connection, executor, pair->batch, i);
 	}
@@ -551,7 +553,7 @@ int Executor_execute(Executor *executor, int timeout_ms)
 			DEBUG(("Executor select res %d\n", poll_result));
 		}
 
-		for(int i = 0; i < executor->numpairs; i++) {
+		for(i = 0; i < executor->numpairs; i++) {
 
 			struct _Pair *pair = &executor->pairs[i];
 			Connection *connection = pair->connection;
