@@ -661,10 +661,10 @@ void ParentDB::GeoRerionsAdd(const std::string &country, const std::string &regi
             if(pStmt->GetDataCount() == 0)
             {
                 sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO GeoLiteCity(locId,country,city) \
+                                 "INSERT INTO GeoLiteCity(locId,country,city) \
                          SELECT max(locId)+1,%s,'%q' FROM GeoLiteCity;",
-                             val[i].size() > 0 ? val[i].c_str() : "''",
-                             region.c_str());
+                                 val[i].size() > 0 ? val[i].c_str() : "''",
+                                 region.c_str());
                 pStmt->SqlStatement(buf);
             }
 
@@ -1041,39 +1041,15 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         }
 
         std::string domains_allowed;
-        it = o.getObjectField("allowed").getObjectField("domains");
-        while (it.more())
-        {
-            bzero(buf,sizeof(buf));
-            std::string acnt = it.next().str();
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q');",acnt.c_str());
-            try
-            {
-                pStmt->SqlStatement(buf);
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                logDb(ex);
-            }
 
-            if(domains_allowed.empty())
-            {
-                domains_allowed += "'"+acnt+"'";
-            }
-            else
-            {
-                domains_allowed += ",'"+acnt+"'";
-            }
-        }
-
-        if(domains_allowed.size())
+        if(!o.getObjectField("allowed").isEmpty())
         {
-            bzero(buf,sizeof(buf));
+            std::clog <<"campaign: "<<long_id<<" empty"<<std::endl;
+
             sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO Campaign2Domains(id_cam,id_dom,allowed) \
-                             SELECT %lld,id,1 FROM Domains WHERE name IN(%s);",
-                             long_id, domains_allowed.c_str()
-                            );
+            "UPDATE Campaign \
+                             SET valid=0 \
+                             WHERE id=%lld;",long_id);
             try
             {
                 pStmt->SqlStatement(buf);
@@ -1082,6 +1058,57 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
             {
                 logDb(ex);
             }
+
+        }
+        else
+        {
+            it = o.getObjectField("allowed").getObjectField("domains");
+            while (it.more())
+            {
+                std::string acnt = it.next().str();
+
+                if(acnt.empty())
+                {
+                    continue;
+                }
+
+                bzero(buf,sizeof(buf));
+                sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q');",acnt.c_str());
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+
+                if(domains_allowed.empty())
+                {
+                    domains_allowed += "'"+acnt+"'";
+                }
+                else
+                {
+                    domains_allowed += ",'"+acnt+"'";
+                }
+            }
+
+            if(domains_allowed.size())
+            {
+                sqlite3_snprintf(sizeof(buf),buf,
+                "INSERT INTO Campaign2Domains(id_cam,id_dom,allowed) \
+                             SELECT %lld,id,1 FROM Domains WHERE name IN(%s);",
+                long_id, domains_allowed.c_str()                                );
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+            }
+
         }
 
         // Множества информеров, аккаунтов и доменов, на которых запрещен показ
@@ -1155,9 +1182,9 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         endShowTimeMinutes = strtol(bendTime.getStringField("minutes"),NULL,10);
 
         if(startShowTimeHours == 0 &&
-        startShowTimeMinutes == 0 &&
-        endShowTimeHours == 0 &&
-        endShowTimeMinutes == 0)
+                startShowTimeMinutes == 0 &&
+                endShowTimeHours == 0 &&
+                endShowTimeMinutes == 0)
         {
             endShowTimeHours = 24;
         }
@@ -1168,10 +1195,10 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
             {
                 bzero(buf,sizeof(buf));
                 sqlite3_snprintf(sizeof(buf),buf,
-                "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1);",
-                long_id, day,
-                startShowTimeHours,
-                startShowTimeMinutes
+                                 "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1);",
+                                 long_id, day,
+                                 startShowTimeHours,
+                                 startShowTimeMinutes
                                 );
 
                 try
@@ -1207,10 +1234,10 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 day = it.next().numberInt();
                 bzero(buf,sizeof(buf));
                 sqlite3_snprintf(sizeof(buf),buf,
-                "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1);",
-                long_id, day,
-                startShowTimeHours,
-                startShowTimeMinutes
+                                 "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1);",
+                                 long_id, day,
+                                 startShowTimeHours,
+                                 startShowTimeMinutes
                                 );
 
                 try
