@@ -5,6 +5,11 @@
 //----------------------------long term---------------------------------------
 void HistoryManager::getLongTerm()
 {
+    if(params->newClient)
+    {
+        return;
+    }
+
     std::string strSH = history_archive[HistoryType::LongTerm]->get(key);
 
     if(strSH.empty())
@@ -33,6 +38,11 @@ void *HistoryManager::getLongTermEnv(void *data)
 }
 bool HistoryManager::getLongTermAsync()
 {
+    if(params->newClient)
+    {
+        return true;
+    }
+
     pthread_attr_t attributes, *pAttr = &attributes;
     pthread_attr_init(pAttr);
     //pthread_attr_setstacksize(pAttr, THREAD_STACK_SIZE);
@@ -49,6 +59,11 @@ bool HistoryManager::getLongTermAsync()
 
 bool HistoryManager::getLongTermAsyncWait()
 {
+    if(params->newClient)
+    {
+        return true;
+    }
+
     pthread_join(thrGetLongTermAsync, 0);
 //    Log::gdb("HistoryManager::getLongTermAsyncWait return");
     return true;

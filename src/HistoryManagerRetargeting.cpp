@@ -11,6 +11,11 @@ void HistoryManager::getRetargeting()
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
 
+    if(params->newClient)
+    {
+        return;
+    }
+
     RetargetingClear();
 
     getHistoryByType(HistoryType::Retargeting, vretageting);
@@ -76,6 +81,11 @@ void *HistoryManager::getRetargetingEnv(void *data)
 
 bool HistoryManager::getRetargetingAsync()
 {
+    if(params->newClient)
+    {
+        return true;
+    }
+
     pthread_attr_t attributes, *pAttr = &attributes;
     pthread_attr_init(pAttr);
     //pthread_attr_setstacksize(pAttr, THREAD_STACK_SIZE);
@@ -93,6 +103,11 @@ bool HistoryManager::getRetargetingAsync()
 void HistoryManager::getRetargetingAsyncWait()
 {
 
+    if(params->newClient)
+    {
+        return;
+    }
+
     pthread_join(thrGetRetargetingAsync, 0);
 #ifdef DEBUG
     Log::info("[%ld]HistoryManager::getRetargetingAsyncWait return",tid);
@@ -105,6 +120,11 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &v, unsigned len)
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
     int viewTime = 0;
+
+    if(params->newClient)
+    {
+        return;
+    }
 
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
     //pStmt->BeginTransaction();
@@ -164,6 +184,11 @@ void HistoryManager::RetargetingClear()
 {
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
+
+    if(params->newClient)
+    {
+        return;
+    }
 
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
  //   pStmt->BeginTransaction();

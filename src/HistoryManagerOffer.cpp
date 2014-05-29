@@ -112,6 +112,11 @@ void *HistoryManager::getDeprecatedOffersEnv(void *data)
 
 bool HistoryManager::getDeprecatedOffersAsync()
 {
+    if(params->newClient)
+    {
+        return true;
+    }
+
     pthread_attr_t* attributes = (pthread_attr_t*) malloc(sizeof(pthread_attr_t));
     pthread_attr_init(attributes);
     //pthread_attr_setstacksize(attributes, THREAD_STACK_SIZE);
@@ -130,6 +135,11 @@ bool HistoryManager::getDeprecatedOffersAsync()
 
 bool HistoryManager::getDeprecatedOffersAsyncWait()
 {
+    if(params->newClient)
+    {
+        return true;
+    }
+
     pthread_join(thrGetDeprecatedOffersAsync, 0);
 //    Log::gdb("HistoryManager::getDeprecatedOffersAsyncWait return");
     return true;

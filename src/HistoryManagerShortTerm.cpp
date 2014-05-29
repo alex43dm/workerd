@@ -5,6 +5,11 @@
 //----------------------------short term---------------------------------------
 void HistoryManager::getShortTerm()
 {
+    if(params->newClient)
+    {
+        return;
+    }
+
     std::string strSH = history_archive[HistoryType::ShortTerm]->get(key);
 
     if(strSH.empty())
@@ -34,6 +39,11 @@ void *HistoryManager::getShortTermEnv(void *data)
 
 bool HistoryManager::getShortTermAsync()
 {
+    if(params->newClient)
+    {
+        return true;
+    }
+
     pthread_attr_t attributes, *pAttr = &attributes;
     pthread_attr_init(pAttr);
     //pthread_attr_setstacksize(pAttr, THREAD_STACK_SIZE);
@@ -50,6 +60,11 @@ bool HistoryManager::getShortTermAsync()
 
 bool HistoryManager::getShortTermAsyncWait()
 {
+    if(params->newClient)
+    {
+        return true;
+    }
+
     pthread_join(thrGetShortTermAsync, 0);
 //    Log::gdb("HistoryManager::getShortTermAsyncWait return");
     return true;

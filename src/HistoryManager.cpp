@@ -63,16 +63,10 @@ void HistoryManager::getUserHistory(Params *_params)
     key_inv = key+"-inv";
     Log::gdb("key: %s",key.c_str());
 
-    if(!params->newClient)
-    {
-        getDeprecatedOffersAsync();
+    getDeprecatedOffersAsync();
 
-        getRetargetingAsync();
-    }
-    else
-    {
-        std::clog<<"["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<"no history for: "<<key<<std::endl;
-    }
+    getRetargetingAsync();
+//        std::clog<<"["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<" no history for: "<<key<<std::endl;
 
     //Запрос по запросам к поисковикам
     if(isSearch())
@@ -97,14 +91,11 @@ void HistoryManager::getUserHistory(Params *_params)
         }
     }
 
-    if(!params->newClient)
-    {
-        if(isLongTerm())
-            getLongTermAsync();
+    if(isLongTerm())
+        getLongTermAsync();
 
-        if(isShortTerm())
-            getShortTermAsync();
-    }
+    if(isShortTerm())
+        getShortTermAsync();
 }
 
 void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
