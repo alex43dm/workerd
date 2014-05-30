@@ -433,6 +433,7 @@ std::string BaseCore::Status()
             "<td>" << ((*it)->social ? "Да" : "Нет") << "</td>" <<
             "<td>" << (*it)->offersCount << "</td>"<<
             "</tr>\n";
+        delete *it;
     }
     out << "</table>";
 

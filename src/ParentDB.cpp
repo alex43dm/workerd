@@ -304,6 +304,7 @@ long long ParentDB::insertAndGetDomainId(const std::string &domain)
         logDb(ex);
     }
     pStmt->FreeQuery();
+    delete pStmt;
     return domainId;
 }
 //-------------------------------------------------------------------------------------------------------
@@ -674,6 +675,7 @@ void ParentDB::GeoRerionsAdd(const std::string &country, const std::string &regi
             logDb(ex);
         }
     }
+    delete pStmt;
 }
 
 

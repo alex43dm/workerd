@@ -27,7 +27,7 @@ GeoIPTools* GeoIPTools::Instance()
     Если по какой-либо причине страну определить не удалось, возвращается
     пустая строка
 */
-std::string GeoIPTools::country_code_by_addr(const std::string &ip)
+std::string GeoIPTools::country_code_by_addr(const std::string &ip) const
 {
     if (!mGeoCountry)
         return "";
@@ -41,7 +41,7 @@ std::string GeoIPTools::country_code_by_addr(const std::string &ip)
     Если по какой-либо причине область определить не удалось, возвращается
     пустая строка.
 */
-std::string GeoIPTools::region_code_by_addr(const std::string &ip)
+std::string GeoIPTools::region_code_by_addr(const std::string &ip) const
 {
     if (!mGeoCity)
         return "";
@@ -52,10 +52,15 @@ std::string GeoIPTools::region_code_by_addr(const std::string &ip)
 
     const char *region_name =
         GeoIP_region_name_by_code(record->country_code, record->region);
-    return region_name? region_name : "";
+
+    std::string ret;
+    ret = region_name? region_name : "";
+    free((void*)region_name);
+
+    return ret;
 }
 
-std::string GeoIPTools::city_code_by_addr(const std::string &ip)
+std::string GeoIPTools::city_code_by_addr(const std::string &ip) const
 {
     if (!mGeoCity)
         return "";

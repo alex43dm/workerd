@@ -229,7 +229,12 @@ std::string Core::Process(Params *prms)
     }
 //printf("%s\n",ret.c_str());
 
-    Log::info("[%ld]core time: %s %d",tid, boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime).c_str(), vOutPut.size());
+    std::clog<<"["<<tid<<"]core time: "<< boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime)
+             <<" out: "<<vOutPut.size()
+             <<" ip: "<<params->getIP()
+             <<" country: "<<params->getCountry()
+             <<" region: "<<params->getRegion()
+             <<std::endl;
 
     return ret;
 }
@@ -524,7 +529,7 @@ bool Core::getAllOffers(Offer::Map &ret)
 bool Core::getOffers(Offer::Map &result, bool getAll)
 {
     Kompex::SQLiteStatement *pStmt;
-    pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
+    bool ret = true;
 
 #ifndef DUMMY
     if(!getAll)
@@ -571,23 +576,14 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
     printf("%s\n",cmd);
 #endif // DEBUG
 
-    try
-    {
-        pStmt->Sql(cmd);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        printf("%s\n", cmd);
-        Log::err("DB error: getOffers: %s", ex.GetString().c_str());
-        delete pStmt;
-        return false;
-    }
-
+    pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
     try
     {
         teasersCount = 0;
         teasersMediumRating = 0;
         teasersMaxRating = 0;
+
+        pStmt->Sql(cmd);
         while(pStmt->FetchRow())
         {
             Offer *off = new Offer(pStmt->GetColumnString(1),
@@ -617,21 +613,23 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
             {
                 teasersMaxRating = off->rating;
             }
-
             result.insert(Offer::Pair(off->id_int,off));
         }
-        pStmt->FreeQuery();
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DB error: %s", ex.GetString().c_str());
-        delete pStmt;
-        return false;
+        std::clog<<"["<<tid<<"] error: "<<__func__
+                 <<ex.GetString()
+                 <<std::endl;
+
+        ret = false;
     }
 
+
+    pStmt->FreeQuery();
     delete pStmt;
 
-    return true;
+    return ret;
 }
 
 std::string Core::OffersToHtml(const Offer::Vector &items, const std::string &url) const

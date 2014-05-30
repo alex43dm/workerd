@@ -190,8 +190,12 @@ void XXXSearcher::processKeywords(
                     break;
                 }
 
-                Log::info("id: %lld old rating: %f new: %f weight: %d match by %s: %s",
-                         pOffer->id_int, oldRating, pOffer->rating, weight, match.c_str(),pOffer->matching.c_str());
+                std::clog<<"offer id: "<<pOffer->id_int
+                <<" old rating: "<<oldRating
+                <<" new: "<< pOffer->rating
+                <<" weight: "<< weight
+                <<" match by "<<match <<" what: "<<pOffer->matching
+                <<std::endl;
             }
         }
     }
