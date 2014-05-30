@@ -26,15 +26,8 @@ Params &Params::ip(const std::string &ip)
 
     ip_ = ip;
 
-    if(country_.empty())
-    {
-        country_ = geoip->country_code_by_addr(ip_);
-    }
-
-    if(region_.empty())
-    {
-        region_ = geoip->region_code_by_addr(ip_);
-    }
+    country_ = geoip->country_code_by_addr(ip_);
+    region_ = geoip->region_code_by_addr(ip_);
 
     if(inet_pton(AF_INET, ip_.c_str(), &ipval))
     {
@@ -99,7 +92,7 @@ Params &Params::time(const boost::posix_time::ptime &time)
 */
 Params &Params::country(const std::string &country)
 {
-    if(!country_.size())
+    if(!country.empty())
     {
         country_ = country;
     }
@@ -119,7 +112,7 @@ Params &Params::country(const std::string &country)
 */
 Params &Params::region(const std::string &region)
 {
-    if(!region_.size())
+    if(!region.empty())
     {
         region_ = region;
     }
