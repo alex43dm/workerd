@@ -16,16 +16,16 @@ public:
     пустая строка
 */
 
-std::string country_code_by_addr(const std::string &ip);
+std::string country_code_by_addr(const std::string &ip) const;
 
 
 /** Возвращает название географической области по ``ip``.
     Если по какой-либо причине область определить не удалось, возвращается
     пустая строка.
 */
-std::string region_code_by_addr(const std::string &ip);
+std::string region_code_by_addr(const std::string &ip) const;
 
-std::string city_code_by_addr(const std::string &ip);
+std::string city_code_by_addr(const std::string &ip) const;
 
 
 private:
