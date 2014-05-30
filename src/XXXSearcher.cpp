@@ -130,7 +130,6 @@ void XXXSearcher::processKeywords(
                 }
 
                 long long id = sphinx_get_int(res, i, 0);
-//                Log::info("id: %lld", id);
 
                 Offer::it p;
                 p = items.find(id);
@@ -150,8 +149,6 @@ void XXXSearcher::processKeywords(
                     + weight;
                     //+ sphinx_get_float(res, i, 1);
 
-                Log::gdb("id: %lld old rating: %f new: %f weight: %d",
-                         pOffer->id_int, oldRating, pOffer->rating, weight);
                 //pOffer->rating = weight * (int)sr.size() > tt ? sr[tt].rate : 1;// * startRating;
 
                 //user search update
@@ -169,31 +166,32 @@ void XXXSearcher::processKeywords(
                                              const sphinx_uint64_t * docids,
                                              const sphinx_int64_t * values );
                 }*/
-                /*
-                            std::string match = sphinx_get_int(res, i, 2);
-                            if ( match == "nomatch")
-                            {
-                                matching = (string) sphinx_get_string( res, i, 0 ) + " | " + (string) sphinx_get_string( res, i, 1 );
-                            }
-                            else if (match == "broadmatch")
-                            {
-                                matching = sphinx_get_string( res, i, 2 );
-                            }
-                            else if (match == "phrasematch")
-                            {
-                                matching = sphinx_get_string( res, i, 4 );
-                            }
-                            else if (match == "exactmatch")
-                            {
-                                matching = sphinx_get_string( res, i, 3 );
-                            }
-                            else
-                            {
-                                Log::warn("Результат: %s лишний",pOffer->id_int);
-                                break;
-                            }
-*/
 
+                std::string match =  sphinx_get_string(res, i, 2);
+                if ( match == "nomatch")
+                {
+                    pOffer->matching = (std::string)sphinx_get_string( res, i, 0 ) + " | " + (std::string)sphinx_get_string( res, i, 1 );
+                }
+                else if (match == "broadmatch")
+                {
+                    pOffer->matching = sphinx_get_string( res, i, 2 );
+                }
+                else if (match == "phrasematch")
+                {
+                    pOffer->matching = sphinx_get_string( res, i, 4 );
+                }
+                else if (match == "exactmatch")
+                {
+                    pOffer->matching = sphinx_get_string( res, i, 3 );
+                }
+                else
+                {
+                    Log::warn("Результат: %s лишний",pOffer->id_int);
+                    break;
+                }
+
+                Log::info("id: %lld old rating: %f new: %f weight: %d match by %s: %s",
+                         pOffer->id_int, oldRating, pOffer->rating, weight, match.c_str(),pOffer->matching.c_str());
             }
         }
     }
