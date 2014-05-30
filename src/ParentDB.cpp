@@ -969,26 +969,25 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 logDb(ex);
             }
         }
-        /*
-                else
+        else
+        {
+            if(o.getObjectField("allowed").hasElement("accounts"))
+            {
+                bzero(buf,sizeof(buf));
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
+                                 long_id
+                                );
+                try
                 {
-                    if(o.getObjectField("allowed").hasElement("accounts"))
-                    {
-                        bzero(buf,sizeof(buf));
-                        sqlite3_snprintf(sizeof(buf),buf,
-                        "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
-                        long_id
-                                        );
-                        try
-                        {
-                            pStmt->SqlStatement(buf);
-                        }
-                        catch(Kompex::SQLiteException &ex)
-                        {
-                            logDb(ex);
-                        }
-                    }
-                }*/
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+            }
+        }
         // Множества информеров, аккаунтов и доменов, на которых запрещен показ
         std::string accounts_ignored;
         it = o.getObjectField("ignored").getObjectField("accounts");
