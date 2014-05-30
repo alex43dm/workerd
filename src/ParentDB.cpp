@@ -828,58 +828,71 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
 
 
         // Множества информеров, аккаунтов и доменов, на которых разрешён показ
-        if(cType == showCoverage::allowed)
+//        if(cType == showCoverage::allowed)
+//       {
+        //------------------------informers-----------------------
+        if(!aCampaignId.empty())
         {
-            //------------------------informers-----------------------
-            if(!aCampaignId.empty())
+            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Informer WHERE id_cam=%lld;",long_id);
+            try
             {
-                sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Informer WHERE id_cam=%lld;",long_id);
-                try
-                {
-                    pStmt->SqlStatement(buf);
-                }
-                catch(Kompex::SQLiteException &ex)
-                {
-                    logDb(ex);
-                }
+                pStmt->SqlStatement(buf);
             }
-            // Множества информеров, аккаунтов и доменов, на которых разрешён показ
-            std::string informers_allowed;
-            it = o.getObjectField("allowed").getObjectField("informers");
-            while (it.more())
-                informers_allowed += "'"+it.next().str()+"',";
+            catch(Kompex::SQLiteException &ex)
+            {
+                logDb(ex);
+            }
+        }
+        // Множества информеров, аккаунтов и доменов, на которых разрешён показ
+        std::string informers_allowed;
+        it = o.getObjectField("allowed").getObjectField("informers");
+        while (it.more())
+            informers_allowed += "'"+it.next().str()+"',";
 
-            informers_allowed = informers_allowed.substr(0, informers_allowed.size()-1);
-            bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO Campaign2Informer(id_cam,id_inf,allowed) \
+        informers_allowed = informers_allowed.substr(0, informers_allowed.size()-1);
+        bzero(buf,sizeof(buf));
+        sqlite3_snprintf(sizeof(buf),buf,
+                         "INSERT INTO Campaign2Informer(id_cam,id_inf,allowed) \
                          SELECT %lld,id,1 FROM Informer WHERE guid IN(%s);",
-                             long_id, informers_allowed.c_str()
-                            );
-            try
-            {
-                pStmt->SqlStatement(buf);
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                logDb(ex);
-            }
+                         long_id, informers_allowed.c_str()
+                        );
+        try
+        {
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            logDb(ex);
+        }
 
-            bzero(buf,sizeof(buf));
+        bzero(buf,sizeof(buf));
 
-            // Множества информеров, аккаунтов и доменов, на которых запрещен показ
-            std::string informers_ignored;
-            it = o.getObjectField("ignored").getObjectField("informers");
-            while (it.more())
-                informers_ignored += "'"+it.next().str()+"',";
+        // Множества информеров, аккаунтов и доменов, на которых запрещен показ
+        std::string informers_ignored;
+        it = o.getObjectField("ignored").getObjectField("informers");
+        while (it.more())
+            informers_ignored += "'"+it.next().str()+"',";
 
-            informers_ignored = informers_ignored.substr(0, informers_ignored.size()-1);
-            bzero(buf,sizeof(buf));
-            sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO Campaign2Informer(id_cam,id_inf,allowed) \
+        informers_ignored = informers_ignored.substr(0, informers_ignored.size()-1);
+        bzero(buf,sizeof(buf));
+        sqlite3_snprintf(sizeof(buf),buf,
+                         "INSERT INTO Campaign2Informer(id_cam,id_inf,allowed) \
                          SELECT %lld,id,0 FROM Informer WHERE guid IN(%s);",
-                             long_id, informers_ignored.c_str()
-                            );
+                         long_id, informers_ignored.c_str()
+                        );
+        try
+        {
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            logDb(ex);
+        }
+
+        //------------------------accounts-----------------------
+        if(!aCampaignId.empty())
+        {
+            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Accounts WHERE id_cam=%lld;",long_id);
             try
             {
                 pStmt->SqlStatement(buf);
@@ -888,11 +901,21 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
             {
                 logDb(ex);
             }
-
-            //------------------------accounts-----------------------
-            if(!aCampaignId.empty())
+        }
+        std::string accounts_allowed;
+        if(!o.getObjectField("allowed").getObjectField("accounts").isEmpty())
+        {
+            it = o.getObjectField("allowed").getObjectField("accounts");
+            while (it.more())
             {
-                sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Accounts WHERE id_cam=%lld;",long_id);
+                std::string acnt = it.next().str();
+
+                if(acnt.empty())
+                {
+                    continue;
+                }
+
+                sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name) VALUES('%q');",acnt.c_str());
                 try
                 {
                     pStmt->SqlStatement(buf);
@@ -901,49 +924,44 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 {
                     logDb(ex);
                 }
-            }
-            std::string accounts_allowed;
-            if(!o.getObjectField("allowed").getObjectField("accounts").isEmpty())
-            {
-                it = o.getObjectField("allowed").getObjectField("accounts");
-                while (it.more())
+
+                if(accounts_allowed.empty())
                 {
-                    std::string acnt = it.next().str();
-
-                    if(acnt.empty())
-                    {
-                        continue;
-                    }
-
-                    sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name) VALUES('%q');",acnt.c_str());
-                    try
-                    {
-                        pStmt->SqlStatement(buf);
-                    }
-                    catch(Kompex::SQLiteException &ex)
-                    {
-                        logDb(ex);
-                    }
-
-                    if(accounts_allowed.empty())
-                    {
-                        accounts_allowed += "'"+acnt+"'";
-                    }
-                    else
-                    {
-                        accounts_allowed += ",'"+acnt+"'";
-                    }
+                    accounts_allowed += "'"+acnt+"'";
                 }
+                else
+                {
+                    accounts_allowed += ",'"+acnt+"'";
+                }
+            }
 
 
 //                std::clog <<"campaign: "<<long_id<<" "<<id<<"load: "<<accounts_allowed<<std::endl;
-                if(accounts_allowed.size())
-                {
-                    //bzero(buf,sizeof(buf));
-                    sqlite3_snprintf(sizeof(buf),buf,
-                                     "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) \
+            if(accounts_allowed.size())
+            {
+                //bzero(buf,sizeof(buf));
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) \
                              SELECT %lld,id,1 FROM Accounts WHERE name IN(%s);",
-                                     long_id, accounts_allowed.c_str());
+                                 long_id, accounts_allowed.c_str());
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+            }
+            else
+            {
+                if(o.getObjectField("allowed").hasElement("accounts"))
+                {
+                    bzero(buf,sizeof(buf));
+                    sqlite3_snprintf(sizeof(buf),buf,
+                                     "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
+                                     long_id
+                                    );
                     try
                     {
                         pStmt->SqlStatement(buf);
@@ -954,7 +972,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                     }
                 }
             }
-            else
+            else if(cType == showCoverage::allowed)
             {
                 std::clog <<"campaign: "<<long_id<<" "<<id<<" not valid"<<std::endl;
 
@@ -972,24 +990,6 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 }
             }
             /*
-                    else
-                    {
-                        if(o.getObjectField("allowed").hasElement("accounts"))
-                        {
-                            bzero(buf,sizeof(buf));
-                            sqlite3_snprintf(sizeof(buf),buf,
-                            "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
-                            long_id
-                                            );
-                            try
-                            {
-                                pStmt->SqlStatement(buf);
-                            }
-                            catch(Kompex::SQLiteException &ex)
-                            {
-                                logDb(ex);
-                            }
-                        }
                     }*/
             // Множества информеров, аккаунтов и доменов, на которых запрещен показ
             std::string accounts_ignored;
@@ -1120,43 +1120,60 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                     }
                 }
 
-            }
+                // }
 
-            // Множества информеров, аккаунтов и доменов, на которых запрещен показ
-            std::string domains_ignored;
-            it = o.getObjectField("ignored").getObjectField("domains");
-            while (it.more())
-            {
-                bzero(buf,sizeof(buf));
-                std::string acnt = it.next().str();
-                sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q');",acnt.c_str());
-                try
+                // Множества информеров, аккаунтов и доменов, на которых запрещен показ
+                std::string domains_ignored;
+                it = o.getObjectField("ignored").getObjectField("domains");
+                while (it.more())
                 {
-                    pStmt->SqlStatement(buf);
-                }
-                catch(Kompex::SQLiteException &ex)
-                {
-                    logDb(ex);
+                    bzero(buf,sizeof(buf));
+                    std::string acnt = it.next().str();
+                    sqlite3_snprintf(sizeof(buf),buf,"INSERT OR IGNORE INTO Domains(name) VALUES('%q');",acnt.c_str());
+                    try
+                    {
+                        pStmt->SqlStatement(buf);
+                    }
+                    catch(Kompex::SQLiteException &ex)
+                    {
+                        logDb(ex);
+                    }
+
+                    if(domains_ignored.empty())
+                    {
+                        domains_ignored += "'"+acnt+"'";
+                    }
+                    else
+                    {
+                        domains_ignored += ",'"+acnt+"'";
+                    }
                 }
 
-                if(domains_ignored.empty())
+                if(domains_ignored.size())
                 {
-                    domains_ignored += "'"+acnt+"'";
-                }
-                else
-                {
-                    domains_ignored += ",'"+acnt+"'";
-                }
-            }
-
-            if(domains_ignored.size())
-            {
-                bzero(buf,sizeof(buf));
-                sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO Campaign2Domains(id_cam,id_dom,allowed) \
+                    bzero(buf,sizeof(buf));
+                    sqlite3_snprintf(sizeof(buf),buf,
+                                     "INSERT INTO Campaign2Domains(id_cam,id_dom,allowed) \
                              SELECT %lld,id,0 FROM Domains WHERE name IN(%s);",
-                                 long_id, domains_ignored.c_str()
-                                );
+                                     long_id, domains_ignored.c_str()
+                                    );
+                    try
+                    {
+                        pStmt->SqlStatement(buf);
+                    }
+                    catch(Kompex::SQLiteException &ex)
+                    {
+                        logDb(ex);
+                    }
+                }
+
+            }
+
+            //------------------------cron-----------------------
+            // Дни недели, в которые осуществляется показ
+            if(!aCampaignId.empty())
+            {
+                sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM CronCampaign WHERE id_cam=%lld;",long_id);
                 try
                 {
                     pStmt->SqlStatement(buf);
@@ -1167,13 +1184,161 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 }
             }
 
-        }
+            int day,startShowTimeHours,startShowTimeMinutes,endShowTimeHours,endShowTimeMinutes;
 
-        //------------------------cron-----------------------
-        // Дни недели, в которые осуществляется показ
-        if(!aCampaignId.empty())
-        {
-            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM CronCampaign WHERE id_cam=%lld;",long_id);
+            mongo::BSONObj bstartTime = o.getObjectField("startShowTime");
+            mongo::BSONObj bendTime = o.getObjectField("endShowTime");
+
+            startShowTimeHours = strtol(bstartTime.getStringField("hours"),NULL,10);
+            startShowTimeMinutes = strtol(bstartTime.getStringField("minutes"),NULL,10);
+            endShowTimeHours = strtol(bendTime.getStringField("hours"),NULL,10);
+            endShowTimeMinutes = strtol(bendTime.getStringField("minutes"),NULL,10);
+
+            if(startShowTimeHours == 0 &&
+                    startShowTimeMinutes == 0 &&
+                    endShowTimeHours == 0 &&
+                    endShowTimeMinutes == 0)
+            {
+                endShowTimeHours = 24;
+            }
+
+            if(o.getObjectField("daysOfWeek").isEmpty())
+            {
+                for(day = 1; day < 8; day++)
+                {
+                    bzero(buf,sizeof(buf));
+                    sqlite3_snprintf(sizeof(buf),buf,
+                                     "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1);",
+                                     long_id, day,
+                                     startShowTimeHours,
+                                     startShowTimeMinutes
+                                    );
+
+                    try
+                    {
+                        pStmt->SqlStatement(buf);
+                    }
+                    catch(Kompex::SQLiteException &ex)
+                    {
+                        logDb(ex);
+                    }
+
+                    sqlite3_snprintf(sizeof(buf),buf,
+                                     "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,0);",
+                                     long_id, day,
+                                     endShowTimeHours,
+                                     endShowTimeMinutes
+                                    );
+                    try
+                    {
+                        pStmt->SqlStatement(buf);
+                    }
+                    catch(Kompex::SQLiteException &ex)
+                    {
+                        logDb(ex);
+                    }
+                }
+            }
+            else
+            {
+                it = o.getObjectField("daysOfWeek");
+                while (it.more())
+                {
+                    day = it.next().numberInt();
+                    bzero(buf,sizeof(buf));
+                    sqlite3_snprintf(sizeof(buf),buf,
+                                     "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1);",
+                                     long_id, day,
+                                     startShowTimeHours,
+                                     startShowTimeMinutes
+                                    );
+
+                    try
+                    {
+                        pStmt->SqlStatement(buf);
+                    }
+                    catch(Kompex::SQLiteException &ex)
+                    {
+                        logDb(ex);
+                    }
+
+                    sqlite3_snprintf(sizeof(buf),buf,
+                                     "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,0);",
+                                     long_id, day,
+                                     endShowTimeHours,
+                                     endShowTimeMinutes
+                                    );
+                    try
+                    {
+                        pStmt->SqlStatement(buf);
+                    }
+                    catch(Kompex::SQLiteException &ex)
+                    {
+                        logDb(ex);
+                    }
+                }
+            }
+
+            //------------------------themes-----------------------
+            // Тематические категории, к которым относится кампания
+            if(!aCampaignId.empty())
+            {
+                sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Categories WHERE id_cam=%lld;",long_id);
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+            }
+
+            if(cType == showCoverage::thematic)
+            {
+                std::string catAll;
+                it = o.getObjectField("categories");
+                while (it.more())
+                {
+                    std::string cat = it.next().str();
+                    sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Categories(id,guid) VALUES(%lli,'%q');",
+                                     cats, cat.c_str());
+                    try
+                    {
+                        pStmt->SqlStatement(buf);
+                        cats++;
+                    }
+                    catch(Kompex::SQLiteException &ex)
+                    {
+                        logDb(ex);
+                    }
+                    if(catAll.empty())
+                    {
+                        catAll += "'"+cat+"'";
+                    }
+                    else
+                    {
+                        catAll += ",'"+cat+"'";
+                    }
+                }
+
+                sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Campaign2Categories(id_cam,id_cat) \
+                         SELECT %lld,cat.id FROM Categories AS cat WHERE cat.guid IN(%s);",
+                                 long_id,catAll.c_str());
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+
+                i++;
+            }
+
+            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Categories WHERE id_cam IN (SELECT id FROM Campaign WHERE showCoverage=1);");
+
             try
             {
                 pStmt->SqlStatement(buf);
@@ -1184,161 +1349,43 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
             }
         }
 
-        int day,startShowTimeHours,startShowTimeMinutes,endShowTimeHours,endShowTimeMinutes;
+        pStmt->CommitTransaction();
+        pStmt->FreeQuery();
 
-        mongo::BSONObj bstartTime = o.getObjectField("startShowTime");
-        mongo::BSONObj bendTime = o.getObjectField("endShowTime");
 
-        startShowTimeHours = strtol(bstartTime.getStringField("hours"),NULL,10);
-        startShowTimeMinutes = strtol(bstartTime.getStringField("minutes"),NULL,10);
-        endShowTimeHours = strtol(bendTime.getStringField("hours"),NULL,10);
-        endShowTimeMinutes = strtol(bendTime.getStringField("minutes"),NULL,10);
+        delete pStmt;
 
-        if(startShowTimeHours == 0 &&
-                startShowTimeMinutes == 0 &&
-                endShowTimeHours == 0 &&
-                endShowTimeMinutes == 0)
+        if(!aCampaignId.empty())
         {
-            endShowTimeHours = 24;
-        }
-
-        if(o.getObjectField("daysOfWeek").isEmpty())
-        {
-            for(day = 1; day < 8; day++)
-            {
-                bzero(buf,sizeof(buf));
-                sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1);",
-                                 long_id, day,
-                                 startShowTimeHours,
-                                 startShowTimeMinutes
-                                );
-
-                try
-                {
-                    pStmt->SqlStatement(buf);
-                }
-                catch(Kompex::SQLiteException &ex)
-                {
-                    logDb(ex);
-                }
-
-                sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,0);",
-                                 long_id, day,
-                                 endShowTimeHours,
-                                 endShowTimeMinutes
-                                );
-                try
-                {
-                    pStmt->SqlStatement(buf);
-                }
-                catch(Kompex::SQLiteException &ex)
-                {
-                    logDb(ex);
-                }
-            }
+            Log::info("Loaded campaign: %s",aCampaignId.c_str());
         }
         else
         {
-            it = o.getObjectField("daysOfWeek");
-            while (it.more())
-            {
-                day = it.next().numberInt();
-                bzero(buf,sizeof(buf));
-                sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,1);",
-                                 long_id, day,
-                                 startShowTimeHours,
-                                 startShowTimeMinutes
-                                );
-
-                try
-                {
-                    pStmt->SqlStatement(buf);
-                }
-                catch(Kompex::SQLiteException &ex)
-                {
-                    logDb(ex);
-                }
-
-                sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO CronCampaign(id_cam,Day,Hour,Min,startStop) VALUES(%lld,%d,%d,%d,0);",
-                                 long_id, day,
-                                 endShowTimeHours,
-                                 endShowTimeMinutes
-                                );
-                try
-                {
-                    pStmt->SqlStatement(buf);
-                }
-                catch(Kompex::SQLiteException &ex)
-                {
-                    logDb(ex);
-                }
-            }
+            Log::info("Loaded %d campaigns",i);
         }
+    }
 
-        //------------------------themes-----------------------
-        // Тематические категории, к которым относится кампания
-        if(!aCampaignId.empty())
+    /** \brief  Обновление кампании из базы данных  Mongo
+
+     */
+    void ParentDB::CampaignStartStop(const std::string &aCampaignId, int StartStop)
+    {
+        if(aCampaignId.empty())
         {
-            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Categories WHERE id_cam=%lld;",long_id);
-            try
-            {
-                pStmt->SqlStatement(buf);
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                logDb(ex);
-            }
+            return;
         }
 
-        if(cType == showCoverage::thematic)
-        {
-            std::string catAll;
-            it = o.getObjectField("categories");
-            while (it.more())
-            {
-                std::string cat = it.next().str();
-                sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Categories(id,guid) VALUES(%lli,'%q');",
-                cats, cat.c_str());
-                try
-                {
-                    pStmt->SqlStatement(buf);
-                    cats++;
-                }
-                catch(Kompex::SQLiteException &ex)
-                {
-                    logDb(ex);
-                }
-                if(catAll.empty())
-                {
-                    catAll += "'"+cat+"'";
-                }
-                else
-                {
-                    catAll += ",'"+cat+"'";
-                }
-            }
+        Kompex::SQLiteStatement *pStmt;
 
-            sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Campaign2Categories(id_cam,id_cat) \
-                         SELECT %lld,cat.id FROM Categories AS cat WHERE cat.guid IN(%s);",
-                             long_id,catAll.c_str());
-            try
-            {
-                pStmt->SqlStatement(buf);
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                logDb(ex);
-            }
+        pStmt = new Kompex::SQLiteStatement(pdb);
+        pStmt->BeginTransaction();
 
-            i++;
-        }
+        // Дни недели, в которые осуществляется показ
 
-        sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign2Categories WHERE id_cam IN (SELECT id FROM Campaign WHERE showCoverage=1);");
-
+        bzero(buf,sizeof(buf));
+        sqlite3_snprintf(sizeof(buf),buf,"UPDATE Campaign \
+                     SET valid=%d \
+                     WHERE guid='%s';",StartStop,aCampaignId.c_str());
         try
         {
             pStmt->SqlStatement(buf);
@@ -1347,101 +1394,54 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         {
             logDb(ex);
         }
+
+        pStmt->CommitTransaction();
+        pStmt->FreeQuery();
+
+        delete pStmt;
+
+        Log::info("campaign %s %sed",aCampaignId.c_str(), StartStop ? "start":"stop");
     }
 
-    pStmt->CommitTransaction();
-    pStmt->FreeQuery();
 
-
-    delete pStmt;
-
-    if(!aCampaignId.empty())
+    void ParentDB::CampaignRemove(const std::string &aCampaignId)
     {
-        Log::info("Loaded campaign: %s",aCampaignId.c_str());
+        if(aCampaignId.empty())
+        {
+            return;
+        }
+
+        Kompex::SQLiteStatement *pStmt;
+
+        pStmt = new Kompex::SQLiteStatement(pdb);
+        pStmt->BeginTransaction();
+        sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign WHERE guid='%s';",aCampaignId.c_str());
+        try
+        {
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            logDb(ex);
+        }
+        pStmt->CommitTransaction();
+        pStmt->FreeQuery();
+
+        delete pStmt;
+
+        Log::info("campaign %s removed",aCampaignId.c_str());
     }
-    else
-    {
-        Log::info("Loaded %d campaigns",i);
-    }
-}
-
-/** \brief  Обновление кампании из базы данных  Mongo
-
- */
-void ParentDB::CampaignStartStop(const std::string &aCampaignId, int StartStop)
-{
-    if(aCampaignId.empty())
-    {
-        return;
-    }
-
-    Kompex::SQLiteStatement *pStmt;
-
-    pStmt = new Kompex::SQLiteStatement(pdb);
-    pStmt->BeginTransaction();
-
-    // Дни недели, в которые осуществляется показ
-
-    bzero(buf,sizeof(buf));
-    sqlite3_snprintf(sizeof(buf),buf,"UPDATE Campaign \
-                     SET valid=%d \
-                     WHERE guid='%s';",StartStop,aCampaignId.c_str());
-    try
-    {
-        pStmt->SqlStatement(buf);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        logDb(ex);
-    }
-
-    pStmt->CommitTransaction();
-    pStmt->FreeQuery();
-
-    delete pStmt;
-
-    Log::info("campaign %s %sed",aCampaignId.c_str(), StartStop ? "start":"stop");
-}
-
-
-void ParentDB::CampaignRemove(const std::string &aCampaignId)
-{
-    if(aCampaignId.empty())
-    {
-        return;
-    }
-
-    Kompex::SQLiteStatement *pStmt;
-
-    pStmt = new Kompex::SQLiteStatement(pdb);
-    pStmt->BeginTransaction();
-    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Campaign WHERE guid='%s';",aCampaignId.c_str());
-    try
-    {
-        pStmt->SqlStatement(buf);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        logDb(ex);
-    }
-    pStmt->CommitTransaction();
-    pStmt->FreeQuery();
-
-    delete pStmt;
-
-    Log::info("campaign %s removed",aCampaignId.c_str());
-}
 
 //==================================================================================
-std::string ParentDB::CampaignGetName(long long campaign_id)
-{
-    auto cursor = monga_main->query(cfg->mongo_main_db_ +".campaign", QUERY("guid_int" << campaign_id));
-
-    while (cursor->more())
+    std::string ParentDB::CampaignGetName(long long campaign_id)
     {
-        mongo::BSONObj x = cursor->next();
-        return x.getStringField("guid");
+        auto cursor = monga_main->query(cfg->mongo_main_db_ +".campaign", QUERY("guid_int" << campaign_id));
+
+        while (cursor->more())
+        {
+            mongo::BSONObj x = cursor->next();
+            return x.getStringField("guid");
+        }
+        return "";
     }
-    return "";
-}
 
