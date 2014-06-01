@@ -122,7 +122,7 @@ public:
     }
 
     // Каждому элементу просмотра присваиваем уникальный токен
-    long long int gen();
+    std::string gen();
 
     std::string toJson() const;
     bool setBranch(const  EBranchT tbranch);

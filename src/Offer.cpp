@@ -64,7 +64,7 @@ std::string Offer::toJson() const
          "\t\"image\": \"" << Json::Utils::Escape(image_url) << "\",\n" <<
          "\t\"swf\": \"" << Json::Utils::Escape(swf) << "\",\n" <<
          "\t\"url\": \"" << Json::Utils::Escape(redirect_url) << "\",\n" <<
-         "\t\"token\": \"" << Json::Utils::Escape(token) << "\",\n" <<
+         "\t\"token\": \"" << token << "\",\n" <<
          "\t\"rating\": \"" << rating << "\",\n" <<
          "\t\"width\": \"" << width << "\",\n" <<
          "\t\"height\": \"" << height << "\",\n" <<
@@ -76,11 +76,11 @@ std::string Offer::toJson() const
     return str_json.str();
 }
 
-long long int Offer::gen()
+std::string Offer::gen()
 {
     token_int = (long long int)rand();
     token = std::to_string(token_int);
-    return token_int;
+    return token;
 }
 
 

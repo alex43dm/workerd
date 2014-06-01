@@ -874,7 +874,7 @@ links_make:
     {
         (*p)->redirect_url =
             Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
-                        boost::format("id=%s\ninf=%s\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
+                        boost::format("id=%s\ninf=%s\ntoken=%s\nurl=%s\nserver=%s\nloc=%s")
                         % (*p)->id
                         % params->informer_id_
                         % (*p)->gen()
@@ -971,7 +971,7 @@ make_return:
     {
         (*p)->redirect_url =
             Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
-                        boost::format("id=%s\ninf=%s\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
+                        boost::format("id=%s\ninf=%s\ntoken=%s\nurl=%s\nserver=%s\nloc=%s")
                         % (*p)->id
                         % params->informer_id_
                         % (*p)->gen()
