@@ -47,7 +47,7 @@ public:
     //Задаём обнавление долгосрочной истории
     bool updateContext;
 
-    Offer::Vector *vretg;
+    Offer::Vector vretg;
 
     HistoryManager(const std::string &tmpTableName);
     virtual ~HistoryManager();

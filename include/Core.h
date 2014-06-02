@@ -85,7 +85,7 @@ private:
     float teasersMediumRating,teasersMaxRating;
     std::string tmpTableName;
     Offer::Vector vOutPut;
-    Offer::Vector result, resultRetargeting;
+    Offer::Vector result;
     Offer::Map items;
 
     bool getOffers(Offer::Map &result, bool getAll=false);
