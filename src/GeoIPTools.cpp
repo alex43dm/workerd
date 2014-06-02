@@ -39,6 +39,7 @@ std::string GeoIPTools::country_code_by_addr(const std::string &ip) const
     if((country = GeoIP_country_code_by_addr(mGeoCountry, ip.c_str())))
     {
         ret = country;
+        free((void*)country);
     }
 
     return ret;
@@ -71,7 +72,7 @@ std::string GeoIPTools::region_code_by_addr(const std::string &ip) const
             free((void*)region_name);
         }
 
-        free((void*)record);
+        GeoIPRecord_delete(record);
     }
 
     return ret;
@@ -88,7 +89,7 @@ std::string GeoIPTools::city_code_by_addr(const std::string &ip) const
     if((record = GeoIP_record_by_addr(mGeoCity, ip.c_str())))
     {
         ret = record->city;
-        free((void*)record);
+        GeoIPRecord_delete(record);
     }
 
     return ret;
