@@ -30,10 +30,10 @@ HistoryManager::~HistoryManager()
 
     delete sphinx;
 
-    delete history_archive[ViewHistory];
-    delete history_archive[ShortTerm];
-    delete history_archive[LongTerm];
-    delete history_archive[Retargeting];
+    delete pViewHistory;
+    delete pShortTerm;
+    delete pLongTerm;
+    delete pRetargeting;
 
     Module_free(module);
 }
@@ -43,17 +43,17 @@ bool HistoryManager::initDB()
 
     Config *cfg = Config::Instance();
 
-    history_archive[ViewHistory] = new RedisClient(cfg->redis_user_view_history_host_, cfg->redis_user_view_history_port_,Config::Instance()->views_expire_);
-    history_archive[ViewHistory]->connect();
+    pViewHistory = new RedisClient(cfg->redis_user_view_history_host_, cfg->redis_user_view_history_port_,Config::Instance()->views_expire_);
+    pViewHistory->connect();
 
-    history_archive[ShortTerm] = new RedisClient(cfg->redis_short_term_history_host_, cfg->redis_short_term_history_port_,REDIS_TIMEOUT);
-    history_archive[ShortTerm]->connect();
+    pShortTerm = new RedisClient(cfg->redis_short_term_history_host_, cfg->redis_short_term_history_port_,REDIS_TIMEOUT);
+    pShortTerm->connect();
 
-    history_archive[LongTerm] = new RedisClient(cfg->redis_long_term_history_host_, cfg->redis_long_term_history_port_,REDIS_TIMEOUT);
-    history_archive[LongTerm]->connect();
+    pLongTerm = new RedisClient(cfg->redis_long_term_history_host_, cfg->redis_long_term_history_port_,REDIS_TIMEOUT);
+    pLongTerm->connect();
 
-    history_archive[Retargeting] = new RedisClient(cfg->redis_retargeting_host_, cfg->redis_retargeting_port_,REDIS_TIMEOUT);
-    history_archive[Retargeting]->connect();
+    pRetargeting = new RedisClient(cfg->redis_retargeting_host_, cfg->redis_retargeting_port_,REDIS_TIMEOUT);
+    pRetargeting->connect();
 
     return true;
 }
@@ -190,7 +190,7 @@ bool HistoryManager::updateUserHistory(
 
     if(mtailOffers.size())
     {
-        history_archive[ViewHistory]->del(key_inv);
+        pViewHistory->del(key_inv);
         mtailOffers.clear();
     }
 
@@ -199,15 +199,37 @@ bool HistoryManager::updateUserHistory(
     return true;
 }
 
+RedisClient *HistoryManager::getHistoryPointer(const HistoryType type) const
+{
+    switch(type)
+    {
+        case ViewHistory:
+            return pViewHistory;
+            break;
+        case ShortTerm:
+            return pShortTerm;
+            break;
+        case LongTerm:
+            return pLongTerm;
+            break;
+        case Retargeting:
+            return pRetargeting;
+            break;
+        default:
+            return nullptr;
+    }
+}
+
 /** \brief Получение истории пользователя.
  *
  * \param params - параметры запроса.
  */
 bool HistoryManager::getHistoryByType(HistoryType type, std::list<std::string> &rr)
 {
-    if(history_archive[type]->exists(key))
+    RedisClient *r = getHistoryPointer(type);
+    if(r->exists(key))
     {
-        if(!history_archive[type]->getRange(key, 0, -1, rr))
+        if(!r->getRange(key, 0, -1, rr))
         {
             std::clog<<LogPriority::Err<< "["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<EnumHistoryTypeStrings[type]<<":"<< Module_last_error(module) << std::endl;
             //Log::err("[%ld]%s::%s %s: %s", tid, typeid(this).name(), __func__,EnumHistoryTypeStrings[type], Module_last_error(module));
@@ -252,7 +274,7 @@ void HistoryManager::unlock()
 */
 bool HistoryManager::getDBStatus(HistoryType t)
 {
-    if(!history_archive[t]->isConnected())
+    if(!getHistoryPointer(t)->isConnected())
     {
         Log::err("HistoryManager::getDBStatus HistoryType: %d error: %s", (int)t, Module_last_error(module));
         return false;

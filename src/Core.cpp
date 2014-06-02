@@ -524,7 +524,7 @@ bool Core::getAllOffers(Offer::Map &ret)
     return getOffers(ret);
 }
 */
-bool Core::getOffers(Offer::Map &result, bool getAll)
+bool Core::getOffers(Offer::Map &res, bool getAll)
 {
     Kompex::SQLiteStatement *pStmt;
     bool ret = true;
@@ -611,7 +611,7 @@ bool Core::getOffers(Offer::Map &result, bool getAll)
             {
                 teasersMaxRating = off->rating;
             }
-            result.insert(Offer::Pair(off->id_int,off));
+            res.insert(Offer::Pair(off->id_int,off));
         }
     }
     catch(Kompex::SQLiteException &ex)

@@ -10,7 +10,7 @@ void HistoryManager::getShortTerm()
         return;
     }
 
-    std::string strSH = history_archive[HistoryType::ShortTerm]->get(key);
+    std::string strSH = pShortTerm->get(key);
 
     if(strSH.empty())
     {

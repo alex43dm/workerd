@@ -10,7 +10,7 @@ void HistoryManager::getLongTerm()
         return;
     }
 
-    std::string strSH = history_archive[HistoryType::LongTerm]->get(key);
+    std::string strSH = pLongTerm->get(key);
 
     if(strSH.empty())
     {

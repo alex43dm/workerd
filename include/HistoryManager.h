@@ -3,7 +3,6 @@
 
 #include <string>
 #include <list>
-#include <map>
 
 #include <boost/date_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -98,7 +97,7 @@ private:
     std::string key, key_inv;
     Params *params;
     Module *module;
-    std::map<HistoryType, RedisClient *> history_archive;
+    RedisClient *pViewHistory,*pShortTerm,*pLongTerm,*pRetargeting;
     std::string tmpTable;
     std::vector<sphinxRequests> stringQuery;
     XXXSearcher *sphinx;
@@ -127,5 +126,6 @@ private:
     static void *getLongTermEnv(void *);
     static void *getShortTermEnv(void *);
     static void *getRetargetingEnv(void *);
+    RedisClient *getHistoryPointer(const HistoryType type) const;
 };
 #endif
