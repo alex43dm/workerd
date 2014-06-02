@@ -12,6 +12,7 @@ GeoIPTools::GeoIPTools()
 GeoIPTools::~GeoIPTools()
 {
     GeoIP_delete(mGeoCountry);
+    GeoIP_delete(mGeoCity);
 }
 
 GeoIPTools* GeoIPTools::Instance()
@@ -29,11 +30,18 @@ GeoIPTools* GeoIPTools::Instance()
 */
 std::string GeoIPTools::country_code_by_addr(const std::string &ip) const
 {
-    if (!mGeoCountry)
-        return "";
+    std::string ret;
+    const char *country;
 
-    const char *country = GeoIP_country_code_by_addr(mGeoCountry, ip.c_str());
-    return country? country : "";
+    if (!mGeoCountry)
+        return ret;
+
+    if((country = GeoIP_country_code_by_addr(mGeoCountry, ip.c_str())))
+    {
+        ret = country;
+    }
+
+    return ret;
 }
 
 
@@ -43,31 +51,45 @@ std::string GeoIPTools::country_code_by_addr(const std::string &ip) const
 */
 std::string GeoIPTools::region_code_by_addr(const std::string &ip) const
 {
-    if (!mGeoCity)
-        return "";
-
-    GeoIPRecord *record = GeoIP_record_by_addr(mGeoCity, ip.c_str());
-    if (!record)
-        return "";
-
-    const char *region_name =
-        GeoIP_region_name_by_code(record->country_code, record->region);
-
     std::string ret;
-    ret = region_name? region_name : "";
-    free((void*)region_name);
+    const char *region_name;
+    GeoIPRecord *record;
+
+    if (!mGeoCity)
+        return ret;
+
+    if (!(record = GeoIP_record_by_addr(mGeoCity, ip.c_str())))
+    {
+        return ret;
+    }
+    else
+    {
+        if((region_name =
+            GeoIP_region_name_by_code(record->country_code, record->region)))
+        {
+            ret = region_name;
+            free((void*)region_name);
+        }
+
+        free((void*)record);
+    }
 
     return ret;
 }
 
 std::string GeoIPTools::city_code_by_addr(const std::string &ip) const
 {
+    std::string ret;
+    GeoIPRecord *record;
+
     if (!mGeoCity)
-        return "";
+        return ret;
 
-    GeoIPRecord *record = GeoIP_record_by_addr(mGeoCity, ip.c_str());
-    if (!record)
-        return "";
+    if((record = GeoIP_record_by_addr(mGeoCity, ip.c_str())))
+    {
+        ret = record->city;
+        free((void*)record);
+    }
 
-    return record->city ? record->city : "";
+    return ret;
 }
