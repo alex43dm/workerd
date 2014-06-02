@@ -492,6 +492,7 @@ std::string Core::getGeo()
                     AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND (reg.city='' OR reg.city='NOT FOUND'))";
                 }
                 pStmt->FreeQuery();
+                delete pStmt;
             }
             catch(Kompex::SQLiteException &ex)
             {

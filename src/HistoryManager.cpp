@@ -179,6 +179,7 @@ bool HistoryManager::updateUserHistory(
     vshortTerm.clear();
     vlongTerm.clear();
     vretageting.clear();
+    vretg->clear();
 
     if(mtailOffers.size())
     {

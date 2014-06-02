@@ -339,7 +339,10 @@ long long ParentDB::insertAndGetAccountId(const std::string &accout)
     {
         logDb(ex);
     }
+
     pStmt->FreeQuery();
+    delete pStmt;
+
     return accountId;
 }
 //-------------------------------------------------------------------------------------------------------
@@ -675,6 +678,7 @@ void ParentDB::GeoRerionsAdd(const std::string &country, const std::string &regi
             logDb(ex);
         }
     }
+    pStmt->FreeQuery();
     delete pStmt;
 }
 
