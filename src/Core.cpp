@@ -59,8 +59,6 @@ Core::Core()
 #ifndef DUMMY
     hm = new HistoryManager(tmpTableName);
     hm->initDB();
-    hm->vretg = &resultRetargeting;
-    //hm->RetargetingOfferStr = pDb->getSqlFile("requests/03.sql");
 #endif // DUMMY
     Log::info("[%ld]core start",tid);
 }
@@ -151,7 +149,7 @@ std::string Core::Process(Params *prms)
 
     //ris algorithm
     hm->getRetargetingAsyncWait();
-    RISAlgorithmRetagreting(resultRetargeting, vOutPut,
+    RISAlgorithmRetagreting(hm->vretg, vOutPut,
                             vRIS.size() == (u_int)informer->capacity ? informer->RetargetingCount : informer->capacity);
     Log::gdb("[%ld]RISAlgorithmRetagreting: vOutPut %ld done",tid, vOutPut.size());
 
@@ -348,7 +346,6 @@ void Core::ProcessSaveResults()
 
     items.clear();
     result.clear();
-    resultRetargeting.clear();
 
     vOutPut.clear();
 

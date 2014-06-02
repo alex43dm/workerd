@@ -27,8 +27,15 @@ HistoryManager::HistoryManager(const std::string &tmpTableName):
 HistoryManager::~HistoryManager()
 {
     pthread_mutex_destroy((pthread_mutex_t*)m_pPrivate);
-    Module_free(module);
+
     delete sphinx;
+
+    delete history_archive[ViewHistory];
+    delete history_archive[ShortTerm];
+    delete history_archive[LongTerm];
+    delete history_archive[Retargeting];
+
+    Module_free(module);
 }
 
 bool HistoryManager::initDB()
@@ -179,7 +186,7 @@ bool HistoryManager::updateUserHistory(
     vshortTerm.clear();
     vlongTerm.clear();
     vretageting.clear();
-    vretg->clear();
+    vretg.clear();
 
     if(mtailOffers.size())
     {

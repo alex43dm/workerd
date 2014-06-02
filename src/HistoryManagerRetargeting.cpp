@@ -57,7 +57,7 @@ void HistoryManager::getRetargeting()
                                    pStmt->GetColumnString(17)
                                   );
 
-            vretg->push_back(off);
+            vretg.push_back(off);
         }
         pStmt->FreeQuery();
     }

@@ -141,32 +141,33 @@ void *CgiService::Serve(void *data)
     CgiService *csrv = (CgiService*)data;
 
     Core *core = new Core();
-//    core->set_server_ip(Config::Instance()->server_ip_);
-//    core->set_redirect_script(Config::Instance()->redirect_script_);
 
     FCGX_Request request;
 
     if(FCGX_InitRequest(&request, csrv->socketId, 0) != 0)
     {
-        Log::err("Can not init request");
+        std::clog<<"Can not init request"<<std::endl;
         return nullptr;
     }
 
+    static pthread_mutex_t accept_mutex = PTHREAD_MUTEX_INITIALIZER;
+
     for(;;)
     {
-        static pthread_mutex_t accept_mutex = PTHREAD_MUTEX_INITIALIZER;
         pthread_mutex_lock(&accept_mutex);
         int rc = FCGX_Accept_r(&request);
         pthread_mutex_unlock(&accept_mutex);
 
         if(rc < 0)
         {
-            Log::err("Can not accept new request");
+            std::clog<<"Can not accept new request"<<std::endl;
             break;
         }
 
         csrv->ProcessRequest(&request, core);
     }
+
+    std::clog<<"thread: "<<pthread_self()<<" exit.";
 
     delete core;
 
