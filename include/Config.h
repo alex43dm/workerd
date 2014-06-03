@@ -87,6 +87,8 @@ public:
     std::string mq_path_;
     std::string offerSqlStr, informerSqlStr, retargetingOfferSqlStr, offerSqlStrAll;
 
+    bool logCoreTime, logOutPutSize, logIP, logCountry, logRegion;
+
     DataBase *pDb;
 
     static Config* Instance();

@@ -77,6 +77,9 @@ bool Config::Load()
     TiXmlElement *mel, *mels;
     boost::filesystem::path p;
 
+    logCoreTime = logOutPutSize = logIP = true;
+    logCountry = logRegion = false;
+
     p = boost::filesystem::path(mFileName);
 
     if(!boost::filesystem::is_regular_file(p))

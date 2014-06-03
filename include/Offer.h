@@ -16,19 +16,19 @@ typedef unsigned long long	sphinx_uint64_t;
 class Offer
 {
 public:
-    typedef std::map <const long long,Offer*> Map;
+    typedef std::map <const unsigned long,Offer*> Map;
     typedef std::multimap <const float,Offer*, std::greater<float>> MapRate;
-    typedef std::map <const long long,Offer*>::iterator it;
-    typedef std::map <const long long,Offer*>::const_iterator cit;
+    typedef std::map <const unsigned long,Offer*>::iterator it;
+    typedef std::map <const unsigned long,Offer*>::const_iterator cit;
     typedef std::pair<const float,Offer*> PairRate;
-    typedef std::pair<const long long,Offer*> Pair;
+    typedef std::pair<const unsigned long,Offer*> Pair;
     typedef std::vector <Offer*> Vector;
     typedef std::vector <Offer*>::iterator itV;
 
     typedef enum { banner, teazer, unknown } Type;
     /// Структура для хранения информации о рекламном предложении.
     std::string id;             ///< ID предложения
-    long long id_int;                 ///< ID предложения
+    long long int id_int;                 ///< ID предложения
     std::string title;          ///< Заголовок
     std::string price;          ///< Цена
     std::string description;    ///< Описание

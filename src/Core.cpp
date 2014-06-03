@@ -123,7 +123,6 @@ std::string Core::Process(Params *prms)
 
     Log::gdb("Core::Process start");
     Log::gdb("search: %s",prms->getSearch().c_str());
-    boost::posix_time::ptime startTime, endTime;//добавлено для отладки, УДАЛИТЬ!!!
     startTime = boost::posix_time::microsec_clock::local_time();
 
     params = prms;
@@ -140,7 +139,7 @@ std::string Core::Process(Params *prms)
     //load all history async
     hm->getUserHistory(params);
 
-    getOffers(items);
+    getOffers();
     Log::gdb("[%ld]getOffers: %d done",tid, items.size());
 
     //wait all history load
@@ -227,14 +226,30 @@ std::string Core::Process(Params *prms)
     }
 //printf("%s\n",ret.c_str());
 
-    std::clog<<"["<<tid<<"]core time: "<< boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime)
-             <<" out: "<<vOutPut.size()
-             <<" ip: "<<params->getIP()
-             <<" country: "<<params->getCountry()
-             <<" region: "<<params->getRegion()
-             <<std::endl;
-
+    log();
     return ret;
+}
+
+void Core::log()
+{
+    std::clog<<"["<<tid<<"]";
+
+    if(cfg->logCoreTime)
+        std::clog<<" core time:"<< boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime);
+
+    if(cfg->logOutPutSize)
+        std::clog<<" out:"<<vOutPut.size();
+
+    if(cfg->logIP)
+        std::clog<<" ip:"<<params->getIP();
+
+    if(cfg->logCountry)
+        std::clog<<" country:"<<params->getCountry();
+
+    if(cfg->logRegion)
+        std::clog<<" region:"<<params->getRegion();
+
+    std::clog<<std::endl;
 }
 
 // Сохраняем выданные ссылки в базе данных
@@ -257,13 +272,8 @@ void Core::ProcessSaveResults()
         if(items.size() <= (u_int)informer->capacity * 2)
         {
             Log::gdb("set tail");
-            for(auto i = vOutPut.begin(); i != vOutPut.end(); ++i)
-            {
-                items.erase((*i)->id_int);
-                delete *i;
-            }
             hm->clean = true;
-            hm->setTailOffers(items);
+            hm->setTailOffers(items,vOutPut);
         }
 
         hm->updateUserHistory(vOutPut, informer->RetargetingCount);
@@ -525,7 +535,7 @@ bool Core::getAllOffers(Offer::Map &ret)
     return getOffers(ret);
 }
 */
-bool Core::getOffers(Offer::Map &res, bool getAll)
+bool Core::getOffers(bool getAll)
 {
     Kompex::SQLiteStatement *pStmt;
     bool ret = true;
@@ -585,6 +595,12 @@ bool Core::getOffers(Offer::Map &res, bool getAll)
         pStmt->Sql(cmd);
         while(pStmt->FetchRow())
         {
+
+            if(items.count(pStmt->GetColumnInt64(0)) > 0)
+            {
+                continue;
+            }
+
             Offer *off = new Offer(pStmt->GetColumnString(1),
                                    pStmt->GetColumnInt64(0),
                                    pStmt->GetColumnString(2),
@@ -605,6 +621,7 @@ bool Core::getOffers(Offer::Map &res, bool getAll)
                                    pStmt->GetColumnBool(16),
                                    pStmt->GetColumnString(17)
                                   );
+
             if(!off->social)
                 all_social = false;
 
@@ -612,7 +629,7 @@ bool Core::getOffers(Offer::Map &res, bool getAll)
             {
                 teasersMaxRating = off->rating;
             }
-            res.insert(Offer::Pair(off->id_int,off));
+            items.insert(Offer::Pair(off->id_int,off));
         }
     }
     catch(Kompex::SQLiteException &ex)

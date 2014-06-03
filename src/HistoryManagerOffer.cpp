@@ -123,11 +123,29 @@ bool HistoryManager::getDeprecatedOffers()
     return true;
 }
 
-bool HistoryManager::setTailOffers(const Offer::Map &items)
+bool HistoryManager::setTailOffers(const Offer::Map &items, const Offer::Vector &toShow)
 {
+    bool fFound;
     for(auto it = items.begin(); it != items.end(); ++it)
     {
-        pViewHistory->zadd(key_inv, 1, (*it).first);
+        fFound = false;
+        for(auto i = toShow.begin(); i != toShow.end(); ++i)
+        {
+            if(items.count((*i)->id_int)>0)
+            {
+                fFound = true;
+                break;
+            }
+        }
+
+        if(fFound)
+        {
+            continue;
+        }
+        else
+        {
+            pViewHistory->zadd(key_inv, 1, (*it).first);
+        }
     }
     return true;
 }

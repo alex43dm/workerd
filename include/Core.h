@@ -88,7 +88,7 @@ private:
     Offer::Vector result;
     Offer::Map items;
 
-    bool getOffers(Offer::Map &result, bool getAll=false);
+    bool getOffers(bool getAll=false);
     Informer *getInformer();
     void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen);
 
@@ -102,6 +102,8 @@ private:
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
     std::string getGeo();
+    void log();
+    boost::posix_time::ptime startTime, endTime;
 };
 
 #endif // CORE_H

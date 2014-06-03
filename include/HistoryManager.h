@@ -67,7 +67,7 @@ public:
     bool getDeprecatedOffersAsync();
     bool getDeprecatedOffersAsyncWait();
     bool clearDeprecatedOffers();
-    bool setTailOffers(const Offer::Map &items);
+    bool setTailOffers(const Offer::Map &items, const Offer::Vector &toShow);
 
     bool getLongTermAsync();
     bool getLongTermAsyncWait();
