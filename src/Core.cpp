@@ -260,6 +260,7 @@ void Core::ProcessSaveResults()
             for(auto i = vOutPut.begin(); i != vOutPut.end(); ++i)
             {
                 items.erase((*i)->id_int);
+                delete *i;
             }
             hm->clean = true;
             hm->setTailOffers(items);
