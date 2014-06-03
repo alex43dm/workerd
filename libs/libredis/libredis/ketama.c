@@ -217,9 +217,8 @@ void Ketama_create_continuum(Ketama *ketama)
     /* Continuum will hold one mcs for each point on the circle: */
     ketama->continuum = Alloc_alloc(ketama->numservers * sizeof(mcs) * 160);
     unsigned k, cont = 0;
-    int i;
 
-    for(i = 0; i < ketama->numservers; i++)
+    for(int i = 0; i < ketama->numservers; i++)
     {
         serverinfo *sinfo = &(ketama->servers[i]);
     	float pct = (float)sinfo->memory / (float)ketama->memory;

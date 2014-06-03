@@ -366,14 +366,12 @@ void Connection_read_data(Connection *connection, int ordinal)
 		ReplyParserResult rp_res = ReplyParser_execute(connection->parser, buffer, Buffer_position(buffer), &reply);
 		switch(rp_res) {
 		case RPR_ERROR: {
-			Reply_free(reply);
 			Connection_abort(connection, "result parse error");
 			return;
 		}
 		case RPR_MORE: {
 			DEBUG(("read data RPR_MORE buf recv\n"));
 			size_t res = Buffer_recv(buffer, connection->sockfd);
-			Reply_free(reply);
 #ifndef NDEBUG
 		Buffer_dump(buffer, 128);
 #endif
@@ -400,7 +398,6 @@ void Connection_read_data(Connection *connection, int ordinal)
 			break;
 		}
 		default:
-			Reply_free(reply);
 			Connection_abort(connection, "unexpected result parser result, rpres: %d", rp_res);
 			return;
 		}
@@ -527,14 +524,13 @@ int Executor_execute(Executor *executor, int timeout_ms)
 
 	//determine max endtime based on timeout
 	struct timespec tm;
-	int i;
 	clock_gettime(CLOCK_MONOTONIC, &tm);
 	DEBUG(("Executor start_tm_ms: %3.2f\n", TIMESPEC_TO_MS(tm)));
 	executor->end_tm_ms = TIMESPEC_TO_MS(tm) + ((float)timeout_ms);
 	DEBUG(("Executor end_tm_ms: %3.2f\n", executor->end_tm_ms));
 
 	executor->numevents = 0;
-	for(i = 0; i < executor->numpairs; i++) {
+	for(int i = 0; i < executor->numpairs; i++) {
 		struct _Pair *pair = &executor->pairs[i];
 		Connection_execute_start(pair->connection, executor, pair->batch, i);
 	}
@@ -555,7 +551,7 @@ int Executor_execute(Executor *executor, int timeout_ms)
 			DEBUG(("Executor select res %d\n", poll_result));
 		}
 
-		for(i = 0; i < executor->numpairs; i++) {
+		for(int i = 0; i < executor->numpairs; i++) {
 
 			struct _Pair *pair = &executor->pairs[i];
 			Connection *connection = pair->connection;
