@@ -46,9 +46,9 @@ bool RedisClient::connect()
 bool RedisClient::getRange(const std::string &key,
                            int start,
                            int stop,
-                           std::string &ret)
+                           std::string &resString)
 {
-
+    bool ret = true;
     Batch *batch;
     Executor *executor;
 
@@ -61,12 +61,11 @@ bool RedisClient::getRange(const std::string &key,
     executor = Executor_new();
     Executor_add(executor, connection, batch);
     int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
+
     if(rr <= 0)
     {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
-        return false;
+        std::clog<<__func__<<" error: "<<cmd<<std::endl;
+        ret = false;
     }
     else
     {
@@ -78,26 +77,26 @@ bool RedisClient::getRange(const std::string &key,
         {
             if(reply_type == RT_ERROR)
             {
-                Log::err("redis getRange: false: %s", reply_data);
+                std::clog<<__func__<<" error: "<<reply_data<<std::endl;
+                ret = false;
             }
             else if(RT_BULK == reply_type)
-                ret += std::string(reply_data, reply_len) + ",";
+                resString += std::string(reply_data, reply_len) + ",";
         }
     }
 
-    if (!ret.empty())
-        ret.erase(std::prev(ret.end()));
-
+    Executor_free(executor);
     Batch_free(batch);
 
-    return true;
+    return ret;
 }
 
 bool RedisClient::getRange(const std::string &key,
                            int start,
                            int stop,
-                           std::list<std::string> &ret)
+                           std::list<std::string> &retList)
 {
+    bool ret = true;
     Batch *batch;
     Executor *executor;
 
@@ -110,12 +109,11 @@ bool RedisClient::getRange(const std::string &key,
     executor = Executor_new();
     Executor_add(executor, connection, batch);
     int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
+
     if(rr <= 0)
     {
-        Log::err("redis cmd false: %s",cmd);
-        Batch_free(batch);
-        return false;
+        std::clog<<__func__<<" error: "<<cmd<<std::endl;
+        ret = false;
     }
     else
     {
@@ -127,16 +125,19 @@ bool RedisClient::getRange(const std::string &key,
         {
             if(reply_type == RT_ERROR)
             {
-                Log::err("redis getRange: false: %s", reply_data);
+                std::clog<<__func__<<" error: "<<reply_data<<std::endl;
+                ret = false;
             }
             else if(RT_BULK == reply_type)
             {
-                ret.push_back(std::string(reply_data, reply_len));
+                retList.push_back(std::string(reply_data, reply_len));
             }
         }
     }
 
-    return true;
+    Executor_free(executor);
+    Batch_free(batch);
+    return ret;
 }
 
 
