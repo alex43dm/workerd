@@ -60,13 +60,13 @@ void HistoryManager::getRetargeting()
             vretg.push_back(off);
         }
         pStmt->FreeQuery();
+        delete pStmt;
     }
     catch(Kompex::SQLiteException &ex)
     {
         Log::err("DB error: %s", ex.GetString().c_str());
     }
 
-    delete pStmt;
 #ifdef DEBUG
     Log::info("[%ld]HistoryManager::getRetargeting : done",tid);
 #endif // DEBUG

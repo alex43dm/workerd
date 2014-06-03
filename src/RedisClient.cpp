@@ -98,23 +98,24 @@ bool RedisClient::getRange(const std::string &key,
                            int stop,
                            std::list<std::string> &ret)
 {
-    bool vret = false;
     Batch *batch;
     Executor *executor;
 
     bzero(cmd,CMD_SIZE);
-    int rrr = snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s %d %d\r\n", key.c_str(), start, stop);
+    snprintf(cmd, CMD_SIZE, "ZREVRANGEBYSCORE %s %d %d\r\n", key.c_str(), start, stop);
 
     batch = Batch_new();
-    Batch_write(batch, cmd, rrr, 1);
+    Batch_write(batch, cmd, strlen(cmd), 1);
 
     executor = Executor_new();
     Executor_add(executor, connection, batch);
     int rr = Executor_execute(executor, timeOutMSec);
-
+    Executor_free(executor);
     if(rr <= 0)
     {
         Log::err("redis cmd false: %s",cmd);
+        Batch_free(batch);
+        return false;
     }
     else
     {
@@ -126,21 +127,16 @@ bool RedisClient::getRange(const std::string &key,
         {
             if(reply_type == RT_ERROR)
             {
-                Log::err("redis cmd: getRange false: %s", reply_data);
+                Log::err("redis getRange: false: %s", reply_data);
             }
             else if(RT_BULK == reply_type)
             {
                 ret.push_back(std::string(reply_data, reply_len));
             }
-
         }
-        vret = true;
     }
 
-    Executor_free(executor);
-    Batch_free(batch);
-
-    return vret;
+    return true;
 }
 
 
