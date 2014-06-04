@@ -798,11 +798,24 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
 
         if(region_targeting.size())
         {
-            sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO geoTargeting(id_cam,id_geo) \
-                              SELECT %lld,locId FROM GeoLiteCity WHERE city IN(%s);",
-                             long_id,region_targeting.c_str()
-                            );
+            if(country_targeting.size())
+            {
+
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO geoTargeting(id_cam,id_geo) \
+                                  SELECT %lld,locId FROM GeoLiteCity WHERE country IN(%s) AND city=IN(%q);",
+                                 long_id, country_targeting.c_str(),,region_targeting.c_str()
+                                );
+            }
+            else
+            {
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO geoTargeting(id_cam,id_geo) \
+                                  SELECT %lld,locId FROM GeoLiteCity WHERE city IN(%s);",
+                                 long_id,region_targeting.c_str()
+                                );
+            }
+
         }
         else
         {
