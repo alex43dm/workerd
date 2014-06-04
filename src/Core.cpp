@@ -249,6 +249,21 @@ void Core::log()
     if(cfg->logRegion)
         std::clog<<" region:"<<params->getRegion();
 
+    if(cfg->logCookie)
+        std::clog<<" cookie:"<<params->getCookieId();
+
+    if(cfg->logContext)
+        std::clog<<" context:"<<params->getContext();
+
+    if(cfg->logSearch)
+        std::clog<<" search:"<<params->getSearch();
+
+    if(cfg->logInformerId)
+        std::clog<<" informer id:"<<informer->id;
+
+    if(cfg->logLocation)
+        std::clog<<" location:"<<params->getLocation();
+
     std::clog<<std::endl;
 }
 

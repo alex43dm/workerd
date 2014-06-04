@@ -3,14 +3,14 @@
 <!--настройки сервера-->
 <server>
     <!--IP сервера. Ссылка на редирект по рекламному предложению содержит в себе адрес сервера, который её создал-->
-    <ip>10.0.0.122</ip>
+    <ip>10.0.0.125</ip>
     <lock_file>/tmp/workerd/lock</lock_file>
     <pid_file>/tmp/workerd/pid</pid_file>
     <user>alex</user>
     <!--путь к файлу сокета-->
     <socket_path>/tmp/workerd/sock</socket_path>
     <!--количество ниток-->
-    <children>1</children>
+    <children>13</children>
 
     <!--путь к очереди сообщений-->
     <mq_path>guest:guest@localhost//</mq_path>
@@ -18,7 +18,8 @@
     <!--путь к фалу базы данных sqlite или :memory:-->
     <sqlite>
         <!--файл базы-->
-        <db>/run/alex/mem.db</db>
+        <!--db>:memory:</db-->
+        <db>/run/alex/db</db>
         <!--путь к каталогу дампа sqlite базы-->
         <schema>db_dump</schema>
         <!--путь к csv файлу содержимого таблицы GeoRerions-->
@@ -30,7 +31,7 @@
 
     <cookie>
         <name>YSID</name>
-        <domain>helpers.com.ua</domain>
+        <domain>yottos.com</domain>
         <path>/</path>
     </cookie>
 
@@ -54,7 +55,7 @@
     </templates>
 
     <!--время обновление временных кампаний(HH:MM:SS)-->
-    <time_update>00:15:00</time_update>
+    <time_update>00:05:00</time_update>
 </server>
 
 <!--ретаргетинг-->
@@ -133,7 +134,7 @@
                 0 - отключить
                 1 - максимальный рейтинг
         -->
-        <value>1</value>
+        <value>0</value>
     </search>
 </history>
 
@@ -202,5 +203,18 @@
         <!--minuswords>100</minuswords-->
     </fields>
 </sphinx>
+
+<log>
+    <coretime>1</coretime>
+    <outsize>1</outsize>
+    <ip>1</ip>
+    <country>0</country>
+    <region>0</region>
+    <cookie>0</cookie>
+    <context>0</context>
+    <search>0</search>
+    <informerId>0</informerId>
+    <location>0</location>
+</log>
 
 </root>

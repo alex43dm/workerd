@@ -77,9 +77,6 @@ bool Config::Load()
     TiXmlElement *mel, *mels;
     boost::filesystem::path p;
 
-    logCoreTime = logOutPutSize = logIP = true;
-    logCountry = logRegion = false;
-
     p = boost::filesystem::path(mFileName);
 
     if(!boost::filesystem::is_regular_file(p))
@@ -557,6 +554,65 @@ bool Config::Load()
     }
 
 #endif // DUMMY
+
+    if( (mElem = mRoot->FirstChildElement("log")) )
+    {
+        if( (mel = mElem->FirstChildElement("coretime")) && (mel->GetText()) )
+        {
+            logCoreTime = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("outsize")) && (mel->GetText()) )
+        {
+            logOutPutSize = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("ip")) && (mel->GetText()) )
+        {
+            logIP = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("country")) && (mel->GetText()) )
+        {
+            logCountry = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("region")) && (mel->GetText()) )
+        {
+            logRegion = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("cookie")) && (mel->GetText()) )
+        {
+            logCookie = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("context")) && (mel->GetText()) )
+        {
+            logContext = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("search")) && (mel->GetText()) )
+        {
+            logSearch = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("informerId")) && (mel->GetText()) )
+        {
+            logInformerId = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("location")) && (mel->GetText()) )
+        {
+            logLocation = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+    }
+    else
+    {
+        logCoreTime = logOutPutSize = logIP = true;
+        logLocation = logInformerId = logSearch = logContext = logCookie = logCountry = logRegion = false;
+    }
+
 
     pDb = new DataBase(true);
 
