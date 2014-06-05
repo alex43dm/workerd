@@ -22,6 +22,11 @@ HistoryManager::HistoryManager(const std::string &tmpTableName):
     tid = pthread_self();
 
     sphinx = new XXXSearcher();
+
+    if(!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
+    {
+        std::clog<<"["<<tid<<"]"<<"no sphinx search enabled!"<<std::endl;
+    }
 }
 
 HistoryManager::~HistoryManager()
@@ -110,6 +115,7 @@ void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
 
     if(!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
     {
+        std::clog<<" no sphinx search enabled"<<std::endl;
         if(mtailOffers.size())
         {
             for(auto i = mtailOffers.begin(); i != mtailOffers.end(); ++i)
