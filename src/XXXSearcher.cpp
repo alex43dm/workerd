@@ -167,28 +167,7 @@ void XXXSearcher::processKeywords(
                                              const sphinx_int64_t * values );
                 }*/
 
-                std::string match =  sphinx_get_string(res, i, 2);
-                if ( match == "nomatch")
-                {
-                    pOffer->matching = (std::string)sphinx_get_string( res, i, 0 ) + " | " + (std::string)sphinx_get_string( res, i, 1 );
-                }
-                else if (match == "broadmatch")
-                {
-                    pOffer->matching = sphinx_get_string( res, i, 2 );
-                }
-                else if (match == "phrasematch")
-                {
-                    pOffer->matching = sphinx_get_string( res, i, 4 );
-                }
-                else if (match == "exactmatch")
-                {
-                    pOffer->matching = sphinx_get_string( res, i, 3 );
-                }
-                else
-                {
-                    std::clog<<"Результат: "<<pOffer->id_int<<" лишний"<<std::endl;
-                    break;
-                }
+                pOffer->matching =  sphinx_get_string(res, i, 2);
 
                 if(cfg->logSphinx)
                 {
@@ -215,8 +194,11 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
     int i,j, k, mva_len;;
     unsigned int * mva;
 
-    std::clog<<"sphinx: num_matches:"<<res->num_matches<<", rating line: "<<midleRange<<std::endl;
-    std::clog<<"sphinx: retrieved: "<< res->total<<" of matches: "<<res->total_found<<std::endl;
+    std::clog<<"sphinx: total: "<< res->total
+    <<" total_found: "<<res->total_found
+    <<" num_matches:"<<res->num_matches
+    <<" rating line: "<<midleRange
+    <<std::endl;
 
     for (i=0; i<res->num_words; i++ )
         std::clog<<"sphinx: query stats: "<<res->words[i].word<<" found "<<res->words[i].hits<<" times in "<<res->words[i].docs<<" documents"<<std::endl;
