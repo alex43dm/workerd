@@ -219,20 +219,18 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
     int i,j, k, mva_len;;
     unsigned int * mva;
 
-    std::clog<<"retrieved "<< res->total<<" of "<<res->total_found <<" matches\n";
+    std::clog<<"sphinx: retrieved "<< res->total<<" of "<<res->total_found <<" matches"<<std::endl;
 
-    std::clog<<"Query stats:";
     for (i=0; i<res->num_words; i++ )
-        std::clog<<"\t"<<res->words[i].word<<" found "<<res->words[i].hits<<" times in "<<res->words[i].docs<<" documents\n";
+        std::clog<<"sphinx: query stats: "<<res->words[i].word<<" found "<<res->words[i].hits<<" times in "<<res->words[i].docs<<" documents"<<std::endl;
 
-    std::clog<<"\nMatches:\n";
     for( i=0; i<res->num_matches; i++ )
     {
-        std::clog<<"#"<<1+i<<" doc_id="<<(int)sphinx_get_id ( res, i )<<", weight="<<sphinx_get_weight ( res, i );
+        std::clog<<"sphinx:  matches:#"<<1+i<<" doc_id="<<(int)sphinx_get_id ( res, i )<<", weight="<<sphinx_get_weight ( res, i )<<std::endl;
 
         for( j=0; j<res->num_attrs; j++ )
         {
-            std::clog<<" ="<<res->attr_names[j];
+            std::clog<<"sphinx:  matches: "<<res->attr_names[j]<<"=";
             switch ( res->attr_types[j] )
             {
             case SPH_ATTR_MULTI64:
@@ -242,7 +240,7 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
                 std::clog<< "(";
                 for ( k=0; k<mva_len; k++ )
                     std::clog<<( res->attr_types[j]==SPH_ATTR_MULTI ? mva[k] : (unsigned int)sphinx_get_mva64_value ( mva, k ) );
-                std::clog<<")" ;
+                std::clog<<")";
                 break;
 
             case SPH_ATTR_FLOAT:
@@ -255,7 +253,7 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
                 std::clog<<(unsigned int)sphinx_get_int ( res, i, j );
                 break;
             }
+            std::clog<<std::endl;
         }
     }
-    std::clog<<std::endl;
 }
