@@ -92,7 +92,8 @@ public:
         //retargeting offer ids from redis
         logRetargetingOfferIds,
         //output offer ids
-        logOutPutOfferIds
+        logOutPutOfferIds,
+        logSphinx
         ;
 
     DataBase *pDb;

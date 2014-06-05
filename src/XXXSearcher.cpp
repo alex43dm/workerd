@@ -86,14 +86,18 @@ void XXXSearcher::processKeywords(
         {
             sphinx_add_query( client, (*it).query.c_str(), indexName.c_str(), NULL );
 #ifdef DEBUG
-            printf("query%d: %s\n",counts++,(*it).query.c_str());
+            std::clog<<__func__<<": "<<"query #"<<counts++<<" : "<<(*it).query;
 #endif // DEBUG
         }
+
+#ifdef DEBUG
+            std::clog<<std::endl;
+#endif // DEBUG
 
         res = sphinx_run_queries(client);
         if(!res)
         {
-            Log::warn("unligal sphinx result: %s", sphinx_error(client));
+            std::clog<<__func__<<": unligal sphinx result: "<<sphinx_error(client)<<std::endl;
             return;
         }
 
@@ -103,29 +107,29 @@ void XXXSearcher::processKeywords(
         {
             if (res->status == SEARCHD_ERROR)
             {
-                Log::warn("sphinx: %s",res->error);
+                std::clog<<__func__<<": SEARCHD_ERROR: "<<res->error<<std::endl;
                 continue;
             }
 
             if(res->status == SEARCHD_WARNING)
             {
-                Log::warn("sphinx: %s",res->warning);
+                std::clog<<__func__<<": SEARCHD_WARNING: "<<res->warning<<std::endl;
             }
 
-#ifdef DEBUG
-        dumpResult(res);
-#endif // DEBUG
+            if(cfg->logSphinx)
+                dumpResult(res);
+
 
             if (res->num_matches > 0)
             {
-                Log::info("sphinx match, rating line: %f",midleRange);
+                std::clog<<__func__<<": wran: match, rating line: "<<midleRange<<std::endl;
             }
 
             for ( int i=0; i<res->num_matches; i++ )
             {
                 if (res->num_attrs != 6)
                 {
-                    Log::warn("num_attrs: %d",res->num_attrs);
+                    std::clog<<"num_attrs: "<<res->num_attrs<<std::endl;
                     continue;
                 }
 
@@ -135,7 +139,7 @@ void XXXSearcher::processKeywords(
                 p = items.find(id);
                 if( p == items.end() )
                 {
-                    Log::warn("not found in items: %lld", id);
+                    std::clog<<__func__<<": not found in items: "<<id<<std::endl;
                     continue;
                 }
 
@@ -186,22 +190,25 @@ void XXXSearcher::processKeywords(
                 }
                 else
                 {
-                    Log::warn("Результат: %s лишний",pOffer->id_int);
+                    std::clog<<"Результат: "<<pOffer->id_int<<" лишний"<<std::endl;
                     break;
                 }
 
-                std::clog<<"offer id: "<<pOffer->id_int
-                <<" old rating: "<<oldRating
-                <<" new: "<< pOffer->rating
-                <<" weight: "<< weight
-                <<" match by "<<match <<" what: "<<pOffer->matching
-                <<std::endl;
+                if(cfg->logSphinx)
+                {
+                    std::clog<<"offer id: "<<pOffer->id_int
+                    <<" old rating: "<<oldRating
+                    <<" new: "<< pOffer->rating
+                    <<" weight: "<< weight
+                    <<" match by "<<match <<" what: "<<pOffer->matching
+                    <<std::endl;
+                }
             }
         }
     }
     catch (std::exception const &ex)
     {
-        Log::warn("Непонятная sphinx ошибка: %s: %s: %s", typeid(ex).name(), ex.what(), sphinx_error(client));
+        std::clog<<"Непонятная sphinx ошибка: "<<typeid(ex).name()<<" "<<ex.what()<<" "<<sphinx_error(client);
     }
 
     return;
@@ -212,46 +219,43 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
     int i,j, k, mva_len;;
     unsigned int * mva;
 
-    printf("retrieved %d of %d matches\n", res->total, res->total_found );
+    std::clog<<"retrieved "<< res->total<<" of "<<res->total_found <<" matches\n";
 
-    printf ( "Query stats:\n" );
+    std::clog<<"Query stats:";
     for (i=0; i<res->num_words; i++ )
-        printf ( "\t'%s' found %d times in %d documents\n",
-                 res->words[i].word, res->words[i].hits, res->words[i].docs );
+        std::clog<<"\t"<<res->words[i].word<<" found "<<res->words[i].hits<<" times in "<<res->words[i].docs<<" documents\n";
 
-    printf ( "\nMatches:\n" );
+    std::clog<<"\nMatches:\n";
     for( i=0; i<res->num_matches; i++ )
     {
-        printf ( "%d. doc_id=%d, weight=%d", 1+i,
-                 (int)sphinx_get_id ( res, i ), sphinx_get_weight ( res, i ) );
+        std::clog<<"#"<<1+i<<" doc_id="<<(int)sphinx_get_id ( res, i )<<", weight="<<sphinx_get_weight ( res, i );
 
         for( j=0; j<res->num_attrs; j++ )
         {
-            printf ( ", %s=", res->attr_names[j] );
+            std::clog<<" ="<<res->attr_names[j];
             switch ( res->attr_types[j] )
             {
             case SPH_ATTR_MULTI64:
             case SPH_ATTR_MULTI:
                 mva = sphinx_get_mva ( res, i, j );
                 mva_len = *mva++;
-                printf ( "(" );
+                std::clog<< "(";
                 for ( k=0; k<mva_len; k++ )
-                    printf ( k ? ",%u" : "%u", ( res->attr_types[j]==SPH_ATTR_MULTI ? mva[k] : (unsigned int)sphinx_get_mva64_value ( mva, k ) ) );
-                printf ( ")" );
+                    std::clog<<( res->attr_types[j]==SPH_ATTR_MULTI ? mva[k] : (unsigned int)sphinx_get_mva64_value ( mva, k ) );
+                std::clog<<")" ;
                 break;
 
             case SPH_ATTR_FLOAT:
-                printf ( "%f", sphinx_get_float ( res, i, j ) );
+                std::clog<<sphinx_get_float ( res, i, j );
                 break;
             case SPH_ATTR_STRING:
-                printf ( "%s", sphinx_get_string ( res, i, j ) );
+                std::clog<<sphinx_get_string ( res, i, j );
                 break;
             default:
-                printf ( "%u", (unsigned int)sphinx_get_int ( res, i, j ) );
+                std::clog<<(unsigned int)sphinx_get_int ( res, i, j );
                 break;
             }
         }
-        printf ( "\n" );
     }
-    printf ( "\n" );
+    std::clog<<std::endl;
 }

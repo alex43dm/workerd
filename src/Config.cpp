@@ -607,6 +607,11 @@ bool Config::Load()
             logLocation = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
         }
 
+        if( (mel = mElem->FirstChildElement("sphinx")) && (mel->GetText()) )
+        {
+            logSphinx = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
         if( (mel = mElem->FirstChildElement("RetargetingOfferIds")) && (mel->GetText()) )
         {
             logRetargetingOfferIds = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
@@ -621,7 +626,7 @@ bool Config::Load()
     {
         logCoreTime = logOutPutSize = logIP = true;
 
-        logOutPutOfferIds = logRetargetingOfferIds =
+        logSphinx = logOutPutOfferIds = logRetargetingOfferIds =
         logLocation = logInformerId = logSearch =
         logContext = logCookie = logCountry = logRegion = false;
     }
