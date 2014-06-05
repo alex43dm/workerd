@@ -131,11 +131,6 @@ bool RedisClient::getRange(const std::string &key,
             else if(RT_BULK == reply_type)
             {
                 retList.push_back(std::string(reply_data, reply_len));
-
-                if(reply_data)
-                {
-                    free((void*)reply_data);
-                }
             }
         }
     }

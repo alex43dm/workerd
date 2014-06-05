@@ -123,10 +123,10 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items, unsigned len)
 
     if(cfg->logRetargetingOfferIds)
     {
-        std::clog<<" RetargetingOfferIds: ";
+        std::clog<<" RetargetingOfferIds: (redis):";
         for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
         {
-            std::clog<<*i;
+            std::clog<<" "<<*i;
         }
 
     }
@@ -139,9 +139,14 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items, unsigned len)
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
     //pStmt->BeginTransaction();
 
+    if(cfg->logRetargetingOfferIds)
+    {
+        std::clog<<" (pickup):";
+    }
 
     for(unsigned i = 0; i < len && i < items.size(); i++)
     {
+        std::clog<<" "<<items[i]->id<<" "<<items[i]->id_int<<" hits:"<<items[i]->uniqueHits<<";";
         try
         {
             sqlite3_snprintf(sizeof(buf),buf,
