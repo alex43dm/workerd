@@ -489,8 +489,23 @@ bool Config::Load()
             {
                 range_long_term_ = ::atof(mel->GetText());
             }
-
             redisHostAndPort(section, redis_long_term_history_host_, redis_long_term_history_port_);
+        }
+        //context
+        if( (section = history->FirstChildElement("context")) )
+        {
+            if( (mel = section->FirstChildElement("value")) && (mel->GetText()) )
+            {
+                range_context_ = ::atof(mel->GetText());
+            }
+        }
+        //context
+        if( (section = history->FirstChildElement("search")) )
+        {
+            if( (mel = section->FirstChildElement("value")) && (mel->GetText()) )
+            {
+                range_search_ = ::atof(mel->GetText());
+            }
         }
     }
     else

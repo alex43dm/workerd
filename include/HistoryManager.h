@@ -85,10 +85,10 @@ public:
     void RetargetingUpdate(const Offer::Vector &,unsigned);
     void RetargetingClear();
 
-    bool isShortTerm(){return Config::Instance()->range_short_term_ > 0;}
-    bool isLongTerm(){return Config::Instance()->range_long_term_ > 0;}
-    bool isContext(){return Config::Instance()->range_context_ > 0;}
-    bool isSearch(){return Config::Instance()->range_search_ > 0;}
+    bool isShortTerm(){return cfg->range_short_term_ > 0;}
+    bool isLongTerm(){return cfg->range_long_term_ > 0;}
+    bool isContext(){return cfg->range_context_ > 0;}
+    bool isSearch(){return cfg->range_search_ > 0;}
 
     mongo::BSONObj BSON_Keywords();
 
