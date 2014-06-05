@@ -86,7 +86,7 @@ void XXXSearcher::processKeywords(
         {
             sphinx_add_query( client, (*it).query.c_str(), indexName.c_str(), NULL );
 #ifdef DEBUG
-            std::clog<<__func__<<": "<<"query #"<<counts++<<" : "<<(*it).query;
+            std::clog<<__func__<<": "<<"query #"<<counts++<<" : "<<(*it).query<<std::endl;
 #endif // DEBUG
         }
 
@@ -219,7 +219,7 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
     int i,j, k, mva_len;;
     unsigned int * mva;
 
-    std::clog<<"sphinx: retrieved "<< res->total<<" of "<<res->total_found <<" matches"<<std::endl;
+    std::clog<<"sphinx: retrieved: "<< res->total<<" of matches: "<<res->total_found<<std::endl;
 
     for (i=0; i<res->num_words; i++ )
         std::clog<<"sphinx: query stats: "<<res->words[i].word<<" found "<<res->words[i].hits<<" times in "<<res->words[i].docs<<" documents"<<std::endl;
