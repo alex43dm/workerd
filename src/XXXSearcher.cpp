@@ -117,12 +117,8 @@ void XXXSearcher::processKeywords(
             }
 
             if(cfg->logSphinx)
-                dumpResult(res);
-
-
-            if (res->num_matches > 0)
             {
-                std::clog<<__func__<<": wran: match, rating line: "<<midleRange<<std::endl;
+                dumpResult(res);
             }
 
             for ( int i=0; i<res->num_matches; i++ )
@@ -219,6 +215,7 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
     int i,j, k, mva_len;;
     unsigned int * mva;
 
+    std::clog<<"sphinx: num_matches:"<<res->num_matches<<", rating line: "<<midleRange<<std::endl;
     std::clog<<"sphinx: retrieved: "<< res->total<<" of matches: "<<res->total_found<<std::endl;
 
     for (i=0; i<res->num_words; i++ )
