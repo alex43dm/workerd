@@ -236,7 +236,7 @@ void Core::log()
 {
     std::clog<<"["<<tid<<"]";
 
-    if(cfg->logCoreTime)
+   if(cfg->logCoreTime)
         std::clog<<" core time:"<< boost::posix_time::to_simple_string(endCoreTime - startCoreTime);
 
     if(cfg->logOutPutSize)
@@ -269,7 +269,6 @@ void Core::log()
     if(cfg->logOutPutOfferIds || cfg->logRetargetingOfferIds)
         std::clog<<" key:"<<params->getUserKey();
 
-    std::clog<<std::endl;
 }
 
 // Сохраняем выданные ссылки в базе данных
@@ -384,6 +383,8 @@ void Core::ProcessSaveResults()
 
     if(informer)
         delete informer;
+
+    std::clog<<std::endl;
 }
 
 Informer *Core::getInformer()
