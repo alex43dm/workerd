@@ -612,7 +612,7 @@ bool Config::Load()
             logRetargetingOfferIds = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
         }
 
-        if( (mel = mElem->FirstChildElement("location")) && (mel->GetText()) )
+        if( (mel = mElem->FirstChildElement("OutPutOfferIds")) && (mel->GetText()) )
         {
             logOutPutOfferIds = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
         }
