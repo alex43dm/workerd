@@ -9,15 +9,34 @@ bool HistoryManager::clearDeprecatedOffers()
     return pViewHistory->del(key);
 }
 
-bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
+bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned len)
 {
+    if(cfg->logOutPutOfferIds)
+    {
+        std::clog<<" OutPutOfferIds: ";
+    }
+
     if(clean)
     {
+        if(cfg->logOutPutOfferIds)
+        {
+            std::clog<<", clean, ";
+        }
         pViewHistory->del(key);
     }
 
-    for(auto it = items.begin(); it != items.end(); ++it)
+    if(cfg->logOutPutOfferIds)
     {
+        std::clog<<", ids:";
+    }
+
+    for(auto it = items.begin()+len; it != items.end(); ++it)
+    {
+        if(cfg->logOutPutOfferIds)
+        {
+            std::clog<<" "<<(*it)->id<<" "<<(*it)->id_int<<" hits:"<<(*it)->uniqueHits<<";";
+        }
+
         if ((*it)->uniqueHits > 0)
         {
             if (pViewHistory->exists(key))

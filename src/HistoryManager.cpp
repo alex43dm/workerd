@@ -179,8 +179,8 @@ bool HistoryManager::updateUserHistory(
     unsigned RetargetingCount)
 {
     //обновление deprecated
-    setDeprecatedOffers(items);
-
+    setDeprecatedOffers(items, RetargetingCount);
+    //обновление retargeting
     RetargetingUpdate(items, RetargetingCount);
 
     vshortTerm.clear();

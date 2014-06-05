@@ -123,7 +123,7 @@ std::string Core::Process(Params *prms)
 
     Log::gdb("Core::Process start");
     Log::gdb("search: %s",prms->getSearch().c_str());
-    startTime = boost::posix_time::microsec_clock::local_time();
+    startCoreTime = boost::posix_time::microsec_clock::local_time();
 
     params = prms;
 
@@ -226,7 +226,9 @@ std::string Core::Process(Params *prms)
     }
 //printf("%s\n",ret.c_str());
 
-    log();
+
+    endCoreTime = boost::posix_time::microsec_clock::local_time();
+
     return ret;
 }
 
@@ -235,7 +237,7 @@ void Core::log()
     std::clog<<"["<<tid<<"]";
 
     if(cfg->logCoreTime)
-        std::clog<<" core time:"<< boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time() - startTime);
+        std::clog<<" core time:"<< boost::posix_time::to_simple_string(endCoreTime - startCoreTime);
 
     if(cfg->logOutPutSize)
         std::clog<<" out:"<<vOutPut.size();
@@ -264,6 +266,9 @@ void Core::log()
     if(cfg->logLocation)
         std::clog<<" location:"<<params->getLocation();
 
+    if(cfg->logOutPutOfferIds || cfg->logRetargetingOfferIds)
+        std::clog<<" key:"<<params->getUserKey();
+
     std::clog<<std::endl;
 }
 
@@ -271,6 +276,8 @@ void Core::log()
 void Core::ProcessSaveResults()
 {
     request_processed_++;
+
+    log();
 
     if (!params->test_mode_ && informer)
     {

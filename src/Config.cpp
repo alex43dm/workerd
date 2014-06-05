@@ -606,11 +606,24 @@ bool Config::Load()
         {
             logLocation = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
         }
+
+        if( (mel = mElem->FirstChildElement("RetargetingOfferIds")) && (mel->GetText()) )
+        {
+            logRetargetingOfferIds = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("location")) && (mel->GetText()) )
+        {
+            logOutPutOfferIds = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
     }
     else
     {
         logCoreTime = logOutPutSize = logIP = true;
-        logLocation = logInformerId = logSearch = logContext = logCookie = logCountry = logRegion = false;
+
+        logOutPutOfferIds = logRetargetingOfferIds =
+        logLocation = logInformerId = logSearch =
+        logContext = logCookie = logCountry = logRegion = false;
     }
 
 

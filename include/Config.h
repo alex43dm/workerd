@@ -88,7 +88,12 @@ public:
     std::string offerSqlStr, informerSqlStr, retargetingOfferSqlStr, offerSqlStrAll;
 
     bool logCoreTime, logOutPutSize, logIP, logCountry, logRegion, logCookie,
-        logContext, logSearch, logInformerId, logLocation;
+        logContext, logSearch, logInformerId, logLocation,
+        //retargeting offer ids from redis
+        logRetargetingOfferIds,
+        //output offer ids
+        logOutPutOfferIds
+        ;
 
     DataBase *pDb;
 

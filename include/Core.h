@@ -103,7 +103,7 @@ private:
     static std::string EscapeJson(const std::string &str);
     std::string getGeo();
     void log();
-    boost::posix_time::ptime startTime, endTime;
+    boost::posix_time::ptime startCoreTime, endCoreTime;
 };
 
 #endif // CORE_H

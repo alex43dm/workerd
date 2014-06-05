@@ -61,7 +61,7 @@ public:
     void sphinxProcess(Offer::Map &items, float teasersMaxRating);
     bool updateUserHistory(const Offer::Vector &items, unsigned RetargetingCount);
 
-    bool setDeprecatedOffers(const Offer::Vector &items);
+    bool setDeprecatedOffers(const Offer::Vector &items,unsigned);
     bool getDeprecatedOffers(std::string &);
     bool getDeprecatedOffers();
     bool getDeprecatedOffersAsync();
@@ -82,7 +82,7 @@ public:
 
     bool getRetargetingAsync();
     void getRetargetingAsyncWait();
-    void RetargetingUpdate(const Offer::Vector &v, unsigned);
+    void RetargetingUpdate(const Offer::Vector &,unsigned);
     void RetargetingClear();
 
     bool isShortTerm(){return Config::Instance()->range_short_term_ > 0;}
