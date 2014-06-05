@@ -175,7 +175,7 @@ void XXXSearcher::processKeywords(
                     <<" old rating: "<<oldRating
                     <<" new: "<< pOffer->rating
                     <<" weight: "<< weight
-                    <<" match by "<<match <<" what: "<<pOffer->matching
+                    <<" match: "<<pOffer->matching
                     <<std::endl;
                 }
             }
