@@ -51,8 +51,8 @@ INNER JOIN (
         WHERE (c2ia.id_inf=%lld OR c2ia.id_inf=1) AND c2ia.allowed=1
         EXCEPT
         SELECT c2id.id_cam AS id
-        LEFT JOIN Campaign2Informer AS c2ide ON c2id.id_cam=c2ide.id_cam AND c2ide.id_acc=%lld AND c2ide.allowed=1
         FROM Campaign2Informer AS c2id
+        LEFT JOIN Campaign2Informer AS c2ide ON c2id.id_cam=c2ide.id_cam AND c2ide.id_acc=%lld AND c2ide.allowed=1
         WHERE c2ide.id_cam IS NULL AND ((c2id.id_inf=%lld OR c2id.id_inf=1) AND c2id.allowed=0)
 ) AS c ON ca.id=c.id
 LEFT JOIN tmp%d%lld AS deph ON ofrs.id=deph.id
