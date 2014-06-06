@@ -702,7 +702,7 @@ std::string Config::getFileContents(const std::string &fileName)
         return(cnt);
     }
 
-    std::clog<<"error open file: "<<fileName<<" error number: "<<errno);
+    std::clog<<"error open file: "<<fileName<<" error number: "<<errno<<std::endl;
     return std::string();
 }
 //---------------------------------------------------------------------------------------------------------------
