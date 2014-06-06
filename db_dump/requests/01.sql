@@ -42,7 +42,8 @@ INNER JOIN (
 		EXCEPT
         SELECT c2ad.id_cam AS id
         FROM Campaign2Accounts AS c2ad
-        WHERE (c2ad.id_acc=%lld OR c2ad.id_acc=1) AND c2ad.allowed=0
+        LEFT JOIN Campaign2Accounts AS c2ade ON c2ad.id_cam=c2ade.id_cam AND c2ade.id_acc=%lld AND c2ade.allowed=1
+        WHERE c2ade.id_cam IS NULL AND ((c2ad.id_acc=%lld OR c2ad.id_acc=1) AND c2ad.allowed=0)
         UNION ALL
         SELECT c2ia.id_cam AS id
         FROM Campaign2Informer AS c2ia
