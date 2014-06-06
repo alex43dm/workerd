@@ -34,7 +34,7 @@ INNER JOIN (
 		EXCEPT
         SELECT c2dd.id_cam AS id
         FROM Campaign2Domains AS c2dd
-        LEFT JOIN Campaign2Domains AS c2dde ON c2dd.id_cam=c2dde.id_cam AND c2dde.id_acc=%lld AND c2dde.allowed=1
+        LEFT JOIN Campaign2Domains AS c2dde ON c2dd.id_cam=c2dde.id_cam AND c2dde.id_dom=%lld AND c2dde.allowed=1
         WHERE c2dde.id_cam IS NULL AND ((c2dd.id_dom=%lld OR c2dd.id_dom=1) AND c2dd.allowed=0)
         UNION ALL
         SELECT c2aa.id_cam AS id
