@@ -196,12 +196,14 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
 
     std::clog<<"sphinx: total: "<< res->total
     <<" total_found: "<<res->total_found
-    <<" num_matches:"<<res->num_matches
+    <<" num_matches: "<<res->num_matches
     <<" rating line: "<<midleRange
     <<std::endl;
 
     for (i=0; i<res->num_words; i++ )
-        std::clog<<"sphinx: query stats: "<<res->words[i].word<<" found "<<res->words[i].hits<<" times in "<<res->words[i].docs<<" documents"<<std::endl;
+        std::clog<<"sphinx: query stats: "<<res->words[i].word
+        <<" found "<<res->words[i].hits
+        <<" times in "<<res->words[i].docs<<" documents"<<std::endl;
 
     for( i=0; i<res->num_matches; i++ )
     {

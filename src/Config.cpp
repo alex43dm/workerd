@@ -68,7 +68,7 @@ void Config::redisHostAndPort(TiXmlElement *p, std::string &host, std::string &p
 void Config::exit(const std::string &mes)
 {
     std::cerr<<mes<<std::endl;
-    Log::err(mes);
+    std::clog<<mes<<std::endl;
     ::exit(1);
 }
 
@@ -84,22 +84,12 @@ bool Config::Load()
         exit("does not regular file: "+mFileName);
     }
 
-    Log::info("Config::Load: load file: %s",mFileName.c_str());
-
     mIsInited = false;
     mDoc = new TiXmlDocument(mFileName);
 
     if(!mDoc)
     {
         exit("does not found config file: "+mFileName);
-    }
-
-    if(!mDoc->LoadFile())
-    {
-        exit("load file: "+mFileName+
-             " error: "+ mDoc->ErrorDesc()+
-             " row: "+std::to_string(mDoc->ErrorRow())+
-             " col: "+std::to_string(mDoc->ErrorCol()));
     }
 
     if(p.has_parent_path())
@@ -110,9 +100,19 @@ bool Config::Load()
     {
         cfgFilePath = "./";
     }
-#ifdef DEBUG
-    std::cout<<"config path: "<<cfgFilePath<<std::endl;
-#endif // DEBUG
+
+    std::clog<<"Config::Load: load file: "<<mFileName
+    <<" config path: "<<cfgFilePath<<std::endl;
+
+
+    if(!mDoc->LoadFile())
+    {
+        exit("load file: "+mFileName+
+             " error: "+ mDoc->ErrorDesc()+
+             " row: "+std::to_string(mDoc->ErrorRow())+
+             " col: "+std::to_string(mDoc->ErrorCol()));
+    }
+
 
     mRoot = mDoc->FirstChildElement("root");
 
@@ -219,7 +219,7 @@ bool Config::Load()
 
             if(!checkPath(server_socket_path_, true, true, mes))
             {
-                Log::warn("server socket path: %s",mes.c_str());
+                std::clog<<"server socket path: "<<mes<<std::endl;
             }
             else
             {
@@ -245,7 +245,7 @@ bool Config::Load()
             }
             else
             {
-                Log::warn("element db is not inited: :memory:");
+                std::clog<<"sqlite database mode: in memory"<<std::endl;
                 dbpath_ = ":memory:";
             }
 
@@ -310,7 +310,7 @@ bool Config::Load()
             }
             else
             {
-                exit(std::string(__func__)+": no time match in config.xml element: time_update");
+                exit("Config::Load: no time match in config.xml element: time_update");
             }
 
         }
@@ -382,20 +382,20 @@ bool Config::Load()
                 cookie_name_ = mels->GetText();
             else
             {
-                Log::warn("element cookie_name is not inited");
+                exit("element cookie_name is not inited");
             }
             if( (mels = mel->FirstChildElement("domain")) && (mels->GetText()) )
                 cookie_domain_ = mels->GetText();
             else
             {
-                Log::warn("element cookie_domain is not inited");
+                exit("element cookie_domain is not inited");
             }
 
             if( (mels = mel->FirstChildElement("path")) && (mels->GetText()) )
                 cookie_path_ = mels->GetText();
             else
             {
-                Log::warn("element cookie_path is not inited");
+                exit("element cookie_path is not inited");
             }
         }
     }
@@ -558,10 +558,13 @@ bool Config::Load()
             {
                 sphinx_field_names_[sphinx_field_len_] = strdup(mElem->Value());
                 sphinx_field_weights_[sphinx_field_len_] = atoi(mElem->GetText());
+
+                std::clog<<"sphinx field name: "<<sphinx_field_names_[sphinx_field_len_]
+                <<", weights: "<<sphinx_field_weights_[sphinx_field_len_]<<std::endl;
             }
         }
 
-        Log::info("sphinx mach: %s, rank: %s sort: %s", shpinx_match_mode_.c_str(), shpinx_rank_mode_.c_str(), shpinx_sort_mode_.c_str());
+        std::clog<<"sphinx mach mode: "<<shpinx_match_mode_<<", rank mode: "<<shpinx_rank_mode_<<" sort mode: "<<shpinx_sort_mode_<<std::endl;
     }
     else
     {
@@ -644,6 +647,8 @@ bool Config::Load()
         logSphinx = logOutPutOfferIds = logRetargetingOfferIds =
         logLocation = logInformerId = logSearch =
         logContext = logCookie = logCountry = logRegion = false;
+
+        std::clog<<"using default log mode: CoreTime OutPutSize IP"<<std::endl;
     }
 
 
@@ -697,7 +702,7 @@ std::string Config::getFileContents(const std::string &fileName)
         return(cnt);
     }
 
-    Log::err("error open file: %s: %d",fileName.c_str(), errno);
+    std::clog<<"error open file: "<<fileName<<" error number: "<<errno);
     return std::string();
 }
 //---------------------------------------------------------------------------------------------------------------
