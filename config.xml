@@ -202,6 +202,7 @@
         <!--phrases>90</phrases-->
         <!--minuswords>100</minuswords-->
     </fields>
+    <min_offres_process>10</min_offres_process><!-- 20 default value -->
 </sphinx>
 
 <log>

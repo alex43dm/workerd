@@ -113,9 +113,12 @@ void HistoryManager::getUserHistory(Params *_params)
 void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
 {
 
-    if(!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
+    if((!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
+       || items.size() >= cfg->shpinx_min_offres_process_)
     {
-        std::clog<<" no sphinx search enabled"<<std::endl;
+        std::clog<<" no sphinx search enabled or shpinx_min_offres_process_: "
+            <<cfg->shpinx_min_offres_process_<<std::endl;
+
         if(mtailOffers.size())
         {
             for(auto i = mtailOffers.begin(); i != mtailOffers.end(); ++i)

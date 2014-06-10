@@ -67,6 +67,7 @@ public:
     std::string shpinx_match_mode_;
     std::string shpinx_rank_mode_;
     std::string shpinx_sort_mode_;
+    unsigned    shpinx_min_offres_process_;
 
     int         instanceId;
     std::string lock_file_;
