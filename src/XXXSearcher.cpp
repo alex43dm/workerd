@@ -171,7 +171,7 @@ void XXXSearcher::processKeywords(
 
                 if(cfg->logSphinx)
                 {
-                    std::clog<<"offer id: "<<pOffer->id_int
+                    std::clog<<"sphinx: offer id: "<<pOffer->id_int
                     <<" old rating: "<<oldRating
                     <<" new: "<< pOffer->rating
                     <<" weight: "<< weight
