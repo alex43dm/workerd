@@ -85,14 +85,12 @@ void XXXSearcher::processKeywords(
         for (auto it = sr.begin(); it != sr.end(); ++it)
         {
             sphinx_add_query( client, (*it).query.c_str(), indexName.c_str(), NULL );
-#ifdef DEBUG
-            std::clog<<__func__<<": "<<"query #"<<counts++<<" : "<<(*it).query<<std::endl;
-#endif // DEBUG
-        }
 
-#ifdef DEBUG
-            std::clog<<std::endl;
-#endif // DEBUG
+            if(cfg->logSphinx)
+            {
+                std::clog<<"shpinx: request for: "<<(*it).getBranchName()<<": "<<"query #"<<counts++<<" : "<<(*it).query<<std::endl;
+            }
+        }
 
         res = sphinx_run_queries(client);
         if(!res)
