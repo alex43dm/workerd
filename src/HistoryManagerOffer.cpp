@@ -20,7 +20,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
     {
         if(cfg->logOutPutOfferIds)
         {
-            std::clog<<", clean, ";
+            std::clog<<"[clean]";
         }
         pViewHistory->del(key);
     }
@@ -34,7 +34,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
     {
         if(cfg->logOutPutOfferIds)
         {
-            std::clog<<" "<<(*it)->id<<" "<<(*it)->id_int<<" hits:"<<(*it)->uniqueHits<<";";
+            std::clog<<" "<<(*it)->id<<" "<<(*it)->id_int<<" hits:"<<(*it)->uniqueHits<<" rate:"<<(*it)->rating;
         }
 
         if ((*it)->uniqueHits > 0)
