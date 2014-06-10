@@ -1,0 +1,14 @@
+ /var/log/workerd.log {
+    weekly
+    rotate 4
+    missingok
+    notifempty
+    compress
+    nocreate
+    delaycompress
+    sharedscripts
+    postrotate
+        invoke-rc.d rsyslog rotate > /dev/null
+    endscript
+ }
+
