@@ -116,8 +116,11 @@ void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
     if((!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
        || items.size() >= cfg->shpinx_min_offres_process_)
     {
-        std::clog<<" no sphinx search enabled or shpinx_min_offres_process_: "
-            <<cfg->shpinx_min_offres_process_<<std::endl;
+        if(items.size() >= cfg->shpinx_min_offres_process_)
+        {
+            std::clog<<"shpinx_min_offres_process_: "
+            <<cfg->shpinx_min_offres_process_" >= items count:"<<items.size()<<std::endl;
+        }
 
         if(mtailOffers.size())
         {
