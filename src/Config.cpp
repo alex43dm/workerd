@@ -545,6 +545,15 @@ bool Config::Load()
             shpinx_sort_mode_ = mel->GetText();
         }
 
+        if( (mel = mElem->FirstChildElement("min_offres_process")) && (mel->GetText()) )
+        {
+            shpinx_min_offres_process_ = atoi(mel->GetText());
+        }
+        else
+        {
+            shpinx_min_offres_process_ = 20;//default value
+        }
+
         if((mel = mElem->FirstChildElement("fields")))
         {
 
@@ -563,16 +572,6 @@ bool Config::Load()
                 <<", weights: "<<sphinx_field_weights_[sphinx_field_len_]<<std::endl;
             }
         }
-
-        if( (mel = mElem->FirstChildElement("min_offres_process")) && (mel->GetText()) )
-        {
-            shpinx_min_offres_process_ = atoi(mel->GetText());
-        }
-        else
-        {
-            shpinx_min_offres_process_ = 20;//default value
-        }
-
         std::clog<<"sphinx mach mode: "<<shpinx_match_mode_<<", rank mode: "<<shpinx_rank_mode_<<" sort mode: "<<shpinx_sort_mode_<<std::endl;
     }
     else
