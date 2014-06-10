@@ -119,7 +119,7 @@ void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
         if(items.size() >= cfg->shpinx_min_offres_process_)
         {
             std::clog<<"shpinx_min_offres_process_: "
-            <<cfg->shpinx_min_offres_process_" >= items count:"<<items.size()<<std::endl;
+            <<cfg->shpinx_min_offres_process_<<" >= items count:"<<items.size()<<std::endl;
         }
 
         if(mtailOffers.size())
