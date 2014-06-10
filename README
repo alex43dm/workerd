@@ -1,8 +1,8 @@
 ﻿workerd: multithread demon, to return html(inframe) with offers. Runs on background and listen unix socket(config.xml) ready to http requests from nginx.
- 
+
 Input
 http variables:
-	QUERY_STRING 
+	QUERY_STRING
 	REMOTE_ADDR
 	SCRIPT_NAME
 	HTTP_COOKIE
@@ -12,7 +12,7 @@ and url variables:
 	ip(REMOTE_ADDR) - ip
 	cookie_id(HTTP_COOKIE) – cookie id
 	scr – informer id
-	country – country for tests 
+	country – country for tests
 	region – region for tests
 	show(json) – html or json returns
 	location – return to http response
@@ -23,7 +23,7 @@ and url variables:
 
 Outputs:
 html with offers selected by rating from:
-cat db_dump/requests/01.sql 
+cat db_dump/requests/01.sql
 
 SELECT ofrs.id,
 ofrs.guid,
@@ -75,7 +75,7 @@ WHERE ofrs.valid=1
 where:
 tmp%d%lld – user view offers history
 CampaignNow - campaign allowed now by time
-%s - 
+%s -
 IF:
 
 SELECT geo.id_cam FROM geoTargeting AS geo \
@@ -99,7 +99,7 @@ Core algorithm
 
 each thread wait input, so it cann't get cpu resources, after parsing intput variables(class Param) and get geo data:
 1) load informer:
-cat db_dump/requests/02.sql 
+cat db_dump/requests/02.sql
 SELECT 	inf.id,
 	inf.capacity,
 	inf.bannersCss,
@@ -204,7 +204,7 @@ the sample nginx configuration:
                 root /var/www/localhost/htdocs;
                 keepalive_timeout 1ms;
 
-                location /adshow.fcgi { 
+                location /adshow.fcgi {
                         send_timeout 100ms;
                         fastcgi_cache off;
                         fastcgi_pass fastcgi_backend;
@@ -212,8 +212,8 @@ the sample nginx configuration:
                         fastcgi_buffers 2 24k;
                         fastcgi_busy_buffers_size 24k;
                         fastcgi_keep_conn on;
-                        include fastcgi_params; 
-                } 
+                        include fastcgi_params;
+                }
         }
 
 DATABASES
@@ -235,7 +235,7 @@ The database will be loaded into sqlite database file(may be file on tmpfs for d
 <dbpath>/run/mem.db</dbpath>
  or memory:
 <dbpath>:memory:</dbpath>
-The database dump 
+The database dump
 db_dump/requests/02.sql
 db_dump/requests/01.sql
 db_dump/requests/04.sql
@@ -277,7 +277,7 @@ THREADS
 Threads number: server/children
 
 SPHINX
-To match search 
+To match search
 <sphinx>
  <!--host>213.186.121.76</host-->
  <host>127.0.0.1</host>
@@ -295,10 +295,51 @@ To match search
  <!--phrases>90</phrases-->
  <!--minuswords>100</minuswords-->
  </fields>
+ <min_offres_process>10</min_offres_process><!-- 20 default value -->
 </sphinx>
 
+The programm can make sphinx requests by:
+    user search,
+    page context,
+    short term history,
+    long term history;
+
+The requests were shown in log file when in config.xml set root->log->sphinx turned on 1.
+
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: shpinx: request for: context : (@title bind | @title linux | @title windows | @title apache | @title nginx | @title mysql | @t
+itle сервер | @title установка | @title настройка | @title mongodb | @title mssql | @title iptables | @title hyper)|(@description bind | @description linux | @descripti
+on windows | @description apache | @description nginx | @description mysql | @description сервер | @description установка | @description настройка | @description mongod
+b | @description mssql | @description iptables | @description hyper)|(@keywords bind | @keywords linux | @keywords windows | @keywords apache | @keywords nginx | @keywo
+rds mysql | @keywords сервер | @keywords установка | @keywords настройка | @keywords mongodb | @keywords mssql | @keywords iptables | @keywords hyper)|(@exactly_phrases
+ bind | @exactly_phrases linux | @exactly_phrases windows | @exactly_phrases apache | @exactly_phrases nginx | @exactly_phrases mysql | @exactly_phrases сервер | @exact
+ly_phrases установка | @exactly_phrases настройка | @exactly_phrases mongodb | @exactly_phrases mssql | @exactly_phrases iptables | @exactly_phrases hyper)|(@phrases bi
+nd | @phrases linux | @phrases windows | @phrases apache | @phrases nginx | @phrases mysql | @phrases сервер | @phrases установка | @phrases настройка | @phrases mongod
+b | @phrases mssql | @phrases iptables | @phrases hyper)|(@minuswords bind | @minuswords linux | @minuswords windows | @minuswords apache | @minuswords nginx | @minuswo
+rds mysql | @minuswords сервер | @minuswords установка | @minuswords настройка | @minuswords mongodb | @minuswords mssql | @minuswords iptables | @minuswords hyper)
+
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: shpinx: request for: short term history : ((@exactly_phrases "<<мано <<керам <<сковор <<плюс <<придбати <<cковор <<нтернет <<м
+агазин <<shop <<замовити "~1) | (@title "мано керам сковор плюс придбати cковор нтернет магазин shop замовити"/3)| (@description "мано керам сковор плюс придбати cковор
+ нтернет магазин shop замовити"/3) | (@keywords  мано | керам | сковор | плюс | придбати | cковор | нтернет | магазин | shop | замовити ) | (@phrases "мано керам сковор
+ плюс придбати cковор нтернет магазин shop замовити"~5))
+
+When offer match the request it rating recalculated:
+
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx:  matches:#14 doc_id=21965, weight=280500 by:  guidint=1695190717  rating=721.218  match=broadmatch sphrases=  skeywords=интернет магазин топшоп sexactly_phrases=
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx:  matches:#8 doc_id=22903, weight=420500 by:  guidint=3157471387  rating=409.096  match=broadmatch sphrases=  skeywords=магазин topshop sexactly_phrases=
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx:  matches:#25 doc_id=22968, weight=280500 by:  guidint=1981191986  rating=1676.64  match=broadmatch sphrases=  skeywords=интернет магазин шланги для полива sexactly_phrases=
+~
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx: offer id: 1695190717 old rating: 625.812 new: 22045.8 weight: 420 match: broadmatch
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx: offer id: 3157471387 old rating: 610.511 new: 22030.5 weight: 420 match: broadmatch
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx: offer id: 1981191986 old rating: 2787.85 new: 24207.8 weight: 420 match: broadmatch
+
+by formula:
+new offer rating =
+    old offer rating +
+    request rate[user search, page context,short term history,long term history] * max offers rating
+    + weight;
+
 ALL
-Please read and edit config.xml to fine tune. 
+Please read and edit config.xml to fine tune.
 
 The configuration options by groups(mongo/main/db means xpath:
 <mongo><main><db/></main></mongo>):
@@ -312,7 +353,7 @@ Main configuration:
 	context_expire: time to live keys in site contex  redis database in seconds
 
 The  re-targeting
-	retargeting_by_persents: how match max re-targeting offers can be in result 
+	retargeting_by_persents: how match max re-targeting offers can be in result
 	retargeting_by_time: re-targeting user view history time to live
 	retargeting_unique_by_campaign: re-targeting unique by campaign
 
@@ -324,7 +365,7 @@ The range coefficients for shpinx, 0- off, 1-max:
 
 The source database
 	 {$db} in main,log
-	main – the main database(read only), 
+	main – the main database(read only),
 	log – log store
 
 	mongo/{$db}/host: host:port
@@ -334,7 +375,7 @@ The source database
 
 Redis servers
 	 {$db} in  short_term_history, long_term_history, user_view_history
-	short_term_history – short term history, 
+	short_term_history – short term history,
 	long_term_history – long term history
 	user_view_history  – user view history
 
@@ -423,12 +464,12 @@ http://yottos.com/adshow.fcgi?scr=00122a9a-9f60-11e1-a3a7-00163e0301c1&location=
 
 where
 src – informer guid
-alex@hp ~/Projects/worker $ echo "select guid from informer limit 1;"|sqlite3 /run/alex/mem.db 
+alex@hp ~/Projects/worker $ echo "select guid from informer limit 1;"|sqlite3 /run/alex/mem.db
 00122a9a-9f60-11e1-a3a7-00163e0301c1
-search – words by space(%20)(rating.search in the config.xml must be more then 0) 
+search – words by space(%20)(rating.search in the config.xml must be more then 0)
 
 output:
-alex@hp ~/Projects/worker $ ./workerd 
+alex@hp ~/Projects/worker $ ./workerd
 Wed Mar 12 16:50:56.338 starting new replica set monitor for replica set vsrv with seed of 213.186.121.76:27018
 Wed Mar 12 16:50:56.364 successfully connected to seed 213.186.121.76:27018 for replica set vsrv
 Wed Mar 12 16:50:56.390 changing hosts to { 0: "213.186.121.76:27018", 1: "212.113.32.147:27018", 2: "212.113.32.146:27018", 3: "212.113.32.167:27018", 4: "212.113.33.66:27018", 5: "213.186.121.199:27018" } from vsrv/
@@ -471,7 +512,7 @@ FROM Offer AS ofrs
 INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
 INNER JOIN (
 		SELECT cn.id FROM CampaignNow AS cn
-		
+
         INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
         INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
                 AND ct2d.id_dom=324
@@ -518,7 +559,7 @@ FROM Offer AS ofrs
 INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
 INNER JOIN (
 		SELECT cn.id FROM CampaignNow AS cn
-		
+
         INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
         INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
                 AND ct2d.id_dom=324
