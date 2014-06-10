@@ -165,6 +165,8 @@ void XXXSearcher::processKeywords(
 
                 pOffer->matching =  sphinx_get_string(res, i, 2);
 
+                pOffer->setBranch(sr[tt].branches);
+
                 if(cfg->logSphinx)
                 {
                     std::clog<<"sphinx: offer id: "<<pOffer->id_int
