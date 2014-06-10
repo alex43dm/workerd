@@ -67,6 +67,8 @@ void CgiService::run()
 {
     boost::posix_time::ptime now;
     bool loaded = false;
+    int memSize, newMemSize;
+
    //main loop
     for(;;)
     {
@@ -85,7 +87,14 @@ void CgiService::run()
         {
             loaded = false;
         }
-        Log::info("VmSize: %d", Log::memUsage());
+
+        newMemSize = Log::memUsage();
+        if(newMemSize != memSize)
+        {
+            Log::info("VmSize: %d", newMemSize);
+            memSize = newMemSize;
+        }
+
         sleep(1);
     }
 }
