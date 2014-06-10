@@ -209,9 +209,12 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
     {
         std::clog<<"sphinx:  matches:#"<<1+i<<" doc_id="<<(int)sphinx_get_id ( res, i )<<", weight="<<sphinx_get_weight ( res, i )<<std::endl;
 
+        std::clog<<"sphinx:  matches:";
+
         for( j=0; j<res->num_attrs; j++ )
         {
-            std::clog<<"sphinx:  matches: "<<res->attr_names[j]<<"=";
+            std::clog<<" "<<res->attr_names[j]<<"=";
+
             switch ( res->attr_types[j] )
             {
             case SPH_ATTR_MULTI64:
@@ -234,7 +237,10 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
                 std::clog<<(unsigned int)sphinx_get_int ( res, i, j );
                 break;
             }
-            std::clog<<std::endl;
+
+            std::clog<<" ";
         }
+
+        std::clog<<std::endl;
     }
 }
