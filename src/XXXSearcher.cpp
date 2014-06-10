@@ -71,10 +71,6 @@ void XXXSearcher::processKeywords(
     const std::vector<sphinxRequests> &sr,
     Offer::Map &items)
 {
-#ifdef DEBUG
-    int counts;
-        counts = 0;
-#endif // DEBUG
     float oldRating;
 
     try
@@ -88,7 +84,7 @@ void XXXSearcher::processKeywords(
 
             if(cfg->logSphinx)
             {
-                std::clog<<"shpinx: request for: "<<(*it).getBranchName()<<": "<<"query #"<<counts++<<" : "<<(*it).query<<std::endl;
+                std::clog<<"shpinx: request for: "<<(*it).getBranchName()<<" : "<<(*it).query<<std::endl;
             }
         }
 
