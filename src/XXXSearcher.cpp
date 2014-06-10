@@ -81,11 +81,6 @@ void XXXSearcher::processKeywords(
         for (auto it = sr.begin(); it != sr.end(); ++it)
         {
             sphinx_add_query( client, (*it).query.c_str(), indexName.c_str(), NULL );
-
-            if(cfg->logSphinx)
-            {
-                std::clog<<"shpinx: request for: "<<(*it).getBranchName()<<" : "<<(*it).query<<std::endl;
-            }
         }
 
         res = sphinx_run_queries(client);
@@ -112,7 +107,7 @@ void XXXSearcher::processKeywords(
 
             if(cfg->logSphinx)
             {
-                std::clog<<"sphinx: request #"<<tt<<" by: "<<sr[tt].getBranchName()<<std::endl;
+                std::clog<<"sphinx: request #"<<tt<<" by: "<<sr[tt].getBranchName()<<" query: "<<sr[tt].query<<std::endl;
 
                 dumpResult(res);
             }
