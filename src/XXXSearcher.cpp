@@ -112,6 +112,8 @@ void XXXSearcher::processKeywords(
 
             if(cfg->logSphinx)
             {
+                std::clog<<"sphinx: request #"<<tt<<" by: "<<sr[tt].getBranchName()<<std::endl;
+
                 dumpResult(res);
             }
 
