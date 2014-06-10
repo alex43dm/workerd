@@ -207,16 +207,17 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
 
     for( i=0; i<res->num_matches; i++ )
     {
-        std::clog<<"sphinx:  matches:#"<<1+i<<" doc_id="<<(int)sphinx_get_id ( res, i )<<", weight="<<sphinx_get_weight ( res, i )<<std::endl;
-
-        std::clog<<"sphinx:  matches:";
+        std::clog<<"sphinx:  matches:#"<<1+i
+        <<" doc_id="<<(int)sphinx_get_id ( res, i )
+        <<", weight="<<sphinx_get_weight ( res, i )
+        <<" by: ";
 
         for( j=0; j<res->num_attrs; j++ )
         {
             if(res->attr_types[j] == SPH_ATTR_STRING)
             {
                 std::string mstring = sphinx_get_string(res,i,j);
-                if(!mstring.empty())
+                if(!mstring.empty() && mstring.size()>1)
                 {
                     std::clog<<" "<<res->attr_names[j]<<"="<<mstring;
                     continue;
