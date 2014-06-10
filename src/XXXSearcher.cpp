@@ -172,8 +172,7 @@ void XXXSearcher::processKeywords(
                     std::clog<<"sphinx: offer id: "<<pOffer->id_int
                     <<" old rating: "<<oldRating
                     <<" new: "<< pOffer->rating
-                    <<" weight: "<< weight
-                    <<" match: "<<pOffer->matching
+                    <<" branch: "<<pOffer->getBranch()
                     <<std::endl;
                 }
             }
