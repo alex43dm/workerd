@@ -213,6 +213,16 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
 
         for( j=0; j<res->num_attrs; j++ )
         {
+            if(res->attr_types[j] == SPH_ATTR_STRING)
+            {
+                std::string mstring = sphinx_get_string(res,i,j);
+                if(!mstring.empty())
+                {
+                    std::clog<<" "<<res->attr_names[j]<<"="<<mstring;
+                    continue;
+                }
+            }
+
             std::clog<<" "<<res->attr_names[j]<<"=";
 
             switch ( res->attr_types[j] )
