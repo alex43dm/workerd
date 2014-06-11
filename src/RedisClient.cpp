@@ -608,7 +608,8 @@ std::string RedisClient::get(const std::string &key)
     {
         if(reply_type == RT_ERROR)
         {
-            Log::err("redis cmd: isConnected false: %s", reply_data);
+            std::clog<<"redis:"<<__func__<<" error");
+            break;
         }
         else if(reply_type == RT_BULK)
         {
