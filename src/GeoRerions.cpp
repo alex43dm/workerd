@@ -86,6 +86,8 @@ bool GeoRerions::load(Kompex::SQLiteDatabase *pdb, const std::string &fname)
         {
             Log::err("GeoRerions::load insert: %s error: %s", buf, ex.GetString().c_str());
         }
+
+        val.clear();
     }
     infile.close();
 

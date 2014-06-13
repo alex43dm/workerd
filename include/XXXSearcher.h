@@ -67,7 +67,6 @@ public:
 
 protected:
 private:
-    std::string indexName;
     sphinx_client* client;
     bool makeFilterOn;
     sphinx_int64_t *filter;

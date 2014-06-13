@@ -30,30 +30,24 @@ bool ParentDB::ConnectMainDatabase()
     for(auto h = cfg->mongo_main_host_.begin(); h != cfg->mongo_main_host_.end(); ++h)
     {
         hvec.push_back(mongo::HostAndPort(*h));
-        Log::info("Connecting to: %s",(*h).c_str());
+        std::clog<<"Connecting to: "<<(*h)<<std::endl;
     }
 
     try
     {
-        std::string err;
         if(!cfg->mongo_main_set_.empty())
         {
             monga_main = new mongo::DBClientReplicaSet(cfg->mongo_main_set_, hvec);
             monga_main->connect();
         }
-        else
-        {
-//            monga_main = new mongo::DBClientConnection();
-//            monga_main->connect((*cfg->mongo_main_host_.begin()), err);
-        }
 
 
         if(!cfg->mongo_main_login_.empty())
         {
+            std::string err;
             if(!monga_main->auth(cfg->mongo_main_db_,cfg->mongo_main_login_,cfg->mongo_main_passwd_, err))
             {
-                Log::warn("auth db: %s login: %s error: %s",
-                          cfg->mongo_main_db_.c_str(),cfg->mongo_main_login_.c_str(), err.c_str());
+                std::clog<<"auth db: "<<cfg->mongo_main_db_<<" login: "<<cfg->mongo_main_login_<<" error: "<<err<<std::endl;
             }
             else
             {
@@ -67,7 +61,7 @@ bool ParentDB::ConnectMainDatabase()
     }
     catch (mongo::UserException &ex)
     {
-        Log::err("ParentDB mongo error: %s", ex.what());
+        std::clog<<"ParentDB::"<<__func__<<" mongo error: "<<ex.what()<<std::endl;
         return false;
     }
 

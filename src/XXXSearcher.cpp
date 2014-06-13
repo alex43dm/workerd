@@ -3,8 +3,7 @@
 #include "XXXSearcher.h"
 
 
-XXXSearcher::XXXSearcher() :
-    indexName(Config::Instance()->sphinx_index_)
+XXXSearcher::XXXSearcher()
 {
     client = sphinx_create ( SPH_TRUE );
     sphinx_set_server ( client, Config::Instance()->sphinx_host_.c_str(), Config::Instance()->sphinx_port_ );
@@ -80,7 +79,7 @@ void XXXSearcher::processKeywords(
         //Создаем запросы
         for (auto it = sr.begin(); it != sr.end(); ++it)
         {
-            sphinx_add_query( client, (*it).query.c_str(), indexName.c_str(), NULL );
+            sphinx_add_query( client, (*it).query.c_str(), cfg->sphinx_index_.c_str(), NULL );
         }
 
         res = sphinx_run_queries(client);

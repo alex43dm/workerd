@@ -595,7 +595,7 @@ std::string RedisClient::get(const std::string &key)
     Executor_free(executor);
     if(rr <= 0)
     {
-        Log::err("redis cmd false: %s",cmd);
+        std::clog<<"redis:"<<__func__<<" Executor_execute error on: "<<cmd<<std::endl;
         Batch_free(batch);
         return std::string();
     }
@@ -608,7 +608,7 @@ std::string RedisClient::get(const std::string &key)
     {
         if(reply_type == RT_ERROR)
         {
-            std::clog<<"redis:"<<__func__<<" error";
+            std::clog<<"redis:"<<__func__<<" Batch_next_reply error"<<std::endl;
             break;
         }
         else if(reply_type == RT_BULK)

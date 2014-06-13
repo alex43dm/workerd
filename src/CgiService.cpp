@@ -91,7 +91,7 @@ void CgiService::run()
         newMemSize = Log::memUsage();
         if(newMemSize != memSize)
         {
-            Log::info("VmSize: %d diff: %d", newMemSize, newMemSize - memSize);
+            std::clog<<"VmSize:"<<newMemSize<<" diff:"<<newMemSize - memSize<<std::endl;
             memSize = newMemSize;
         }
 
