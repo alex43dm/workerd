@@ -2,6 +2,40 @@
 #include "Config.h"
 #include "XXXSearcher.h"
 
+std::map<std::string,int> map_sph_match =
+{
+    { "SPH_MATCH_ALL", SPH_MATCH_ALL },
+    { "SPH_MATCH_ANY", SPH_MATCH_ANY },
+    { "SPH_MATCH_PHRASE", SPH_MATCH_PHRASE },
+    { "SPH_MATCH_BOOLEAN", SPH_MATCH_BOOLEAN },
+    { "SPH_MATCH_EXTENDED", SPH_MATCH_EXTENDED },
+    { "SPH_MATCH_FULLSCAN", SPH_MATCH_FULLSCAN },
+    { "SPH_MATCH_EXTENDED2", SPH_MATCH_EXTENDED2 }
+};
+
+std::map<std::string,int> map_sph_rank =
+{
+    { "SPH_RANK_PROXIMITY_BM25", SPH_RANK_PROXIMITY_BM25 },
+    { "SPH_RANK_BM25", SPH_RANK_BM25 },
+    { "SPH_RANK_NONE", SPH_RANK_NONE },
+    { "SPH_RANK_WORDCOUNT", SPH_RANK_WORDCOUNT },
+    { "SPH_RANK_PROXIMITY", SPH_RANK_PROXIMITY },
+    { "SPH_RANK_MATCHANY", SPH_RANK_MATCHANY },
+    { "SPH_RANK_FIELDMASK", SPH_RANK_FIELDMASK },
+    { "SPH_RANK_SPH04", SPH_RANK_SPH04 },
+    { "SPH_RANK_EXPR", SPH_RANK_EXPR },
+    { "SPH_RANK_TOTAL", SPH_RANK_TOTAL }
+};
+
+std::map<std::string,int> map_sph_sort =
+{
+    { "SPH_SORT_RELEVANCE", SPH_SORT_RELEVANCE },
+    { "SPH_SORT_ATTR_DESC", SPH_SORT_ATTR_DESC },
+    { "SPH_SORT_ATTR_ASC", SPH_SORT_ATTR_ASC },
+    { "SPH_SORT_TIME_SEGMENTS", SPH_SORT_TIME_SEGMENTS },
+    { "SPH_SORT_EXTENDED", SPH_SORT_EXTENDED },
+    { "SPH_SORT_EXPR", SPH_SORT_EXPR }
+};
 
 XXXSearcher::XXXSearcher()
 {
@@ -9,9 +43,9 @@ XXXSearcher::XXXSearcher()
     sphinx_set_server ( client, Config::Instance()->sphinx_host_.c_str(), Config::Instance()->sphinx_port_ );
     sphinx_open ( client );
 
-    sphinx_set_match_mode(client,map_match[Config::Instance()->shpinx_match_mode_]);
-    sphinx_set_ranking_mode(client, map_rank[Config::Instance()->shpinx_rank_mode_], NULL);
-    sphinx_set_sort_mode(client, map_sort[Config::Instance()->shpinx_sort_mode_], NULL);
+    sphinx_set_match_mode(client,map_sph_match[Config::Instance()->shpinx_match_mode_]);
+    sphinx_set_ranking_mode(client, map_sph_rank[Config::Instance()->shpinx_rank_mode_], NULL);
+    sphinx_set_sort_mode(client, map_sph_sort[Config::Instance()->shpinx_sort_mode_], NULL);
     sphinx_set_limits(client, 0, 800, 800, 800);
 
     sphinx_set_field_weights( client,
