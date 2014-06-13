@@ -288,6 +288,10 @@ int Batch_next_reply(Batch *batch, ReplyType *reply_type, char **data, size_t *l
     struct list_head *current = batch->current_reply[batch->current_reply_sp];
     struct list_head *last = batch->current_reply[batch->current_reply_sp + 1];
 
+    if(current==NULL)
+    {
+        return -1;
+    }
     current = current->next;
 
     batch->current_reply[batch->current_reply_sp] = current;
@@ -312,6 +316,12 @@ int Batch_next_reply(Batch *batch, ReplyType *reply_type, char **data, size_t *l
 
     int level = (batch->current_reply_sp / 2) + 1;
     Reply *current_reply = list_entry(current, Reply, list);
+    
+    if(current_reply == NULL)
+    {
+        return -1;
+    }
+
     *reply_type = current_reply->type;
 //		RT_NONE = 0,
 //	    RT_OK = 1,
