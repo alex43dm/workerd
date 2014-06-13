@@ -1,11 +1,7 @@
 #include "DB.h"
-#include <boost/foreach.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <boost/date_time/posix_time/posix_time_io.hpp>
-#include <boost/format.hpp>
+
 #include <boost/regex.hpp>
-#include <ctime>
-#include <cstdlib>
+
 #include <sstream>
 
 #include <mongo/util/net/hostandport.h>
