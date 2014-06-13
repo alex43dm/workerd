@@ -3,10 +3,6 @@
 
 #include "../config.h"
 
-#include <list>
-#include <vector>
-#include <map>
-#include <utility>
 #include <boost/date_time.hpp>
 
 #ifndef AMQPCPP_OLD
@@ -39,11 +35,9 @@ public:
      */
     ~BaseCore();
 
-
     /** \brief  Загружает все сущности, которые используются при показе
      *          рекламы. */
     void LoadAllEntities();
-
 
     void ReloadAllEntities();
 
@@ -52,19 +46,6 @@ public:
 
     /** \brief  Выводит состояние службы и некоторую статистику */
     std::string Status();
-
-
-    /** \brief  Адрес скрипта перехода на рекламное предложение.
-     *
-     * По умолчанию равен \c "/redirect", то есть скрипт будет указывать
-     * на тот же сервер, который отдал информер.
-     *
-     * Примеры значений:
-     *
-     * - \code http://rg.yottos.com/redirect \endcode
-     * - \code http://getmyad.vsrv-1.2.yottos.com/redirect \endcode
-     * - \code http://rynok.yottos.com/Redirect.ashx \endcode
-    */
 
 private:
     void InitMessageQueue();
@@ -88,7 +69,6 @@ private:
     std::string toString(AMQPMessage *m);
     bool cmdParser(const std::string &cmd, std::string &offerId, std::string &campaignId);
     ParentDB *pdb;
-    static void signal_handler(int signum);
     std::string mq_log_;
 };
 

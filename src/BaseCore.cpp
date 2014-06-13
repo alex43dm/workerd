@@ -15,7 +15,6 @@
 #include "Log.h"
 #include "BaseCore.h"
 #include "base64.h"
-
 #include "Informer.h"
 #include "Campaign.h"
 #include "Offer.h"
@@ -23,16 +22,6 @@
 
 BaseCore::BaseCore()
 {
-//    fConnectedToLogDatabase = false;
-
-    struct sigaction actions;
-    sigemptyset(&actions.sa_mask);
-    actions.sa_flags = 0;
-    actions.sa_handler = signal_handler;
-
-    sigaction(SIGHUP,&actions,NULL);
-    sigaction(SIGPIPE,&actions,NULL);
-
     time_service_started_ = boost::posix_time::second_clock::local_time();
 
     pdb = new ParentDB();
@@ -44,6 +33,7 @@ BaseCore::BaseCore()
 
 BaseCore::~BaseCore()
 {
+    delete pdb;
     delete amqp_;
 }
 std::string BaseCore::toString(AMQPMessage *m)
@@ -69,6 +59,12 @@ bool BaseCore::ProcessMQ()
     int stopCount;
 
     time_mq_check_ = boost::posix_time::second_clock::local_time();
+
+    if(mq_log_.size() > 100*1024)
+    {
+        mq_log_.clear();
+    }
+
     try
     {
         {
@@ -78,8 +74,7 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                Log::gdb("BaseCore::ProcessMQ campaign: %s",m->getRoutingKey().c_str());
-                mq_log_ = "BaseCore::ProcessMQ campaign: " + m->getRoutingKey();
+                mq_log_ += "BaseCore::ProcessMQ campaign: " + m->getRoutingKey();
 
                 if(m->getRoutingKey() == "campaign.update")
                 {
@@ -113,8 +108,7 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                Log::gdb("BaseCore::ProcessMQ advertise: %s",m->getRoutingKey().c_str());
-                mq_log_ = "BaseCore::ProcessMQ advertise: " + m->getRoutingKey();
+                mq_log_ += "BaseCore::ProcessMQ advertise: " + m->getRoutingKey();
 
                 m1 = toString(m);
                 if(m->getRoutingKey() == "advertise.update")
@@ -148,8 +142,7 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                Log::gdb("BaseCore::ProcessMQ informer: %s",m->getRoutingKey().c_str());
-                mq_log_ = "BaseCore::ProcessMQ informer: " + m->getRoutingKey();
+                mq_log_ += "BaseCore::ProcessMQ informer: " + m->getRoutingKey();
 
                 if(m->getRoutingKey() == "informer.update")
                 {
@@ -170,8 +163,8 @@ bool BaseCore::ProcessMQ()
     }
     catch (AMQPException &ex)
     {
-        Log::err("AMQPException: %s", ex.getMessage().c_str());
-        mq_log_ = "error";
+        std::clog<<"AMQPException: "<<ex.getMessage()<<std::endl;
+        mq_log_ += "error: "+ ex.getMessage();
     }
     return false;
 }
@@ -237,7 +230,6 @@ void BaseCore::InitMessageQueue()
         amqp_ = new AMQP(Config::Instance()->mq_path_);
         exchange_ = amqp_->createExchange();
         exchange_->Declare("getmyad", "topic", AMQP_AUTODELETE);
-        //LogToAmqp("AMQP is up");
 
         // Составляем уникальные имена для очередей
         boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
@@ -261,14 +253,15 @@ void BaseCore::InitMessageQueue()
         exchange_->Bind(mq_campaign_name, "campaign.#");
         exchange_->Bind(mq_informer_name, "informer.#");
 
-       Log::info("Created ampq queues: %s, %s, %s",
-                  mq_campaign_name.c_str(),
-                  mq_informer_name.c_str(),
-                  mq_advertise_name.c_str());
+       std::clog<<"Created ampq queues: "
+                  <<mq_campaign_name
+                  <<mq_informer_name
+                  <<mq_advertise_name
+                  <<std::endl;
     }
     catch (AMQPException &ex)
     {
-        Log::err("Error in AMPQ init: %s, Feature will be disabled.", ex.getMessage().c_str());
+        std::clog<<"Error in AMPQ init: "<<ex.getMessage()<<std::endl;
     }
 }
 
@@ -461,15 +454,4 @@ bool BaseCore::cmdParser(const std::string &cmd, std::string &offerId, std::stri
         return true;
     }
     return false;
-}
-
-void BaseCore::signal_handler(int signum)
-{
-	switch(signum)
-	{
-    case SIGHUP:
-        cfg->Load();
-    case SIGPIPE:
-        Log::err("sig pipe");
-	}
 }
