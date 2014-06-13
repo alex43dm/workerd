@@ -1,16 +1,10 @@
-#pragma once
+#ifndef XXXSEARCHER_H
+#define XXXSEARCHER_H
 
-#include <string>
 #include <vector>
-#include <map>
 
-#include <stdlib.h>
-#include <boost/crc.hpp>
-#define _UNICODE
+//#define _UNICODE
 #include <sphinxclient.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <typeinfo>
 
 #include "Offer.h"
 #include "sphinxRequests.h"
@@ -37,3 +31,5 @@ private:
 
     void dumpResult(sphinx_result *res) const;
 };
+
+#endif // XXXSEARCHER_H

@@ -1,3 +1,8 @@
+#include <map>
+#include <string>
+
+#include <typeinfo>
+
 #include "Log.h"
 #include "Config.h"
 #include "XXXSearcher.h"
