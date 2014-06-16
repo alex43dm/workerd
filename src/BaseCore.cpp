@@ -70,7 +70,7 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "BaseCore::ProcessMQ campaign: " + m->getRoutingKey();
+                mq_log_ += "campaign: " + m->getRoutingKey() + "</br>";
 
                 if(m->getRoutingKey() == "campaign.update")
                 {
@@ -104,7 +104,7 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "BaseCore::ProcessMQ advertise: " + m->getRoutingKey();
+                mq_log_ += "advertise: " + m->getRoutingKey() + "</br>";
 
                 m1 = toString(m);
                 if(m->getRoutingKey() == "advertise.update")
@@ -138,7 +138,7 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "BaseCore::ProcessMQ informer: " + m->getRoutingKey();
+                mq_log_ += "informer: " + m->getRoutingKey() + "</br>";
 
                 if(m->getRoutingKey() == "informer.update")
                 {
@@ -154,6 +154,51 @@ bool BaseCore::ProcessMQ()
                 }
                 mq_informer_->Get(AMQP_NOACK);
                 m = mq_informer_->getMessage();
+            }
+        }
+        {
+            // Проверка сообщений mq_process_.#
+            bool flagSave = false;
+            mq_process_->Get(AMQP_NOACK);
+            m = mq_process_->getMessage();
+            stopCount = MAXCOUNT;
+            while(m->getMessageCount() > -1 && stopCount--)
+            {
+                mq_log_ += "process: " + m->getRoutingKey() + "</br>";
+
+                if(m->getRoutingKey() == "process.range_short_term")
+                {
+                    cfg->range_short_term_ = ::atof(toString(m).c_str());
+                    flagSave = true;
+                }
+                else if(m->getRoutingKey() == "process.range_long_term")
+                {
+                    cfg->range_long_term_ = ::atof(toString(m).c_str());
+                    flagSave = true;
+                }
+                else if(m->getRoutingKey() == "process.range_context")
+                {
+                    cfg->range_context_ = ::atof(toString(m).c_str());
+                    flagSave = true;
+                }
+                else if(m->getRoutingKey() == "process.range_search")
+                {
+                    cfg->range_search_ = ::atof(toString(m).c_str());
+                    flagSave = true;
+                }
+                else if(m->getRoutingKey() == "process.offer_by_campaign_unique")
+                {
+                    cfg->offer_by_campaign_unique_ = (unsigned)strtol(toString(m).c_str(),NULL,10);
+                    flagSave = true;
+                }
+
+                mq_process_->Get(AMQP_NOACK);
+                m = mq_process_->getMessage();
+            }
+
+            if(flagSave)
+            {
+                cfg->Save();
             }
         }
     }
@@ -235,6 +280,7 @@ void BaseCore::InitMessageQueue()
         std::string mq_advertise_name( "getmyad.advertise." + postfix );
         std::string mq_campaign_name( "getmyad.campaign." + postfix );
         std::string mq_informer_name( "getmyad.informer." + postfix );
+        std::string mq_process_name( "getmyad.process." + postfix );
 
         // Объявляем очереди
         mq_campaign_ = amqp_->createQueue();
@@ -243,17 +289,17 @@ void BaseCore::InitMessageQueue()
         mq_informer_->Declare(mq_informer_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
         mq_advertise_ = amqp_->createQueue();
         mq_advertise_->Declare(mq_advertise_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
+        mq_process_ = amqp_->createQueue();
+        mq_process_->Declare(mq_process_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
 
        // Привязываем очереди
         exchange_->Bind(mq_advertise_name, "advertise.#");
         exchange_->Bind(mq_campaign_name, "campaign.#");
         exchange_->Bind(mq_informer_name, "informer.#");
+        exchange_->Bind(mq_process_name, "process.#");
 
-       std::clog<<"Created ampq queues: "
-                  <<mq_campaign_name
-                  <<mq_informer_name
-                  <<mq_advertise_name
-                  <<std::endl;
+       std::clog<<"Created ampq queues: "<<mq_campaign_name<<","<<mq_informer_name<<","
+       <<mq_advertise_name<<","<<mq_process_name<<std::endl;
     }
     catch (AMQPException &ex)
     {

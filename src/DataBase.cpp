@@ -17,12 +17,10 @@
 #include "KompexSQLiteException.h"
 #include "GeoRerions.h"
 #include "Config.h"
-
+#include "BoostHelpers.h"
 
 
 #define INSERTSTATMENT "INSERT INTO Offer (id) VALUES (%lu)"
-
-bool is_file_exist(const std::string &fileName);
 
 DataBase::DataBase(bool create) :
     reopen(false),
@@ -83,7 +81,7 @@ bool DataBase::openDb()
 
         if(dbFileName != ":memory:")
         {
-            reopen = is_file_exist(dbFileName);
+            reopen = BoostHelpers::checkPath(dbFileName,true,true);
             if(!reopen)
             {
                 flags |= SQLITE_OPEN_CREATE;

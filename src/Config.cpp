@@ -1,28 +1,20 @@
-#include <iostream>
+//#include <iostream>
 #include <fstream>
-
-#include <boost/filesystem.hpp>
-#include <boost/regex.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <string.h>
 #include <stdlib.h>
 #include <pwd.h>
+#include <assert.h>
 
 #include "Log.h"
 #include "Config.h"
-#include <assert.h>
+#include "BoostHelpers.h"
+
 
 unsigned long request_processed_;
 unsigned long last_time_request_processed;
 unsigned long offer_processed_;
 unsigned long social_processed_;
-
-bool is_file_exist(const std::string &fileName)
-{
-    std::ifstream infile(fileName);
-    return infile.good();
-}
 
 // Global static pointer used to ensure a single instance of the class.
 Config* Config::mInstance = NULL;
@@ -38,7 +30,6 @@ Config* Config::Instance()
 Config::Config()
 {
     mIsInited = false;
-    mDoc = NULL;
 }
 
 bool Config::LoadConfig(const std::string fName)
@@ -74,35 +65,24 @@ void Config::exit(const std::string &mes)
 
 bool Config::Load()
 {
-    TiXmlElement *mel, *mels;
-    boost::filesystem::path p;
+    TiXmlDocument *mDoc;
+    TiXmlElement *mRoot, *mElem, *mel, *mels;
 
-    p = boost::filesystem::path(mFileName);
-
-    if(!boost::filesystem::is_regular_file(p))
-    {
-        exit("does not regular file: "+mFileName);
-    }
+    std::clog<<"open config file:"<<mFileName;
 
     mIsInited = false;
-    mDoc = new TiXmlDocument(mFileName);
 
-    if(!mDoc)
+    if((cfgFilePath = BoostHelpers::getConfigDir(mFileName)).empty())
     {
-        exit("does not found config file: "+mFileName);
+        return false;
     }
 
-    if(p.has_parent_path())
-    {
-        cfgFilePath = p.parent_path().string() + "/";
-    }
-    else
-    {
-        cfgFilePath = "./";
-    }
+    std::clog<<" config dir:"<<cfgFilePath;
 
-    std::clog<<"Config::Load: load file: "<<mFileName
-    <<" config path: "<<cfgFilePath<<std::endl;
+    if(!(mDoc = new TiXmlDocument(mFileName)))
+    {
+        exit("error create TiXmlDocument object");
+    }
 
 
     if(!mDoc->LoadFile())
@@ -207,9 +187,9 @@ bool Config::Load()
         {
             geocity_path_ = mel->GetText();
 
-            if(!checkPath(geocity_path_, false, true, mes))
+            if(!BoostHelpers::checkPath(geocity_path_, false, true))
             {
-                exit(mes);
+                ::exit(1);
             }
         }
 
@@ -217,12 +197,9 @@ bool Config::Load()
         {
             server_socket_path_ = mel->GetText();
 
-            if(!checkPath(server_socket_path_, true, true, mes))
+            if(BoostHelpers::checkPath(server_socket_path_, true, true))
             {
-                std::clog<<"server socket path: "<<mes<<std::endl;
-            }
-            else
-            {
+                std::clog<<"server socket path: "<<server_socket_path_<<" exists"<<std::endl;
                 unlink(server_socket_path_.c_str());
             }
         }
@@ -238,9 +215,9 @@ bool Config::Load()
             {
                 dbpath_ = mels->GetText();
 
-                if(dbpath_!=":memory:" && !checkPath(dbpath_,true, true, mes))
+                if(dbpath_!=":memory:" && !BoostHelpers::checkPath(dbpath_,true, true))
                 {
-                    exit(mes);
+                    ::exit(1);
                 }
             }
             else
@@ -253,9 +230,9 @@ bool Config::Load()
             {
                 db_dump_path_ = cfgFilePath + mels->GetText();
 
-                if(!checkPath(db_dump_path_,false, false, mes))
+                if(!BoostHelpers::checkPath(db_dump_path_,false, false))
                 {
-                    exit(mes);
+                    ::exit(1);
                 }
             }
 
@@ -263,9 +240,9 @@ bool Config::Load()
             {
                 db_geo_csv_ = cfgFilePath + mels->GetText();
 
-                if(!checkPath(db_geo_csv_, false, true, mes))
+                if(!BoostHelpers::checkPath(db_geo_csv_, false, true))
                 {
-                    exit(mes);
+                    ::exit(1);
                 }
             }
         }
@@ -274,9 +251,9 @@ bool Config::Load()
         {
             lock_file_ = mel->GetText();
 
-            if(!checkPath(lock_file_,true, true, mes))
+            if(!BoostHelpers::checkPath(lock_file_,true, true))
             {
-                exit(mes);
+                ::exit(1);
             }
         }
 
@@ -284,9 +261,9 @@ bool Config::Load()
         {
             pid_file_ = mel->GetText();
 
-            if(!checkPath(pid_file_,true, true, mes))
+            if(!BoostHelpers::checkPath(pid_file_,true, true))
             {
-                exit(mes);
+                ::exit(1);
             }
         }
 
@@ -302,17 +279,10 @@ bool Config::Load()
 
         if( (mel = mElem->FirstChildElement("time_update")) && (mel->GetText()) )
         {
-            boost::regex timeRegex("(\\d+):(\\d+):(\\d+)");
-            boost::cmatch tres;
-            if(boost::regex_match(mel->GetText(),  tres, timeRegex))
-            {
-                time_update_ = std::atoi(tres[2].first);//only seconds
-            }
-            else
+            if((time_update_ = BoostHelpers::getSeconds(mel->GetText())) == -1)
             {
                 exit("Config::Load: no time match in config.xml element: time_update");
             }
-
         }
 
 
@@ -320,9 +290,9 @@ bool Config::Load()
         {
             if( (mels = mel->FirstChildElement("teaser")) && (mels->GetText()) )
             {
-                if(!checkPath(cfgFilePath + mels->GetText(),false, true, mes))
+                if(!BoostHelpers::checkPath(cfgFilePath + mels->GetText(),false, true))
                 {
-                    exit(mes);
+                    ::exit(1);
                 }
 
                 template_teaser_ = getFileContents(cfgFilePath + mels->GetText());
@@ -334,9 +304,9 @@ bool Config::Load()
 
             if( (mels = mel->FirstChildElement("banner")) && (mels->GetText()) )
             {
-                if(!checkPath(cfgFilePath + mels->GetText(),false, true, mes))
+                if(!BoostHelpers::checkPath(cfgFilePath + mels->GetText(),false, true))
                 {
-                    exit(mes);
+                    ::exit(1);
                 }
 
                 template_banner_ = getFileContents(cfgFilePath + mels->GetText());
@@ -348,9 +318,9 @@ bool Config::Load()
 
             if( (mels = mel->FirstChildElement("error")) && (mels->GetText()) )
             {
-                if(!checkPath(cfgFilePath + mels->GetText(),false, true, mes))
+                if(!BoostHelpers::checkPath(cfgFilePath + mels->GetText(),false, true))
                 {
-                    exit(mes);
+                    ::exit(1);
                 }
 
                 template_error_ = getFileContents(cfgFilePath + mels->GetText());
@@ -363,9 +333,9 @@ bool Config::Load()
 
             if( (mels = mel->FirstChildElement("swfobject")) && (mels->GetText()) )
             {
-                if(!checkPath(cfgFilePath + mels->GetText(),false, true, mes))
+                if(!BoostHelpers::checkPath(cfgFilePath + mels->GetText(),false, true))
                 {
-                    exit(mes);
+                    ::exit(1);
                 }
 
                 swfobject_ = getFileContents(cfgFilePath + mels->GetText());
@@ -448,6 +418,15 @@ bool Config::Load()
 
     if( (history = mRoot->FirstChildElement("history")) )
     {
+        if( (mel = history->FirstChildElement("offer_by_campaign_unique")) && (mel->GetText()) )
+        {
+            offer_by_campaign_unique_ = (unsigned)strtol(mel->GetText(),NULL,10);
+        }
+        else
+        {
+            offer_by_campaign_unique_ = 1;
+        }
+
         //views
         if( (section = history->FirstChildElement("views")) )
         {
@@ -674,12 +653,6 @@ bool Config::Load()
 //---------------------------------------------------------------------------------------------------------------
 Config::~Config()
 {
-    if (mDoc != NULL)
-    {
-        delete mDoc;
-        mDoc = NULL;
-    }
-
     delete pDb;
 
     mInstance = NULL;
@@ -713,216 +686,212 @@ std::string Config::getFileContents(const std::string &fileName)
     std::clog<<"error open file: "<<fileName<<" error number: "<<errno<<std::endl;
     return std::string();
 }
-//---------------------------------------------------------------------------------------------------------------
-/*
-                stat = boost::filesystem::status(test, errcode);
-                if(errcode)
-                {
-                  Log::err("file system error: object: %s value: %d message: %s",
-                           test.string().c_str(),
-                           errcode.value(),
-                           errcode.message().c_str());
-                    return false;
-                }
 
-*/
-bool Config::checkPath(const std::string &path_, bool checkWrite, bool isFile, std::string &mes)
+bool Config::ReLoad()
 {
-    boost::filesystem::path path, test;
-    boost::system::error_code errcode;
-    boost::filesystem::path::iterator toEnd;
-    struct stat info;
-    uid_t uid;
-    gid_t gid;
+    TiXmlDocument *mDoc;
+    TiXmlElement *mRoot, *mElem, *mel;
+    bool returnFlag = false;
 
-    uid = getuid();
-    gid = getgid();
+    mDoc = new TiXmlDocument(mFileName);
 
-
-    path = boost::filesystem::path(path_);
-
-    toEnd = path.end();
-    if(isFile)
+    if(!mDoc)
     {
-        toEnd--;
+        std::clog<<"error open config file:"<<mFileName<<std::endl;
+        return false;
     }
 
-    for (boost::filesystem::path::iterator it = path.begin(); it != toEnd; ++it)
+    std::clog<<"reload config file:"<<mFileName<<" path: "<<cfgFilePath<<std::endl;
+
+    if(!mDoc->LoadFile())
     {
-        test /= *it;
-
-        if(test.string()=="" || test.string()=="/")
-            continue;
-
-        if(boost::filesystem::exists(test))
-        {
-            ::stat(test.string().c_str(), &info);
-
-            if (boost::filesystem::is_regular_file(test))
-            {
-                if(info.st_uid != uid && info.st_gid != gid)
-                {
-                    if(info.st_mode &(S_IROTH | S_IWOTH))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        mes = "file system error: path: "+test.string()+" message: cann't write";
-                        return false;
-                    }
-                }
-                else if(info.st_uid == uid && info.st_gid != gid)
-                {
-                    if(info.st_mode & (S_IRUSR | S_IWUSR))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        mes = "file system error: path: "+test.string()+" message: cann't write";
-                        return false;
-                    }
-                }
-                else if(info.st_uid != uid && info.st_gid == gid)
-                {
-                    if(info.st_mode & (S_IRGRP | S_IWGRP))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        mes = "file system error: path: "+test.string()+" message: cann't write";
-                        return false;
-                    }
-                }
-                else
-                {
-                    if(info.st_mode & (S_IRUSR | S_IWUSR))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        mes = "file system error: path: "+test.string()+" message: cann't write";
-                        return false;
-                    }
-                }
-            }
-            else if (boost::filesystem::is_directory(test))
-            {
-                if(info.st_uid != uid && info.st_gid != gid)
-                {
-                    if(info.st_mode & (S_IROTH | S_IXOTH))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        mes = "file system error: path: "+test.string()+" message: cann't write";
-                        return false;
-                    }
-                }
-                else if(info.st_uid == uid && info.st_gid != gid)
-                {
-                    if(info.st_mode & (S_IRUSR | S_IXUSR))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        mes = "file system error: path: "+test.string()+" message: cann't write";
-                        return false;
-                    }
-                }
-                else if(info.st_uid != uid && info.st_gid == gid)
-                {
-                    if(info.st_mode & (S_IRGRP | S_IXGRP))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        mes = "file system error: path: "+test.string()+" message: cann't write";
-                        return false;
-                    }
-                }
-                else
-                {
-                    if(info.st_mode & (S_IRUSR | S_IXUSR))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        mes = "file system error: path: "+test.string()+" message: cann't write";
-                        return false;
-                    }
-                }
-                continue;
-            }
-            else
-            {
-                if(checkWrite)
-                {
-                    try
-                    {
-                        if(!boost::filesystem::create_directories(test))
-                        {
-                            return false;
-                        }
-                    }
-                    catch(const boost::filesystem::filesystem_error &ex)
-                    {
-                        mes = "file system error: path: "+test.string()+" message: "+ex.what();
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-        else//does not exists
-        {
-            if(checkWrite)
-            {
-                try
-                {
-                    if(!boost::filesystem::create_directories(test))
-                    {
-                        return false;
-                    }
-                }
-                catch(const boost::filesystem::filesystem_error &ex)
-                {
-                    mes = "file system error: path: "+test.string()+" message: "+ex.what();
-                    return false;
-                }
-            }
-            else
-            {
-                mes = "file system error: path: "+test.string()+" message: does not exists";
-                return false;
-            }
-        }
+        std::clog<<" config file:"<<mFileName<<" is not valid."
+             <<" error: "<<mDoc->ErrorDesc()
+             <<" row: "<<mDoc->ErrorRow()
+             <<" col: "<<mDoc->ErrorCol();
+        goto clear_obj;
     }
 
-    if(isFile && checkWrite)
-    {
-        int lfp = open((path_+"test").c_str(),O_RDWR|O_CREAT,0640);
 
-		if(lfp < 0)
-		{
-			exit("unable to create file: "+path_+", "+strerror(errno));
-		}
-		else
-        {
-            close(lfp);
-            unlink((path_+"test").c_str());
-        }
+    mRoot = mDoc->FirstChildElement("root");
+
+    if(!mRoot)
+    {
+        std::clog<<"does not found root section"<<std::endl;
+        goto clear_obj;
     }
 
-    return true;
+    if( (mElem = mRoot->FirstChildElement("log")) )
+    {
+        if( (mel = mElem->FirstChildElement("coretime")) && (mel->GetText()) )
+        {
+            logCoreTime = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("outsize")) && (mel->GetText()) )
+        {
+            logOutPutSize = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("ip")) && (mel->GetText()) )
+        {
+            logIP = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("country")) && (mel->GetText()) )
+        {
+            logCountry = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("region")) && (mel->GetText()) )
+        {
+            logRegion = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("cookie")) && (mel->GetText()) )
+        {
+            logCookie = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("context")) && (mel->GetText()) )
+        {
+            logContext = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("search")) && (mel->GetText()) )
+        {
+            logSearch = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("informerId")) && (mel->GetText()) )
+        {
+            logInformerId = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("location")) && (mel->GetText()) )
+        {
+            logLocation = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("sphinx")) && (mel->GetText()) )
+        {
+            logSphinx = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("RetargetingOfferIds")) && (mel->GetText()) )
+        {
+            logRetargetingOfferIds = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+
+        if( (mel = mElem->FirstChildElement("OutPutOfferIds")) && (mel->GetText()) )
+        {
+            logOutPutOfferIds = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
+    }
+    else
+    {
+        std::clog<<"does not found log section"<<std::endl;
+        goto clear_obj;
+    }
+
+    returnFlag = true;
+
+clear_obj:
+    delete mDoc;
+
+    return returnFlag;
+}
+
+bool Config::Save()
+{
+    TiXmlDocument *mDoc;
+    TiXmlElement *mRoot;
+    bool returnFlag = false;
+
+    mDoc = new TiXmlDocument(mFileName);
+
+    if(!mDoc)
+    {
+        std::clog<<"error open config file:"<<mFileName<<std::endl;
+        return false;
+    }
+
+    std::clog<<"reload config file:"<<mFileName<<" path: "<<cfgFilePath<<std::endl;
+
+    if(!mDoc->LoadFile())
+    {
+        std::clog<<" config file:"<<mFileName<<" is not valid."
+                 <<" error: "<<mDoc->ErrorDesc()
+                 <<" row: "<<mDoc->ErrorRow()
+                 <<" col: "<<mDoc->ErrorCol();
+        goto clear_obj;
+    }
+
+
+    mRoot = mDoc->FirstChildElement("root");
+
+    if(!mRoot)
+    {
+        std::clog<<"does not found root section"<<std::endl;
+        goto clear_obj;
+    }
+
+
+    //history
+    TiXmlElement *history, *section, *mel;
+
+    if( (history = mRoot->FirstChildElement("history")) )
+    {
+        if( (mel = history->FirstChildElement("offer_by_campaign_unique")))
+        {
+            mel->SetValue(std::to_string(offer_by_campaign_unique_));
+        }
+
+        //short term
+        if( (section = history->FirstChildElement("short_term")) )
+        {
+            if( (mel = section->FirstChildElement("value")) )
+            {
+                mel->SetValue(BoostHelpers::float2string(range_short_term_));
+            }
+        }
+
+        //long term
+        if( (section = history->FirstChildElement("long_term")) )
+        {
+            if( (mel = section->FirstChildElement("value")) && (mel->GetText()) )
+            {
+                mel->SetValue(BoostHelpers::float2string(range_long_term_));
+            }
+        }
+        //context
+        if( (section = history->FirstChildElement("context")) )
+        {
+            if( (mel = section->FirstChildElement("value")) && (mel->GetText()) )
+            {
+                mel->SetValue(BoostHelpers::float2string(range_context_));
+            }
+        }
+        //context
+        if( (section = history->FirstChildElement("search")) )
+        {
+            if( (mel = section->FirstChildElement("value")) && (mel->GetText()) )
+            {
+                mel->SetValue(BoostHelpers::float2string(range_search_));
+            }
+        }
+
+        returnFlag = true;
+
+        mDoc->SaveFile();
+    }
+    else
+    {
+        std::clog<<"no history section in config file"<<std::endl;
+    }
+
+clear_obj:
+    delete mDoc;
+
+    return returnFlag;
 }

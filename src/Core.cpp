@@ -121,39 +121,38 @@ std::string Core::Process(Params *prms)
 {
     Offer::Vector vRIS;
 
-    Log::gdb("Core::Process start");
-    Log::gdb("search: %s",prms->getSearch().c_str());
+//    Log::gdb("Core::Process start");
     startCoreTime = boost::posix_time::microsec_clock::local_time();
 
     params = prms;
 
     if(getInformer() == 0)
     {
-        Log::err("there is no informer id: %s", prms->getInformerId().c_str());
+        std::clog<<"there is no informer id: "<<prms->getInformerId()<<std::endl;
         return Config::Instance()->template_error_;
     }
 
-    Log::gdb("[%ld]getInformer: done",tid);
+//    Log::gdb("[%ld]getInformer: done",tid);
 
 #ifndef DUMMY
     //load all history async
     hm->getUserHistory(params);
 
     getOffers();
-    Log::gdb("[%ld]getOffers: %d done",tid, items.size());
+//    Log::gdb("[%ld]getOffers: %d done",tid, items.size());
 
     //wait all history load
     hm->sphinxProcess(items, teasersMaxRating);
-    Log::gdb("[%ld]sphinxProcess: done",tid);
+//    Log::gdb("[%ld]sphinxProcess: done",tid);
 
     //ris algorithm
     hm->getRetargetingAsyncWait();
     RISAlgorithmRetagreting(hm->vretg, vOutPut,
                             vRIS.size() == (u_int)informer->capacity ? informer->RetargetingCount : informer->capacity);
-    Log::gdb("[%ld]RISAlgorithmRetagreting: vOutPut %ld done",tid, vOutPut.size());
+//    Log::gdb("[%ld]RISAlgorithmRetagreting: vOutPut %ld done",tid, vOutPut.size());
 
     RISAlgorithm(items, vRIS, informer->capacity);
-    Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
+//    Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
 
     informer->RetargetingCount = vOutPut.size();
 
@@ -191,7 +190,7 @@ std::string Core::Process(Params *prms)
     }
 #else
     getOffers(items);
-    Log::gdb("[%ld]getOffers: %d done",tid, items.size());
+//    Log::gdb("[%ld]getOffers: %d done",tid, items.size());
 
     for(auto i = items.begin(); i != items.end(); ++i)
     {
@@ -292,7 +291,7 @@ void Core::ProcessSaveResults()
         //cycle view
         if(items.size() <= (u_int)informer->capacity * 2)
         {
-            Log::gdb("set tail");
+//            Log::gdb("set tail");
             hm->clean = true;
             hm->setTailOffers(items,vOutPut);
         }
@@ -770,7 +769,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     Offer::MapRate resultAll;
     unsigned loopCount;
 
-    RISResult.clear();
+//    RISResult.clear();
 
     if(items.size() == 0 && (0 >= outLen && outLen > 1024))
     {
@@ -816,7 +815,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
 #ifndef DUMMY
         hm->clean = true;
 #endif // DUMMY
-        Log::warn("RISAlgorithm: result size less or equal %d: clean history", result.size());
+        std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "result size less or equal: "<<result.size()<<" outLen: "<<outLen<<", clean history"<<std::endl;
     }
 
     //check is all social
@@ -825,13 +824,13 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
 #ifndef DUMMY
         hm->clean = true;
 #endif // DUMMY
-        Log::warn("RISAlgorithm: all social: clean history");
+        std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "all social: clean history"<<std::endl;
     }
 
     //add teaser when teaser unique id and with company unique and rating > 0
     for(p = result.begin(); p != result.end(); ++p)
     {
-        if(!OutPutCampaignMap.count((*p)->campaign_id)
+        if((!OutPutCampaignMap.count((*p)->campaign_id) < cfg->offer_by_campaign_unique_)
                 && (*p)->rating > 0.0
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {

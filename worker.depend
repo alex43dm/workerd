@@ -6,15 +6,9 @@
 1386588626 /home/alex/Projects/worker/include/base64.h
 	<string>
 
-1401459959 source:/home/alex/Projects/worker/src/BaseCore.cpp
+1402669277 source:/home/alex/Projects/worker/src/BaseCore.cpp
 	"DB.h"
-	<boost/foreach.hpp>
-	<boost/date_time/posix_time/ptime.hpp>
-	<boost/date_time/posix_time/posix_time_io.hpp>
-	<boost/format.hpp>
 	<boost/regex.hpp>
-	<ctime>
-	<cstdlib>
 	<sstream>
 	<mongo/util/net/hostandport.h>
 	"../config.h"
@@ -43,12 +37,8 @@
 	<string>
 	<streambuf>
 
-1399559741 /home/alex/Projects/worker/include/BaseCore.h
+1402928063 /home/alex/Projects/worker/include/BaseCore.h
 	"../config.h"
-	<list>
-	<vector>
-	<map>
-	<utility>
 	<boost/date_time.hpp>
 	<AMQPcpp.h>
 	<amqpcpp.h>
@@ -116,7 +106,7 @@
 1399550556 /home/alex/Projects/worker/include/EBranch.h
 	<string>
 
-1401952020 /home/alex/Projects/worker/include/Config.h
+1402926600 /home/alex/Projects/worker/include/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
@@ -137,7 +127,7 @@
 	<iostream>
 	"KompexSQLitePrerequisites.h"
 
-1401707093 source:/home/alex/Projects/worker/src/CgiService.cpp
+1402917288 source:/home/alex/Projects/worker/src/CgiService.cpp
 	<boost/algorithm/string.hpp>
 	"DB.h"
 	"Log.h"
@@ -152,7 +142,7 @@
 	"Server.h"
 	<fcgi_stdio.h>
 
-1401191798 /home/alex/Projects/worker/include/CgiService.h
+1402917332 /home/alex/Projects/worker/include/CgiService.h
 	<string>
 	"BaseCore.h"
 	"Config.h"
@@ -168,7 +158,7 @@
 	<GeoIPCity.h>
 	<string>
 
-1401951403 /home/alex/Projects/worker/include/Core.h
+1402927342 /home/alex/Projects/worker/include/Core.h
 	<list>
 	<vector>
 	<map>
@@ -187,7 +177,7 @@
 	<string>
 	<boost/date_time.hpp>
 
-1401953641 /home/alex/Projects/worker/include/HistoryManager.h
+1401977566 /home/alex/Projects/worker/include/HistoryManager.h
 	<string>
 	<list>
 	<boost/date_time.hpp>
@@ -213,20 +203,13 @@
 	<string>
 	<boost/regex/icu.hpp>
 
-1392384065 /home/alex/Projects/worker/include/XXXSearcher.h
-	<string>
+1402664455 /home/alex/Projects/worker/include/XXXSearcher.h
 	<vector>
-	<map>
-	<stdlib.h>
-	<boost/crc.hpp>
 	<sphinxclient.h>
-	<stdarg.h>
-	<stdlib.h>
-	<typeinfo>
 	"Offer.h"
 	"sphinxRequests.h"
 
-1390207157 /home/alex/Projects/worker/include/sphinxRequests.h
+1402393635 /home/alex/Projects/worker/include/sphinxRequests.h
 	<string>
 	"EBranch.h"
 
@@ -238,25 +221,22 @@
 1387450434 /home/alex/Projects/worker/include/Server.h
 	<string>
 
-1401952106 source:/home/alex/Projects/worker/src/Config.cpp
-	<iostream>
+1402926798 source:/home/alex/Projects/worker/src/Config.cpp
 	<fstream>
-	<boost/filesystem.hpp>
-	<boost/regex.hpp>
-	<boost/lexical_cast.hpp>
 	<string.h>
 	<stdlib.h>
 	<pwd.h>
+	<assert.h>
 	"Log.h"
 	"Config.h"
-	<assert.h>
+	"BoostHelpers.h"
 
 1396958001 source:/home/alex/Projects/worker/src/Cookie.cpp
 	"Cookie.h"
 	<string.h>
 	<boost/date_time/posix_time/posix_time.hpp>
 
-1399547219 source:/home/alex/Projects/worker/src/DataBase.cpp
+1402920484 source:/home/alex/Projects/worker/src/DataBase.cpp
 	<iostream>
 	<algorithm>
 	<fstream>
@@ -273,6 +253,7 @@
 	"KompexSQLiteException.h"
 	"GeoRerions.h"
 	"Config.h"
+	"BoostHelpers.h"
 
 1386837321 /home/alex/Projects/worker/include/GeoRerions.h
 	"KompexSQLiteDatabase.h"
@@ -288,7 +269,7 @@
 	"Config.h"
 	"GeoIPTools.h"
 
-1391676801 source:/home/alex/Projects/worker/src/GeoRerions.cpp
+1402644595 source:/home/alex/Projects/worker/src/GeoRerions.cpp
 	<iostream>
 	<fstream>
 	<string>
@@ -301,26 +282,26 @@
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 
-1401736898 source:/home/alex/Projects/worker/src/HistoryManagerLongTerm.cpp
+1402903637 source:/home/alex/Projects/worker/src/HistoryManagerLongTerm.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 
-1401954641 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
-	"HistoryManager.h"
-	"Config.h"
-	"Log.h"
-	"KompexSQLiteStatement.h"
-	"KompexSQLiteException.h"
-
-1401954629 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
+1402909248 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 
-1401737025 source:/home/alex/Projects/worker/src/HistoryManagerShortTerm.cpp
+1401963159 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
+	"HistoryManager.h"
+	"Config.h"
+	"Log.h"
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+
+1402903669 source:/home/alex/Projects/worker/src/HistoryManagerShortTerm.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
@@ -388,7 +369,7 @@
 	"GeoIPTools.h"
 	"Log.h"
 
-1401888141 source:/home/alex/Projects/worker/src/ParentDB.cpp
+1402644250 source:/home/alex/Projects/worker/src/ParentDB.cpp
 	<vector>
 	<boost/algorithm/string.hpp>
 	"ParentDB.h"
@@ -398,7 +379,7 @@
 	"Config.h"
 	"Offer.h"
 
-1401794048 source:/home/alex/Projects/worker/src/RedisClient.cpp
+1402922808 source:/home/alex/Projects/worker/src/RedisClient.cpp
 	<strings.h>
 	<string.h>
 	"RedisClient.h"
@@ -406,7 +387,7 @@
 	"Config.h"
 	"base64.h"
 
-1398673444 source:/home/alex/Projects/worker/src/Server.cpp
+1402917470 source:/home/alex/Projects/worker/src/Server.cpp
 	<fstream>
 	<signal.h>
 	<pwd.h>
@@ -423,24 +404,27 @@
 	"Config.h"
 	"Log.h"
 
-1389863417 source:/home/alex/Projects/worker/src/sphinxRequests.cpp
+1402396378 source:/home/alex/Projects/worker/src/sphinxRequests.cpp
 	"sphinxRequests.h"
 
 1392637687 source:/home/alex/Projects/worker/src/UrlParser.cpp
 	<sstream>
 	"UrlParser.h"
 
-1401455288 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+1402664416 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+	<map>
+	<string>
+	<typeinfo>
 	"Log.h"
 	"Config.h"
 	"XXXSearcher.h"
 
-1401953606 source:/home/alex/Projects/worker/src/HistoryManager.cpp
+1402386230 source:/home/alex/Projects/worker/src/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 
-1401953788 source:/home/alex/Projects/worker/src/Core.cpp
+1402927582 source:/home/alex/Projects/worker/src/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -457,4 +441,16 @@
 	"KompexSQLiteException.h"
 	"base64.h"
 	"EBranch.h"
+
+1402925871 source:/home/alex/Projects/worker/src/BoostHelpers.cpp
+	<sys/stat.h>
+	<fcntl.h>
+	<boost/filesystem.hpp>
+	<boost/regex.hpp>
+	<boost/lexical_cast.hpp>
+	"BoostHelpers.h"
+	"Log.h"
+
+1402925783 /home/alex/Projects/worker/include/BoostHelpers.h
+	<string>
 

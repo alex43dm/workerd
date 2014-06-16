@@ -32,33 +32,35 @@ CgiService::CgiService()
     socketId = FCGX_OpenSocket(cfg->server_socket_path_.c_str(), cfg->server_children_);
     if(socketId < 0)
     {
-        Log::err("Error open socket. exit");
-        exit(1);
+        std::clog<<"Error open socket. exit"<<std::endl;
+        ::exit(1);
     }
     umask(old_mode);
+
+    struct sigaction actions;
+
+    memset(&actions, 0, sizeof(actions));
+    actions.sa_flags = 0;
+    actions.sa_handler = SignalHandler;
+
+    sigaction(SIGHUP,&actions,NULL);
+    sigaction(SIGPIPE,&actions,NULL);
 
     pthread_attr_t* attributes = (pthread_attr_t*) malloc(sizeof(pthread_attr_t));
     pthread_attr_init(attributes);
     pthread_attr_setstacksize(attributes, THREAD_STACK_SIZE);
 
-    /*
-    sigemptyset(&es); //BLOCK all signals
-
-    if (pthread_sigmask(SIG_BLOCK, &es, NULL) != 0)
-    {
-        Log::err("pthread_sigmask  error");
-    }
-*/
-    int i;
     threads = new pthread_t[cfg->server_children_ + 1];
 
-    for(i = 0; i < cfg->server_children_; i++)
+    for(int i = 0; i < cfg->server_children_; i++)
     {
         if(pthread_create(&threads[i], attributes, &this->Serve, this))
         {
-            Log::err("creating thread failed");
+            std::clog<<"creating thread failed"<<std::endl;
+            ::exit(1);
         }
     }
+
     pthread_attr_destroy(attributes);
     free(attributes);
 }
@@ -300,5 +302,19 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
     {
         Log::err("exception %s: name: %s while processing: %s", typeid(ex).name(), ex.what(), query.c_str());
         Response(req, 503);
+    }
+}
+
+void CgiService::SignalHandler(int signum)
+{
+    switch(signum)
+    {
+    case SIGHUP:
+        std::clog<<"CgiService: sig hup"<<std::endl;
+        cfg->ReLoad();
+        break;
+    case SIGPIPE:
+        std::clog<<"CgiService: sig pipe"<<std::endl;
+        break;
     }
 }

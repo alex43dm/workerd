@@ -411,6 +411,7 @@ bool RedisClient::execCmd(const std::string &cmd)
 {
     Batch *batch;
     Executor *executor;
+    bool returnFlag = false;
 
     batch= Batch_new();
 
@@ -420,11 +421,10 @@ bool RedisClient::execCmd(const std::string &cmd)
     Executor_add(executor, connection, batch);
 
     int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
+
     if(rr <= 0)
     {
-        Log::err("redis cmd false: %s",cmd.c_str());
-        return false;
+        std::clog<<"redis cmd error."<<std::endl;
     }
     else
     {
@@ -436,18 +436,23 @@ bool RedisClient::execCmd(const std::string &cmd)
         {
             if(reply_type == RT_ERROR)
             {
-                Log::err("redis cmd: %s false: %s",cmd.c_str(), reply_data);
+                std::clog<<"redis cmd error: "<<reply_data<<std::endl;
+                break;
             }
             else if(reply_type == RT_INTEGER)
             {
 //                ret = strtol(reply_data,NULL,10);
+                returnFlag = true;
                 break;
             }
         }
     }
 
+    Executor_free(executor);
+
     Batch_free(batch);
-    return true;
+
+    return returnFlag;
 }
 
 bool RedisClient::del(const std::string &key)

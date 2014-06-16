@@ -76,7 +76,6 @@ Server::Server(const std::string &lockFileName, const std::string &pidFileName) 
 	signal(SIGCHLD,child_handler);
 	signal(SIGUSR1,child_handler);
 	signal(SIGALRM,child_handler);
-	signal(SIGHUP,child_handler);
 
 	pid = fork();
 
@@ -95,12 +94,13 @@ Server::Server(const std::string &lockFileName, const std::string &pidFileName) 
 
 	parent = getppid();
 
+	signal(SIGHUP,SIG_DFL);
 	signal(SIGCHLD,SIG_DFL);
 	signal(SIGTSTP,SIG_IGN);
 	signal(SIGTTOU,SIG_IGN);
 	signal(SIGTTIN,SIG_IGN);
 	signal(SIGTERM,SIG_DFL);
-	signal(SIGPIPE,SIG_IGN);
+	signal(SIGPIPE,SIG_DFL);
 	signal(SIGRTMIN,SIG_DFL);
 
 	umask(007);

@@ -90,6 +90,7 @@ private:
 
     mongo::DBClientReplicaSet *monga_log;
     bool ConnectLogDatabase();
+    static void SignalHandler(int signum);
 };
 
 #endif

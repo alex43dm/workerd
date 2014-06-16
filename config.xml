@@ -77,6 +77,8 @@
 
 <!--история-->
 <history>
+    <!--количество предложений одной кампании в блоке(1..100)-->
+    <offer_by_campaign_unique>2</offer_by_campaign_unique>
     <!--история показа-->
     <views>
         <ttl>10:00:00</ttl>

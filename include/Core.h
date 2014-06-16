@@ -79,7 +79,7 @@ private:
 
     unsigned teasersCount;
 
-    std::map<long,long> OutPutCampaignMap;
+    std::multimap<long,long> OutPutCampaignMap;
 
     char *cmd;
     float teasersMediumRating,teasersMaxRating;

@@ -44,6 +44,7 @@ public:
     float range_long_term_;
     float range_context_;
     float range_search_;
+    unsigned offer_by_campaign_unique_;
 
     //new params
     std::string server_ip_;
@@ -102,6 +103,8 @@ public:
     static Config* Instance();
     bool LoadConfig(const std::string fName);
     bool Load();
+    bool ReLoad();
+    bool Save();
     virtual ~Config();
 
     bool to_bool(std::string const& s)
@@ -125,10 +128,6 @@ private:
     std::string mes;
     std::string mFileName;
     std::string cfgFilePath;
-
-    TiXmlDocument *mDoc;
-    TiXmlElement* mRoot;
-    TiXmlElement* mElem;
 
     int getTime(const char *p);
     std::string getFileContents(const std::string &fileName);
