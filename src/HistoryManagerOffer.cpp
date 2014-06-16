@@ -64,53 +64,36 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
     return true;
 }
 
-/** \brief Получение идентификаторов РП от индекса lucene.
- *
- * Возвращает список пар (идентификатор,вес), отсортированный по убыванию веса.
- *
- * В этом методе происходит обращение к redis за историей пользователя и отбор идентификаторов РП из индекса CLucene.
- */
-bool HistoryManager::getDeprecatedOffers(std::string &rr)
-{
-    clean = false;
-
-    if(!pViewHistory->exists(key))
-    {
-        //Log::err("%s::%s error: %s", typeid(this),__func__,Module_last_error(module));
-        return false;
-    }
-
-    if(!pViewHistory->getRange(key , 0, -1, rr))
-    {
-        Log::err("HistoryManager::getDeprecatedOffers error: %s", Module_last_error(module));
-        return false;
-    }
-
-    return true;
-}
-
-#define CMD_SIZE 4096
+#define OFFER_SIZE 10
 
 bool HistoryManager::getDeprecatedOffers()
 {
-    std::list<std::string> offers;
-    char * cmd = new char[CMD_SIZE];
+    if(params->newClient)
+    {
+        return true;
+    }
 
     if(pViewHistory->exists(key))
     {
+        std::list<std::string> offers;
+
         if(!pViewHistory->getRange(key, 0, -1, offers))
         {
-            Log::err("[%ld]%s::%s error: %s for key: %s", tid, typeid(this).name(), __func__, Module_last_error(module), key.c_str());
+            std::clog<<"["<<tid<<"]"<<__func__<<" pViewHistory->getRange error: "<<Module_last_error(module)<<" for key: "<<key<<std::endl;
         }
         else
         {
+            size_t cmdSize = OFFER_SIZE * offers.size();
+            char * cmd = new char[cmdSize];
+
             Kompex::SQLiteStatement *pStmt;
             pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+
             try
             {
                 for( auto i = offers.begin(); i != offers.end(); ++i)
                 {
-                    sqlite3_snprintf(CMD_SIZE, cmd, "INSERT INTO %s(id) VALUES(%s);",
+                    sqlite3_snprintf(cmdSize, cmd, "INSERT INTO %s(id) VALUES(%s);",
                                      tmpTable.c_str(),
                                      (*i).c_str());
                     pStmt->SqlStatement(cmd);
@@ -120,25 +103,26 @@ bool HistoryManager::getDeprecatedOffers()
             {
                 std::clog<<"["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<" : "<<ex.GetString()<<std::endl;
             }
+
             delete pStmt;
+            delete []cmd;
         }
+
+        offers.clear();
     }
     else
     {
-        Log::warn("[%ld]%s::%s: no history for key: %s",tid, typeid(this).name(),__func__, key.c_str());
+        std::clog<<"["<<tid<<"]"<<__func__<<" no history for key:"<<key<<std::endl;
     }
 
     if(pViewHistory->exists(key_inv))
     {
         if(!pViewHistory->getRange(key_inv, 0, -1, mtailOffers))
         {
-            Log::err("[%ld]%s::%s error: %s", tid, typeid(this).name(), __func__,Module_last_error(module));
+            std::clog<<"["<<tid<<"]"<<__func__<<" error: "<<Module_last_error(module)<<" for key:"<<key<<std::endl;
         }
     }
 
-    delete []cmd;
-
-    Log::gdb("[%ld]%s::%s: done",tid, typeid(this).name(), __func__);
     return true;
 }
 
