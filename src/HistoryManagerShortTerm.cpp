@@ -5,7 +5,7 @@
 //----------------------------short term---------------------------------------
 void HistoryManager::getShortTerm()
 {
-    if(params->newClient)
+    if(params->newClient && !pShortTerm->exists(key))
     {
         return;
     }

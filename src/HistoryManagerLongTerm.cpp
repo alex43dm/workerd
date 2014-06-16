@@ -5,7 +5,7 @@
 //----------------------------long term---------------------------------------
 void HistoryManager::getLongTerm()
 {
-    if(params->newClient)
+    if(params->newClient && !pLongTerm->exists(key))
     {
         return;
     }
