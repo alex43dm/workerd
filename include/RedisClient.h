@@ -17,6 +17,7 @@ class RedisClient
         virtual ~RedisClient();
 
         bool connect();
+        bool reconnect();
 
         bool isConnected() const;
 
