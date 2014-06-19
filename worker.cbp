@@ -107,6 +107,7 @@
 		<Unit filename="db_dump/view/03_Campaign2Acnts.sql" />
 		<Unit filename="db_dump/view/04_Campaign2Infs.sql" />
 		<Unit filename="include/BaseCore.h" />
+		<Unit filename="include/BoostHelpers.h" />
 		<Unit filename="include/Campaign.h" />
 		<Unit filename="include/CgiService.h" />
 		<Unit filename="include/Config.h" />
@@ -137,6 +138,7 @@
 		<Unit filename="include/main.h" />
 		<Unit filename="include/sphinxRequests.h" />
 		<Unit filename="src/BaseCore.cpp" />
+		<Unit filename="src/BoostHelpers.cpp" />
 		<Unit filename="src/Campaign.cpp" />
 		<Unit filename="src/CgiService.cpp" />
 		<Unit filename="src/Config.cpp" />

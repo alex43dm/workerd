@@ -18,7 +18,8 @@ ofrs.uniqueHits,
 ofrs.height,
 ofrs.width,
 ca.social,
-ca.guid
+ca.guid,
+ca.offer_by_campaign_unique
 FROM Offer AS ofrs
 INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
 INNER JOIN CampaignNow AS cn ON ca.id=cn.id

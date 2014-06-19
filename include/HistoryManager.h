@@ -57,8 +57,8 @@ public:
     bool getDBStatus(HistoryType t);
 
     //main methods
-    void getUserHistory(Params *params);
-    void sphinxProcess(Offer::Map &items, float teasersMaxRating);
+    void startGetUserHistory(Params *params, Informer *);
+    void sphinxProcess(Offer::Map &items);
     bool updateUserHistory(const Offer::Vector &items, unsigned RetargetingCount);
 
     bool setDeprecatedOffers(const Offer::Vector &items,unsigned);
@@ -67,7 +67,12 @@ public:
     bool getDeprecatedOffersAsync();
     bool getDeprecatedOffersAsyncWait();
     bool clearDeprecatedOffers();
+
     bool setTailOffers(const Offer::Map &items, const Offer::Vector &toShow);
+    bool getTailOffersAsyncWait();
+    bool getTailOffersAsync();
+    bool moveUpTailOffers(Offer::Map &items, float teasersMaxRating);
+    bool getTailOffers();
 
     bool getLongTermAsync();
     bool getLongTermAsyncWait();
@@ -85,18 +90,13 @@ public:
     void RetargetingUpdate(const Offer::Vector &,unsigned);
     void RetargetingClear();
 
-    bool isShortTerm(){return cfg->range_short_term_ > 0;}
-    bool isLongTerm(){return cfg->range_long_term_ > 0;}
-    bool isContext(){return cfg->range_context_ > 0;}
-    bool isSearch(){return cfg->range_search_ > 0;}
-
     mongo::BSONObj BSON_Keywords();
 
 protected:
 private:
     std::string key, key_inv;
     Params *params;
-    Module *module;
+    Informer *inf;
     RedisClient *pViewHistory,*pShortTerm,*pLongTerm,*pRetargeting;
     std::string tmpTable;
     std::vector<sphinxRequests> stringQuery;
@@ -107,7 +107,8 @@ private:
                 thrGetLongTermAsync,
                 thrGetShortTermAsync,
                 thrGetRetargetingAsync,
-                thrGetPageKeywordsAsync;
+                thrGetPageKeywordsAsync,
+                thrGetTailOffersAsync;
 
     std::list<std::string> vshortTerm, vlongTerm, vretageting;
     std::list<long> mtailOffers;
@@ -126,6 +127,7 @@ private:
     static void *getLongTermEnv(void *);
     static void *getShortTermEnv(void *);
     static void *getRetargetingEnv(void *);
+    static void *getTailOffersEnv(void *data);
     RedisClient *getHistoryPointer(const HistoryType type) const;
 };
 #endif

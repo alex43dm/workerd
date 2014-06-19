@@ -13,6 +13,7 @@ class BoostHelpers
         static bool checkPath(const std::string &path_, bool checkWrite, bool isFile);
         static int getSeconds(const std::string &s);
         static std::string float2string(const float);
+        static bool fileExists(const std::string &path_);
     protected:
     private:
 };

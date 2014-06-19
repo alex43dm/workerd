@@ -52,6 +52,11 @@ std::string BoostHelpers::getConfigDir(const std::string &filePath)
     return "";
 }
 
+bool BoostHelpers::fileExists(const std::string &path_)
+{
+    return boost::filesystem::exists(path_);
+}
+
 bool BoostHelpers::checkPath(const std::string &path_, bool checkWrite, bool isFile)
 {
     boost::filesystem::path path, test;

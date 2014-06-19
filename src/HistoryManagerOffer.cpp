@@ -51,13 +51,13 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
                 else
                 {
                     pViewHistory->zadd(key,(*it)->uniqueHits - 1, (*it)->id_int);
-                    //pViewHistory->expire(key, Config::Instance()->views_expire_);
+                    pViewHistory->expire(key, cfg->views_expire_);
                 }
             }
             else//if not exists
             {
                 pViewHistory->zadd(key,(*it)->uniqueHits - 1, (*it)->id_int);
-                //pViewHistory->expire(key, Config::Instance()->views_expire_);
+                pViewHistory->expire(key, cfg->views_expire_);
             }
         }
     }
@@ -79,7 +79,7 @@ bool HistoryManager::getDeprecatedOffers()
 
         if(!pViewHistory->getRange(key, 0, -1, offers))
         {
-            std::clog<<"["<<tid<<"]"<<__func__<<" pViewHistory->getRange error: "<<Module_last_error(module)<<" for key: "<<key<<std::endl;
+            std::clog<<"["<<tid<<"]"<<__func__<<" pViewHistory->getRange error: "<<Module_last_error(cfg->module)<<" for key: "<<key<<std::endl;
         }
         else
         {
@@ -115,41 +115,6 @@ bool HistoryManager::getDeprecatedOffers()
         std::clog<<"["<<tid<<"]"<<__func__<<" no history for key:"<<key<<std::endl;
     }
 
-    if(pViewHistory->exists(key_inv))
-    {
-        if(!pViewHistory->getRange(key_inv, 0, -1, mtailOffers))
-        {
-            std::clog<<"["<<tid<<"]"<<__func__<<" error: "<<Module_last_error(module)<<" for key:"<<key<<std::endl;
-        }
-    }
-
-    return true;
-}
-
-bool HistoryManager::setTailOffers(const Offer::Map &items, const Offer::Vector &toShow)
-{
-    bool fFound;
-    for(auto it = items.begin(); it != items.end(); ++it)
-    {
-        fFound = false;
-        for(auto i = toShow.begin(); i != toShow.end(); ++i)
-        {
-            if(items.count((*i)->id_int)>0)
-            {
-                fFound = true;
-                break;
-            }
-        }
-
-        if(fFound)
-        {
-            continue;
-        }
-        else
-        {
-            pViewHistory->zadd(key_inv, 1, (*it).first);
-        }
-    }
     return true;
 }
 
@@ -169,11 +134,10 @@ bool HistoryManager::getDeprecatedOffersAsync()
 
     pthread_attr_t* attributes = (pthread_attr_t*) malloc(sizeof(pthread_attr_t));
     pthread_attr_init(attributes);
-    //pthread_attr_setstacksize(attributes, THREAD_STACK_SIZE);
 
     if(pthread_create(&thrGetDeprecatedOffersAsync, attributes, &this->getDeprecatedOffersEnv, this))
     {
-        Log::err("creating thread failed");
+        std::clog<<"creating thread failed"<<std::endl;
     }
 
     pthread_attr_destroy(attributes);
@@ -191,6 +155,5 @@ bool HistoryManager::getDeprecatedOffersAsyncWait()
     }
 
     pthread_join(thrGetDeprecatedOffersAsync, 0);
-//    Log::gdb("HistoryManager::getDeprecatedOffersAsyncWait return");
     return true;
 }

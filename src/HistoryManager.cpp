@@ -3,15 +3,13 @@
 #include "Log.h"
 
 #define REDIS_TIMEOUT 3 * 24 * 3600
+#define SPHINX_CAPACITY_COUNT 2
 
 static const char * EnumHistoryTypeStrings[] = {"ShortTerm", "LongTerm", "ViewHistory", "Category","Retargeting"};
 
 HistoryManager::HistoryManager(const std::string &tmpTableName):
     tmpTable(tmpTableName)
 {
-    module = Module_new();
-    Module_init(module);
-
     m_pPrivate = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
@@ -22,11 +20,6 @@ HistoryManager::HistoryManager(const std::string &tmpTableName):
     tid = pthread_self();
 
     sphinx = new XXXSearcher();
-
-    if(!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
-    {
-        std::clog<<"["<<tid<<"]"<<"no sphinx search enabled!"<<std::endl;
-    }
 }
 
 HistoryManager::~HistoryManager()
@@ -40,7 +33,6 @@ HistoryManager::~HistoryManager()
     delete pLongTerm;
     delete pRetargeting;
 
-    Module_free(module);
 }
 
 bool HistoryManager::initDB()
@@ -63,97 +55,82 @@ bool HistoryManager::initDB()
     return true;
 }
 
-void HistoryManager::getUserHistory(Params *_params)
+void HistoryManager::startGetUserHistory(Params *_params, Informer *inf_)
 {
-    std::string q;
     clean = false;
     updateShort = false;
     updateContext = false;
 
+    inf = inf_;
+
     params = _params;
     key = params->getUserKey();
     key_inv = key+"-inv";
-    Log::gdb("key: %s",key.c_str());
 
-    getDeprecatedOffersAsync();
-
-    getRetargetingAsync();
-//        std::clog<<"["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<" no history for: "<<key<<std::endl;
+    if( !inf->sphinxProcessEnable() )
+    {
+        return;
+    }
 
     //Запрос по запросам к поисковикам
-    if(isSearch())
+
+    std::string q;
+    if(inf->isSearch())
     {
         q = getContextKeywordsString(params->getSearch());
         if (!q.empty())
         {
             lock();
-            stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_search_,EBranchT::T1));
+            stringQuery.push_back(sphinxRequests(q,inf->range_search,EBranchT::T1));
             unlock();
         }
     }
     //Запрос по контексту страницы
-    if(isContext())
+    if(inf->isContext())
     {
         q = getContextKeywordsString(params->getContext());
         if (!q.empty())
         {
             lock();
-            stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_context_,EBranchT::T2));
+            stringQuery.push_back(sphinxRequests(q,inf->range_context,EBranchT::T2));
             unlock();
         }
     }
 
-    if(isLongTerm())
+    if(inf->isLongTerm())
+    {
         getLongTermAsync();
+    }
 
-    if(isShortTerm())
+    if(inf->isShortTerm())
+    {
         getShortTermAsync();
+    }
 }
 
-void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
+void HistoryManager::sphinxProcess(Offer::Map &items)
 {
 
-    if((!isShortTerm() && !isLongTerm() && !isContext() && !isSearch())
-       || cfg->shpinx_min_offres_process_ >= items.size())
+    if( inf->capacity * SPHINX_CAPACITY_COUNT >= items.size() || !inf->sphinxProcessEnable() )
     {
-        if(cfg->shpinx_min_offres_process_ >= items.size())
-        {
-            std::clog<<"shpinx: shpinx_min_offres_process_: "
-            <<cfg->shpinx_min_offres_process_<<" >= items count:"<<items.size()<<std::endl;
-        }
-
-        if(mtailOffers.size())
-        {
-            for(auto i = mtailOffers.begin(); i != mtailOffers.end(); ++i)
-            {
-                if(items[*i])
-                {
-                    items[*i]->rating = items[*i]->rating + teasersMaxRating;
-                }
-            }
-        }
         return;
     }
 
     sphinx->makeFilter(items);
 
-    if(isShortTerm() && !params->newClient)
+    if(inf->isShortTerm())
+    {
         getShortTermAsyncWait();
+    }
 
-    if(isLongTerm() && !params->newClient)
+    if(inf->isLongTerm())
+    {
         getLongTermAsyncWait();
-
-    Log::gdb("[%ld]sphinx get history: done",tid);
+    }
 
     sphinx->processKeywords(stringQuery, items);
 
     sphinx->cleanFilter();
-
-    for(auto i = mtailOffers.begin(); i != mtailOffers.end(); ++i)
-    {
-        items[*i]->rating = items[*i]->rating + teasersMaxRating;
-    }
-
 }
 
 
@@ -243,7 +220,7 @@ bool HistoryManager::getHistoryByType(HistoryType type, std::list<std::string> &
     {
         if(!r->getRange(key, 0, -1, rr))
         {
-            std::clog<<LogPriority::Err<< "["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<EnumHistoryTypeStrings[type]<<":"<< Module_last_error(module) << std::endl;
+            std::clog<<LogPriority::Err<< "["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<EnumHistoryTypeStrings[type]<<":"<< Module_last_error(cfg->module) << std::endl;
             //Log::err("[%ld]%s::%s %s: %s", tid, typeid(this).name(), __func__,EnumHistoryTypeStrings[type], Module_last_error(module));
             return false;
         }
@@ -260,7 +237,8 @@ boost::int64_t HistoryManager::currentDateToInt()
     boost::posix_time::ptime myEpoch(d);
     boost::posix_time::time_duration myTimeFromEpoch = myTime - myEpoch;
     boost::int64_t myTimeAsInt = myTimeFromEpoch.ticks();
-    return (myTimeAsInt%10000000000) ;
+
+    return (myTimeAsInt%10000000000);
 }
 
 //------------------------------------------sync functions----------------------------------------
@@ -288,7 +266,7 @@ bool HistoryManager::getDBStatus(HistoryType t)
 {
     if(!getHistoryPointer(t)->isConnected())
     {
-        Log::err("HistoryManager::getDBStatus HistoryType: %d error: %s", (int)t, Module_last_error(module));
+        Log::err("HistoryManager::getDBStatus HistoryType: %d error: %s", (int)t, Module_last_error(cfg->module));
         return false;
     }
     return true;

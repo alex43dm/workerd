@@ -19,14 +19,13 @@ public:
     };
 
        long long id;                         //Индентификатор РБ
-//        sphinx_int64_t id_int;                             //Индентификатор РБ
-        int capacity;                           //Количество мест под тизер
+        unsigned capacity;                           //Количество мест под тизер
         std::string bannersCss;                 //Стиль CSS РБ для отображения банеров
         std::string teasersCss;                 //Стиль CSS РБ для отображения тизеров
         long domainId;
         long accountId;
-        //unsigned rtgPercentage;
-        unsigned RetargetingCount;
+        unsigned retargeting_capacity;
+        double range_short_term, range_long_term, range_context, range_search;
 
         bool blocked;                           //Статус активности РБ
         ShowNonRelevant nonrelevant;            //Что отображать при отсутствии платных РП
@@ -38,7 +37,9 @@ public:
         int width_banner;                       //Ширина отображаемых банеров
 
     Informer(long id);
-    Informer(long id, int capacity, const std::string &bannersCss, const std::string &teasersCss, long , long);//, int);
+    Informer(long id, int capacity,
+             const std::string &bannersCss,
+             const std::string &teasersCss, long , long, double, double, double, double, int);//, int);
     virtual ~Informer();
 
     bool is_null() const
@@ -48,6 +49,13 @@ public:
 
     bool operator==(const Informer &other) const;
     bool operator<(const Informer &other) const;
+
+    bool isShortTerm() const {return range_short_term > 0;}
+    bool isLongTerm() const {return range_long_term > 0;}
+    bool isContext() const {return range_context > 0;}
+    bool isSearch() const {return range_search > 0;}
+    bool sphinxProcessEnable() const {
+        return range_short_term > 0 || range_long_term > 0 || range_context > 0 || range_search > 0;}
 
 private:
 

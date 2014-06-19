@@ -9,14 +9,15 @@ valid SMALLINT,
 impressionsPerDayLimit SMALLINT,
 showCoverage SMALLINT,
 retargeting SMALLINT,
+offer_by_campaign_unique SMALLINT,
 UNIQUE (id) ON CONFLICT IGNORE,
 UNIQUE (guid) ON CONFLICT IGNORE
 );
 
 CREATE INDEX IF NOT EXISTS idx_Campaign_id ON Campaign (id);
 CREATE INDEX IF NOT EXISTS idx_Campaign_guid ON Campaign (guid);
-CREATE INDEX IF NOT EXISTS idx_Campaign_showCoverage ON Campaign (showCoverage);
-CREATE INDEX IF NOT EXISTS idx_Campaign_impressionsPerDayLimit ON Campaign (impressionsPerDayLimit);
-CREATE INDEX IF NOT EXISTS idx_Campaign_valid ON Campaign (valid);
-CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting ON Campaign (retargeting);
+--CREATE INDEX IF NOT EXISTS idx_Campaign_showCoverage ON Campaign (showCoverage);
+--CREATE INDEX IF NOT EXISTS idx_Campaign_impressionsPerDayLimit ON Campaign (impressionsPerDayLimit);
+--CREATE INDEX IF NOT EXISTS idx_Campaign_valid ON Campaign (valid);
+--CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting ON Campaign (retargeting);
 CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting_valid ON Campaign (valid,retargeting);

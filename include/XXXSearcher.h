@@ -7,6 +7,7 @@
 #include <sphinxclient.h>
 
 #include "Offer.h"
+#include "Informer.h"
 #include "sphinxRequests.h"
 
 class XXXSearcher

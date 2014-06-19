@@ -378,9 +378,9 @@ bool Config::Load()
     //retargeting config
     if( (mElem = mRoot->FirstChildElement("retargeting")) )
     {
-        if( (mel = mElem->FirstChildElement("persents")) && (mel->GetText()) )
+        if( (mel = mElem->FirstChildElement("percentage")) && (mel->GetText()) )
         {
-            retargeting_by_persents_ = strtol(mel->GetText(),NULL,10);
+            retargeting_percentage_ = strtol(mel->GetText(),NULL,10);
         }
 
         if( (mel = mElem->FirstChildElement("ttl")) && (mel->GetText()) )
@@ -390,15 +390,6 @@ bool Config::Load()
         else
         {
             retargeting_by_time_ = 24*3600;
-        }
-
-        if( (mel = mElem->FirstChildElement("unique_by_campaign")) && (mel->GetText()) )
-        {
-            retargeting_unique_by_campaign_ = strncmp(mel->GetText(),"false", 5) > 0 ? false : true;
-        }
-        else
-        {
-            retargeting_unique_by_campaign_ = false;
         }
 
         redisHostAndPort(mElem, redis_retargeting_host_, redis_retargeting_port_);
@@ -524,15 +515,6 @@ bool Config::Load()
             shpinx_sort_mode_ = mel->GetText();
         }
 
-        if( (mel = mElem->FirstChildElement("min_offres_process")) && (mel->GetText()) )
-        {
-            shpinx_min_offres_process_ = atoi(mel->GetText());
-        }
-        else
-        {
-            shpinx_min_offres_process_ = 20;//default value
-        }
-
         if((mel = mElem->FirstChildElement("fields")))
         {
 
@@ -641,6 +623,9 @@ bool Config::Load()
 
     pDb = new DataBase(true);
 
+    module = Module_new();
+    Module_init(module);
+
     request_processed_ = 0;
     last_time_request_processed = 0;
     offer_processed_ = 0;
@@ -654,6 +639,8 @@ bool Config::Load()
 Config::~Config()
 {
     delete pDb;
+
+    Module_free(module);
 
     mInstance = NULL;
 }

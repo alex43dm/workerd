@@ -36,7 +36,6 @@ public:
     std::string image_url;      ///< URL картинки
     std::string swf;            ///< URL Flash
     long long campaign_id;    ///< ID кампании, к которой относится предложение
-    bool valid;                 ///< Является ли запись действительной.
     bool isOnClick;             ///< Реклама по кликам или показам
     Type type;			///< тип РП
     std::string conformity;		///< тип соответствия РП и запроса, изменяеться после выбора РП из индекса
@@ -49,6 +48,7 @@ public:
     int width;					///< ширина РП (имеет значение для баннеров)
     bool social;
     std::string campaign_guid;
+    unsigned unique_by_campaign;
 
     long long int token_int;
     std::string token;          ///< Токен для проверки ссылки
@@ -65,7 +65,6 @@ public:
           const std::string &image_url,
           const std::string &swf,
           long long campaign_id,
-          bool valid,
           bool isOnClick,
           int type,
           float rating,
@@ -74,7 +73,8 @@ public:
           int height,
           int width,
           bool social,
-          std::string campaign_guid);
+          std::string campaign_guid,
+          int unique_by_campaign);
 
     virtual ~Offer();
 

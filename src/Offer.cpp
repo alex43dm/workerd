@@ -13,7 +13,6 @@ Offer::Offer(const std::string &id,
              const std::string &image_url,
              const std::string &swf,
              long long campaign_id,
-             bool valid,
              bool isOnClick,
              int type_int,
              float rating,
@@ -22,7 +21,8 @@ Offer::Offer(const std::string &id,
              int height,
              int width,
              bool social,
-             std::string campaign_guid):
+             std::string campaign_guid,
+             int unique_by_campaign):
     id(id),
     id_int(id_int),
     title(title),
@@ -32,7 +32,6 @@ Offer::Offer(const std::string &id,
     image_url(image_url),
     swf(swf),
     campaign_id(campaign_id),
-    valid(valid),
     isOnClick(isOnClick),
     type(typeFromInt(type_int)),
     branch(EBranchL::L30),
@@ -42,7 +41,8 @@ Offer::Offer(const std::string &id,
     height(height),
     width(width),
     social(social),
-    campaign_guid(campaign_guid)
+    campaign_guid(campaign_guid),
+    unique_by_campaign((unsigned)unique_by_campaign)
 {
 }
 

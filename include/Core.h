@@ -62,7 +62,7 @@ private:
     bool checkBannerSize(const Offer *offer);
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(const Offer::Map &items, Offer::Vector &RISresult, unsigned outLen);
+    void RISAlgorithm(const Offer::Map &items, Offer::Vector &RISresult);
 
     bool isSocial (Offer& i);
 
@@ -77,7 +77,7 @@ private:
 #endif
     bool all_social;
 
-    unsigned teasersCount;
+    unsigned teasersCount, RetargetingCount;
 
     std::multimap<long,long> OutPutCampaignMap;
 
@@ -90,7 +90,7 @@ private:
 
     bool getOffers(bool getAll=false);
     Informer *getInformer();
-    void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen);
+    void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult);
 
     //bool contains( const Offer::Vector &v, const Offer::itV p) const {return std::find(v.begin(), v.end(), *p) != v.end();}
     //bool containsInRetargeting(const Offer::itV p)const {return contains(resultRetargeting, p);}

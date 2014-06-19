@@ -75,17 +75,13 @@ bool DataBase::openDb()
             return true;
         }
 
-        Log::gdb("open and create db");
+        std::clog<<"open and create db: "<<dbFileName<<std::endl;
 
         flags = SQLITE_OPEN_READWRITE;
 
-        if(dbFileName != ":memory:")
+        if(dbFileName != ":memory:" && !(reopen = BoostHelpers::fileExists(dbFileName)) )
         {
-            reopen = BoostHelpers::checkPath(dbFileName,true,true);
-            if(!reopen)
-            {
                 flags |= SQLITE_OPEN_CREATE;
-            }
         }
 
         pDatabase = new Kompex::SQLiteDatabase(dbFileName, flags, NULL);//SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | | SQLITE_OPEN_FULLMUTEX

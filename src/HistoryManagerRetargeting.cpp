@@ -45,7 +45,6 @@ void HistoryManager::getRetargeting()
                                    pStmt->GetColumnString(6),
                                    pStmt->GetColumnString(7),
                                    pStmt->GetColumnInt64(8),
-                                   true,
                                    pStmt->GetColumnBool(9),
                                    pStmt->GetColumnInt(10),
                                    pStmt->GetColumnDouble(11),
@@ -54,8 +53,11 @@ void HistoryManager::getRetargeting()
                                    pStmt->GetColumnInt(14),
                                    pStmt->GetColumnInt(15),
                                    pStmt->GetColumnBool(16),
-                                   pStmt->GetColumnString(17)
+                                   pStmt->GetColumnString(17),
+                                   pStmt->GetColumnInt(18)
                                   );
+
+            off->branch = EBranchL::L30;
 
             vretg.push_back(off);
         }
@@ -207,7 +209,7 @@ void HistoryManager::RetargetingClear()
     }
 
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
- //   pStmt->BeginTransaction();
+//   pStmt->BeginTransaction();
 
     try
     {

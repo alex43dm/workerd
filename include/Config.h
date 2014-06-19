@@ -7,6 +7,7 @@
 #include <tinyxml.h>
 
 #include "DataBase.h"
+#include "RedisClient.h"
 
 extern unsigned long request_processed_;
 extern unsigned long last_time_request_processed;
@@ -36,6 +37,8 @@ public:
     std::string redis_long_term_history_port_;
     std::string redis_user_view_history_host_;
     std::string redis_user_view_history_port_;
+    std::string redis_retargeting_host_;
+    std::string redis_retargeting_port_;
 
     int views_expire_;
     //int shortterm_expire_;
@@ -44,7 +47,6 @@ public:
     float range_long_term_;
     float range_context_;
     float range_search_;
-    unsigned offer_by_campaign_unique_;
 
     //new params
     std::string server_ip_;
@@ -68,18 +70,15 @@ public:
     std::string shpinx_match_mode_;
     std::string shpinx_rank_mode_;
     std::string shpinx_sort_mode_;
-    unsigned    shpinx_min_offres_process_;
 
     int         instanceId;
     std::string lock_file_;
     std::string pid_file_;
     std::string user_;
 
-    int retargeting_by_persents_;
+    int retargeting_percentage_;
     int retargeting_by_time_;
-    bool retargeting_unique_by_campaign_;
-    std::string redis_retargeting_host_;
-    std::string redis_retargeting_port_;
+    unsigned offer_by_campaign_unique_;
 
     std::string template_teaser_;
     std::string template_banner_;
@@ -97,6 +96,8 @@ public:
         logOutPutOfferIds,
         logSphinx
         ;
+
+    Module *module;
 
     DataBase *pDb;
 

@@ -386,9 +386,12 @@ bool ParentDB::InformerLoadAll()
         accountId = insertAndGetAccountId(x.getStringField("user"));
 
         sqlite3_snprintf(sizeof(buf),buf,
-                         "INSERT INTO Informer(id,guid,title,bannersCss,teasersCss,domainId,accountId,blocked,\
-             nonrelevant,valid,height,width,height_banner,width_banner,capacity,rtgPercentage) VALUES(\
-             %lld,'%q','%q','%q','%q',%lld,%lld,0,'%q',1,%d,%d,%d,%d,%d,%d);",
+                         "INSERT INTO Informer(id,guid,title,bannersCss,teasersCss,domainId,accountId,\
+             nonrelevant,valid,height,width,height_banner,width_banner,capacity,\
+             range_short_term, range_long_term, range_context, range_search, retargeting_capacity) VALUES(\
+             %lld,'%q','%q','%q','%q',%lld,%lld,\
+             '%q',1,%d,%d,%d,%d,%d,\
+             %s,%s,%s,%s,%s);",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getStringField("title"),
@@ -396,14 +399,19 @@ bool ParentDB::InformerLoadAll()
                          x.getStringField("css"),
                          domainId,
                          accountId,
+
                          x.getStringField("nonRelevant"),
                          x.getIntField("height"),
                          x.getIntField("width"),
                          x.getIntField("height_banner"),
                          x.getIntField("width_banner"),
                          capacity,
-                         0
-//                         x.getIntField("rtgPercentage") > 0 ? x.getIntField("rtgPercentage") : 0
+
+                         x.hasField("range_short_term") ? x.getStringField("range_short_term") : std::to_string(cfg->range_short_term_).c_str(),
+                         x.hasField("range_long_term") ? x.getStringField("range_long_term") : std::to_string(cfg->range_long_term_).c_str(),
+                         x.hasField("range_context") ? x.getStringField("range_context") : std::to_string(cfg->range_context_).c_str(),
+                         x.hasField("range_search") ? x.getStringField("range_search") : std::to_string(cfg->range_search_).c_str(),
+                         x.hasField("retargeting_capacity") ? x.getStringField("retargeting_capacity") : std::to_string((unsigned)(cfg->retargeting_percentage_*capacity/100)).c_str()
                         );
         try
         {
@@ -485,7 +493,8 @@ bool ParentDB::InformerUpdate(const std::string &id)
                          height_banner=%d,\
                          width_banner=%d,\
                          capacity=%d \
-                         rtgPercentage=%d \
+                         range_short_term=%s, range_long_term=%s, range_context=%s, range_search=%s \
+                         retargeting_capacity=%s \
                          WHERE id=%lld;",
                          x.getStringField("title"),
                          x.getStringField("css_banner"),
@@ -498,7 +507,11 @@ bool ParentDB::InformerUpdate(const std::string &id)
                          x.getIntField("height_banner"),
                          x.getIntField("width_banner"),
                          capacity,
-                         0,//x.getIntField("rtgPercentage"),
+                         x.hasField("range_short_term") ? x.getStringField("range_short_term") : std::to_string(cfg->range_short_term_).c_str(),
+                         x.hasField("range_long_term") ? x.getStringField("range_long_term") : std::to_string(cfg->range_long_term_).c_str(),
+                         x.hasField("range_context") ? x.getStringField("range_context") : std::to_string(cfg->range_context_).c_str(),
+                         x.hasField("range_search") ? x.getStringField("range_search") : std::to_string(cfg->range_search_).c_str(),
+                         x.hasField("retargeting_capacity") ? x.getStringField("retargeting_capacity") : std::to_string((unsigned)(cfg->retargeting_percentage_*capacity/100)).c_str(),
                          long_id
                         );
         try
@@ -547,35 +560,7 @@ void ParentDB::InformerRemove(const std::string &id)
 
     Log::info("informer %s removed",id.c_str());
 }
-/*
-void ParentDB::updateRating(const std::string &id)
-{
-    Kompex::SQLiteStatement *pStmt;
 
-    if(id.empty())
-    {
-        return;
-    }
-
-    pStmt = new Kompex::SQLiteStatement(pdb);
-    pStmt->BeginTransaction();
-    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Informer2OfferRating WHERE id_inf=%s;",id.c_str());
-        try
-        {
-            pStmt->SqlStatement(buf);
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            logDb(ex);
-        }
-    pStmt->CommitTransaction();
-    pStmt->FreeQuery();
-
-    delete pStmt;
-
-    Log::info("informer %s removed",id.c_str());
-}
-*/
 void ParentDB::CategoriesLoad()
 {
     if(!fConnectedToMainDatabase)
@@ -722,8 +707,8 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         bzero(buf,sizeof(buf));
         sqlite3_snprintf(sizeof(buf),buf,
                          "INSERT OR REPLACE INTO Campaign\
-                         (id,guid,title,project,social,valid,showCoverage,impressionsPerDayLimit,retargeting) \
-                         VALUES(%lld,'%q','%q','%q',%d,%d,%d,%d,%d);",
+                         (id,guid,title,project,social,valid,showCoverage,impressionsPerDayLimit,retargeting,offer_by_campaign_unique) \
+                         VALUES(%lld,'%q','%q','%q',%d,%d,%d,%d,%d,%s);",
                          long_id,
                          id.c_str(),
                          x.getStringField("title"),
@@ -732,7 +717,8 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                          o.isValid() ? 1 : 0,
                          cType,
                          x.getField("impressionsPerDayLimit").numberInt(),
-                         o.getBoolField("retargeting") ? 1 : 0
+                         o.getBoolField("retargeting") ? 1 : 0,
+                         x.hasField("offer_by_campaign_unique") ? x.getStringField("offer_by_campaign_unique") : std::to_string(cfg->offer_by_campaign_unique_).c_str()
                         );
         try
         {

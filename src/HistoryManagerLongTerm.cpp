@@ -5,7 +5,7 @@
 //----------------------------long term---------------------------------------
 void HistoryManager::getLongTerm()
 {
-    if(params->newClient && !pLongTerm->exists(key))
+    if(!pLongTerm->exists(key))
     {
         return;
     }
@@ -14,20 +14,18 @@ void HistoryManager::getLongTerm()
 
     if(strSH.empty())
     {
-        Log::warn("HistoryManager::%s empty",__func__);
+        std::clog<<"["<<tid<<"]HistoryManager::"<<__func__<<" long term empty"<<std::endl;
     }
-    else if(Config::Instance()->range_long_term_ > 0)
+    else
     {
         std::string q = getKeywordsString(strSH);
         if (!q.empty())
         {
             lock();
-            stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_long_term_,EBranchT::T5));
+            stringQuery.push_back(sphinxRequests(q,inf->range_long_term,EBranchT::T5));
             unlock();
         }
     }
-
-    Log::gdb("[%ld]HistoryManager::getLongTerm : done",tid);
 }
 
 void *HistoryManager::getLongTermEnv(void *data)
@@ -38,7 +36,7 @@ void *HistoryManager::getLongTermEnv(void *data)
 }
 bool HistoryManager::getLongTermAsync()
 {
-    if(params->newClient)
+    if(params->newClient || !inf->isLongTerm())
     {
         return true;
     }
@@ -49,7 +47,7 @@ bool HistoryManager::getLongTermAsync()
 
     if(pthread_create(&thrGetLongTermAsync, pAttr, &this->getLongTermEnv, this))
     {
-        Log::err("creating thread failed");
+        std::clog<<"["<<tid<<"]HistoryManager::"<<__func__<<" creating thread failed"<<std::endl;
     }
 
     pthread_attr_destroy(pAttr);
@@ -59,7 +57,7 @@ bool HistoryManager::getLongTermAsync()
 
 bool HistoryManager::getLongTermAsyncWait()
 {
-    if(params->newClient)
+    if(params->newClient || !inf->isLongTerm())
     {
         return true;
     }

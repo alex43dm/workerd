@@ -5,7 +5,7 @@
 //----------------------------short term---------------------------------------
 void HistoryManager::getShortTerm()
 {
-    if(params->newClient && !pShortTerm->exists(key))
+    if(!pShortTerm->exists(key))
     {
         return;
     }
@@ -14,20 +14,18 @@ void HistoryManager::getShortTerm()
 
     if(strSH.empty())
     {
-        Log::warn("HistoryManager::%s empty",__func__);
+        std::clog<<"["<<tid<<"]HistoryManager::"<<__func__<<" long term empty"<<std::endl;
     }
-    else if(Config::Instance()->range_short_term_ > 0)
+    else
     {
         std::string q = getKeywordsString(strSH);
         if (!q.empty())
         {
             lock();
-            stringQuery.push_back(sphinxRequests(q,Config::Instance()->range_short_term_,EBranchT::T3));
+            stringQuery.push_back(sphinxRequests(q,inf->range_short_term,EBranchT::T3));
             unlock();
         }
     }
-
-    Log::gdb("[%ld]HistoryManager::getShortTerm : done",tid);
 }
 
 void *HistoryManager::getShortTermEnv(void *data)
@@ -39,7 +37,7 @@ void *HistoryManager::getShortTermEnv(void *data)
 
 bool HistoryManager::getShortTermAsync()
 {
-    if(params->newClient)
+    if(params->newClient || !inf->isShortTerm())
     {
         return true;
     }
@@ -50,7 +48,7 @@ bool HistoryManager::getShortTermAsync()
 
     if(pthread_create(&thrGetShortTermAsync, pAttr, &this->getShortTermEnv, this))
     {
-        Log::err("creating thread failed");
+        std::clog<<"["<<tid<<"]HistoryManager::"<<__func__<<" creating thread failed"<<std::endl;
     }
 
     pthread_attr_destroy(pAttr);
@@ -60,7 +58,7 @@ bool HistoryManager::getShortTermAsync()
 
 bool HistoryManager::getShortTermAsyncWait()
 {
-    if(params->newClient)
+    if(params->newClient || !inf->isShortTerm())
     {
         return true;
     }
@@ -68,17 +66,4 @@ bool HistoryManager::getShortTermAsyncWait()
     pthread_join(thrGetShortTermAsync, 0);
 //    Log::gdb("HistoryManager::getShortTermAsyncWait return");
     return true;
-}
-
-void HistoryManager::updateShortHistory(const std::string & query)
-{
-    if(query.empty() && !updateShort)
-        return;
-    /*
-        history_archive[ShortTerm]->zadd(key, currentDateToInt(), query);
-        history_archive[ShortTerm]->expire(key, Config::Instance()->shortterm_expire_);
-        if (history_archive[ShortTerm]->zcount(key) >= 3)
-        {
-            history_archive[ShortTerm]->zremrangebyrank(key, 0, 0);
-        }*/
 }

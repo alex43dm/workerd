@@ -135,26 +135,31 @@ std::string Core::Process(Params *prms)
 //    Log::gdb("[%ld]getInformer: done",tid);
 
 #ifndef DUMMY
+    //init history search
+    hm->startGetUserHistory(params, informer);
+
     //load all history async
-    hm->getUserHistory(params);
+    hm->getDeprecatedOffersAsync();
+
+    hm->getRetargetingAsync();
+
+    hm->getTailOffersAsync();
 
     getOffers();
-//    Log::gdb("[%ld]getOffers: %d done",tid, items.size());
 
-    //wait all history load
-    hm->sphinxProcess(items, teasersMaxRating);
-//    Log::gdb("[%ld]sphinxProcess: done",tid);
+    //process history
+    hm->sphinxProcess(items);
 
-    //ris algorithm
+    //set tail
+    hm->getTailOffersAsyncWait();
+    hm->moveUpTailOffers(items, teasersMaxRating);
+
     hm->getRetargetingAsyncWait();
-    RISAlgorithmRetagreting(hm->vretg, vOutPut,
-                            vRIS.size() == (u_int)informer->capacity ? informer->RetargetingCount : informer->capacity);
-//    Log::gdb("[%ld]RISAlgorithmRetagreting: vOutPut %ld done",tid, vOutPut.size());
+    RISAlgorithmRetagreting(hm->vretg, vOutPut);
 
-    RISAlgorithm(items, vRIS, informer->capacity);
-//    Log::gdb("[%ld]RISAlgorithm: vRIS %ld done",tid, vRIS.size());
+    RISAlgorithm(items, vRIS);
 
-    informer->RetargetingCount = vOutPut.size();
+    RetargetingCount = vOutPut.size();
 
     //merge
     if( (vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner) ||
@@ -190,7 +195,6 @@ std::string Core::Process(Params *prms)
     }
 #else
     getOffers(items);
-//    Log::gdb("[%ld]getOffers: %d done",tid, items.size());
 
     for(auto i = items.begin(); i != items.end(); ++i)
     {
@@ -296,7 +300,7 @@ void Core::ProcessSaveResults()
             hm->setTailOffers(items,vOutPut);
         }
 
-        hm->updateUserHistory(vOutPut, informer->RetargetingCount);
+        hm->updateUserHistory(vOutPut, RetargetingCount);
 #endif // DUMMY
         try
         {
@@ -423,17 +427,14 @@ Informer *Core::getInformer()
                                      pStmt->GetColumnString(2),
                                      pStmt->GetColumnString(3),
                                      pStmt->GetColumnInt64(4),
-                                     pStmt->GetColumnInt64(5)
-                                     //                     pStmt->GetColumnInt(6)
+                                     pStmt->GetColumnInt64(5),
+                                     pStmt->GetColumnDouble(6),
+                                     pStmt->GetColumnDouble(7),
+                                     pStmt->GetColumnDouble(8),
+                                     pStmt->GetColumnDouble(9),
+                                     pStmt->GetColumnInt(10)
                                     );
 
-//            if(!informer->rtgPercentage){
-            informer->RetargetingCount  =
-                informer->capacity * Config::Instance()->retargeting_by_persents_ / 100;
-            //          }else{
-            //            informer->RetargetingCount  =
-            //          informer->capacity * informer->rtgPercentage / 100;
-            //            }
             break;
         }
     }
@@ -636,7 +637,6 @@ bool Core::getOffers(bool getAll)
                                    pStmt->GetColumnString(6),
                                    pStmt->GetColumnString(7),
                                    pStmt->GetColumnInt64(8),
-                                   true,
                                    pStmt->GetColumnBool(9),
                                    pStmt->GetColumnInt(10),
                                    pStmt->GetColumnDouble(11),
@@ -645,7 +645,8 @@ bool Core::getOffers(bool getAll)
                                    pStmt->GetColumnInt(14),
                                    pStmt->GetColumnInt(15),
                                    pStmt->GetColumnBool(16),
-                                   pStmt->GetColumnString(17)
+                                   pStmt->GetColumnString(17),
+                                   pStmt->GetColumnInt(18)
                                   );
 
             if(!off->social)
@@ -761,8 +762,8 @@ bool Core::checkBannerSize(const Offer *offer)
 	если выбранных тизеров достаточно для РБ, показываем.
 	если нет - добираем из исходного массива стоящие слева тизеры.
  */
-#define FULL RISResult.size() >= outLen
-void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsigned outLen)
+#define FULL RISResult.size() >= informer->capacity
+void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
 {
     Offer::itV p;
     Offer::Vector result;
@@ -771,9 +772,9 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
 
 //    RISResult.clear();
 
-    if(items.size() == 0 && (0 >= outLen && outLen > 1024))
+    if( items.size() == 0 )
     {
-        std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "error items size: "<<items.size()<<" outLen: "<<outLen<<std::endl;
+        std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "error items size: 0"<<std::endl;
         return;
     }
 
@@ -810,12 +811,12 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     teasersMediumRating /= teasersCount;
 
     //size check
-    if(result.size() <= outLen)
+    if(result.size() <= informer->capacity)
     {
 #ifndef DUMMY
         hm->clean = true;
 #endif // DUMMY
-        std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "result size less or equal: "<<result.size()<<" outLen: "<<outLen<<", clean history"<<std::endl;
+        std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "result size less or equal: "<<result.size()<<" outLen: "<<informer->capacity<<", clean history"<<std::endl;
     }
 
     //check is all social
@@ -830,7 +831,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     //add teaser when teaser unique id and with company unique and rating > 0
     for(p = result.begin(); p != result.end(); ++p)
     {
-        if((!OutPutCampaignMap.count((*p)->campaign_id) < cfg->offer_by_campaign_unique_)
+        if((!OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign)
                 && (*p)->rating > 0.0
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
@@ -856,9 +857,9 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     }
 
     //add teaser when teaser unique id and with company unique and with any rating
-    for(p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
+    for(p = result.begin(); p!=result.end() && RISResult.size() < informer->capacity; ++p)
     {
-        if(!OutPutCampaignMap.count((*p)->campaign_id)
+        if((!OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign)
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
             if(FULL)
@@ -877,7 +878,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
     }
 
     //add teaser when teaser unique id and with id unique and with any rating
-    for(p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
+    for(p = result.begin(); p != result.end() && RISResult.size() < informer->capacity; ++p)
     {
         if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
@@ -898,7 +899,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult, unsig
 
     //expand to return size
     loopCount = RISResult.size();
-    for(p = result.begin(); loopCount < outLen && p != result.end(); ++p, loopCount++)
+    for(p = result.begin(); loopCount < informer->capacity && p != result.end(); ++p, loopCount++)
     {
         RISResult.push_back(*p);
         OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
@@ -927,7 +928,7 @@ links_make:
     }
 }
 //
-void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult, unsigned outLen)
+void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult)
 {
     RISResult.clear();
 
@@ -947,11 +948,11 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
             goto make_return;
         }
 
-        if(!OutPutCampaignMap.count((*p)->campaign_id)
+        if((!OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign)
                 && (*p)->rating > 0.0
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
-            if(RISResult.size() < outLen)
+            if(RISResult.size() < informer->retargeting_capacity)
             {
                 RISResult.push_back(*p);
                 OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
@@ -964,14 +965,14 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
     }
 
     //add teaser when teaser unique id and with company unique and any rating
-    if(RISResult.size() < outLen)
+    if(RISResult.size() < informer->retargeting_capacity)
     {
-        for(auto p = result.begin(); p!=result.end() && RISResult.size() < outLen; ++p)
+        for(auto p = result.begin(); p!=result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
         {
-            if(!OutPutCampaignMap.count((*p)->campaign_id)
+        if((!OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign)
                     && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
             {
-                if(RISResult.size() < outLen)
+                if(RISResult.size() < informer->retargeting_capacity)
                 {
                     RISResult.push_back(*p);
                     OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
@@ -985,15 +986,13 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
     }
 
     //add teaser when teaser unique id
-    if(!Config::Instance()->retargeting_unique_by_campaign_)
-    {
-        if(RISResult.size() < outLen)
+        if(RISResult.size() < informer->retargeting_capacity)
         {
-            for(auto p = result.begin(); p != result.end() && RISResult.size() < outLen; ++p)
+            for(auto p = result.begin(); p != result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
             {
                 if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
                 {
-                    if(RISResult.size() < outLen)
+                    if(RISResult.size() < informer->retargeting_capacity)
                     {
                         RISResult.push_back(*p);
                         OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
@@ -1005,7 +1004,6 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
                 }
             }
         }
-    }
 
 make_return:
     //redirect links make

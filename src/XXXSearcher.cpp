@@ -111,6 +111,11 @@ void XXXSearcher::processKeywords(
 {
     float oldRating;
 
+    if( sr.size() == 0 )
+    {
+        return;
+    }
+
     try
     {
         sphinx_result * res;
@@ -150,7 +155,7 @@ void XXXSearcher::processKeywords(
                 dumpResult(res);
             }
 
-            for ( int i=0; i<res->num_matches; i++ )
+            for( int i=0; i<res->num_matches; i++ )
             {
                 if (res->num_attrs != 6)
                 {
@@ -174,8 +179,8 @@ void XXXSearcher::processKeywords(
 
                 oldRating = pOffer->rating;
                 pOffer->rating = pOffer->rating
-                    + (sr.size()>(unsigned)tt ? sr[tt].rate : 1) * maxRating
-                    + weight;
+                    + (sr.size()>(unsigned)tt ? sr[tt].rate : 1)
+                    * (maxRating + weight);
                     //+ sphinx_get_float(res, i, 1);
 
                 //pOffer->rating = weight * (int)sr.size() > tt ? sr[tt].rate : 1;// * startRating;
