@@ -623,9 +623,6 @@ bool Config::Load()
 
     pDb = new DataBase(true);
 
-    module = Module_new();
-    Module_init(module);
-
     request_processed_ = 0;
     last_time_request_processed = 0;
     offer_processed_ = 0;
@@ -639,8 +636,6 @@ bool Config::Load()
 Config::~Config()
 {
     delete pDb;
-
-    Module_free(module);
 
     mInstance = NULL;
 }

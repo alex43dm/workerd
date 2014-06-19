@@ -79,7 +79,7 @@ bool HistoryManager::getDeprecatedOffers()
 
         if(!pViewHistory->getRange(key, 0, -1, offers))
         {
-            std::clog<<"["<<tid<<"]"<<__func__<<" pViewHistory->getRange error: "<<Module_last_error(cfg->module)<<" for key: "<<key<<std::endl;
+            std::clog<<"["<<tid<<"]"<<__func__<<" pViewHistory->getRange error: "<<Module_last_error(module)<<" for key: "<<key<<std::endl;
         }
         else
         {

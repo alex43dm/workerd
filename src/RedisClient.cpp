@@ -64,7 +64,7 @@ bool RedisClient::getRange(const std::string &key,
 
     if(rr <= 0)
     {
-        std::clog<<__func__<<" cmd: "<<cmd<<" error: "<<Module_last_error(cfg->module)<<std::endl;
+        std::clog<<__func__<<" error Executor_execute"<<std::endl;
         ret = false;
     }
     else
@@ -77,7 +77,7 @@ bool RedisClient::getRange(const std::string &key,
         {
             if(reply_type == RT_ERROR)
             {
-                std::clog<<__func__<<" error: "<<reply_data<<" module error: "<<Module_last_error(cfg->module)<<std::endl;
+                std::clog<<__func__<<" error: "<<reply_data<<std::endl;
 
                 ret = false;
             }

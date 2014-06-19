@@ -97,8 +97,6 @@ public:
         logSphinx
         ;
 
-    Module *module;
-
     DataBase *pDb;
 
     static Config* Instance();
