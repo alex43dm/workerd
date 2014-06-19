@@ -4,7 +4,11 @@ SELECT 	inf.id,
 	inf.teasersCss,
 	inf.domainId,
 	inf.accountId,
-	inf.rtgPercentage
+    inf.range_short_term,
+	inf.range_long_term,
+	inf.range_context,
+	inf.range_search,
+	inf.retargeting_capacity
 FROM Informer AS inf
 WHERE inf.guid='%s'
 LIMIT 1;
