@@ -27,7 +27,7 @@ void HistoryManager::getRetargeting()
         ids += (*i);
     }
 
-    sqlite3_snprintf(sizeof(buf), buf, Config::Instance()->retargetingOfferSqlStr.c_str(), params->getUserKeyLong(), ids.c_str());
+    sqlite3_snprintf(sizeof(buf), buf, cfg->retargetingOfferSqlStr.c_str(), params->getUserKeyLong(), ids.c_str());
 
     try
     {
@@ -66,12 +66,8 @@ void HistoryManager::getRetargeting()
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DB error: %s", ex.GetString().c_str());
+        std::clog<<__func__<<" Kompex::SQLiteException: "<<ex.GetString()<<std::endl;
     }
-
-#ifdef DEBUG
-    Log::info("[%ld]HistoryManager::getRetargeting : done",tid);
-#endif // DEBUG
 }
 
 void *HistoryManager::getRetargetingEnv(void *data)
@@ -94,7 +90,7 @@ bool HistoryManager::getRetargetingAsync()
 
     if(pthread_create(&thrGetRetargetingAsync, pAttr, &this->getRetargetingEnv, this))
     {
-        Log::err("creating thread failed");
+        std::clog<<"creating thread failed"<<std::endl;
     }
 
     pthread_attr_destroy(pAttr);
@@ -111,9 +107,6 @@ void HistoryManager::getRetargetingAsyncWait()
     }
 
     pthread_join(thrGetRetargetingAsync, 0);
-#ifdef DEBUG
-    Log::info("[%ld]HistoryManager::getRetargetingAsyncWait return",tid);
-#endif // DEBUG
     return;
 }
 
@@ -162,7 +155,7 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items, unsigned len)
 
             if(viewTime)
             {
-                if(viewTime + Config::Instance()->retargeting_by_time_ > std::time(0))
+                if(viewTime + cfg->retargeting_by_time_ > std::time(0))
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
                                      "UPDATE Retargeting SET uniqueHits=uniqueHits-1 WHERE id=%lli AND offerId=%lli;",
@@ -192,10 +185,6 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items, unsigned len)
     //pStmt->CommitTransaction();
     pStmt->FreeQuery();
     delete pStmt;
-
-#ifdef DEBUG
-    Log::info("[%ld]HistoryManager::RetargetingUpdate return",tid);
-#endif // DEBUG
 }
 
 void HistoryManager::RetargetingClear()
@@ -226,8 +215,4 @@ void HistoryManager::RetargetingClear()
 //    pStmt->CommitTransaction();
     pStmt->FreeQuery();
     delete pStmt;
-
-#ifdef DEBUG
-    Log::info("[%ld]HistoryManager::RetargetingClear return",tid);
-#endif // DEBUG
 }

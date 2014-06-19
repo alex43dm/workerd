@@ -14,7 +14,7 @@ void HistoryManager::getShortTerm()
 
     if(strSH.empty())
     {
-        std::clog<<"["<<tid<<"]HistoryManager::"<<__func__<<" long term empty"<<std::endl;
+        std::clog<<"["<<tid<<"]HistoryManager::"<<__func__<<" sort term empty"<<std::endl;
     }
     else
     {
