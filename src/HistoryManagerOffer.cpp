@@ -112,7 +112,7 @@ bool HistoryManager::getDeprecatedOffers()
     }
     else
     {
-        std::clog<<"["<<tid<<"]"<<__func__<<" no history for key:"<<key<<std::endl;
+        std::clog<<"["<<tid<<"]"<<__func__<<" pViewHistory->exists error: "<<Module_last_error(module)<<" no history for key: "<<key<<std::endl;
     }
 
     return true;

@@ -265,9 +265,52 @@ bool RedisClient::isConnected() const
 
 bool RedisClient::exists(const std::string &key)
 {
+    bool ret = false;
+    Batch *batch;
+    Executor *executor;
+
+    batch= Batch_new();
+
     bzero(cmd,CMD_SIZE);
     snprintf(cmd, CMD_SIZE, "EXISTS %s\r\n", key.c_str());
-    return execCmd(cmd);
+    Batch_write(batch, cmd, strlen(cmd), 1);
+
+    executor = Executor_new();
+    Executor_add(executor, connection, batch);
+
+    int rr = Executor_execute(executor, timeOutMSec);
+    Executor_free(executor);
+    if(rr <= 0)
+    {
+        std::clog<<"redis exists false for key:"<<key<<std::endl;
+        Batch_free(batch);
+        return ret;
+    }
+    else
+    {
+        ReplyType reply_type;
+        char *reply_data;
+        size_t reply_len;
+        int level;
+        while((level = Batch_next_reply(batch, &reply_type, &reply_data, &reply_len)))
+        {
+            if(reply_type == RT_ERROR)
+            {
+                std::clog<<"redis exists false for key:"<<key<<" error: "<<reply_data<<std::endl;
+            }
+            else if(reply_type == RT_INTEGER)
+            {
+                if(strtol(reply_data,NULL,10) == 1)
+                {
+                    ret = true;
+                }
+                break;
+            }
+        }
+    }
+
+    Batch_free(batch);
+    return ret;
 }
 
 long int RedisClient::zrank(const std::string &key, long id)
