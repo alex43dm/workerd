@@ -61,7 +61,7 @@
 <!--ретаргетинг-->
 <retargeting>
     <!--представление, в процентах, в исходящей выборке-->
-    <persents>50</persents>
+    <percentage>50</percentage>
     <!--Redis-сервер с БД о Ретаргетинге-->
     <redis>
             <!--IP-адрес-->
@@ -71,14 +71,13 @@
     </redis>
     <!--период жизни(ЧЧ:ММ:СС)-->
     <ttl>06:00:00</ttl>
-    <!--выдерживать уникальность кампаний в исходящей выборке-->
-    <unique_by_campaign>false</unique_by_campaign>
 </retargeting>
 
 <!--история-->
 <history>
     <!--количество предложений одной кампании в блоке(1..100)-->
     <offer_by_campaign_unique>2</offer_by_campaign_unique>
+
     <!--история показа-->
     <views>
         <ttl>10:00:00</ttl>
@@ -96,7 +95,7 @@
                 0 - отключить
                 1 - максимальный рейтинг
         -->
-        <value>0</value>
+        <value>0.5</value>
         <ttl>24:00:00</ttl>
         <!--Redis-сервер с БД о краткосрочной истории пользователя-->
         <redis>
@@ -127,7 +126,7 @@
                 0 - отключить
                 1 - максимальный рейтинг
         -->
-        <value>0</value>
+        <value>0.1</value>
         <!--"Продолжительность жизни" ключей в базе истории контекста страницы-->
     </context>
     <!--поисковым запросам пользователя страницы-->
@@ -136,7 +135,7 @@
                 0 - отключить
                 1 - максимальный рейтинг
         -->
-        <value>0</value>
+        <value>1</value>
     </search>
 </history>
 
@@ -204,7 +203,6 @@
         <!--phrases>90</phrases-->
         <!--minuswords>100</minuswords-->
     </fields>
-    <min_offres_process>10</min_offres_process><!-- 20 default value -->
 </sphinx>
 
 <log>

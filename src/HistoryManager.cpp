@@ -157,7 +157,7 @@ mongo::BSONObj HistoryManager::BSON_Keywords()
 
     return         mongo::BSONObjBuilder().
                    append("ShortTermHistory", shortTermArray).
-                   append("longtermhistory", longTermArray)
+                   append("LongTermHistory", longTermArray)
                    //append("contexttermhistory", contextTermArray)
                    .obj()
                    ;

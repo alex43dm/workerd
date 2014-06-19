@@ -58,8 +58,6 @@ bool HistoryManager::moveUpTailOffers(Offer::Map &items, float teasersMaxRating)
                 items[*i]->rating = items[*i]->rating + teasersMaxRating;
             }
         }
-
-        mtailOffers.clear();
     }
 
     return true;
