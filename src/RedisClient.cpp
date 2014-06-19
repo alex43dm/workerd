@@ -10,7 +10,7 @@
 #define CMD_SIZE 4096
 
 RedisClient::RedisClient(const std::string &host, const std::string &port, int expireTime) :
-    timeOutMSec(1000),
+    timeOutMSec(100000),
     expireTime(expireTime),
     host(host),
     port(port),
@@ -42,6 +42,21 @@ bool RedisClient::connect()
     isConnected_ = true;
     return true;
 }
+
+bool RedisClient::reconnect()
+{
+    isConnected_ = false;
+    Connection_free(connection);
+    connection = Connection_new((host + ":" + port).c_str());
+    if(connection==NULL)
+    {
+        Log::err("redis cannot connect to %s port %s", host.c_str(), port.c_str());
+        return false;
+    }
+    isConnected_ = true;
+    return true;
+}
+
 
 bool RedisClient::getRange(const std::string &key,
                            int start,
@@ -284,6 +299,7 @@ bool RedisClient::exists(const std::string &key)
     {
         std::clog<<"redis exists false for key:"<<key<<std::endl;
         Batch_free(batch);
+        reconnect();
         return ret;
     }
     else
@@ -296,7 +312,9 @@ bool RedisClient::exists(const std::string &key)
         {
             if(reply_type == RT_ERROR)
             {
+                //error: Connection error read eof [addr: 127.0.0.1:6380]
                 std::clog<<"redis exists false for key:"<<key<<" error: "<<reply_data<<std::endl;
+                reconnect();
             }
             else if(reply_type == RT_INTEGER)
             {

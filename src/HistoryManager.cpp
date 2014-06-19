@@ -45,7 +45,7 @@ bool HistoryManager::initDB()
     module = Module_new();
     Module_init(module);
 
-    pViewHistory = new RedisClient(cfg->redis_user_view_history_host_, cfg->redis_user_view_history_port_,Config::Instance()->views_expire_);
+    pViewHistory = new RedisClient(cfg->redis_user_view_history_host_, cfg->redis_user_view_history_port_,cfg->views_expire_);
     pViewHistory->connect();
 
     pShortTerm = new RedisClient(cfg->redis_short_term_history_host_, cfg->redis_short_term_history_port_,REDIS_TIMEOUT);
