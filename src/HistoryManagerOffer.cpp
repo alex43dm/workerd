@@ -31,7 +31,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
 
         try
         {
-            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Retargeting WHERE id=%lli;",params->getUserKeyLong());
+            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE id=%lli;",params->getUserKeyLong());
             pStmt->SqlStatement(buf);
         }
         catch(Kompex::SQLiteException &ex)
