@@ -111,8 +111,13 @@ void XXXSearcher::processKeywords(
 {
     float oldRating;
 
+
     if( sr.size() == 0 )
     {
+        if(cfg->logSphinx)
+        {
+            std::clog<<"sphinx: 0 request"<<std::endl;
+        }
         return;
     }
 
