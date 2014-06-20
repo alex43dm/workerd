@@ -38,7 +38,7 @@ bool Config::LoadConfig(const std::string fName)
     return Load();
 }
 
-void Config::redisHostAndPort(TiXmlElement *p, std::string &host, std::string &port)
+void Config::redisHostAndPort(TiXmlElement *p, std::string &host, std::string &port, unsigned &timeout)
 {
     TiXmlElement *t1, *t2;
 
@@ -52,6 +52,11 @@ void Config::redisHostAndPort(TiXmlElement *p, std::string &host, std::string &p
         if( (t2 = t1->FirstChildElement("port")) && (t2->GetText()) )
         {
             port = t2->GetText();
+        }
+
+        if( (t2 = t1->FirstChildElement("timeout")) && (t2->GetText()) )
+        {
+            timeout = strtol(t2->GetText(),NULL,10);
         }
     }
 }
@@ -392,7 +397,7 @@ bool Config::Load()
             retargeting_by_time_ = 24*3600;
         }
 
-        redisHostAndPort(mElem, redis_retargeting_host_, redis_retargeting_port_);
+        redisHostAndPort(mElem, redis_retargeting_host_, redis_retargeting_port_, redis_retargeting_timeout_);
     }
     else
     {
@@ -430,7 +435,7 @@ bool Config::Load()
                 views_expire_ = 24*3600;
             }
 
-            redisHostAndPort(section, redis_user_view_history_host_, redis_user_view_history_port_);
+            redisHostAndPort(section, redis_user_view_history_host_, redis_user_view_history_port_,redis_user_view_history_timeout_);
         }
         //short term
         if( (section = history->FirstChildElement("short_term")) )
@@ -450,7 +455,7 @@ bool Config::Load()
                 range_short_term_ = ::atof(mel->GetText());
             }
 
-            redisHostAndPort(section, redis_short_term_history_host_, redis_short_term_history_port_);
+            redisHostAndPort(section, redis_short_term_history_host_, redis_short_term_history_port_,redis_short_term_history_timeout_);
         }
         //long term
         if( (section = history->FirstChildElement("long_term")) )
@@ -459,7 +464,8 @@ bool Config::Load()
             {
                 range_long_term_ = ::atof(mel->GetText());
             }
-            redisHostAndPort(section, redis_long_term_history_host_, redis_long_term_history_port_);
+
+            redisHostAndPort(section, redis_long_term_history_host_, redis_long_term_history_port_,redis_long_term_history_timeout_);
         }
         //context
         if( (section = history->FirstChildElement("context")) )

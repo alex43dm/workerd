@@ -68,6 +68,7 @@
             <host>127.0.0.1</host>
             <!--порт-->
             <port>6380</port>
+            <timeout>1000</timeout>
     </redis>
     <!--период жизни(ЧЧ:ММ:СС)-->
     <ttl>06:00:00</ttl>
@@ -87,6 +88,7 @@
             <host>127.0.0.1</host>
             <!--порт-->
             <port>6377</port>
+            <timeout>1000</timeout>
         </redis>
     </views>
     <!--кратскосрочная история-->
@@ -103,6 +105,7 @@
             <host>127.0.0.1</host>
             <!--порт-->
             <port>6379</port>
+            <timeout>1000</timeout>
         </redis>
     </short_term>
     <!--долгосрочная история-->
@@ -118,6 +121,7 @@
             <host>127.0.0.1</host>
             <!--порт-->
             <port>6378</port>
+            <timeout>1000</timeout>
         </redis>
     </long_term>
     <!--контекст страницы-->

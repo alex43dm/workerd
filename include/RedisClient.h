@@ -13,7 +13,7 @@ class RedisClient
         int timeOutMSec;
         int expireTime;
 
-        RedisClient(const std::string &host, const std::string &port, int expireTime);
+        RedisClient(const std::string &host, const std::string &port, int expireTime, unsigned);
         virtual ~RedisClient();
 
         bool connect();

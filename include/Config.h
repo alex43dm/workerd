@@ -33,12 +33,17 @@ public:
 
     std::string redis_short_term_history_host_;
     std::string redis_short_term_history_port_;
+    unsigned redis_short_term_history_timeout_;
     std::string redis_long_term_history_host_;
     std::string redis_long_term_history_port_;
+    unsigned redis_long_term_history_timeout_;
     std::string redis_user_view_history_host_;
     std::string redis_user_view_history_port_;
+    unsigned redis_user_view_history_timeout_;
     std::string redis_retargeting_host_;
     std::string redis_retargeting_port_;
+    unsigned redis_retargeting_timeout_;
+
 
     int views_expire_;
     //int shortterm_expire_;
@@ -130,7 +135,7 @@ private:
 
     int getTime(const char *p);
     std::string getFileContents(const std::string &fileName);
-    void redisHostAndPort(TiXmlElement *p, std::string &host, std::string &port);
+    void redisHostAndPort(TiXmlElement *p, std::string &host, std::string &port, unsigned&);
     void exit(const std::string &mes);
     bool checkPath(const std::string &path_, bool checkWrite, bool isFile, std::string &mes);
 };

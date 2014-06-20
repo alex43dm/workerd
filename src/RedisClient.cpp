@@ -9,8 +9,8 @@
 
 #define CMD_SIZE 4096
 
-RedisClient::RedisClient(const std::string &host, const std::string &port, int expireTime) :
-    timeOutMSec(2000),
+RedisClient::RedisClient(const std::string &host, const std::string &port, int expireTime, unsigned timeOutMSec) :
+    timeOutMSec(timeOutMSec),
     expireTime(expireTime),
     host(host),
     port(port),

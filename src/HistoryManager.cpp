@@ -2,7 +2,7 @@
 #include "Config.h"
 #include "Log.h"
 
-#define REDIS_TIMEOUT 3 * 24 * 3600
+#define REDIS_EXPIRE 3 * 24 * 3600
 #define SPHINX_CAPACITY_COUNT 2
 
 static const char * EnumHistoryTypeStrings[] = {"ShortTerm", "LongTerm", "ViewHistory", "Category","Retargeting"};
@@ -45,16 +45,28 @@ bool HistoryManager::initDB()
     module = Module_new();
     Module_init(module);
 
-    pViewHistory = new RedisClient(cfg->redis_user_view_history_host_, cfg->redis_user_view_history_port_,cfg->views_expire_);
+    pViewHistory = new RedisClient(cfg->redis_user_view_history_host_,
+                                   cfg->redis_user_view_history_port_,
+                                   cfg->views_expire_,
+                                   cfg->redis_long_term_history_timeout_);
     pViewHistory->connect();
 
-    pShortTerm = new RedisClient(cfg->redis_short_term_history_host_, cfg->redis_short_term_history_port_,REDIS_TIMEOUT);
+    pShortTerm = new RedisClient(cfg->redis_short_term_history_host_,
+                                 cfg->redis_short_term_history_port_,
+                                 REDIS_EXPIRE,
+                                 cfg->redis_short_term_history_timeout_);
     pShortTerm->connect();
 
-    pLongTerm = new RedisClient(cfg->redis_long_term_history_host_, cfg->redis_long_term_history_port_,REDIS_TIMEOUT);
+    pLongTerm = new RedisClient(cfg->redis_long_term_history_host_,
+                                cfg->redis_long_term_history_port_,
+                                REDIS_EXPIRE,
+                                cfg->redis_long_term_history_timeout_);
     pLongTerm->connect();
 
-    pRetargeting = new RedisClient(cfg->redis_retargeting_host_, cfg->redis_retargeting_port_,REDIS_TIMEOUT);
+    pRetargeting = new RedisClient(cfg->redis_retargeting_host_,
+                                   cfg->redis_retargeting_port_,
+                                   REDIS_EXPIRE,
+                                   cfg->redis_retargeting_timeout_);
     pRetargeting->connect();
 
     return true;
@@ -197,20 +209,20 @@ RedisClient *HistoryManager::getHistoryPointer(const HistoryType type) const
 {
     switch(type)
     {
-        case ViewHistory:
-            return pViewHistory;
-            break;
-        case ShortTerm:
-            return pShortTerm;
-            break;
-        case LongTerm:
-            return pLongTerm;
-            break;
-        case Retargeting:
-            return pRetargeting;
-            break;
-        default:
-            return nullptr;
+    case ViewHistory:
+        return pViewHistory;
+        break;
+    case ShortTerm:
+        return pShortTerm;
+        break;
+    case LongTerm:
+        return pLongTerm;
+        break;
+    case Retargeting:
+        return pRetargeting;
+        break;
+    default:
+        return nullptr;
     }
 }
 
