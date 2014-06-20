@@ -322,10 +322,10 @@ bool RedisClient::exists(const std::string &key)
                 break;
             }
         }
-
         Executor_free(executor);
-        Batch_free(batch);
     }
+
+    Batch_free(batch);
 
     return ret;
 }
