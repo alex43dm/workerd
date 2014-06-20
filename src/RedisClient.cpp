@@ -294,13 +294,10 @@ bool RedisClient::exists(const std::string &key)
     Executor_add(executor, connection, batch);
 
     int rr = Executor_execute(executor, timeOutMSec);
-    Executor_free(executor);
     if(rr <= 0)
     {
         std::clog<<"redis exists false for key:"<<key<<std::endl;
-        Batch_free(batch);
         reconnect();
-        return ret;
     }
     else
     {
@@ -325,9 +322,11 @@ bool RedisClient::exists(const std::string &key)
                 break;
             }
         }
+
+        Executor_free(executor);
+        Batch_free(batch);
     }
 
-    Batch_free(batch);
     return ret;
 }
 
