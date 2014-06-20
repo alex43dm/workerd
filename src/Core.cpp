@@ -139,7 +139,7 @@ std::string Core::Process(Params *prms)
     hm->startGetUserHistory(params, informer);
 
     //load all history async
-    hm->getDeprecatedOffersAsync();
+    //hm->getDeprecatedOffersAsync();
 
     hm->getRetargetingAsync();
 
@@ -579,10 +579,9 @@ bool Core::getOffers(bool getAll)
                          informer->id,
                          informer->id,
                          informer->id,
-                         getpid(),
-                         tid,
+                         params->getUserKeyLong(),
                          informer->id);
-        hm->getDeprecatedOffersAsyncWait();
+        //hm->getDeprecatedOffersAsyncWait();
     }
     else
     {

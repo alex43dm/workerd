@@ -11,6 +11,10 @@ bool HistoryManager::clearDeprecatedOffers()
 
 bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned len)
 {
+    char buf[8192];
+    Kompex::SQLiteStatement *pStmt;
+    int viewTime = 0;
+
     if(cfg->logOutPutOfferIds)
     {
         std::clog<<" OutPutOfferIds: ";
@@ -30,6 +34,8 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
         std::clog<<", ids:";
     }
 
+    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+
     for(auto it = items.begin()+len; it != items.end(); ++it)
     {
         if(cfg->logOutPutOfferIds)
@@ -37,119 +43,44 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
             std::clog<<" "<<(*it)->id<<" "<<(*it)->id_int<<" hits:"<<(*it)->uniqueHits<<" rate:"<<(*it)->rating;
         }
 
-        if ((*it)->uniqueHits > 0)
+        try
         {
-            if (pViewHistory->exists(key))
+            sqlite3_snprintf(sizeof(buf),buf,
+                             "SELECT viewTime FROM Session WHERE id=%lli AND offerId=%lli;",
+                             params->getUserKeyLong(), (*it)->id_int);
+
+            pStmt->Sql(buf);
+            pStmt->FetchRow();
+            viewTime = pStmt->GetColumnInt64(0);
+            pStmt->Reset();
+
+            if(viewTime)
             {
-                if (pViewHistory->zrank(key,(*it)->id_int) > 0) //if rank == -1
+                if(viewTime + cfg->retargeting_by_time_ > std::time(0))
                 {
-                    if (pViewHistory->zscore(key,(*it)->id_int) > 0)
-                    {
-                        pViewHistory->zincrby(key, (*it)->id_int, -1);
-                    }
+                    sqlite3_snprintf(sizeof(buf),buf,
+                                     "UPDATE Session SET uniqueHits=uniqueHits-1 WHERE id=%lli AND offerId=%lli;",
+                                     params->getUserKeyLong(), (*it)->id_int);
                 }
                 else
                 {
-                    pViewHistory->zadd(key,(*it)->uniqueHits - 1, (*it)->id_int);
-                    pViewHistory->expire(key, cfg->views_expire_);
+                    sqlite3_snprintf(sizeof(buf),buf,
+                                     "DELETE FROM Session WHERE id=%lli AND offerId=%lli;",
+                                     params->getUserKeyLong(), (*it)->id_int);
                 }
             }
-            else//if not exists
+            else
             {
-                pViewHistory->zadd(key,(*it)->uniqueHits - 1, (*it)->id_int);
-                pViewHistory->expire(key, cfg->views_expire_);
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO Session(id,offerId,uniqueHits,viewTime) VALUES(%lli,%lli,%d,%lli);",
+                                 params->getUserKeyLong(), (*it)->id_int, (*it)->uniqueHits-1,std::time(0));
             }
+            pStmt->SqlStatement(buf);
         }
-    }
-    return true;
-}
-
-#define OFFER_SIZE 10
-
-bool HistoryManager::getDeprecatedOffers()
-{
-    if(params->newClient)
-    {
-        return true;
-    }
-
-    if(pViewHistory->exists(key))
-    {
-        std::list<std::string> offers;
-
-        if(!pViewHistory->getRange(key, 0, -1, offers))
+        catch(Kompex::SQLiteException &ex)
         {
-            std::clog<<"["<<tid<<"]"<<__func__<<" View History getRange error for key: "<<key<<std::endl;
+            Log::err("HistoryManager::setDeprecatedOffers select(%s) error: %s", buf, ex.GetString().c_str());
         }
-        else
-        {
-            size_t cmdSize = OFFER_SIZE * offers.size();
-            char * cmd = new char[cmdSize];
-
-            Kompex::SQLiteStatement *pStmt;
-            pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-
-            try
-            {
-                for( auto i = offers.begin(); i != offers.end(); ++i)
-                {
-                    sqlite3_snprintf(cmdSize, cmd, "INSERT INTO %s(id) VALUES(%s);",
-                                     tmpTable.c_str(),
-                                     (*i).c_str());
-                    pStmt->SqlStatement(cmd);
-                }
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                std::clog<<"["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<" : "<<ex.GetString()<<std::endl;
-            }
-
-            delete pStmt;
-            delete []cmd;
-        }
-
-        offers.clear();
     }
-
-    return true;
-}
-
-void *HistoryManager::getDeprecatedOffersEnv(void *data)
-{
-    HistoryManager *h = (HistoryManager*)data;
-    h->getDeprecatedOffers();
-    return NULL;
-}
-
-bool HistoryManager::getDeprecatedOffersAsync()
-{
-    if(params->newClient)
-    {
-        return true;
-    }
-
-    pthread_attr_t* attributes = (pthread_attr_t*) malloc(sizeof(pthread_attr_t));
-    pthread_attr_init(attributes);
-
-    if(pthread_create(&thrGetDeprecatedOffersAsync, attributes, &this->getDeprecatedOffersEnv, this))
-    {
-        std::clog<<"creating thread failed"<<std::endl;
-    }
-
-    pthread_attr_destroy(attributes);
-
-    free(attributes);
-
-    return true;
-}
-
-bool HistoryManager::getDeprecatedOffersAsyncWait()
-{
-    if(params->newClient)
-    {
-        return true;
-    }
-
-    pthread_join(thrGetDeprecatedOffersAsync, 0);
     return true;
 }
