@@ -18,6 +18,9 @@ RedisClient::RedisClient(const std::string &host, const std::string &port, int e
 {
     //ctor
     cmd = new char[CMD_SIZE];
+
+    module = Module_new();
+    Module_init(module);
 }
 
 RedisClient::~RedisClient()
@@ -28,6 +31,8 @@ RedisClient::~RedisClient()
     {
         Connection_free(connection);
     }
+
+    Module_free(module);
 }
 
 bool RedisClient::connect()
@@ -79,7 +84,7 @@ bool RedisClient::getRange(const std::string &key,
 
     if(rr <= 0)
     {
-        std::clog<<__func__<<" error Executor_execute"<<std::endl;
+        std::clog<<__func__<<" error Executor_execute error:"<<Module_last_error(module)<<std::endl;
         ret = false;
     }
     else
@@ -297,7 +302,7 @@ bool RedisClient::exists(const std::string &key)
 
     if(rr <= 0)
     {
-        std::clog<<"redis exists false for key:"<<key<<std::endl;
+        std::clog<<"redis exists false for key:"<<key<<" error:"<<Module_last_error(module)<<std::endl;
     }
     else
     {
@@ -351,7 +356,7 @@ long int RedisClient::zrank(const std::string &key, long id)
     Executor_free(executor);
     if(rr <= 0)
     {
-        Log::err("redis cmd false: %s",cmd);
+        std::clog<<"redis zrank false for key:"<<key<<" error:"<<Module_last_error(module)<<std::endl;
         Batch_free(batch);
         return ret;
     }
@@ -418,7 +423,7 @@ int RedisClient::zscore(const std::string &key, long id)
     Executor_free(executor);
     if(rr <= 0)
     {
-        Log::err("redis cmd false: %s",cmd);
+        std::clog<<"redis zscore false for key:"<<key<<" error:"<<Module_last_error(module)<<std::endl;
         return ret;
     }
     else
@@ -485,7 +490,7 @@ bool RedisClient::execCmd(const std::string &cmd)
 
     if(rr <= 0)
     {
-        std::clog<<"redis cmd error."<<std::endl;
+        std::clog<<"redis execCmd error:"<<Module_last_error(module)<<std::endl;
     }
     else
     {
@@ -497,7 +502,7 @@ bool RedisClient::execCmd(const std::string &cmd)
         {
             if(reply_type == RT_ERROR)
             {
-                std::clog<<"redis cmd error: "<<reply_data<<std::endl;
+                std::clog<<"redis execCmd error: "<<reply_data<<std::endl;
                 break;
             }
             else if(reply_type == RT_INTEGER)

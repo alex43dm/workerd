@@ -101,7 +101,6 @@ private:
     std::string tmpTable;
     std::vector<sphinxRequests> stringQuery;
     XXXSearcher *sphinx;
-    Module *module;
 
     pthread_mutex_t *m_pPrivate;
 

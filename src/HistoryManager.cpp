@@ -26,8 +26,6 @@ HistoryManager::~HistoryManager()
 {
     pthread_mutex_destroy((pthread_mutex_t*)m_pPrivate);
 
-    Module_free(module);
-
     delete sphinx;
 
     delete pViewHistory;
@@ -41,9 +39,6 @@ bool HistoryManager::initDB()
 {
 
     Config *cfg = Config::Instance();
-
-    module = Module_new();
-    Module_init(module);
 
     pViewHistory = new RedisClient(cfg->redis_user_view_history_host_,
                                    cfg->redis_user_view_history_port_,
@@ -237,7 +232,7 @@ bool HistoryManager::getHistoryByType(HistoryType type, std::list<std::string> &
     {
         if(!r->getRange(key, 0, -1, rr))
         {
-            std::clog<<LogPriority::Err<< "["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<EnumHistoryTypeStrings[type]<<":"<< Module_last_error(module) << std::endl;
+            std::clog<<LogPriority::Err<< "["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<EnumHistoryTypeStrings[type]<< std::endl;
             //Log::err("[%ld]%s::%s %s: %s", tid, typeid(this).name(), __func__,EnumHistoryTypeStrings[type], Module_last_error(module));
             return false;
         }
@@ -283,7 +278,7 @@ bool HistoryManager::getDBStatus(HistoryType t)
 {
     if(!getHistoryPointer(t)->isConnected())
     {
-        Log::err("HistoryManager::getDBStatus HistoryType: %d error: %s", (int)t, Module_last_error(module));
+        std::clog<<"HistoryManager::getDBStatus HistoryType: "<<(int)t<<std::endl;
         return false;
     }
     return true;

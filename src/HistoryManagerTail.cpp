@@ -13,7 +13,7 @@ bool HistoryManager::getTailOffers()
     {
         if(!pViewHistory->getRange(key_inv, 0, -1, mtailOffers))
         {
-            std::clog<<"["<<tid<<"]"<<__func__<<" error: "<<Module_last_error(module)<<" for key:"<<key<<std::endl;
+            std::clog<<"["<<tid<<"]"<<__func__<<" error for key:"<<key<<std::endl;
         }
     }
 

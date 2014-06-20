@@ -48,10 +48,12 @@ class RedisClient
         std::string port;
         bool isConnected_;
         char *cmd;
+        Module *module;
         Connection *connection;
 
         bool _addVal(const std::string &key, double score, const std::string &member);
         bool execCmd(const std::string &cmd);
+        void error();
 };
 
 #endif // REDISCLIENT_H
