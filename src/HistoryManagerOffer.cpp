@@ -15,6 +15,8 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
     Kompex::SQLiteStatement *pStmt;
     int viewTime = 0;
 
+    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+
     if(cfg->logOutPutOfferIds)
     {
         std::clog<<" OutPutOfferIds: ";
@@ -26,15 +28,23 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
         {
             std::clog<<"[clean]";
         }
-        pViewHistory->del(key);
+
+        try
+        {
+            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Retargeting WHERE id=%lli;",params->getUserKeyLong());
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            std::clog<<"HistoryManager::setDeprecatedOffers error: "<<ex.GetString()<<std::endl;
+        }
     }
+
 
     if(cfg->logOutPutOfferIds)
     {
         std::clog<<", ids:";
     }
-
-    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
 
     for(auto it = items.begin()+len; it != items.end(); ++it)
     {
