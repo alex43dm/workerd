@@ -66,7 +66,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
 
             if(viewTime)
             {
-                if(viewTime + cfg->retargeting_by_time_ > std::time(0))
+                if(viewTime + cfg->views_expire_ > std::time(0))
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
                                      "UPDATE Session SET uniqueHits=uniqueHits-1 WHERE id=%lli AND offerId=%lli;",
