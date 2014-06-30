@@ -31,7 +31,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
 
         try
         {
-            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE id=%lli;",params->getUserKeyLong());
+            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE id=%llu;",params->getUserKeyLong());
             pStmt->SqlStatement(buf);
         }
         catch(Kompex::SQLiteException &ex)
@@ -56,7 +56,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
         try
         {
             sqlite3_snprintf(sizeof(buf),buf,
-                             "SELECT viewTime FROM Session WHERE id=%lli AND offerId=%lli;",
+                             "SELECT viewTime FROM Session WHERE id=%llu AND offerId=%llu;",
                              params->getUserKeyLong(), (*it)->id_int);
 
             pStmt->Sql(buf);
@@ -69,20 +69,20 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
                 if(viewTime + cfg->views_expire_ > std::time(0))
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
-                                     "UPDATE Session SET uniqueHits=uniqueHits-1 WHERE id=%lli AND offerId=%lli;",
+                                     "UPDATE Session SET uniqueHits=uniqueHits-1 WHERE id=%llu AND offerId=%llu;",
                                      params->getUserKeyLong(), (*it)->id_int);
                 }
                 else
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
-                                     "DELETE FROM Session WHERE id=%lli AND offerId=%lli;",
+                                     "DELETE FROM Session WHERE id=%llu AND offerId=%llu;",
                                      params->getUserKeyLong(), (*it)->id_int);
                 }
             }
             else
             {
                 sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO Session(id,offerId,uniqueHits,viewTime) VALUES(%lli,%lli,%d,%lli);",
+                                 "INSERT INTO Session(id,offerId,uniqueHits,viewTime) VALUES(%llu,%llu,%d,%llu);",
                                  params->getUserKeyLong(), (*it)->id_int, (*it)->uniqueHits-1,std::time(0));
             }
             pStmt->SqlStatement(buf);
