@@ -143,7 +143,7 @@ bool BaseCore::ProcessMQ()
 
                 if(m->getRoutingKey() == "informer.update")
                 {
-                    pdb->InformerUpdate(toString(m));
+                    pdb->InformerUpdate(QUERY("guid" << toString(m)));
                 }
                 else if(m->getRoutingKey() == "informer.delete")
                 {
@@ -157,52 +157,24 @@ bool BaseCore::ProcessMQ()
                 m = mq_informer_->getMessage();
             }
         }
-        /*
         {
             // Проверка сообщений mq_process_.#
-            bool flagSave = false;
-            mq_process_->Get(AMQP_NOACK);
-            m = mq_process_->getMessage();
+            mq_account_->Get(AMQP_NOACK);
+            m = mq_account_->getMessage();
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "process: " + m->getRoutingKey() + "</br>";
+                mq_log_ += "account: " + m->getRoutingKey() + "</br>";
 
-                if(m->getRoutingKey() == "process.range_short_term")
+                if(m->getRoutingKey() == "account.update")
                 {
-                    cfg->range_short_term_ = ::atof(toString(m).c_str());
-                    flagSave = true;
-                }
-                else if(m->getRoutingKey() == "process.range_long_term")
-                {
-                    cfg->range_long_term_ = ::atof(toString(m).c_str());
-                    flagSave = true;
-                }
-                else if(m->getRoutingKey() == "process.range_context")
-                {
-                    cfg->range_context_ = ::atof(toString(m).c_str());
-                    flagSave = true;
-                }
-                else if(m->getRoutingKey() == "process.range_search")
-                {
-                    cfg->range_search_ = ::atof(toString(m).c_str());
-                    flagSave = true;
-                }
-                else if(m->getRoutingKey() == "process.offer_by_campaign_unique")
-                {
-                    cfg->offer_by_campaign_unique_ = (unsigned)strtol(toString(m).c_str(),NULL,10);
-                    flagSave = true;
+                    pdb->InformerUpdate(QUERY("user" << toString(m)));
                 }
 
-                mq_process_->Get(AMQP_NOACK);
-                m = mq_process_->getMessage();
+                mq_account_->Get(AMQP_NOACK);
+                m = mq_account_->getMessage();
             }
-
-            if(flagSave)
-            {
-                cfg->Save();
-            }
-        }*/
+        }
     }
     catch (AMQPException &ex)
     {
@@ -282,7 +254,7 @@ void BaseCore::InitMessageQueue()
         std::string mq_advertise_name( "getmyad.advertise." + postfix );
         std::string mq_campaign_name( "getmyad.campaign." + postfix );
         std::string mq_informer_name( "getmyad.informer." + postfix );
-        //std::string mq_process_name( "getmyad.process." + postfix );
+        std::string mq_account_name( "getmyad.account." + postfix );
 
         // Объявляем очереди
         mq_campaign_ = amqp_->createQueue();
@@ -291,17 +263,17 @@ void BaseCore::InitMessageQueue()
         mq_informer_->Declare(mq_informer_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
         mq_advertise_ = amqp_->createQueue();
         mq_advertise_->Declare(mq_advertise_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
-        //mq_process_ = amqp_->createQueue();
-        //mq_process_->Declare(mq_process_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
+        mq_account_ = amqp_->createQueue();
+        mq_account_->Declare(mq_account_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
 
        // Привязываем очереди
         exchange_->Bind(mq_advertise_name, "advertise.#");
         exchange_->Bind(mq_campaign_name, "campaign.#");
         exchange_->Bind(mq_informer_name, "informer.#");
-        //exchange_->Bind(mq_process_name, "process.#");
+        exchange_->Bind(mq_account_name, "account.#");
 
        std::clog<<"Created ampq queues: "<<mq_campaign_name<<","<<mq_informer_name<<","
-       <<mq_advertise_name<<std::endl;
+       <<mq_advertise_name<<","<<mq_account_name<<std::endl;
     }
     catch (AMQPException &ex)
     {

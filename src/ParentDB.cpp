@@ -434,12 +434,12 @@ bool ParentDB::InformerLoadAll()
     return true;
 }
 
-bool ParentDB::InformerUpdate(const std::string &id)
+bool ParentDB::InformerUpdate(mongo::Query query)
 {
     if(!fConnectedToMainDatabase)
         return false;
 
-    std::unique_ptr<mongo::DBClientCursor> cursor = monga_main->query(cfg->mongo_main_db_ + ".informer", QUERY("guid" << id));
+    std::unique_ptr<mongo::DBClientCursor> cursor = monga_main->query(cfg->mongo_main_db_ + ".informer", query);
     Kompex::SQLiteStatement *pStmt;
     long long domainId,accountId, long_id = 0;
 

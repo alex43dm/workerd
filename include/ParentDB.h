@@ -20,7 +20,7 @@ public:
     void CategoriesLoad();
 
     bool InformerLoadAll();
-    bool InformerUpdate(const std::string &id);
+    bool InformerUpdate(mongo::Query);
     void InformerRemove(const std::string &id);
 
     /** \brief Загружает информацию в локальную бд
