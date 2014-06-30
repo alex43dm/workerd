@@ -392,6 +392,7 @@ void Core::ProcessSaveResults()
 
 bool Core::getInformer()
 {
+    bool ret = false;
     Kompex::SQLiteStatement *pStmt;
 
     informer = nullptr;
@@ -399,19 +400,6 @@ bool Core::getInformer()
     pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
 
     sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->informerSqlStr.c_str(), params->informer_id_.c_str());
-    try
-    {
-        pStmt->Sql(cmd);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-#ifdef DEBUG
-        printf("%s\n",cmd);
-#endif // DEBUG
-        Log::err("DB error: getInformer: %s: %s", ex.GetString().c_str());
-        delete pStmt;
-        return false;
-    }
 
     try
     {
@@ -422,6 +410,8 @@ bool Core::getInformer()
                     return 0;
                 }
         */
+        pStmt->Sql(cmd);
+
         while(pStmt->FetchRow())
         {
             informer =  new Informer(pStmt->GetColumnInt64(0),
@@ -436,20 +426,18 @@ bool Core::getInformer()
                                      pStmt->GetColumnDouble(9),
                                      pStmt->GetColumnInt(10)
                                     );
-
+            ret = true;
             break;
         }
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DB error: %s", ex.GetString().c_str());
-        delete pStmt;
-        return false;
+        std::clog<<__func__<<" error: " <<ex.GetString()<<std::endl;
     }
 
     delete pStmt;
 
-    return true;
+    return ret;
 }
 /**
     Алгоритм работы таков:
