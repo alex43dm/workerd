@@ -493,8 +493,8 @@ bool ParentDB::InformerUpdate(mongo::Query query)
                          height_banner=%d,\
                          width_banner=%d,\
                          capacity=%d \
-                         range_short_term=%s, range_long_term=%s, range_context=%s, range_search=%s \
-                         retargeting_capacity=%s \
+                         range_short_term=%f, range_long_term=%f, range_context=%f, range_search=%f \
+                         retargeting_capacity=%u \
                          WHERE id=%lld;",
                          x.getStringField("title"),
                          x.getStringField("css_banner"),
@@ -507,11 +507,11 @@ bool ParentDB::InformerUpdate(mongo::Query query)
                          x.getIntField("height_banner"),
                          x.getIntField("width_banner"),
                          capacity,
-                         x.hasField("range_short_term") ? x.getStringField("range_short_term") : std::to_string(cfg->range_short_term_).c_str(),
-                         x.hasField("range_long_term") ? x.getStringField("range_long_term") : std::to_string(cfg->range_long_term_).c_str(),
-                         x.hasField("range_context") ? x.getStringField("range_context") : std::to_string(cfg->range_context_).c_str(),
-                         x.hasField("range_search") ? x.getStringField("range_search") : std::to_string(cfg->range_search_).c_str(),
-                         x.hasField("retargeting_capacity") ? x.getStringField("retargeting_capacity") : std::to_string((unsigned)(cfg->retargeting_percentage_*capacity/100)).c_str(),
+                         x.hasField("range_short_term") ? x.getField("range_short_term").numberDouble() : cfg->range_short_term_,
+                         x.hasField("range_long_term") ? x.getField("range_long_term").numberDouble() : cfg->range_long_term_,
+                         x.hasField("range_context") ? x.getField("range_context").numberDouble() : cfg->range_context_,
+                         x.hasField("range_search") ? x.getField("range_search").numberDouble() : cfg->range_search_,
+                         x.hasField("retargeting_capacity") ? x.getIntField("retargeting_capacity") : (unsigned)(cfg->retargeting_percentage_*capacity/100),
                          long_id
                         );
         try
