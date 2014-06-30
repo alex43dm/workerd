@@ -126,7 +126,7 @@ std::string Core::Process(Params *prms)
 
     params = prms;
 
-    if(getInformer() == 0)
+    if(!getInformer())
     {
         std::clog<<"there is no informer id: "<<prms->getInformerId()<<std::endl;
         return Config::Instance()->template_error_;
@@ -390,9 +390,11 @@ void Core::ProcessSaveResults()
     std::clog<<std::endl;
 }
 
-Informer *Core::getInformer()
+bool Core::getInformer()
 {
     Kompex::SQLiteStatement *pStmt;
+
+    informer = nullptr;
 
     pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
 
@@ -408,7 +410,7 @@ Informer *Core::getInformer()
 #endif // DEBUG
         Log::err("DB error: getInformer: %s: %s", ex.GetString().c_str());
         delete pStmt;
-        return 0;
+        return false;
     }
 
     try
@@ -442,12 +444,12 @@ Informer *Core::getInformer()
     {
         Log::err("DB error: %s", ex.GetString().c_str());
         delete pStmt;
-        return 0;
+        return false;
     }
 
     delete pStmt;
 
-    return informer;
+    return true;
 }
 /**
     Алгоритм работы таков:

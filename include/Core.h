@@ -89,7 +89,7 @@ private:
     Offer::Map items;
 
     bool getOffers(bool getAll=false);
-    Informer *getInformer();
+    bool getInformer();
     void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult);
 
     //bool contains( const Offer::Vector &v, const Offer::itV p) const {return std::find(v.begin(), v.end(), *p) != v.end();}
