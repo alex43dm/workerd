@@ -951,6 +951,22 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                     logDb(ex);
                 }
             }
+            else
+            {
+                bzero(buf,sizeof(buf));
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,0);",
+                                 long_id
+                                );
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+            }
         }
         else
         {
