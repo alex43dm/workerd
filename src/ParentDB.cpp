@@ -391,7 +391,7 @@ bool ParentDB::InformerLoadAll()
              range_short_term, range_long_term, range_context, range_search, retargeting_capacity) VALUES(\
              %lld,'%q','%q','%q','%q',%lld,%lld,\
              '%q',1,%d,%d,%d,%d,%d,\
-             %s,%s,%s,%s,%s);",
+             %s,%s,%s,%s,%u);",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getStringField("title"),
@@ -407,11 +407,11 @@ bool ParentDB::InformerLoadAll()
                          x.getIntField("width_banner"),
                          capacity,
 
-                         x.hasField("range_short_term") ? x.getStringField("range_short_term") : std::to_string(cfg->range_short_term_).c_str(),
-                         x.hasField("range_long_term") ? x.getStringField("range_long_term") : std::to_string(cfg->range_long_term_).c_str(),
-                         x.hasField("range_context") ? x.getStringField("range_context") : std::to_string(cfg->range_context_).c_str(),
-                         x.hasField("range_search") ? x.getStringField("range_search") : std::to_string(cfg->range_search_).c_str(),
-                         x.hasField("retargeting_capacity") ? x.getStringField("retargeting_capacity") : std::to_string((unsigned)(cfg->retargeting_percentage_*capacity/100)).c_str()
+                         x.hasField("range_short_term") ? x.getField("range_short_term").numberDouble() : cfg->range_short_term_,
+                         x.hasField("range_long_term") ? x.getField("range_long_term").numberDouble() : cfg->range_long_term_,
+                         x.hasField("range_context") ? x.getField("range_context").numberDouble() : cfg->range_context_,
+                         x.hasField("range_search") ? x.getField("range_search").numberDouble() : cfg->range_search_,
+                         x.hasField("retargeting_capacity") ? x.getIntField("retargeting_capacity") : (unsigned)(cfg->retargeting_percentage_*capacity/100)
                         );
         try
         {
