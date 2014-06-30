@@ -664,7 +664,8 @@ void ParentDB::GeoRerionsAdd(const std::string &country, const std::string &regi
 
 void ParentDB::logDb(const Kompex::SQLiteException &ex) const
 {
-    Log::err("ParentDB::logDb request:(%s) error: %s", buf, ex.GetString().c_str());
+    std::clog<<"ParentDB::logDb error: "<<ex.GetString()<<std::endl;
+    std::clog<<"ParentDB::logDb request: "<<buf<<std::endl;
 }
 /** \brief  Закгрузка всех рекламных кампаний из базы данных  Mongo
 
