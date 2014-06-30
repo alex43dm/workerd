@@ -391,7 +391,7 @@ bool ParentDB::InformerLoadAll()
              range_short_term, range_long_term, range_context, range_search, retargeting_capacity) VALUES(\
              %lld,'%q','%q','%q','%q',%lld,%lld,\
              '%q',1,%d,%d,%d,%d,%d,\
-             %s,%s,%s,%s,%u);",
+             %f,%f,%f,%f,%u);",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getStringField("title"),
