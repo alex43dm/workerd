@@ -900,10 +900,14 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 logDb(ex);
             }
         }
+
         std::string accounts_allowed;
         if(!o.getObjectField("allowed").getObjectField("accounts").isEmpty())
         {
             it = o.getObjectField("allowed").getObjectField("accounts");
+
+            accounts_allowed.clear();
+
             while (it.more())
             {
                 std::string acnt = it.next().str();
@@ -933,8 +937,8 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 }
             }
 
+            //std::clog <<"campaign: "<<long_id<<" "<<id<<"load: "<<accounts_allowed<<std::endl;
 
-//                std::clog <<"campaign: "<<long_id<<" "<<id<<"load: "<<accounts_allowed<<std::endl;
             if(accounts_allowed.size())
             {
                 sqlite3_snprintf(sizeof(buf),buf,
@@ -950,10 +954,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                     logDb(ex);
                 }
             }
-        }
-        else
-        {
-            if(o.getObjectField("allowed").hasElement("accounts"))
+            else
             {
                 sqlite3_snprintf(sizeof(buf),buf,
                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,0);",
@@ -969,12 +970,18 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 }
             }
         }
+        /*
+        else
+        {
+            if(o.getObjectField("allowed").hasElement("accounts"))
+        }*/
         // Множества информеров, аккаунтов и доменов, на которых запрещен показ
         std::string accounts_ignored;
 
         if(!o.getObjectField("ignored").getObjectField("accounts").isEmpty())
         {
             it = o.getObjectField("ignored").getObjectField("accounts");
+            accounts_ignored.clear();
             while (it.more())
             {
                 std::string acnt = it.next().str();
@@ -1015,10 +1022,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                     logDb(ex);
                 }
             }
-        }
-        else
-        {
-            if(o.getObjectField("ignored").hasElement("accounts"))
+            else
             {
                 sqlite3_snprintf(sizeof(buf),buf,
                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
@@ -1034,6 +1038,11 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 }
             }
         }
+        /*
+        else
+        {
+            if(o.getObjectField("ignored").hasElement("accounts"))
+        }*/
 
         //------------------------domains-----------------------
         // Множества информеров, аккаунтов и доменов, на которых разрешён показ
