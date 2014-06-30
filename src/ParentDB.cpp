@@ -709,7 +709,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         sqlite3_snprintf(sizeof(buf),buf,
                          "INSERT OR REPLACE INTO Campaign\
                          (id,guid,title,project,social,valid,showCoverage,impressionsPerDayLimit,retargeting,offer_by_campaign_unique) \
-                         VALUES(%lld,'%q','%q','%q',%d,%d,%d,%d,%d,%s);",
+                         VALUES(%lld,'%q','%q','%q',%d,%d,%d,%d,%d,%d);",
                          long_id,
                          id.c_str(),
                          x.getStringField("title"),
@@ -719,7 +719,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                          cType,
                          x.getField("impressionsPerDayLimit").numberInt(),
                          o.getBoolField("retargeting") ? 1 : 0,
-                         x.hasField("offer_by_campaign_unique") ? x.getStringField("offer_by_campaign_unique") : std::to_string(cfg->offer_by_campaign_unique_).c_str()
+                         x.hasField("offer_by_campaign_unique") ? x.getIntField("offer_by_campaign_unique") : cfg->offer_by_campaign_unique_
                         );
         try
         {
