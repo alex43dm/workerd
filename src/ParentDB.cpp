@@ -953,21 +953,21 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         }
         else
         {
-            //if(o.getObjectField("allowed").hasElement("accounts"))
-            //{
-            sqlite3_snprintf(sizeof(buf),buf,
-                             "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,0);",
-                             long_id
-                            );
-            try
+            if(o.getObjectField("allowed").hasElement("accounts"))
             {
-                pStmt->SqlStatement(buf);
+                sqlite3_snprintf(sizeof(buf),buf,
+                "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,0);",
+                long_id
+                                );
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
             }
-            catch(Kompex::SQLiteException &ex)
-            {
-                logDb(ex);
-            }
-            //}
         }
         // Множества информеров, аккаунтов и доменов, на которых запрещен показ
         std::string accounts_ignored;
@@ -1018,17 +1018,20 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         }
         else
         {
-            sqlite3_snprintf(sizeof(buf),buf,
-            "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
-            long_id
-                            );
-            try
+            if(o.getObjectField("ignored").hasElement("accounts"))
             {
-                pStmt->SqlStatement(buf);
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                logDb(ex);
+                sqlite3_snprintf(sizeof(buf),buf,
+                "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
+                long_id
+                                );
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
             }
         }
 
