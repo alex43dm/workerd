@@ -527,8 +527,11 @@ bool ParentDB::InformerUpdate(mongo::Query query)
                          width=%d,\
                          height_banner=%d,\
                          width_banner=%d,\
-                         capacity=%d \
-                         range_short_term=%f, range_long_term=%f, range_context=%f, range_search=%f \
+                         capacity=%d, \
+                         range_short_term=%f, \
+                         range_long_term=%f, \
+                         range_context=%f, \
+                         range_search=%f, \
                          retargeting_capacity=%u \
                          WHERE id=%lld;",
                          x.getStringField("title"),
