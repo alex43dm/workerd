@@ -46,13 +46,15 @@ Core::Core()
         sqlite3_snprintf(CMD_SIZE, cmd, "CREATE TABLE IF NOT EXISTS %s(id INT8 NOT NULL);",
                          tmpTableName.c_str());
         p->SqlStatement(cmd);
+        /*
         sqlite3_snprintf(CMD_SIZE, cmd, "CREATE INDEX IF NOT EXISTS idx_%s_id ON %s(id);",
                          tmpTableName.c_str(), tmpTableName.c_str());
         p->SqlStatement(cmd);
+        */
     }
     catch(Kompex::SQLiteException &ex)
     {
-        Log::err("DB error: create tmp table: %s", ex.GetString().c_str());
+        std::clog<<__func__<<" error: create tmp table: %s"<< ex.GetString()<<std::endl;
         exit(1);
     }
     delete p;
@@ -140,6 +142,9 @@ std::string Core::Process(Params *prms)
 
     //load all history async
     //hm->getDeprecatedOffersAsync();
+
+    //get campaign list
+    getCampaign();
 
     hm->getRetargetingAsync();
 
@@ -559,18 +564,7 @@ bool Core::getOffers(bool getAll)
     if(!getAll)
     {
         sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
-                         informer->blocked ? " AND ca.social=1 " : "",
-                         getGeo().c_str(),
-                         informer->domainId,
-                         informer->domainId,
-                         informer->domainId,
-                         informer->domainId,
-                         informer->accountId,
-                         informer->accountId,
-                         informer->accountId,
-                         informer->id,
-                         informer->id,
-                         informer->id,
+                         tmpTableName.c_str(),
                          params->getUserKeyLong(),
                          informer->id);
         //hm->getDeprecatedOffersAsyncWait();
@@ -656,6 +650,48 @@ bool Core::getOffers(bool getAll)
                  <<ex.GetString()
                  <<std::endl;
 
+        ret = false;
+    }
+
+
+    pStmt->FreeQuery();
+    delete pStmt;
+
+    return ret;
+}
+
+bool Core::getCampaign()
+{
+    bool ret = false;
+    Kompex::SQLiteStatement *pStmt;
+
+    sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->campaingSqlStr.c_str(),
+                         tmpTableName.c_str(),
+                         informer->blocked ? " AND ca.social=1 " : "",
+                         getGeo().c_str(),
+                         informer->domainId,
+                         informer->domainId,
+                         informer->domainId,
+                         informer->domainId,
+                         informer->accountId,
+                         informer->accountId,
+                         informer->accountId,
+                         informer->id,
+                         informer->id,
+                         informer->id);
+
+    pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
+
+    try
+    {
+        pStmt->Sql(cmd);
+        ret = true;
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        std::clog<<"["<<tid<<"] error: "<<__func__
+                 <<ex.GetString()
+                 <<std::endl;
         ret = false;
     }
 

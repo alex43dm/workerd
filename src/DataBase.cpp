@@ -57,6 +57,7 @@ bool DataBase::openDb()
     Config::Instance()->offerSqlStrAll = getSqlFile("requests/all.sql");
     Config::Instance()->informerSqlStr = getSqlFile("requests/04.sql");
     Config::Instance()->retargetingOfferSqlStr = getSqlFile("requests/03.sql");
+    Config::Instance()->campaingSqlStr = getSqlFile("requests/getCampaings.sql");
 
     try
     {
