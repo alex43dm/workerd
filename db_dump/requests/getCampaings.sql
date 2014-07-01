@@ -1,5 +1,5 @@
 INSERT INTO %s(id)
-SELECT ca.id Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id %s
+SELECT ca.id Campaign AS ca
 INNER JOIN CampaignNow AS cn INDEXED BY idx_CampaignNow_id ON ca.id=cn.id
 		%s
 INNER JOIN (
@@ -34,4 +34,5 @@ INNER JOIN (
         LEFT JOIN Campaign2Informer AS c2ide ON c2id.id_cam=c2ide.id_cam AND c2ide.id_inf=%lld AND c2ide.allowed=1
         WHERE c2ide.id_cam IS NULL AND ((c2id.id_inf=%lld OR c2id.id_inf=1) AND c2id.allowed=0)
 ) AS c ON ca.id=c.id
+WHERE ca.valid=1 AND ca.retargeting=0 %s
 ;
