@@ -229,6 +229,17 @@ void ParentDB::OfferLoad(mongo::Query q_correct)
 
     }
 
+    sqlite3_snprintf(sizeof(buf),buf,"REINDEX Offer;");
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
     delete pStmt;
@@ -258,6 +269,18 @@ void ParentDB::OfferRemove(const std::string &id)
     {
         logDb(ex);
     }
+
+    sqlite3_snprintf(sizeof(buf),buf,"REINDEX Offer;");
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
 
@@ -424,6 +447,18 @@ bool ParentDB::InformerLoadAll()
         }
         i++;
     }
+
+    sqlite3_snprintf(sizeof(buf),buf,"REINDEX Informer;");
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
     delete pStmt;
@@ -524,6 +559,17 @@ bool ParentDB::InformerUpdate(mongo::Query query)
         }
     }
 
+    sqlite3_snprintf(sizeof(buf),buf,"REINDEX Informer;");
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
     delete pStmt;
@@ -553,6 +599,18 @@ void ParentDB::InformerRemove(const std::string &id)
     {
         logDb(ex);
     }
+
+    sqlite3_snprintf(sizeof(buf),buf,"REINDEX Informer;");
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
 
@@ -1340,6 +1398,17 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         }
     }
 
+    sqlite3_snprintf(sizeof(buf),buf,"REINDEX Campaign;");
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
 
@@ -1386,6 +1455,17 @@ void ParentDB::CampaignStartStop(const std::string &aCampaignId, int StartStop)
         logDb(ex);
     }
 
+    sqlite3_snprintf(sizeof(buf),buf,"REINDEX Campaign;");
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
 
@@ -1415,6 +1495,18 @@ void ParentDB::CampaignRemove(const std::string &aCampaignId)
     {
         logDb(ex);
     }
+
+    sqlite3_snprintf(sizeof(buf),buf,"REINDEX Campaign;");
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
     pStmt->CommitTransaction();
     pStmt->FreeQuery();
 
@@ -1472,6 +1564,17 @@ bool ParentDB::AccountLoad(mongo::Query query)
         {
             logDb(ex);
         }
+    }
+
+    sqlite3_snprintf(sizeof(buf),buf,"REINDEX Accounts;");
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
     }
 
     pStmt->FreeQuery();
