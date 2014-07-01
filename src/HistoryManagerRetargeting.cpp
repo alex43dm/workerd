@@ -19,6 +19,12 @@ void HistoryManager::getRetargeting()
     RetargetingClear();
 
     getHistoryByType(HistoryType::Retargeting, vretageting);
+
+    if(vretageting.size() == 0)
+    {
+        return;
+    }
+
     //fill
     for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
     {
