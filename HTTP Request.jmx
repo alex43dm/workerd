@@ -38,7 +38,7 @@
 <node>
 <testelement class="org.apache.jmeter.threads.ThreadGroup">
 <property xml:space="preserve" name="ThreadGroup.scheduler" propType="org.apache.jmeter.testelement.property.BooleanProperty">false</property>
-<property xml:space="preserve" name="ThreadGroup.num_threads" propType="org.apache.jmeter.testelement.property.StringProperty">200</property>
+<property xml:space="preserve" name="ThreadGroup.num_threads" propType="org.apache.jmeter.testelement.property.StringProperty">10</property>
 <property xml:space="preserve" name="ThreadGroup.duration" propType="org.apache.jmeter.testelement.property.StringProperty"/>
 <property xml:space="preserve" name="TestElement.gui_class" propType="org.apache.jmeter.testelement.property.StringProperty">org.apache.jmeter.threads.gui.ThreadGroupGui</property>
 <property xml:space="preserve" name="ThreadGroup.delay" propType="org.apache.jmeter.testelement.property.StringProperty"/>
@@ -48,7 +48,7 @@
 <property xml:space="preserve" name="ThreadGroup.ramp_time" propType="org.apache.jmeter.testelement.property.StringProperty">1</property>
 <property xml:space="preserve" name="TestElement.enabled" propType="org.apache.jmeter.testelement.property.BooleanProperty">true</property>
 <testelement name="ThreadGroup.main_controller" class="org.apache.jmeter.control.LoopController">
-<property xml:space="preserve" name="LoopController.loops" propType="org.apache.jmeter.testelement.property.StringProperty">2</property>
+<property xml:space="preserve" name="LoopController.loops" propType="org.apache.jmeter.testelement.property.StringProperty">1</property>
 <property xml:space="preserve" name="TestElement.gui_class" propType="org.apache.jmeter.testelement.property.StringProperty">org.apache.jmeter.control.gui.LoopControlPanel</property>
 <property xml:space="preserve" name="LoopController.continue_forever" propType="org.apache.jmeter.testelement.property.BooleanProperty">false</property>
 <property xml:space="preserve" name="TestElement.name" propType="org.apache.jmeter.testelement.property.StringProperty">Loop Controller</property>
@@ -60,7 +60,7 @@
 </testelement>
 <node>
 <testelement class="org.apache.jmeter.protocol.http.sampler.HTTPSampler">
-<property xml:space="preserve" name="HTTPSampler.domain" propType="org.apache.jmeter.testelement.property.StringProperty">yottos.com</property>
+<property xml:space="preserve" name="HTTPSampler.domain" propType="org.apache.jmeter.testelement.property.StringProperty">rg.srv-2.yottos.com</property>
 <property xml:space="preserve" name="TestElement.gui_class" propType="org.apache.jmeter.testelement.property.StringProperty">org.apache.jmeter.protocol.http.control.gui.HttpTestSampleGui</property>
 <property xml:space="preserve" name="HTTPSampler.image_parser" propType="org.apache.jmeter.testelement.property.BooleanProperty">false</property>
 <property xml:space="preserve" name="HTTPSampler.FILE_NAME" propType="org.apache.jmeter.testelement.property.StringProperty"/>
@@ -87,14 +87,14 @@
 <property xml:space="preserve" name="HTTPArgument.use_equals" propType="org.apache.jmeter.testelement.property.BooleanProperty">true</property>
 <property xml:space="preserve" name="HTTPArgument.always_encode" propType="org.apache.jmeter.testelement.property.BooleanProperty">false</property>
 <property xml:space="preserve" name="Argument.name" propType="org.apache.jmeter.testelement.property.StringProperty">w</property>
-<property xml:space="preserve" name="Argument.value" propType="org.apache.jmeter.testelement.property.StringProperty">1855</property>
+<property xml:space="preserve" name="Argument.value" propType="org.apache.jmeter.testelement.property.StringProperty">1920</property>
 <property xml:space="preserve" name="Argument.metadata" propType="org.apache.jmeter.testelement.property.StringProperty">=</property>
 </testelement>
 <testelement name="" class="org.apache.jmeter.protocol.http.util.HTTPArgument">
 <property xml:space="preserve" name="HTTPArgument.use_equals" propType="org.apache.jmeter.testelement.property.BooleanProperty">true</property>
 <property xml:space="preserve" name="HTTPArgument.always_encode" propType="org.apache.jmeter.testelement.property.BooleanProperty">false</property>
 <property xml:space="preserve" name="Argument.name" propType="org.apache.jmeter.testelement.property.StringProperty">h</property>
-<property xml:space="preserve" name="Argument.value" propType="org.apache.jmeter.testelement.property.StringProperty">1110</property>
+<property xml:space="preserve" name="Argument.value" propType="org.apache.jmeter.testelement.property.StringProperty">1055</property>
 <property xml:space="preserve" name="Argument.metadata" propType="org.apache.jmeter.testelement.property.StringProperty">=</property>
 </testelement>
 <testelement name="" class="org.apache.jmeter.protocol.http.util.HTTPArgument">
@@ -102,6 +102,13 @@
 <property xml:space="preserve" name="HTTPArgument.always_encode" propType="org.apache.jmeter.testelement.property.BooleanProperty">false</property>
 <property xml:space="preserve" name="Argument.name" propType="org.apache.jmeter.testelement.property.StringProperty">context</property>
 <property xml:space="preserve" name="Argument.value" propType="org.apache.jmeter.testelement.property.StringProperty">bind linux good luck</property>
+<property xml:space="preserve" name="Argument.metadata" propType="org.apache.jmeter.testelement.property.StringProperty">=</property>
+</testelement>
+<testelement name="" class="org.apache.jmeter.protocol.http.util.HTTPArgument">
+<property xml:space="preserve" name="HTTPArgument.use_equals" propType="org.apache.jmeter.testelement.property.BooleanProperty">true</property>
+<property xml:space="preserve" name="HTTPArgument.always_encode" propType="org.apache.jmeter.testelement.property.BooleanProperty">false</property>
+<property xml:space="preserve" name="Argument.name" propType="org.apache.jmeter.testelement.property.StringProperty">rand</property>
+<property xml:space="preserve" name="Argument.value" propType="org.apache.jmeter.testelement.property.StringProperty">848524</property>
 <property xml:space="preserve" name="Argument.metadata" propType="org.apache.jmeter.testelement.property.StringProperty">=</property>
 </testelement>
 </collection>
@@ -114,7 +121,7 @@
 <property xml:space="preserve" name="HTTPSampler.mimetype" propType="org.apache.jmeter.testelement.property.StringProperty"/>
 <property xml:space="preserve" name="HTTPSampler.auto_redirects" propType="org.apache.jmeter.testelement.property.BooleanProperty">false</property>
 <property xml:space="preserve" name="HTTPSampler.follow_redirects" propType="org.apache.jmeter.testelement.property.BooleanProperty">true</property>
-<property xml:space="preserve" name="HTTPSampler.port" propType="org.apache.jmeter.testelement.property.StringProperty">80</property>
+<property xml:space="preserve" name="HTTPSampler.port" propType="org.apache.jmeter.testelement.property.StringProperty">88</property>
 <property xml:space="preserve" name="HTTPSampler.use_keepalive" propType="org.apache.jmeter.testelement.property.BooleanProperty">true</property>
 <property xml:space="preserve" name="TestElement.enabled" propType="org.apache.jmeter.testelement.property.BooleanProperty">true</property>
 <property xml:space="preserve" name="HTTPSampler.monitor" propType="org.apache.jmeter.testelement.property.StringProperty">false</property>

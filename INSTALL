@@ -1,9 +1,9 @@
 ﻿Basic Installation
 ==================
     For more information specific to this package, please read the README
-file. This source code distribution  is auto configuring and you should be 
-able to compile it and install it without manual interventions such as 
-editing Makefiles, configuration files, and so on. These are generic 
+file. This source code distribution  is auto configuring and you should be
+able to compile it and install it without manual interventions such as
+editing Makefiles, configuration files, and so on. These are generic
 instructions for people who are not familiar with installing auto configuring
 software.
 Check automake and libtool packages:
@@ -17,7 +17,7 @@ The software libraries dependents:
 libredis
 amqpcpp
 mongoclient
-icuuc 
+icuuc
 icui18n
 icudata
 fcgi
@@ -32,76 +32,78 @@ boost_threads
 boost_datetime
 boost_regex
 
-Configuration
+Build
 -------------------------------
-$libtoolize
-$autoheader
-$automake --add-missing
-$aclocal
+$libtoolize --install --copy --force --automake
+$aclocal -I config/m4
 $autoconf
-$./configure
-$make
+$autoheader
+$automake --add-missing --copy --foreign --force-missing
 
-Compilation
--------------------------------
-The simplest way to compile this package is to enter the source code
-main directory and do the following:
-   
-  1. Configure the source code by typing:
-        % sh ./configure
+    Configuration
+    -------------------------------
+    The simplest way to compile this package is to enter the source code
+    main directory and do the following:
 
-     If you are planning to install the package into your home
-     directory or to a location other than `/usr/local' then add the
-     flag `--prefix=PATH' to `configure'. For example, if your home
-     directory is `/home/luser' you can configure the package to
-     install itself there by invoking:
-        % sh ./configure --prefix=/home/luser
+      1. Configure the source code by typing:
+            % sh ./configure
 
-     If you are running a debug version of worker, you need to pass the
-     --enable-debug option to the ./configure script:
-        % sh ./configure --prefix=/home/luser \
-                         --enable-debug
-     If you are running a dummy version of worker, you need to pass the
-     --enable-dummy option to the ./configure script:
-        % sh ./configure --enable-debug \
-                         --enable-dummy
-     
-     While running, `configure' prints some messages telling which
-     features is it checking for. 
+         If you are planning to install the package into your home
+         directory or to a location other than `/usr/local' then add the
+         flag `--prefix=PATH' to `configure'. For example, if your home
+         directory is `/home/luser' you can configure the package to
+         install itself there by invoking:
+            % sh ./configure --prefix=/home/luser
 
-  2. Compile the package by typing:
-        % make
-     Running `make' takes a while. If this is a very large package, now
-     is the time to go make some coffee.
-     
-  3. Type `make install' to install the programs and any data files and
-     documentation. Type `make uninstall' to undo the installation.
-     During installation, the following files go to the following directories:
-        Executables          -> /prefix/bin
-     where `prefix' is either `/usr/local' or the PATH that you specified
-     in the `--prefix' flag.
+         If you are running a debug version of worker, you need to pass the
+         --enable-debug option to the ./configure script:
+            % sh ./configure --prefix=/home/luser \
+                             --enable-debug
+         If you are running a dummy version of worker, you need to pass the
+         --enable-dummy option to the ./configure script:
+            % sh ./configure --enable-debug \
+                             --enable-dummy
 
-     If any of these directories do not presently exist, they will be
-     created on demand.
+         While running, `configure' prints some messages telling which
+         features is it checking for.
 
-     If you are installing in your home directory make sure that 
-     `/home/luser/bin' is in your path. If you're using the bash shell
-     add this line at the end of your .cshrc file:
-        PATH="/home/luser/bin:${PATH}"
-        export PATH
-     If you are using csh or tcsh, then use this line instead:
-        setenv PATH /home/luser/bin:${PATH}
-     By prepending your home directory to the rest of the PATH you can
-     override systemwide installed software with your own custom installation.
+      2. Compile the package by typing:
+            % make
+         Running `make' takes a while. If this is a very large package, now
+         is the time to go make some coffee.
 
-  4. Make debian package
-	$make deb
-	output workerd-dummy-1.1-43.deb if configured for dummy(--enable-dummy) 
+      3. Type `make install' to install the programs and any data files and
+         documentation. Type `make uninstall' to undo the installation.
+         During installation, the following files go to the following directories:
+            Executables          -> /prefix/bin
+         where `prefix' is either `/usr/local' or the PATH that you specified
+         in the `--prefix' flag.
 
-  5. You can remove the program binaries and object files from the
-     source code directory by typing `make clean'.  To also remove the
-     files that `configure' created (so you can compile the package for
-     a different kind of computer), type `make distclean'.
+         If any of these directories do not presently exist, they will be
+         created on demand.
+
+         If you are installing in your home directory make sure that
+         `/home/luser/bin' is in your path. If you're using the bash shell
+         add this line at the end of your .cshrc file:
+            PATH="/home/luser/bin:${PATH}"
+            export PATH
+         If you are using csh or tcsh, then use this line instead:
+            setenv PATH /home/luser/bin:${PATH}
+         By prepending your home directory to the rest of the PATH you can
+         override systemwide installed software with your own custom installation.
+
+      4. Make debian package
+        $make deb
+        output workerd-dummy-1.1-43.deb if configured for dummy(--enable-dummy)
+
+      5. You can remove the program binaries and object files from the
+         source code directory by typing `make clean'.  To also remove the
+         files that `configure' created (so you can compile the package for
+         a different kind of computer), type `make distclean'.
+
+    Compilation
+    -------------------------------
+    $make
 
 Compiler configuration
 ======================
@@ -119,11 +121,11 @@ On the tcsh shell, use the `setenv' command instead:
 For other shell, please consult your shell's documentation.
 
 Similarly, you can increase the optimization level by assigning these
-variables to "-g -O3". 
+variables to "-g -O3".
 
 About the configure script
 ==========================
- 
+
    The `configure' shell script attempts to guess correct values for
 various system-dependent variables used during compilation.  It uses
 those values to create a `Makefile' in each directory of the package.
@@ -177,7 +179,7 @@ package recognizes.
 
 Debian build
 ============
-   $./install/mkdeb 
+   $./install/mkdeb
    output debian packages:
 	workerd-1.2-6.deb
 	workerd-dev-1.2-6.deb

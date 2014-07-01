@@ -28,7 +28,6 @@ stamp-h1
 autoscan*.log
 ValgrindOut.xml
 login
-mq.py
 kill
 *.1
 libs/libredis/lib/

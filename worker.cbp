@@ -80,6 +80,7 @@
 		<Unit filename="db_dump/requests/03.sql" />
 		<Unit filename="db_dump/requests/04.sql" />
 		<Unit filename="db_dump/requests/all.sql" />
+		<Unit filename="db_dump/requests/getCampaings.sql" />
 		<Unit filename="db_dump/schema/wokers.mwb" />
 		<Unit filename="db_dump/schema/wokers.mwb.bak" />
 		<Unit filename="db_dump/tables/00_Campaign.sql" />

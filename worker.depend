@@ -6,7 +6,7 @@
 1386588626 /home/alex/Projects/worker/include/base64.h
 	<string>
 
-1402669277 source:/home/alex/Projects/worker/src/BaseCore.cpp
+1404218822 source:/home/alex/Projects/worker/src/BaseCore.cpp
 	"DB.h"
 	<boost/regex.hpp>
 	<sstream>
@@ -37,7 +37,7 @@
 	<string>
 	<streambuf>
 
-1402928063 /home/alex/Projects/worker/include/BaseCore.h
+1404120423 /home/alex/Projects/worker/include/BaseCore.h
 	"../config.h"
 	<boost/date_time.hpp>
 	<AMQPcpp.h>
@@ -83,19 +83,19 @@
 	"sqlite3.h"
 	"KompexSQLitePrerequisites.h"
 
-1398154111 /home/alex/Projects/worker/include/ParentDB.h
+1404218730 /home/alex/Projects/worker/include/ParentDB.h
 	<mongo/client/dbclient_rs.h>
 	"KompexSQLiteDatabase.h"
 	"KompexSQLiteException.h"
 
-1396883432 /home/alex/Projects/worker/include/Informer.h
+1404136634 /home/alex/Projects/worker/include/Informer.h
 	<string>
 
 1401114085 /home/alex/Projects/worker/include/Campaign.h
 	<string>
 	"KompexSQLiteDatabase.h"
 
-1401787481 /home/alex/Projects/worker/include/Offer.h
+1403166328 /home/alex/Projects/worker/include/Offer.h
 	<string>
 	<list>
 	<map>
@@ -106,11 +106,12 @@
 1399550556 /home/alex/Projects/worker/include/EBranch.h
 	<string>
 
-1402926600 /home/alex/Projects/worker/include/Config.h
+1404224195 /home/alex/Projects/worker/include/Config.h
 	<string>
 	<list>
 	<tinyxml.h>
 	"DataBase.h"
+	"RedisClient.h"
 
 1401171433 source:/home/alex/Projects/worker/src/Campaign.cpp
 	<boost/algorithm/string/replace.hpp>
@@ -158,7 +159,7 @@
 	<GeoIPCity.h>
 	<string>
 
-1402927342 /home/alex/Projects/worker/include/Core.h
+1404224195 /home/alex/Projects/worker/include/Core.h
 	<list>
 	<vector>
 	<map>
@@ -177,7 +178,7 @@
 	<string>
 	<boost/date_time.hpp>
 
-1401977566 /home/alex/Projects/worker/include/HistoryManager.h
+1404222319 /home/alex/Projects/worker/include/HistoryManager.h
 	<string>
 	<list>
 	<boost/date_time.hpp>
@@ -191,7 +192,7 @@
 	"XXXSearcher.h"
 	"Config.h"
 
-1401355577 /home/alex/Projects/worker/include/RedisClient.h
+1403261782 /home/alex/Projects/worker/include/RedisClient.h
 	<string>
 	<vector>
 	<list>
@@ -203,10 +204,11 @@
 	<string>
 	<boost/regex/icu.hpp>
 
-1402664455 /home/alex/Projects/worker/include/XXXSearcher.h
+1403005507 /home/alex/Projects/worker/include/XXXSearcher.h
 	<vector>
 	<sphinxclient.h>
 	"Offer.h"
+	"Informer.h"
 	"sphinxRequests.h"
 
 1402393635 /home/alex/Projects/worker/include/sphinxRequests.h
@@ -221,7 +223,7 @@
 1387450434 /home/alex/Projects/worker/include/Server.h
 	<string>
 
-1402926798 source:/home/alex/Projects/worker/src/Config.cpp
+1403246938 source:/home/alex/Projects/worker/src/Config.cpp
 	<fstream>
 	<string.h>
 	<stdlib.h>
@@ -236,7 +238,7 @@
 	<string.h>
 	<boost/date_time/posix_time/posix_time.hpp>
 
-1402920484 source:/home/alex/Projects/worker/src/DataBase.cpp
+1404223574 source:/home/alex/Projects/worker/src/DataBase.cpp
 	<iostream>
 	<algorithm>
 	<fstream>
@@ -282,31 +284,31 @@
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 
-1402903637 source:/home/alex/Projects/worker/src/HistoryManagerLongTerm.cpp
+1404222319 source:/home/alex/Projects/worker/src/HistoryManagerLongTerm.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 
-1402909248 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
-	"HistoryManager.h"
-	"Config.h"
-	"Log.h"
-	"KompexSQLiteStatement.h"
-	"KompexSQLiteException.h"
-
-1401963159 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
+1404121463 source:/home/alex/Projects/worker/src/HistoryManagerOffer.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 	"KompexSQLiteStatement.h"
 	"KompexSQLiteException.h"
 
-1402903669 source:/home/alex/Projects/worker/src/HistoryManagerShortTerm.cpp
+1404222319 source:/home/alex/Projects/worker/src/HistoryManagerRetargeting.cpp
+	"HistoryManager.h"
+	"Config.h"
+	"Log.h"
+	"KompexSQLiteStatement.h"
+	"KompexSQLiteException.h"
+
+1404222319 source:/home/alex/Projects/worker/src/HistoryManagerShortTerm.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 
-1396883421 source:/home/alex/Projects/worker/src/Informer.cpp
+1404136670 source:/home/alex/Projects/worker/src/Informer.cpp
 	"Informer.h"
 
 1388392311 source:/home/alex/Projects/worker/src/json.cpp
@@ -347,7 +349,7 @@
 	"Server.h"
 	"GeoIPTools.h"
 
-1401639410 source:/home/alex/Projects/worker/src/Offer.cpp
+1403166339 source:/home/alex/Projects/worker/src/Offer.cpp
 	<sstream>
 	"Offer.h"
 	"Log.h"
@@ -369,7 +371,7 @@
 	"GeoIPTools.h"
 	"Log.h"
 
-1402644250 source:/home/alex/Projects/worker/src/ParentDB.cpp
+1404219425 source:/home/alex/Projects/worker/src/ParentDB.cpp
 	<vector>
 	<boost/algorithm/string.hpp>
 	"ParentDB.h"
@@ -379,7 +381,7 @@
 	"Config.h"
 	"Offer.h"
 
-1402922808 source:/home/alex/Projects/worker/src/RedisClient.cpp
+1403262317 source:/home/alex/Projects/worker/src/RedisClient.cpp
 	<strings.h>
 	<string.h>
 	"RedisClient.h"
@@ -411,7 +413,7 @@
 	<sstream>
 	"UrlParser.h"
 
-1402664416 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
+1403262899 source:/home/alex/Projects/worker/src/XXXSearcher.cpp
 	<map>
 	<string>
 	<typeinfo>
@@ -419,12 +421,12 @@
 	"Config.h"
 	"XXXSearcher.h"
 
-1402386230 source:/home/alex/Projects/worker/src/HistoryManager.cpp
+1404222319 source:/home/alex/Projects/worker/src/HistoryManager.cpp
 	"HistoryManager.h"
 	"Config.h"
 	"Log.h"
 
-1402927582 source:/home/alex/Projects/worker/src/Core.cpp
+1404223451 source:/home/alex/Projects/worker/src/Core.cpp
 	<boost/foreach.hpp>
 	<boost/date_time/posix_time/ptime.hpp>
 	<boost/date_time/posix_time/posix_time_io.hpp>
@@ -442,7 +444,7 @@
 	"base64.h"
 	"EBranch.h"
 
-1402925871 source:/home/alex/Projects/worker/src/BoostHelpers.cpp
+1403167658 source:/home/alex/Projects/worker/src/BoostHelpers.cpp
 	<sys/stat.h>
 	<fcntl.h>
 	<boost/filesystem.hpp>
@@ -451,6 +453,11 @@
 	"BoostHelpers.h"
 	"Log.h"
 
-1402925783 /home/alex/Projects/worker/include/BoostHelpers.h
+1403167692 /home/alex/Projects/worker/include/BoostHelpers.h
 	<string>
+
+1403261980 source:/home/alex/Projects/worker/src/HistoryManagerTail.cpp
+	"HistoryManager.h"
+	"Config.h"
+	"Log.h"
 
