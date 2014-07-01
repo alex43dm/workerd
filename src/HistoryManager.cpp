@@ -7,8 +7,7 @@
 
 static const char * EnumHistoryTypeStrings[] = {"ShortTerm", "LongTerm", "ViewHistory", "Category","Retargeting"};
 
-HistoryManager::HistoryManager(const std::string &tmpTableName):
-    tmpTable(tmpTableName)
+HistoryManager::HistoryManager()
 {
     m_pPrivate = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
     pthread_mutexattr_t attr;

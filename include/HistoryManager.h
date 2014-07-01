@@ -48,7 +48,7 @@ public:
 
     Offer::Vector vretg;
 
-    HistoryManager(const std::string &tmpTableName);
+    HistoryManager();
     virtual ~HistoryManager();
 
     /** \brief  Инициализация подключения к базам данных Redis
@@ -98,7 +98,6 @@ private:
     Params *params;
     Informer *inf;
     RedisClient *pViewHistory,*pShortTerm,*pLongTerm,*pRetargeting;
-    std::string tmpTable;
     std::vector<sphinxRequests> stringQuery;
     XXXSearcher *sphinx;
 
@@ -126,8 +125,11 @@ private:
 
     static void *getDeprecatedOffersEnv(void *);
     static void *getLongTermEnv(void *);
+    static void signalHanlerLongTerm(int);
     static void *getShortTermEnv(void *);
+    static void signalHanlerShortTerm(int);
     static void *getRetargetingEnv(void *);
+    static void signalHanlerRetargeting(int);
     static void *getTailOffersEnv(void *data);
     RedisClient *getHistoryPointer(const HistoryType type) const;
 };

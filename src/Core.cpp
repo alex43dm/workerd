@@ -25,41 +25,18 @@ int HistoryManager::offer_processed_ = 0;
 int HistoryManager::social_processed_ = 0;
 #endif // DUMMY
 Core::Core()
-//    redirect_script_("/redirect")
 {
     tid = pthread_self();
-
-    sigset_t es;
-    sigfillset(&es);
-    pthread_sigmask(SIG_BLOCK, &es, NULL);
 
     cmd = new char[CMD_SIZE];
 
     pDb = Config::Instance()->pDb;
 
-    tmpTableName = "tmp" + std::to_string((long long int)getpid()) + std::to_string((long long int)tid);
-
-    Kompex::SQLiteStatement *p;
-    try
-    {
-        p = new Kompex::SQLiteStatement(pDb->pDatabase);
-        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE TABLE IF NOT EXISTS %s(id INT8 NOT NULL);",
-                         tmpTableName.c_str());
-        p->SqlStatement(cmd);
-        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE INDEX IF NOT EXISTS idx_%s_id ON %s(id);",
-                         tmpTableName.c_str(), tmpTableName.c_str());
-        p->SqlStatement(cmd);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        Log::err("DB error: create tmp table: %s", ex.GetString().c_str());
-        exit(1);
-    }
-    delete p;
 #ifndef DUMMY
-    hm = new HistoryManager(tmpTableName);
+    hm = new HistoryManager();
     hm->initDB();
 #endif // DUMMY
+
     Log::info("[%ld]core start",tid);
 }
 
