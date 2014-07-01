@@ -37,6 +37,8 @@ public:
 
     bool AccountLoad(mongo::Query=mongo::Query());
 
+    bool ClearSession();
+
 private:
     bool fConnectedToMainDatabase;
     Kompex::SQLiteDatabase *pdb;

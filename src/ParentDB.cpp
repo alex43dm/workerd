@@ -1591,5 +1591,42 @@ bool ParentDB::AccountLoad(mongo::Query query)
 {$and:[{ $or: [{"blocked":"banned"},{"blocked":"light"}]},{"login" 2: "vnutri.info"}]}
 */
 
+bool ParentDB::ClearSession()
+{
+    Kompex::SQLiteStatement *pStmt;
+
+    pStmt = new Kompex::SQLiteStatement(pdb);
+
+    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE viewTime<%llu;",
+        cfg->views_expire_ + std::time(0));
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
+    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Retargeting WHERE viewTime<%llu;",
+        cfg->views_expire_ + std::time(0));
+
+    try
+    {
+        pStmt->SqlStatement(buf);
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+
+    pStmt->FreeQuery();
+
+    delete pStmt;
+
+    return true;
+}
+
 
 
