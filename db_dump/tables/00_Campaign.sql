@@ -16,8 +16,4 @@ UNIQUE (guid) ON CONFLICT IGNORE
 
 CREATE INDEX IF NOT EXISTS idx_Campaign_id ON Campaign (id);
 CREATE INDEX IF NOT EXISTS idx_Campaign_guid ON Campaign (guid);
---CREATE INDEX IF NOT EXISTS idx_Campaign_showCoverage ON Campaign (showCoverage);
---CREATE INDEX IF NOT EXISTS idx_Campaign_impressionsPerDayLimit ON Campaign (impressionsPerDayLimit);
---CREATE INDEX IF NOT EXISTS idx_Campaign_valid ON Campaign (valid);
---CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting ON Campaign (retargeting);
-CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting_valid ON Campaign (valid,retargeting) WHERE valid=1 AND retargeting=0;
+CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting_valid ON Campaign (id,valid,retargeting) WHERE valid=1 AND retargeting=0;

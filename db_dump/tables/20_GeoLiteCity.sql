@@ -12,7 +12,4 @@ areaCode INT8 DEFAULT NULL,
 UNIQUE (locId) ON CONFLICT IGNORE,
 UNIQUE (country,city) ON CONFLICT IGNORE
 );
-CREATE INDEX IF NOT EXISTS idx_GeoRerions_locId ON GeoLiteCity (locId);
-CREATE INDEX IF NOT EXISTS idx_GeoRerions_country ON GeoLiteCity (country);
-CREATE INDEX IF NOT EXISTS idx_GeoRerions_city ON GeoLiteCity (city);
 CREATE INDEX IF NOT EXISTS idx_GeoRerions_country_city ON GeoLiteCity (country,city);
