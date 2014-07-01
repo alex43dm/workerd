@@ -646,7 +646,6 @@ bool Core::getCampaign()
 
     sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->campaingSqlStr.c_str(),
                          tmpTableName.c_str(),
-                         informer->blocked ? " AND ca.social=1 " : "",
                          getGeo().c_str(),
                          informer->domainId,
                          informer->domainId,
@@ -657,7 +656,9 @@ bool Core::getCampaign()
                          informer->accountId,
                          informer->id,
                          informer->id,
-                         informer->id);
+                         informer->id,
+                         informer->blocked ? " AND ca.social=1 " : "",
+                         );
 
     pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
 
