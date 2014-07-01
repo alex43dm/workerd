@@ -17,3 +17,4 @@ UNIQUE (guid) ON CONFLICT IGNORE
 CREATE INDEX IF NOT EXISTS idx_Campaign_id ON Campaign (id);
 CREATE INDEX IF NOT EXISTS idx_Campaign_guid ON Campaign (guid);
 CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting_valid ON Campaign (id,valid,retargeting) WHERE valid=1 AND retargeting=0;
+CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting_valid_inv ON Campaign (id,valid,retargeting) WHERE valid=1 AND retargeting=1;

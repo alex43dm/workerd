@@ -17,10 +17,10 @@ ofrs.width,
 ca.social,
 ca.guid,
 ca.offer_by_campaign_unique
-FROM Offer AS ofrs
-INNER JOIN Campaign AS ca ON ca.retargeting=1 AND ofrs.campaignId=ca.id
-LEFT JOIN Retargeting AS ret ON ret.id=%llu AND ret.uniqueHits <= 0 AND ofrs.id = ret.offerId
-LEFT JOIN Retargeting AS ret1 ON ofrs.id = ret1.offerId
+FROM Offer AS ofrs INDEXED BY idx_Offer_id
+INNER JOIN Campaign AS ca INDEXED BY idx_Campaign_id ON ca.valid=1 AND ca.retargeting=1 AND ofrs.campaignId=ca.id
+LEFT JOIN Retargeting AS ret INDEXED BY idx_Offer_offerId_uniqueHits ON ret.id=%llu AND ret.uniqueHits <= 0 AND ofrs.id = ret.offerId
+LEFT JOIN Retargeting AS ret1 INDEXED BY idx_Offer_offerId ON ofrs.id = ret1.offerId
 WHERE ofrs.id IN(%s)
 	AND ofrs.valid=1
 	AND ret.id IS NULL
