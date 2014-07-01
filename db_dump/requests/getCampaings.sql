@@ -1,5 +1,5 @@
 INSERT INTO %s(id)
-SELECT ca.id Campaign AS ca
+SELECT ca.id FROM Campaign AS ca
 INNER JOIN CampaignNow AS cn INDEXED BY idx_CampaignNow_id ON ca.id=cn.id
 		%s
 INNER JOIN (
