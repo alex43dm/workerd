@@ -657,7 +657,7 @@ bool Core::getCampaign()
                          informer->id,
                          informer->id,
                          informer->id,
-                         informer->blocked ? " AND ca.social=1 " : "",
+                         informer->blocked ? " AND ca.social=1 " : ""
                          );
 
     pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
