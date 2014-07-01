@@ -32,8 +32,6 @@ Core::Core()
 
     pDb = Config::Instance()->pDb;
 
-<<<<<<< HEAD
-=======
     tmpTableName = "tmp" + std::to_string((long long int)getpid()) + std::to_string((long long int)tid);
 
     Kompex::SQLiteStatement *p;
@@ -55,7 +53,6 @@ Core::Core()
         exit(1);
     }
     delete p;
->>>>>>> 7eda8a5
 #ifndef DUMMY
     hm = new HistoryManager();
     hm->initDB();
@@ -663,6 +660,10 @@ bool Core::getCampaign()
                          informer->id);
 
     pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
+
+#ifdef DEBUG
+    printf("%s\n",cmd);
+#endif // DEBUG
 
     try
     {
