@@ -1,3 +1,5 @@
+#include <signal.h>
+
 #include "HistoryManager.h"
 #include "Config.h"
 #include "Log.h"
@@ -31,6 +33,20 @@ void HistoryManager::getShortTerm()
 void *HistoryManager::getShortTermEnv(void *data)
 {
     HistoryManager *h = (HistoryManager*)data;
+
+    struct sigaction sact;
+
+    memset(&sact, 0, sizeof(sact));
+    sact.sa_handler = signalHanlerShortTerm;
+    sigaddset(&sact.sa_mask, SIGPIPE);
+
+    if( sigaction(SIGPIPE, &sact, 0) )
+    {
+        std::clog<<"error set sigaction"<<std::endl;
+    }
+
+    pthread_sigmask(SIG_SETMASK, &sact.sa_mask, NULL);
+
     h->getShortTerm();
     return NULL;
 }
@@ -45,6 +61,7 @@ bool HistoryManager::getShortTermAsync()
     pthread_attr_t attributes, *pAttr = &attributes;
     pthread_attr_init(pAttr);
     //pthread_attr_setstacksize(pAttr, THREAD_STACK_SIZE);
+
 
     if(pthread_create(&thrGetShortTermAsync, pAttr, &this->getShortTermEnv, this))
     {
@@ -66,4 +83,9 @@ bool HistoryManager::getShortTermAsyncWait()
     pthread_join(thrGetShortTermAsync, 0);
 //    Log::gdb("HistoryManager::getShortTermAsyncWait return");
     return true;
+}
+
+void HistoryManager::signalHanlerShortTerm(int sigNum)
+{
+    std::clog<<"get signal: "<<sigNum<<std::endl;
 }

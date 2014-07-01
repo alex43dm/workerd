@@ -1,3 +1,5 @@
+#include <signal.h>
+
 #include "HistoryManager.h"
 #include "Config.h"
 #include "Log.h"
@@ -79,6 +81,20 @@ void HistoryManager::getRetargeting()
 void *HistoryManager::getRetargetingEnv(void *data)
 {
     HistoryManager *h = (HistoryManager*)data;
+
+    struct sigaction sact;
+
+    memset(&sact, 0, sizeof(sact));
+    sact.sa_handler = signalHanlerRetargeting;
+    sigaddset(&sact.sa_mask, SIGPIPE);
+
+    if( sigaction(SIGPIPE, &sact, 0) )
+    {
+        std::clog<<"error set sigaction"<<std::endl;
+    }
+
+    pthread_sigmask(SIG_SETMASK, &sact.sa_mask, NULL);
+
     h->getRetargeting();
     return NULL;
 }
@@ -221,4 +237,9 @@ void HistoryManager::RetargetingClear()
 //    pStmt->CommitTransaction();
     pStmt->FreeQuery();
     delete pStmt;
+}
+
+void HistoryManager::signalHanlerRetargeting(int sigNum)
+{
+    std::clog<<"get signal: "<<sigNum<<std::endl;
 }

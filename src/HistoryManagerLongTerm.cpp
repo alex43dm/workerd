@@ -1,3 +1,5 @@
+#include <signal.h>
+
 #include "HistoryManager.h"
 #include "Config.h"
 #include "Log.h"
@@ -31,6 +33,20 @@ void HistoryManager::getLongTerm()
 void *HistoryManager::getLongTermEnv(void *data)
 {
     HistoryManager *h = (HistoryManager*)data;
+
+    struct sigaction sact;
+
+    memset(&sact, 0, sizeof(sact));
+    sact.sa_handler = signalHanlerLongTerm;
+    sigaddset(&sact.sa_mask, SIGPIPE);
+
+    if( sigaction(SIGPIPE, &sact, 0) )
+    {
+        std::clog<<"error set sigaction"<<std::endl;
+    }
+
+    pthread_sigmask(SIG_SETMASK, &sact.sa_mask, NULL);
+
     h->getLongTerm();
     return NULL;
 }
@@ -65,4 +81,9 @@ bool HistoryManager::getLongTermAsyncWait()
     pthread_join(thrGetLongTermAsync, 0);
 //    Log::gdb("HistoryManager::getLongTermAsyncWait return");
     return true;
+}
+
+void HistoryManager::signalHanlerLongTerm(int sigNum)
+{
+    std::clog<<"get signal: "<<sigNum<<std::endl;
 }
