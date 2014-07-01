@@ -83,7 +83,6 @@ private:
 
     char *cmd;
     float teasersMediumRating,teasersMaxRating;
-    std::string tmpTableName;
     Offer::Vector vOutPut;
     Offer::Vector result;
     Offer::Map items;

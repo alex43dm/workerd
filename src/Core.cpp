@@ -332,23 +332,6 @@ void Core::ProcessSaveResults()
 
     OutPutCampaignMap.clear();
 
-#ifndef DUMMY
-    try
-    {
-        Kompex::SQLiteStatement *p;
-
-        p = new Kompex::SQLiteStatement(pDb->pDatabase);
-        std::string sql("DELETE FROM " + tmpTableName + ";");
-        p->SqlStatement(sql);
-        delete p;
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        Log::err("DB error: delete from %s table: %s", tmpTableName.c_str(), ex.GetString().c_str());
-    }
-#endif // DUMMY
-
-
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
         if(o->second)
