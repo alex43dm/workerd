@@ -13,3 +13,4 @@ UNIQUE (locId) ON CONFLICT IGNORE,
 UNIQUE (country,city) ON CONFLICT IGNORE
 );
 CREATE INDEX IF NOT EXISTS idx_GeoRerions_country_city ON GeoLiteCity (country,city);
+CREATE INDEX IF NOT EXISTS idx_GeoRerions_locId_city ON GeoLiteCity (locId,city);

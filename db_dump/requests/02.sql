@@ -10,7 +10,7 @@ SELECT 	inf.id,
 	inf.range_search,
 	inf.retargeting_capacity,
 	ac.blocked
-FROM Informer AS inf
+FROM Informer AS inf INDEXED BY idx_Informer_guid
 INNER JOIN Accounts AS ac ON inf.accountId = ac.id
 WHERE inf.guid=@informerUid
 LIMIT 1;

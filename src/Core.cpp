@@ -494,7 +494,7 @@ std::string Core::getGeo()
                 Kompex::SQLiteStatement *pStmt;
                 pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
                 sqlite3_snprintf(CMD_SIZE, cmd,"SELECT geo.id_cam FROM geoTargeting AS geo \
-                INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND reg.city='%q';",
+                INNER JOIN GeoLiteCity AS reg INDEXED BY idx_GeoRerions_locId_city ON geo.id_geo = reg.locId AND reg.city='%q';",
                                  params->getRegion().c_str());
 
                 pStmt->Sql(cmd);
