@@ -16,14 +16,14 @@ void HistoryManager::getRetargeting()
         return;
     }
 
-    RetargetingClear();
-
     getHistoryByType(HistoryType::Retargeting, vretageting);
 
     if(vretageting.size() == 0)
     {
         return;
     }
+
+    RetargetingClear();
 
     //fill
     for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
