@@ -79,10 +79,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = x86_64-unknown-linux-gnu
 host_triplet = x86_64-unknown-linux-gnu
-##bin_PROGRAMS = workerd$(EXEEXT)
+bin_PROGRAMS = workerd$(EXEEXT)
 #bin_PROGRAMS = workerd-dummy$(EXEEXT)
 #bin_PROGRAMS = workerd-dev$(EXEEXT)
-bin_PROGRAMS = workerd-dummy-dev$(EXEEXT)
+##bin_PROGRAMS = workerd-dummy-dev$(EXEEXT)
 subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -116,7 +116,8 @@ am__workerd_SOURCES_DIST = src/base64.cpp src/Core.cpp \
 	src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp \
 	src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp \
 	src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp \
-	src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+	src/KompexSQLiteStatement.cpp src/ParentDB.cpp \
+	src/BoostHelpers.cpp
 am__objects_1 = workerd-base64.$(OBJEXT) workerd-Core.$(OBJEXT) \
 	workerd-GeoRerions.$(OBJEXT) \
 	workerd-HistoryManagerShortTerm.$(OBJEXT) \
@@ -136,16 +137,16 @@ am__objects_1 = workerd-base64.$(OBJEXT) workerd-Core.$(OBJEXT) \
 	workerd-Cookie.$(OBJEXT) workerd-GeoIPTools.$(OBJEXT) \
 	workerd-HistoryManagerRetargeting.$(OBJEXT) \
 	workerd-KompexSQLiteStatement.$(OBJEXT) \
-	workerd-ParentDB.$(OBJEXT)
-##am_workerd_OBJECTS = $(am__objects_1)
+	workerd-ParentDB.$(OBJEXT) workerd-BoostHelpers.$(OBJEXT)
+am_workerd_OBJECTS = $(am__objects_1)
 workerd_OBJECTS = $(am_workerd_OBJECTS)
 am__DEPENDENCIES_1 =
 am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
-##workerd_DEPENDENCIES =  \
-##	$(am__DEPENDENCIES_2) \
-##	libs/libredis/lib/libredis.a
+workerd_DEPENDENCIES =  \
+	$(am__DEPENDENCIES_2) \
+	libs/libredis/lib/libredis.a
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
@@ -161,7 +162,8 @@ am__workerd_dev_SOURCES_DIST = src/base64.cpp src/Core.cpp \
 	src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp \
 	src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp \
 	src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp \
-	src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+	src/KompexSQLiteStatement.cpp src/ParentDB.cpp \
+	src/BoostHelpers.cpp
 am__objects_2 = workerd_dev-base64.$(OBJEXT) \
 	workerd_dev-Core.$(OBJEXT) workerd_dev-GeoRerions.$(OBJEXT) \
 	workerd_dev-HistoryManagerShortTerm.$(OBJEXT) \
@@ -183,7 +185,8 @@ am__objects_2 = workerd_dev-base64.$(OBJEXT) \
 	workerd_dev-Cookie.$(OBJEXT) workerd_dev-GeoIPTools.$(OBJEXT) \
 	workerd_dev-HistoryManagerRetargeting.$(OBJEXT) \
 	workerd_dev-KompexSQLiteStatement.$(OBJEXT) \
-	workerd_dev-ParentDB.$(OBJEXT)
+	workerd_dev-ParentDB.$(OBJEXT) \
+	workerd_dev-BoostHelpers.$(OBJEXT)
 #am_workerd_dev_OBJECTS = $(am__objects_2)
 workerd_dev_OBJECTS = $(am_workerd_dev_OBJECTS)
 #workerd_dev_DEPENDENCIES =  \
@@ -196,7 +199,8 @@ am__workerd_dummy_SOURCES_DIST = src/base64.cpp src/Core.cpp \
 	src/EBranch.cpp src/json.cpp src/ParamParse.cpp \
 	src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp \
 	src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp \
-	src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+	src/KompexSQLiteStatement.cpp src/ParentDB.cpp \
+	src/BoostHelpers.cpp
 am__objects_3 = workerd_dummy-base64.$(OBJEXT) \
 	workerd_dummy-Core.$(OBJEXT) \
 	workerd_dummy-GeoRerions.$(OBJEXT) workerd_dummy-Log.$(OBJEXT) \
@@ -215,7 +219,8 @@ am__objects_3 = workerd_dummy-base64.$(OBJEXT) \
 	workerd_dummy-Params.$(OBJEXT) workerd_dummy-Cookie.$(OBJEXT) \
 	workerd_dummy-GeoIPTools.$(OBJEXT) \
 	workerd_dummy-KompexSQLiteStatement.$(OBJEXT) \
-	workerd_dummy-ParentDB.$(OBJEXT)
+	workerd_dummy-ParentDB.$(OBJEXT) \
+	workerd_dummy-BoostHelpers.$(OBJEXT)
 #am_workerd_dummy_OBJECTS = $(am__objects_3)
 workerd_dummy_OBJECTS = $(am_workerd_dummy_OBJECTS)
 #workerd_dummy_DEPENDENCIES =  \
@@ -227,7 +232,8 @@ am__workerd_dummy_dev_SOURCES_DIST = src/base64.cpp src/Core.cpp \
 	src/EBranch.cpp src/json.cpp src/ParamParse.cpp \
 	src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp \
 	src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp \
-	src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+	src/KompexSQLiteStatement.cpp src/ParentDB.cpp \
+	src/BoostHelpers.cpp
 am__objects_4 = workerd_dummy_dev-base64.$(OBJEXT) \
 	workerd_dummy_dev-Core.$(OBJEXT) \
 	workerd_dummy_dev-GeoRerions.$(OBJEXT) \
@@ -251,12 +257,13 @@ am__objects_4 = workerd_dummy_dev-base64.$(OBJEXT) \
 	workerd_dummy_dev-Cookie.$(OBJEXT) \
 	workerd_dummy_dev-GeoIPTools.$(OBJEXT) \
 	workerd_dummy_dev-KompexSQLiteStatement.$(OBJEXT) \
-	workerd_dummy_dev-ParentDB.$(OBJEXT)
-am_workerd_dummy_dev_OBJECTS =  \
-	$(am__objects_4)
+	workerd_dummy_dev-ParentDB.$(OBJEXT) \
+	workerd_dummy_dev-BoostHelpers.$(OBJEXT)
+##am_workerd_dummy_dev_OBJECTS =  \
+##	$(am__objects_4)
 workerd_dummy_dev_OBJECTS = $(am_workerd_dummy_dev_OBJECTS)
-workerd_dummy_dev_DEPENDENCIES =  \
-	$(am__DEPENDENCIES_2)
+##workerd_dummy_dev_DEPENDENCIES =  \
+##	$(am__DEPENDENCIES_2)
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -471,7 +478,7 @@ INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LD = /usr/x86_64-pc-linux-gnu/bin/ld -m elf_x86_64
 LDFLAGS =  -lmongoclient -lboost_system
 LIBOBJS = 
-LIBS = -lrabbitmq -ltinyxml -lGeoIP -lsqlite3 -lfcgi -licudata -licui18n -licuuc -lmongoclient -lamqpcpp 
+LIBS = -lrabbitmq -ltinyxml -lGeoIP -lsqlite3 -lfcgi -licudata -licui18n -licuuc -lmongoclient -lamqpcpp -lsphinxclient 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
@@ -488,17 +495,17 @@ OTOOL64 =
 PACKAGE = workerd
 PACKAGE_BUGREPORT = wvdial@gmail.com
 PACKAGE_NAME = workerd
-PACKAGE_STRING = workerd 1.1-46
+PACKAGE_STRING = workerd 1.3.2
 PACKAGE_TARNAME = workerd
 PACKAGE_URL = 
-PACKAGE_VERSION = 1.1-46
+PACKAGE_VERSION = 1.3.2
 PATH_SEPARATOR = :
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = strip
-VERSION = 1.1-46
+VERSION = 1.3.2
 abs_builddir = /home/alex/Projects/worker
 abs_srcdir = /home/alex/Projects/worker
 abs_top_builddir = /home/alex/Projects/worker
@@ -553,31 +560,31 @@ top_build_prefix =
 top_builddir = .
 top_srcdir = .
 ACLOCAL_AMFLAGS = -I m4
-SRC_ALL = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
-SRC_DUMMY = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/Offer.cpp src/CgiService.cpp src/EBranch.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp
+SRC_ALL = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp src/BoostHelpers.cpp
+SRC_DUMMY = src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/Offer.cpp src/CgiService.cpp src/EBranch.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp src/BoostHelpers.cpp
 CMN_CPPFLAGS = -std=c++11 -Iinclude
 CMN_LDADD = $(BOOST_DATE_TIME_LIBS) $(BOOST_FILESYSTEM_LIBS) $(BOOST_THREAD_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_REGEX_LIBS)
-workerd_dummy_dev_SOURCES = $(SRC_DUMMY)
-workerd_dummy_dev_CPPFLAGS = $(CMN_CPPFLAGS)
-workerd_dummy_dev_LDADD = $(CMN_LDADD)
+##workerd_dummy_dev_SOURCES = $(SRC_DUMMY)
+##workerd_dummy_dev_CPPFLAGS = $(CMN_CPPFLAGS)
+##workerd_dummy_dev_LDADD = $(CMN_LDADD)
 #workerd_dummy_SOURCES = $(SRC_DUMMY)
 #workerd_dummy_CPPFLAGS = $(CMN_CPPFLAGS)
 #workerd_dummy_LDADD = $(CMN_LDADD)
-#DEBDEP = bash (>= 2.05a-11), awk, procps (>= 1:2.0.7-8), sed (>= 3.02-8), grep (>= 2.4.2-3), coreutils (>= 5.0-5), libtinyxml2.6.2 (>=2.6.2), libsqlite3-0 (>=3.7.13), libfcgi0ldbl (>=2.4.0), sphinxsearch (>=2.1.5), geoip-database (>=20130213-1), rabbitmq-server (>=3.2.3), libboost-system1.49.0 (>=1.49.0), libboost-regex1.49.0 (>=1.49.0), libboost-thread1.49.0 (>=1.49.0), libboost-filesystem1.49.0 (>=1.49.0), libboost-date-time1.49.0 (>=1.49.0)
-DEBDEP = bash (>= 2.05a-11), awk, procps (>= 1:2.0.7-8), sed (>= 3.02-8), grep (>= 2.4.2-3), coreutils (>= 5.0-5), libtinyxml2.6.2 (>=2.6.2), libsqlite3-0 (>=3.7.13), libfcgi0ldbl (>=2.4.0), geoip-database (>=20130213-1), rabbitmq-server (>=3.2.3), libboost-system1.49.0 (>=1.49.0), libboost-regex1.49.0 (>=1.49.0), libboost-thread1.49.0 (>=1.49.0), libboost-filesystem1.49.0 (>=1.49.0), libboost-date-time1.49.0 (>=1.49.0)
-#SUBDIRS = libs/libredis
+DEBDEP = bash (>= 2.05a-11), awk, procps (>= 1:2.0.7-8), sed (>= 3.02-8), grep (>= 2.4.2-3), coreutils (>= 5.0-5), libtinyxml2.6.2 (>=2.6.2), libsqlite3-0 (>=3.7.13), libfcgi0ldbl (>=2.4.0), sphinxsearch (>=2.1.5), geoip-database (>=20130213-1), rabbitmq-server (>=3.2.3), libboost-system1.49.0 (>=1.49.0), libboost-regex1.49.0 (>=1.49.0), libboost-thread1.49.0 (>=1.49.0), libboost-filesystem1.49.0 (>=1.49.0), libboost-date-time1.49.0 (>=1.49.0)
+#DEBDEP = bash (>= 2.05a-11), awk, procps (>= 1:2.0.7-8), sed (>= 3.02-8), grep (>= 2.4.2-3), coreutils (>= 5.0-5), libtinyxml2.6.2 (>=2.6.2), libsqlite3-0 (>=3.7.13), libfcgi0ldbl (>=2.4.0), geoip-database (>=20130213-1), rabbitmq-server (>=3.2.3), libboost-system1.49.0 (>=1.49.0), libboost-regex1.49.0 (>=1.49.0), libboost-thread1.49.0 (>=1.49.0), libboost-filesystem1.49.0 (>=1.49.0), libboost-date-time1.49.0 (>=1.49.0)
+SUBDIRS = libs/libredis
 #workerd_dev_SOURCES = $(SRC_ALL)
 #workerd_dev_CPPFLAGS = $(CMN_CPPFLAGS) -Ilibs/libredis
 #workerd_dev_LDADD = $(CMN_LDADD) libs/libredis/lib/libredis.a
-##workerd_SOURCES = $(SRC_ALL)
-##workerd_CPPFLAGS = $(CMN_CPPFLAGS) -Ilibs/libredis
-##workerd_LDADD = $(CMN_LDADD) libs/libredis/lib/libredis.a
-#AM_CFLAGS = -Ofast
-AM_CFLAGS = -g -DDEBUG -Wall
-#AM_CXXFLAGS = -Ofast
-AM_CXXFLAGS = -g -DDEBUG -Wall
-#MAKEINIT = 1
-MAKEINIT = 0
+workerd_SOURCES = $(SRC_ALL)
+workerd_CPPFLAGS = $(CMN_CPPFLAGS) -Ilibs/libredis
+workerd_LDADD = $(CMN_LDADD) libs/libredis/lib/libredis.a
+AM_CFLAGS = -march=corei7 -O2
+#AM_CFLAGS = -g -DDEBUG -Wall
+AM_CXXFLAGS = -march=corei7 -O2
+#AM_CXXFLAGS = -g -DDEBUG -Wall
+MAKEINIT = 1
+#MAKEINIT = 0
 debian_BUILD = $(bin_PROGRAMS)-$(VERSION)
 dist_doc_DATA = README
 sysconf_DATA = \
@@ -586,6 +593,7 @@ db_dump/requests/01.sql \
 db_dump/requests/05.sql \
 db_dump/requests/04.sql \
 db_dump/requests/03.sql \
+db_dump/requests/all.sql \
 db_dump/UA_RU \
 db_dump/tables/11_GeoCountries.sql \
 db_dump/tables/00_Campaign.sql \
@@ -767,6 +775,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/workerd-BaseCore.Po
+include ./$(DEPDIR)/workerd-BoostHelpers.Po
 include ./$(DEPDIR)/workerd-Campaign.Po
 include ./$(DEPDIR)/workerd-CgiService.Po
 include ./$(DEPDIR)/workerd-Config.Po
@@ -799,6 +808,7 @@ include ./$(DEPDIR)/workerd-json.Po
 include ./$(DEPDIR)/workerd-main.Po
 include ./$(DEPDIR)/workerd-sphinxRequests.Po
 include ./$(DEPDIR)/workerd_dev-BaseCore.Po
+include ./$(DEPDIR)/workerd_dev-BoostHelpers.Po
 include ./$(DEPDIR)/workerd_dev-Campaign.Po
 include ./$(DEPDIR)/workerd_dev-CgiService.Po
 include ./$(DEPDIR)/workerd_dev-Config.Po
@@ -831,6 +841,7 @@ include ./$(DEPDIR)/workerd_dev-json.Po
 include ./$(DEPDIR)/workerd_dev-main.Po
 include ./$(DEPDIR)/workerd_dev-sphinxRequests.Po
 include ./$(DEPDIR)/workerd_dummy-BaseCore.Po
+include ./$(DEPDIR)/workerd_dummy-BoostHelpers.Po
 include ./$(DEPDIR)/workerd_dummy-Campaign.Po
 include ./$(DEPDIR)/workerd_dummy-CgiService.Po
 include ./$(DEPDIR)/workerd_dummy-Config.Po
@@ -855,6 +866,7 @@ include ./$(DEPDIR)/workerd_dummy-base64.Po
 include ./$(DEPDIR)/workerd_dummy-json.Po
 include ./$(DEPDIR)/workerd_dummy-main.Po
 include ./$(DEPDIR)/workerd_dummy_dev-BaseCore.Po
+include ./$(DEPDIR)/workerd_dummy_dev-BoostHelpers.Po
 include ./$(DEPDIR)/workerd_dummy_dev-Campaign.Po
 include ./$(DEPDIR)/workerd_dummy_dev-CgiService.Po
 include ./$(DEPDIR)/workerd_dummy_dev-Config.Po
@@ -1348,6 +1360,20 @@ workerd-ParentDB.obj: src/ParentDB.cpp
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd-ParentDB.obj `if test -f 'src/ParentDB.cpp'; then $(CYGPATH_W) 'src/ParentDB.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ParentDB.cpp'; fi`
 
+workerd-BoostHelpers.o: src/BoostHelpers.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd-BoostHelpers.o -MD -MP -MF $(DEPDIR)/workerd-BoostHelpers.Tpo -c -o workerd-BoostHelpers.o `test -f 'src/BoostHelpers.cpp' || echo '$(srcdir)/'`src/BoostHelpers.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd-BoostHelpers.Tpo $(DEPDIR)/workerd-BoostHelpers.Po
+#	$(AM_V_CXX)source='src/BoostHelpers.cpp' object='workerd-BoostHelpers.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd-BoostHelpers.o `test -f 'src/BoostHelpers.cpp' || echo '$(srcdir)/'`src/BoostHelpers.cpp
+
+workerd-BoostHelpers.obj: src/BoostHelpers.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd-BoostHelpers.obj -MD -MP -MF $(DEPDIR)/workerd-BoostHelpers.Tpo -c -o workerd-BoostHelpers.obj `if test -f 'src/BoostHelpers.cpp'; then $(CYGPATH_W) 'src/BoostHelpers.cpp'; else $(CYGPATH_W) '$(srcdir)/src/BoostHelpers.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd-BoostHelpers.Tpo $(DEPDIR)/workerd-BoostHelpers.Po
+#	$(AM_V_CXX)source='src/BoostHelpers.cpp' object='workerd-BoostHelpers.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd-BoostHelpers.obj `if test -f 'src/BoostHelpers.cpp'; then $(CYGPATH_W) 'src/BoostHelpers.cpp'; else $(CYGPATH_W) '$(srcdir)/src/BoostHelpers.cpp'; fi`
+
 workerd_dev-base64.o: src/base64.cpp
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd_dev-base64.o -MD -MP -MF $(DEPDIR)/workerd_dev-base64.Tpo -c -o workerd_dev-base64.o `test -f 'src/base64.cpp' || echo '$(srcdir)/'`src/base64.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd_dev-base64.Tpo $(DEPDIR)/workerd_dev-base64.Po
@@ -1796,6 +1822,20 @@ workerd_dev-ParentDB.obj: src/ParentDB.cpp
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd_dev-ParentDB.obj `if test -f 'src/ParentDB.cpp'; then $(CYGPATH_W) 'src/ParentDB.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ParentDB.cpp'; fi`
 
+workerd_dev-BoostHelpers.o: src/BoostHelpers.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd_dev-BoostHelpers.o -MD -MP -MF $(DEPDIR)/workerd_dev-BoostHelpers.Tpo -c -o workerd_dev-BoostHelpers.o `test -f 'src/BoostHelpers.cpp' || echo '$(srcdir)/'`src/BoostHelpers.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd_dev-BoostHelpers.Tpo $(DEPDIR)/workerd_dev-BoostHelpers.Po
+#	$(AM_V_CXX)source='src/BoostHelpers.cpp' object='workerd_dev-BoostHelpers.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd_dev-BoostHelpers.o `test -f 'src/BoostHelpers.cpp' || echo '$(srcdir)/'`src/BoostHelpers.cpp
+
+workerd_dev-BoostHelpers.obj: src/BoostHelpers.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd_dev-BoostHelpers.obj -MD -MP -MF $(DEPDIR)/workerd_dev-BoostHelpers.Tpo -c -o workerd_dev-BoostHelpers.obj `if test -f 'src/BoostHelpers.cpp'; then $(CYGPATH_W) 'src/BoostHelpers.cpp'; else $(CYGPATH_W) '$(srcdir)/src/BoostHelpers.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd_dev-BoostHelpers.Tpo $(DEPDIR)/workerd_dev-BoostHelpers.Po
+#	$(AM_V_CXX)source='src/BoostHelpers.cpp' object='workerd_dev-BoostHelpers.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd_dev-BoostHelpers.obj `if test -f 'src/BoostHelpers.cpp'; then $(CYGPATH_W) 'src/BoostHelpers.cpp'; else $(CYGPATH_W) '$(srcdir)/src/BoostHelpers.cpp'; fi`
+
 workerd_dummy-base64.o: src/base64.cpp
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd_dummy-base64.o -MD -MP -MF $(DEPDIR)/workerd_dummy-base64.Tpo -c -o workerd_dummy-base64.o `test -f 'src/base64.cpp' || echo '$(srcdir)/'`src/base64.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd_dummy-base64.Tpo $(DEPDIR)/workerd_dummy-base64.Po
@@ -2132,6 +2172,20 @@ workerd_dummy-ParentDB.obj: src/ParentDB.cpp
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd_dummy-ParentDB.obj `if test -f 'src/ParentDB.cpp'; then $(CYGPATH_W) 'src/ParentDB.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ParentDB.cpp'; fi`
 
+workerd_dummy-BoostHelpers.o: src/BoostHelpers.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd_dummy-BoostHelpers.o -MD -MP -MF $(DEPDIR)/workerd_dummy-BoostHelpers.Tpo -c -o workerd_dummy-BoostHelpers.o `test -f 'src/BoostHelpers.cpp' || echo '$(srcdir)/'`src/BoostHelpers.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd_dummy-BoostHelpers.Tpo $(DEPDIR)/workerd_dummy-BoostHelpers.Po
+#	$(AM_V_CXX)source='src/BoostHelpers.cpp' object='workerd_dummy-BoostHelpers.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd_dummy-BoostHelpers.o `test -f 'src/BoostHelpers.cpp' || echo '$(srcdir)/'`src/BoostHelpers.cpp
+
+workerd_dummy-BoostHelpers.obj: src/BoostHelpers.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd_dummy-BoostHelpers.obj -MD -MP -MF $(DEPDIR)/workerd_dummy-BoostHelpers.Tpo -c -o workerd_dummy-BoostHelpers.obj `if test -f 'src/BoostHelpers.cpp'; then $(CYGPATH_W) 'src/BoostHelpers.cpp'; else $(CYGPATH_W) '$(srcdir)/src/BoostHelpers.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd_dummy-BoostHelpers.Tpo $(DEPDIR)/workerd_dummy-BoostHelpers.Po
+#	$(AM_V_CXX)source='src/BoostHelpers.cpp' object='workerd_dummy-BoostHelpers.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd_dummy-BoostHelpers.obj `if test -f 'src/BoostHelpers.cpp'; then $(CYGPATH_W) 'src/BoostHelpers.cpp'; else $(CYGPATH_W) '$(srcdir)/src/BoostHelpers.cpp'; fi`
+
 workerd_dummy_dev-base64.o: src/base64.cpp
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd_dummy_dev-base64.o -MD -MP -MF $(DEPDIR)/workerd_dummy_dev-base64.Tpo -c -o workerd_dummy_dev-base64.o `test -f 'src/base64.cpp' || echo '$(srcdir)/'`src/base64.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd_dummy_dev-base64.Tpo $(DEPDIR)/workerd_dummy_dev-base64.Po
@@ -2467,6 +2521,20 @@ workerd_dummy_dev-ParentDB.obj: src/ParentDB.cpp
 #	$(AM_V_CXX)source='src/ParentDB.cpp' object='workerd_dummy_dev-ParentDB.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd_dummy_dev-ParentDB.obj `if test -f 'src/ParentDB.cpp'; then $(CYGPATH_W) 'src/ParentDB.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ParentDB.cpp'; fi`
+
+workerd_dummy_dev-BoostHelpers.o: src/BoostHelpers.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd_dummy_dev-BoostHelpers.o -MD -MP -MF $(DEPDIR)/workerd_dummy_dev-BoostHelpers.Tpo -c -o workerd_dummy_dev-BoostHelpers.o `test -f 'src/BoostHelpers.cpp' || echo '$(srcdir)/'`src/BoostHelpers.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd_dummy_dev-BoostHelpers.Tpo $(DEPDIR)/workerd_dummy_dev-BoostHelpers.Po
+#	$(AM_V_CXX)source='src/BoostHelpers.cpp' object='workerd_dummy_dev-BoostHelpers.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd_dummy_dev-BoostHelpers.o `test -f 'src/BoostHelpers.cpp' || echo '$(srcdir)/'`src/BoostHelpers.cpp
+
+workerd_dummy_dev-BoostHelpers.obj: src/BoostHelpers.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT workerd_dummy_dev-BoostHelpers.obj -MD -MP -MF $(DEPDIR)/workerd_dummy_dev-BoostHelpers.Tpo -c -o workerd_dummy_dev-BoostHelpers.obj `if test -f 'src/BoostHelpers.cpp'; then $(CYGPATH_W) 'src/BoostHelpers.cpp'; else $(CYGPATH_W) '$(srcdir)/src/BoostHelpers.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/workerd_dummy_dev-BoostHelpers.Tpo $(DEPDIR)/workerd_dummy_dev-BoostHelpers.Po
+#	$(AM_V_CXX)source='src/BoostHelpers.cpp' object='workerd_dummy_dev-BoostHelpers.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(workerd_dummy_dev_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o workerd_dummy_dev-BoostHelpers.obj `if test -f 'src/BoostHelpers.cpp'; then $(CYGPATH_W) 'src/BoostHelpers.cpp'; else $(CYGPATH_W) '$(srcdir)/src/BoostHelpers.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

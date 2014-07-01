@@ -101,6 +101,7 @@ private:
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
     std::string getGeo();
+    bool getCampaign();
     void log();
     boost::posix_time::ptime startCoreTime, endCoreTime;
 };
