@@ -1598,7 +1598,7 @@ bool ParentDB::ClearSession()
     pStmt = new Kompex::SQLiteStatement(pdb);
 
     sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE viewTime<%llu;",
-        cfg->views_expire_ + std::time(0));
+        std::time(0) - cfg->views_expire_);
 
     try
     {
@@ -1610,7 +1610,7 @@ bool ParentDB::ClearSession()
     }
 
     sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Retargeting WHERE viewTime<%llu;",
-        cfg->views_expire_ + std::time(0));
+        std::time(0) - cfg->views_expire_);
 
     try
     {
