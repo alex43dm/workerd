@@ -1531,7 +1531,7 @@ std::string ParentDB::CampaignGetName(long long campaign_id)
 //==================================================================================
 bool ParentDB::AccountLoad(mongo::Query query)
 {
-    std::unique_ptr<mongo::DBClientCursor> cursor = monga_main->query(cfg->mongo_main_db_ + ".user", query);
+    std::unique_ptr<mongo::DBClientCursor> cursor = monga_main->query(cfg->mongo_main_db_ + ".users", query);
     Kompex::SQLiteStatement *pStmt;
     unsigned blockedVal;
 
