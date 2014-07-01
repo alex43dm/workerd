@@ -56,7 +56,7 @@ INNER JOIN (
         LEFT JOIN Campaign2Informer AS c2ide ON c2id.id_cam=c2ide.id_cam AND c2ide.id_inf=%lld AND c2ide.allowed=1
         WHERE c2ide.id_cam IS NULL AND ((c2id.id_inf=%lld OR c2id.id_inf=1) AND c2id.allowed=0)
 ) AS c ON ca.id=c.id
-LEFT JOIN Session AS ses ON ofrs.id=ses.offerId AND ses.id=%llu AND ses.uniqueHits <= 0
+LEFT JOIN Session AS ses INDEXED BY idx_Session_id_offerId ON ofrs.id=ses.offerId AND ses.id=%llu AND ses.uniqueHits <= 0
 LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=%lld AND ofrs.id=iret.id_ofr
 WHERE ofrs.valid=1
     AND ses.offerId IS NULL
