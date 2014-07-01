@@ -168,7 +168,9 @@ bool BaseCore::ProcessMQ()
 
                 if(m->getRoutingKey() == "account.update")
                 {
-                    pdb->InformerUpdate(QUERY("user" << toString(m)));
+                    std::string accountName = toString(m);
+                    pdb->AccountLoad(QUERY("login" << accountName));
+                    pdb->InformerUpdate(QUERY("user" << accountName));
                 }
 
                 mq_account_->Get(AMQP_NOACK);
@@ -198,6 +200,9 @@ void BaseCore::LoadAllEntities()
 {
     if(Config::Instance()->pDb->reopen)
         return;
+
+    //accounts load
+    pdb->AccountLoad();
 
     //Загрузили все информеры
     pdb->InformerLoadAll();

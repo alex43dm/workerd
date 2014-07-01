@@ -39,7 +39,7 @@ public:
     Informer(long id);
     Informer(long id, int capacity,
              const std::string &bannersCss,
-             const std::string &teasersCss, long , long, double, double, double, double, int);//, int);
+             const std::string &teasersCss, long , long, double, double, double, double, int, bool);//, int);
     virtual ~Informer();
 
     bool is_null() const

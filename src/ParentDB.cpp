@@ -674,6 +674,7 @@ void ParentDB::logDb(const Kompex::SQLiteException &ex) const
 void ParentDB::CampaignLoad(const std::string &aCampaignId)
 {
     std::unique_ptr<mongo::DBClientCursor> cursor;
+    mongo::Query query;
     Kompex::SQLiteStatement *pStmt;
     int i = 0, cats = 0;
 
@@ -681,12 +682,14 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
 
     if(!aCampaignId.empty())
     {
-        cursor = monga_main->query(cfg->mongo_main_db_ +".campaign", QUERY("guid" << aCampaignId));
+        query = QUERY("guid" << aCampaignId);
     }
     else
     {
-        cursor = monga_main->query(cfg->mongo_main_db_ +".campaign", mongo::Query());
+        query = mongo::Query();
     }
+
+    cursor = monga_main->query(cfg->mongo_main_db_ +".campaign", query);
 
     pStmt->BeginTransaction();
     while (cursor->more())
@@ -1432,4 +1435,55 @@ std::string ParentDB::CampaignGetName(long long campaign_id)
     }
     return "";
 }
+
+//==================================================================================
+bool ParentDB::AccountLoad(mongo::Query query)
+{
+    std::unique_ptr<mongo::DBClientCursor> cursor = monga_main->query(cfg->mongo_main_db_ + ".user", query);
+    Kompex::SQLiteStatement *pStmt;
+    unsigned blockedVal;
+
+    pStmt = new Kompex::SQLiteStatement(pdb);
+
+    while (cursor->more())
+    {
+        mongo::BSONObj x = cursor->next();
+        std::string login = x.getStringField("login");
+        std::string blocked = x.getStringField("blocked");
+
+        if(blocked == "banned" || blocked == "light")
+        {
+            blockedVal = 1;
+        }
+        else
+        {
+            blockedVal = 0;
+        }
+
+        sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name,blocked) VALUES('%q',%u);"
+                         ,login.c_str()
+                         , blockedVal );
+
+        try
+        {
+            pStmt->SqlStatement(buf);
+        }
+        catch(Kompex::SQLiteException &ex)
+        {
+            logDb(ex);
+        }
+    }
+
+    pStmt->FreeQuery();
+
+    delete pStmt;
+
+    return true;
+}
+
+/*
+{$and:[{ $or: [{"blocked":"banned"},{"blocked":"light"}]},{"login" 2: "vnutri.info"}]}
+*/
+
+
 

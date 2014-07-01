@@ -35,6 +35,8 @@ public:
     void CampaignRemove(const std::string &aCampaignId);
     std::string CampaignGetName(long long campaign_id);
 
+    bool AccountLoad(mongo::Query=mongo::Query());
+
 private:
     bool fConnectedToMainDatabase;
     Kompex::SQLiteDatabase *pdb;

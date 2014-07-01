@@ -8,7 +8,7 @@ Informer::Informer(long id) :
 Informer::Informer(long id, int capacity, const std::string &bannersCss,
                    const std::string &teasersCss, long domainId, long accountId,
                    double range_short_term, double range_long_term,
-                   double range_context, double range_search, int retargeting_capacity):
+                   double range_context, double range_search, int retargeting_capacity, bool blocked):
     id(id),
     capacity(capacity),
     bannersCss(bannersCss),
@@ -19,7 +19,8 @@ Informer::Informer(long id, int capacity, const std::string &bannersCss,
     range_short_term(range_short_term),
     range_long_term(range_long_term),
     range_context(range_context),
-    range_search(range_search)
+    range_search(range_search),
+    blocked(blocked)
 {
 }
 

@@ -424,7 +424,8 @@ bool Core::getInformer()
                                      pStmt->GetColumnDouble(7),
                                      pStmt->GetColumnDouble(8),
                                      pStmt->GetColumnDouble(9),
-                                     pStmt->GetColumnInt(10)
+                                     pStmt->GetColumnInt(10),
+                                     pStmt->GetColumnBool(11)
                                     );
             ret = true;
             break;
@@ -558,6 +559,7 @@ bool Core::getOffers(bool getAll)
     if(!getAll)
     {
         sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
+                         informer->blocked ? " AND ca.social=1 " : "",
                          getGeo().c_str(),
                          informer->domainId,
                          informer->domainId,

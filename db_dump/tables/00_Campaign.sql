@@ -20,4 +20,4 @@ CREATE INDEX IF NOT EXISTS idx_Campaign_guid ON Campaign (guid);
 --CREATE INDEX IF NOT EXISTS idx_Campaign_impressionsPerDayLimit ON Campaign (impressionsPerDayLimit);
 --CREATE INDEX IF NOT EXISTS idx_Campaign_valid ON Campaign (valid);
 --CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting ON Campaign (retargeting);
-CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting_valid ON Campaign (valid,retargeting);
+CREATE INDEX IF NOT EXISTS idx_Campaign_retargeting_valid ON Campaign (valid,retargeting) WHERE valid=1 AND retargeting=0;

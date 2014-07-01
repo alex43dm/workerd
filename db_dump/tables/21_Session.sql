@@ -9,6 +9,4 @@ FOREIGN KEY(offerId) REFERENCES Offer(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_Session_id ON Session (id);
-CREATE INDEX IF NOT EXISTS idx_Session_offerId ON Retargeting (offerId);
-CREATE INDEX IF NOT EXISTS idx_Session_uniqueHits ON Retargeting (uniqueHits);
-CREATE INDEX IF NOT EXISTS idx_Session_viewTime ON Retargeting (viewTime);
+CREATE INDEX IF NOT EXISTS idx_Session_id_offerId ON Session (id,offerId,uniqueHits);
