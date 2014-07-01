@@ -22,7 +22,7 @@ ca.guid,
 ca.offer_by_campaign_unique
 FROM Offer AS ofrs
 INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id %s
-INNER JOIN CampaignNow AS cn ON ca.id=cn.id
+INNER JOIN CampaignNow AS cn INDEXED BY idx_CampaignNow_id ON ca.id=cn.id
 		%s
 INNER JOIN (
         SELECT c2c.id_cam AS id

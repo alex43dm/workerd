@@ -502,15 +502,15 @@ std::string Core::getGeo()
                 if(pStmt->GetDataCount() > 0)
                 {
                     geo =
-                        "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-                    INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND reg.city='"+params->getRegion()+"'";
+                        "INNER JOIN geoTargeting AS geo INDEXED BY idx_geoTargeting_id_geo_id_cam ON geo.id_cam=cn.id \
+                    INNER JOIN GeoLiteCity AS reg INDEXED BY idx_GeoRerions_country_city ON geo.id_geo = reg.locId AND reg.city='"+params->getRegion()+"'";
                 }
                 else if(params->getCountry().size())
                 {
 
                     geo =
-                        "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-                    INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId \
+                        "INNER JOIN geoTargeting AS geo INDEXED BY idx_geoTargeting_id_geo_id_cam ON geo.id_cam=cn.id \
+                    INNER JOIN GeoLiteCity AS reg INDEXED BY idx_GeoRerions_country_city ON geo.id_geo = reg.locId \
                     AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND (reg.city='' OR reg.city='NOT FOUND'))";
                 }
                 pStmt->FreeQuery();
@@ -526,8 +526,8 @@ std::string Core::getGeo()
         {
 
             geo =
-                "INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
-            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId \
+                "INNER JOIN geoTargeting AS geo INDEXED BY idx_geoTargeting_id_geo_id_cam ON geo.id_cam=cn.id \
+            INNER JOIN GeoLiteCity AS reg INDEXED BY idx_GeoRerions_country_city ON geo.id_geo = reg.locId \
             AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND (reg.city='' OR reg.city='NOT FOUND'))";
         }
     }
