@@ -39,3 +39,7 @@ doc
 com
 config.h.in
 Makefile.in
+Makefile
+config.h
+configure
+libtool
