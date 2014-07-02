@@ -19,7 +19,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
 
     if(cfg->logOutPutOfferIds)
     {
-        std::clog<<" OutPutOfferIds: ";
+        std::clog<<" output ids: ";
     }
 
     if(clean)

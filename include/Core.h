@@ -77,7 +77,7 @@ private:
 #endif
     bool all_social;
 
-    unsigned teasersCount, RetargetingCount;
+    unsigned teasersCount, RetargetingCount, offersTotal;
 
     std::multimap<long,long> OutPutCampaignMap;
 

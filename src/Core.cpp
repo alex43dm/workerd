@@ -268,7 +268,11 @@ void Core::log()
         std::clog<<" location:"<<params->getLocation();
 
     if(cfg->logOutPutOfferIds || cfg->logRetargetingOfferIds)
+    {
         std::clog<<" key:"<<params->getUserKey();
+        std::clog<<"offers:  total:"<<offersTotal;
+    }
+
 
 }
 //-------------------------------------------------------------------------------------------------------------------
@@ -632,6 +636,8 @@ bool Core::getOffers(bool getAll)
 
     pStmt->FreeQuery();
     delete pStmt;
+
+    offersTotal = items.size();
 
     return ret;
 }
