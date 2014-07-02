@@ -28,14 +28,14 @@ public:
     typedef enum { banner, teazer, unknown } Type;
     /// Структура для хранения информации о рекламном предложении.
     std::string id;             ///< ID предложения
-    long long int id_int;                 ///< ID предложения
+    unsigned long long id_int;                 ///< ID предложения
     std::string title;          ///< Заголовок
     std::string price;          ///< Цена
     std::string description;    ///< Описание
     std::string url;            ///< URL перехода на предложение
     std::string image_url;      ///< URL картинки
     std::string swf;            ///< URL Flash
-    long long campaign_id;    ///< ID кампании, к которой относится предложение
+    unsigned long long campaign_id;    ///< ID кампании, к которой относится предложение
     bool isOnClick;             ///< Реклама по кликам или показам
     Type type;			///< тип РП
     std::string conformity;		///< тип соответствия РП и запроса, изменяеться после выбора РП из индекса

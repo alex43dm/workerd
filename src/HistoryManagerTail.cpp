@@ -58,7 +58,7 @@ bool HistoryManager::setTailOffers(const Offer::Map &items, const Offer::Vector 
         fFound = false;
         for(auto i = toShow.begin(); i != toShow.end(); ++i)
         {
-            if(items.count((*i)->id_int)>0)
+            if((*i)->id_int == (*it).first)
             {
                 fFound = true;
                 break;
