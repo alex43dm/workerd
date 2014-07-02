@@ -294,10 +294,8 @@ void Core::ProcessSaveResults()
                                   obj();
 #ifndef DUMMY
         //cycle view
-        if(items.size() <= (u_int)informer->capacity * 2)
+        if(hm->tail)
         {
-//            Log::gdb("set tail");
-            hm->clean = true;
             hm->setTailOffers(items,vOutPut);
         }
 
@@ -838,6 +836,12 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
         hm->clean = true;
 #endif // DUMMY
         std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "result size less or equal: "<<result.size()<<" outLen: "<<informer->capacity<<", clean history"<<std::endl;
+    }
+
+    if(result.size() <= informer->capacity * 2)
+    {
+        Log::gdb("set tail");
+        hm->tail = true;
     }
 
     //check is all social
