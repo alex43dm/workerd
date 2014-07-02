@@ -832,68 +832,44 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
 #ifndef DUMMY
     if(result.size() <= informer->capacity * 2)
     {
-        Log::gdb("set tail");
 //        std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "result size less or equal: "<<result.size()<<" outLen: "<<informer->capacity<<", clean history"<<std::endl;
         hm->clean = true;
     }
 #endif // DUMMY
 
-    //check is all social
-    if(all_social)
-    {
-#ifndef DUMMY
-        hm->clean = true;
-#endif // DUMMY
-        std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "all social: clean history"<<std::endl;
-    }
-
     //add teaser when teaser unique id and with company unique and rating > 0
     for(p = result.begin(); p != result.end(); ++p)
     {
-        if((!OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign)
-                && (*p)->rating > 0.0
+        if(OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
+
+            RISResult.push_back(*p);
+
             if(FULL)
             {
                 goto links_make;
             }
 
-            RISResult.push_back(*p);
             OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
-    }
-    /*
-        //user history view clean
-        #ifndef DUMMY
-        hm->clean = true;
-        Log::warn("RISAlgorithm: clean offer history");
-        #endif // DUMMY
-    */
-    if(FULL)
-    {
-        goto links_make;
     }
 
     //add teaser when teaser unique id and with company unique and with any rating
     for(p = result.begin(); p!=result.end() && RISResult.size() < informer->capacity; ++p)
     {
-        if((!OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign)
+        if(OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
+            RISResult.push_back(*p);
+
             if(FULL)
             {
                 goto links_make;
             }
 
-            RISResult.push_back(*p);
             OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
-    }
-
-    if(FULL)
-    {
-        goto links_make;
     }
 
     //add teaser when teaser unique id and with id unique and with any rating
@@ -901,19 +877,15 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     {
         if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
+            RISResult.push_back(*p);
+
             if(FULL)
             {
                 goto links_make;
             }
 
-            RISResult.push_back(*p);
             OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
         }
-    }
-
-    if(FULL)
-    {
-        goto links_make;
     }
 
     //expand to return size

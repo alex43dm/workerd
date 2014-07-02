@@ -42,3 +42,4 @@ Makefile
 config.h
 configure
 libtool
+worker.depend
