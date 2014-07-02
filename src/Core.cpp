@@ -60,7 +60,7 @@ Core::Core()
 
     Log::info("[%ld]core start",tid);
 }
-
+//-------------------------------------------------------------------------------------------------------------------
 Core::~Core()
 {
     delete []cmd;
@@ -86,6 +86,7 @@ Core::~Core()
     Значения никак не экранируются, считается, что они не должны содержать
     символа-разделителя \c '\\n'.
 */
+//-------------------------------------------------------------------------------------------------------------------
 class GenerateRedirectLink
 {
     std::string informerId;
@@ -110,11 +111,7 @@ public:
                     ));
     }
 };
-
-
-
-/** Обработка запроса на показ рекламы с параметрами ``params``.
-	Изменён RealInvest Soft */
+//-------------------------------------------------------------------------------------------------------------------
 std::string Core::Process(Params *prms)
 {
     Offer::Vector vRIS;
@@ -235,7 +232,7 @@ std::string Core::Process(Params *prms)
 
     return ret;
 }
-
+//-------------------------------------------------------------------------------------------------------------------
 void Core::log()
 {
     std::clog<<"["<<tid<<"]";
@@ -274,8 +271,7 @@ void Core::log()
         std::clog<<" key:"<<params->getUserKey();
 
 }
-
-// Сохраняем выданные ссылки в базе данных
+//-------------------------------------------------------------------------------------------------------------------
 void Core::ProcessSaveResults()
 {
     request_processed_++;
@@ -356,6 +352,21 @@ void Core::ProcessSaveResults()
 
     OutPutCampaignMap.clear();
 
+    //clear tmp table
+    Kompex::SQLiteStatement *pStmt;
+    pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
+    sqlite3_snprintf(CMD_SIZE,cmd,"DELETE FROM %s;",tmpTableName.c_str());
+    try
+    {
+        pStmt->SqlStatement(cmd);
+        pStmt->FreeQuery();
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        std::clog<<__func__<<" error: " <<ex.GetString()<<std::endl;
+    }
+    delete pStmt;
+
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
         if(o->second)
@@ -373,7 +384,7 @@ void Core::ProcessSaveResults()
 
     std::clog<<std::endl;
 }
-
+//-------------------------------------------------------------------------------------------------------------------
 bool Core::getInformer()
 {
     bool ret = false;
@@ -463,6 +474,7 @@ file::memory:?cache=shared
 	-#  Предложения, указанные в \c params.exluded_offers, по возможности
 	    исключаются из просмотра. Это используется в прокрутке информера.
  */
+//-------------------------------------------------------------------------------------------------------------------
 std::string Core::getGeo()
 {
     std::string geo;
@@ -517,22 +529,7 @@ std::string Core::getGeo()
     }
     return geo;
 }
-/*
-bool Core::getAllOffers(Offer::Map &ret)
-{
-    sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
-                     getGeo().c_str(),
-                     informer->domainId,
-                     informer->domainId,
-                     informer->accountId,
-                     informer->id,
-                     getpid(),
-                     tid,
-                     informer->id);
-    hm->getDeprecatedOffersAsyncWait();
-    return getOffers(ret);
-}
-*/
+//-------------------------------------------------------------------------------------------------------------------
 bool Core::getOffers(bool getAll)
 {
     Kompex::SQLiteStatement *pStmt;
@@ -638,7 +635,7 @@ bool Core::getOffers(bool getAll)
 
     return ret;
 }
-
+//-------------------------------------------------------------------------------------------------------------------
 bool Core::getCampaign()
 {
     bool ret = false;
@@ -668,7 +665,7 @@ bool Core::getCampaign()
 
     try
     {
-        pStmt->Sql(cmd);
+        pStmt->SqlStatement(cmd);
         ret = true;
     }
     catch(Kompex::SQLiteException &ex)
@@ -685,7 +682,7 @@ bool Core::getCampaign()
 
     return ret;
 }
-
+//-------------------------------------------------------------------------------------------------------------------
 std::string Core::OffersToHtml(const Offer::Vector &items, const std::string &url) const
 {
     std::string informer_html;
@@ -718,8 +715,7 @@ std::string Core::OffersToHtml(const Offer::Vector &items, const std::string &ur
 
     return informer_html;
 }
-
-
+//-------------------------------------------------------------------------------------------------------------------
 std::string Core::OffersToJson(const Offer::Vector &items) const
 {
 
@@ -739,7 +735,7 @@ std::string Core::OffersToJson(const Offer::Vector &items) const
 
     return json.str();
 }
-
+//-------------------------------------------------------------------------------------------------------------------
 /**
  * Проверяет соответствие размера баннера и размера банероместа РБ
  */
@@ -773,6 +769,7 @@ bool Core::checkBannerSize(const Offer *offer)
 	если выбранных тизеров достаточно для РБ, показываем.
 	если нет - добираем из исходного массива стоящие слева тизеры.
  */
+//-------------------------------------------------------------------------------------------------------------------
 #define FULL RISResult.size() >= informer->capacity
 void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
 {
@@ -938,7 +935,7 @@ links_make:
                     ));
     }
 }
-//
+//-------------------------------------------------------------------------------------------------------------------
 void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult)
 {
     RISResult.clear();
@@ -1032,4 +1029,4 @@ make_return:
                     ));
     }
 }
-
+//-------------------------------------------------------------------------------------------------------------------

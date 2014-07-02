@@ -1,7 +1,7 @@
 INSERT INTO %s(id)
 SELECT ca.id FROM Campaign AS ca
 INNER JOIN CampaignNow AS cn INDEXED BY idx_CampaignNow_id ON ca.id=cn.id
-		%s
+%s
 INNER JOIN (
         SELECT c2c.id_cam AS id
         FROM Campaign2Categories AS c2c
