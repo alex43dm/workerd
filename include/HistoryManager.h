@@ -40,7 +40,7 @@ public:
     static int offer_processed_;
     static int social_processed_;
     //Задаем значение очистки истории показов
-    bool clean, tail;
+    bool clean;
     //Задаем обнавление краткосрочной истории
     bool updateShort;
     //Задаём обнавление долгосрочной истории

@@ -69,7 +69,6 @@ bool HistoryManager::initDB()
 void HistoryManager::startGetUserHistory(Params *_params, Informer *inf_)
 {
     clean = false;
-    tail = false;
     updateShort = false;
     updateContext = false;
 
