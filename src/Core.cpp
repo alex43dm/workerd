@@ -270,7 +270,7 @@ void Core::log()
     if(cfg->logOutPutOfferIds || cfg->logRetargetingOfferIds)
     {
         std::clog<<" key:"<<params->getUserKey();
-        std::clog<<"offers:  total:"<<offersTotal;
+        std::clog<<" offers: total:"<<offersTotal;
     }
 
 
@@ -812,11 +812,18 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
         else if((*i).second->type == Offer::Type::banner)
         {
             RISResult.push_back((*i).second);
-            Log::gdb("banner get");
             goto links_make;
         }
         //add if all not social and not social offer(skip social)
-        if(!all_social && !(*i).second->social)
+        if(!all_social)
+        {
+            if(!(*i).second->social))
+            {
+                result.push_back((*i).second);
+            }
+
+        }
+        else//all social
         {
             result.push_back((*i).second);
         }
