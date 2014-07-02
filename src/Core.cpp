@@ -817,7 +817,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
         //add if all not social and not social offer(skip social)
         if(!all_social)
         {
-            if(!(*i).second->social))
+            if(!((*i).second->social))
             {
                 result.push_back((*i).second);
             }
