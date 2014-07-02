@@ -538,7 +538,7 @@ bool Core::getOffers(bool getAll)
 {
     Kompex::SQLiteStatement *pStmt;
     bool ret = true;
-    all_social = false;
+    all_social = true;
 
 #ifndef DUMMY
     if(!getAll)
