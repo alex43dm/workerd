@@ -17,8 +17,11 @@
 #ifndef DUMMY
 #include "HistoryManager.h"
 #endif
+
+#include "TempTable.h"
+
 /// Класс, который связывает воедино все части системы.
-class Core
+class Core : public TempTable
 {
 public:
     /** \brief  Создаёт ядро.
@@ -83,7 +86,6 @@ private:
 
     char *cmd;
     float teasersMediumRating,teasersMaxRating;
-    std::string tmpTableName;
     Offer::Vector vOutPut;
     Offer::Vector result;
     Offer::Map items;

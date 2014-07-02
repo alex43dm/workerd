@@ -32,27 +32,6 @@ Core::Core()
 
     pDb = Config::Instance()->pDb;
 
-    tmpTableName = "tmp" + std::to_string((long long int)getpid()) + std::to_string((long long int)tid);
-
-    Kompex::SQLiteStatement *p;
-    try
-    {
-        p = new Kompex::SQLiteStatement(pDb->pDatabase);
-        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE TABLE IF NOT EXISTS %s(id INT8 NOT NULL);",
-                         tmpTableName.c_str());
-        p->SqlStatement(cmd);
-        /*
-        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE INDEX IF NOT EXISTS idx_%s_id ON %s(id);",
-                         tmpTableName.c_str(), tmpTableName.c_str());
-        p->SqlStatement(cmd);
-        */
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        std::clog<<__func__<<" error: create tmp table: %s"<< ex.GetString()<<std::endl;
-        exit(1);
-    }
-    delete p;
 #ifndef DUMMY
     hm = new HistoryManager();
     hm->initDB();
@@ -100,7 +79,7 @@ public:
     void operator ()(Offer *p)
     {
         p->redirect_url =
-            Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
+            cfg->redirect_script_ + "?" + base64_encode(boost::str(
                         boost::format("id=%s\ninf=%d\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
                         % p->id
                         % informerId
@@ -355,19 +334,7 @@ void Core::ProcessSaveResults()
     OutPutCampaignMap.clear();
 
     //clear tmp table
-    Kompex::SQLiteStatement *pStmt;
-    pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
-    sqlite3_snprintf(CMD_SIZE,cmd,"DELETE FROM %s;",tmpTableName.c_str());
-    try
-    {
-        pStmt->SqlStatement(cmd);
-        pStmt->FreeQuery();
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        std::clog<<__func__<<" error: " <<ex.GetString()<<std::endl;
-    }
-    delete pStmt;
+    TempTable::clearTable();
 
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
@@ -400,13 +367,6 @@ bool Core::getInformer()
 
     try
     {
-        /*
-                if(pStmt->GetNumberOfRows())
-                {
-                    Log::err("no informer id: %s",params->informer_id_.c_str());
-                    return 0;
-                }
-        */
         pStmt->Sql(cmd);
 
         while(pStmt->FetchRow())
@@ -437,45 +397,6 @@ bool Core::getInformer()
 
     return ret;
 }
-/**
-    Алгоритм работы таков:
-file::memory:?cache=shared
-	-#  Получаем рекламные кампании, которые нужно показать в этот раз.
-	    Выбор кампаний происходит случайно, но с учётом веса. На данный момент
-        вес всех кампаний одинаков. Со временем можно сделать составной вес,
-        который включал бы в себя цену за клик, CTR и т.д. (расчёт веса
-        предварительно производится внешним скриптом).
-        .
-	-#  Для каждого "места", которое должно быть занято определённой
-	    кампанией (п. 1) выбираем товар из этой кампании. Товар также
-	    выбирается случайно, но с учётом веса, включающего в себя CTR и др.
-	    (также расчитывается внешним скриптом). На данный момент все товары
-        равны.
-        .
-	-#  При малом кол-ве предложений случайное распределение может давать
-	    одинаковые элементы в пределах одного информера. Поэтому после
-	    получения предложения на п.2, мы проверяем его на уникальность в
-	    пределах информера, и если элемент является дубликатом,
-	    предпринимаем ещё одну попытку получить предложение. Во избежание
-	    вечных циклов, количество попыток ограничивается константой
-	    \c Remove_Duplicates_Retries. Увеличение этой константы ведёт к
-	    уменьшению вероятности попадания дубликатов, но увеличивает
-	    время выполнения. Кроме того, удаление дубликатов меняет
-	    весовое распределение предложений. \n
-        .
-        Иногда удалять дубликаты предложений в пределах кампании недостаточно.
-        Например, мы должны показать две кампании. Первая из них содержит всего
-        одно предолжение, вторая -- сто. Может случиться, что три места на
-        информере будут принадлежать первой кампании. Понятно, что сколько бы
-        попыток выбрать "другой" товар этой кампании, у нас ничего не выйдет
-        и возникнет дубликат. Поэтому, после \c Remove_Duplicates_Retries
-        попыток выбора предложения будет выбрана другая кампания, и цикл
-        повториться. Количество возможных сменcookie_id_ кампаний задаётся константой
-        \c Change_Campaign_Retries.
-        .
-	-#  Предложения, указанные в \c params.exluded_offers, по возможности
-	    исключаются из просмотра. Это используется в прокрутке информера.
- */
 //-------------------------------------------------------------------------------------------------------------------
 std::string Core::getGeo()
 {
@@ -483,8 +404,6 @@ std::string Core::getGeo()
 
     if(params->getCountry().size() || params->getRegion().size())
     {
-        Log::gdb("country: %s region: %s",params->getCountry().c_str(),params->getRegion().c_str());
-
         if(params->getRegion().size())
         {
             try
@@ -516,7 +435,7 @@ std::string Core::getGeo()
             }
             catch(Kompex::SQLiteException &ex)
             {
-                Log::err("Core::getGeo %s error: %s", cmd, ex.GetString().c_str());
+                std::clog<<"Core::getGeo error: "<<ex.GetString()<<std::endl;
             }
 
         }
@@ -542,10 +461,9 @@ bool Core::getOffers(bool getAll)
     if(!getAll)
     {
         sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
-                         tmpTableName.c_str(),
+                         tmpTable(),
                          params->getUserKeyLong(),
                          informer->id);
-        //hm->getDeprecatedOffersAsyncWait();
     }
     else
     {
@@ -646,7 +564,7 @@ bool Core::getCampaign()
     Kompex::SQLiteStatement *pStmt;
 
     sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->campaingSqlStr.c_str(),
-                         tmpTableName.c_str(),
+                         tmpTable(),
                          getGeo().c_str(),
                          informer->domainId,
                          informer->domainId,
@@ -740,20 +658,6 @@ std::string Core::OffersToJson(const Offer::Vector &items) const
     return json.str();
 }
 //-------------------------------------------------------------------------------------------------------------------
-/**
- * Проверяет соответствие размера баннера и размера банероместа РБ
- */
-bool Core::checkBannerSize(const Offer *offer)
-{
-    if (offer->type == Offer::Type::banner)
-    {
-        if (offer->width != informer->width_banner || offer->height != informer->height_banner)
-        {
-            return false;
-        }
-    }
-    return true;
-}
 /**
  * Основной алгоритм.
 	1. если первое РП - баннер - выбрать баннер. конец работы алгоритма.
@@ -939,8 +843,7 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
             goto make_return;
         }
 
-        if((!OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign)
-                && (*p)->rating > 0.0
+        if(OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
             if(RISResult.size() < informer->retargeting_capacity)
@@ -960,8 +863,8 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
     {
         for(auto p = result.begin(); p!=result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
         {
-        if((!OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign)
-                    && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+        if(OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign
+                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
             {
                 if(RISResult.size() < informer->retargeting_capacity)
                 {

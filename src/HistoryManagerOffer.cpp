@@ -40,7 +40,10 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
     {
         if(cfg->logOutPutOfferIds)
         {
-            std::clog<<" "<<(*it)->id<<" "<<(*it)->id_int<<" hits:"<<(*it)->uniqueHits<<" rate:"<<(*it)->rating;
+            std::clog<<" "<<(*it)->id<<" "<<(*it)->id_int
+            <<" hits:"<<(*it)->uniqueHits
+            <<" rate:"<<(*it)->rating
+            <<" cam:"<<(*it)->campaign_id;
         }
 
         try
