@@ -520,7 +520,6 @@ bool ParentDB::InformerUpdate(mongo::Query query)
                          teasersCss='%q',\
                          domainId=%d,\
                          accountId=%d,\
-                         blocked=0,\
                          nonrelevant='%q',\
                          valid=1,\
                          height=%d,\
