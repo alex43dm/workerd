@@ -964,6 +964,24 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
             }
         }
 
+        //old masks allowed all
+        if(o.getObjectField("allowed").isEmpty() && o.getObjectField("ignored").isEmpty())
+        {
+            sqlite3_snprintf(sizeof(buf),buf,
+            "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
+            long_id
+                            );
+            try
+            {
+                pStmt->SqlStatement(buf);
+            }
+            catch(Kompex::SQLiteException &ex)
+            {
+                logDb(ex);
+            }
+            std::clog<<"warn: campaign id: "<<long_id<<" guid: "<<id<<" allowed for all"<<std::endl;
+        }
+
         std::string accounts_allowed;
         if(!o.getObjectField("allowed").getObjectField("accounts").isEmpty())
         {
