@@ -1,6 +1,8 @@
 #include "HistoryManager.h"
 #include "Config.h"
 #include "Log.h"
+#include "KompexSQLiteStatement.h"
+#include "KompexSQLiteException.h"
 
 bool HistoryManager::getTailOffers()
 {
@@ -9,20 +11,48 @@ bool HistoryManager::getTailOffers()
         return true;
     }
 
-    if(pViewHistory->exists(key_inv))
+    char buf[8192];
+    Kompex::SQLiteStatement *pStmt;
+    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+
+    try
     {
-        if(!pViewHistory->getRange(key_inv, 0, -1, mtailOffers))
+        sqlite3_snprintf(sizeof(buf),buf,
+                         "SELECT offerId FROM Session WHERE id=%llu AND tail=1;",
+                         params->getUserKeyLong());
+
+        pStmt->Sql(buf);
+
+        while(pStmt->FetchRow())
         {
-            std::clog<<"["<<tid<<"]"<<__func__<<" error for key:"<<key<<std::endl;
+            mtailOffers.push_back(pStmt->GetColumnInt64(0));
         }
+
+        pStmt->FreeQuery();
+
+        sqlite3_snprintf(sizeof(buf),buf,
+                         "DELETE FROM Session WHERE id=%llu AND tail=1;",
+                         params->getUserKeyLong());
+        pStmt->SqlStatement(buf);
+        pStmt->FreeQuery();
+    }
+    catch(Kompex::SQLiteException &ex)
+    {
+        std::clog<<"HistoryManager::getTailOffers error: "<<ex.GetString()<<" request:"<<buf<<std::endl;
     }
 
+    delete pStmt;
     return true;
 }
 
 bool HistoryManager::setTailOffers(const Offer::Map &items, const Offer::Vector &toShow)
 {
     bool fFound;
+    char buf[8192];
+    Kompex::SQLiteStatement *pStmt;
+
+    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
+
     for(auto it = items.begin(); it != items.end(); ++it)
     {
         fFound = false;
@@ -41,9 +71,24 @@ bool HistoryManager::setTailOffers(const Offer::Map &items, const Offer::Vector 
         }
         else
         {
-            pViewHistory->zadd(key_inv, 1, (*it).first);
+            try
+            {
+                sqlite3_snprintf(sizeof(buf),buf,
+                                 "INSERT INTO Session(id,offerId,uniqueHits,viewTime,tail) VALUES(%llu,%llu,1,%llu,1);",
+                                 params->getUserKeyLong(), (*it).first, std::time(0));
+
+                pStmt->SqlStatement(buf);
+            }
+            catch(Kompex::SQLiteException &ex)
+            {
+                std::clog<<"HistoryManager::setTailOffers error: "<<ex.GetString()<<" request:"<<buf<<std::endl;
+            }
         }
     }
+
+    pStmt->FreeQuery();
+    delete pStmt;
+
     return true;
 }
 
@@ -102,3 +147,4 @@ bool HistoryManager::getTailOffersAsyncWait()
     pthread_join(thrGetTailOffersAsync, 0);
     return true;
 }
+
