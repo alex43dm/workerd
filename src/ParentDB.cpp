@@ -1571,7 +1571,7 @@ bool ParentDB::AccountLoad(mongo::Query query)
             blockedVal = 0;
         }
 
-        sqlite3_snprintf(sizeof(buf),buf,"INSERT INTO Accounts(name,blocked) VALUES('%q',%u);"
+        sqlite3_snprintf(sizeof(buf),buf,"INSERTT OR REPLACE INTO Accounts(name,blocked) VALUES('%q',%u);"
                          ,login.c_str()
                          , blockedVal );
 
