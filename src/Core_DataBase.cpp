@@ -63,24 +63,17 @@ bool Core_DataBase::getGeo(const std::string &country, const std::string &region
     return true;
 }
 //-------------------------------------------------------------------------------------------------------------------
-bool Core_DataBase::getOffers(Offer::Map &items)
+bool Core_DataBase::getOffers(Offer::Map &items,unsigned long long sessionId)
 {
     Kompex::SQLiteStatement *pStmt;
     bool ret = true;
     all_social = true;
 
 #ifndef DUMMY
-        sqlite3_snprintf(len, cmd, cfg->offerSqlStrAll.c_str(),
-                         geo.c_str(),
-                         informer->domainId,
-                         informer->domainId,
-                         informer->domainId,
-                         informer->accountId,
-                         informer->accountId,
-                         informer->id,
-                         informer->id,
-                         informer->id,
-                         informer->capacity);
+        sqlite3_snprintf(len, cmd, cfg->offerSqlStr.c_str(),
+                         tmpTable->str(),
+                         sessionId,
+                         informer->id);
 #else
     sqlite3_snprintf(len, cmd, cfg->offerSqlStr.c_str(),
                      geo.c_str(),
@@ -141,10 +134,12 @@ bool Core_DataBase::getOffers(Offer::Map &items)
             }
             items.insert(Offer::Pair(off->id_int,off));
         }
+
+        pStmt->FreeQuery();
     }
     catch(Kompex::SQLiteException &ex)
     {
-        std::clog<<"["<<pthread_self()<<"] error: "<<__func__
+        std::clog<<"["<<pthread_self()<<"]"<<__func__<<" error: "
                  <<ex.GetString()
                  <<std::endl;
 
@@ -152,7 +147,6 @@ bool Core_DataBase::getOffers(Offer::Map &items)
     }
 
 
-    pStmt->FreeQuery();
     delete pStmt;
 
     offersTotal = items.size();

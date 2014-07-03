@@ -114,7 +114,7 @@ std::string Core::Process(Params *prms)
     //get campaign list
     getCampaign();
 
-    getOffers(items);
+    getOffers(items,params->getUserKeyLong());
 
     //process history
     hm->sphinxProcess(items);

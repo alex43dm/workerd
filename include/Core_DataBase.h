@@ -20,7 +20,7 @@ class Core_DataBase
         virtual ~Core_DataBase();
 
         bool getGeo(const std::string &country, const std::string &region);
-        bool getOffers(Offer::Map &items);
+        bool getOffers(Offer::Map &items,unsigned long long sessionId);
         bool getInformer(const std::string informer_id);
         bool getCampaign();
         bool clearTmpTable(){ return tmpTable->clear(); }

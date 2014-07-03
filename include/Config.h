@@ -91,7 +91,7 @@ public:
     std::string swfobject_;
     int time_update_;
     std::string mq_path_;
-    std::string offerSqlStr, informerSqlStr, retargetingOfferSqlStr, offerSqlStrAll,campaingSqlStr;
+    std::string offerSqlStr, informerSqlStr, retargetingOfferSqlStr,campaingSqlStr;
 
     bool logCoreTime, logOutPutSize, logIP, logCountry, logRegion, logCookie,
         logContext, logSearch, logInformerId, logLocation,
