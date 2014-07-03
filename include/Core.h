@@ -18,11 +18,10 @@
 #include "HistoryManager.h"
 #endif
 
-#include "TempTable.h"
-#include "Geo.h"
+#include "Core_DataBase.h"
 
 /// Класс, который связывает воедино все части системы.
-class Core
+class Core : public Core_DataBase
 {
 public:
     /** \brief  Создаёт ядро.
@@ -54,36 +53,26 @@ private:
     boost::posix_time::ptime time_service_started_;
     /// Время начала последнего запроса
     boost::posix_time::ptime time_request_started_;
-
-    /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(const Offer::Map &items, Offer::Vector &RISresult);
-
-    DataBase *pDb;
+    boost::posix_time::ptime startCoreTime, endCoreTime;
 
     pthread_t tid;
 
-    Informer *informer;
     Params *params;
+
 #ifndef DUMMY
     HistoryManager *hm;
 #endif
-    bool all_social;
 
-    unsigned teasersCount, RetargetingCount, offersTotal;
+    unsigned RetargetingCount;
 
     std::multimap<long,long> OutPutCampaignMap;
 
-    char *cmd;
-    float teasersMediumRating,teasersMaxRating;
     Offer::Vector vOutPut;
     Offer::Vector result;
     Offer::Map items;
 
-    TempTable *tmpTable;
-    Geo *geo;
-
-    bool getOffers(bool getAll=false);
-    bool getInformer();
+    /** \brief Основной алгоритм отбора РП RealInvest Soft. */
+    void RISAlgorithm(const Offer::Map &items, Offer::Vector &RISresult);
     void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult);
 
     //bool contains( const Offer::Vector &v, const Offer::itV p) const {return std::find(v.begin(), v.end(), *p) != v.end();}
@@ -95,9 +84,8 @@ private:
     std::string OffersToJson(const Offer::Vector &items) const;
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
-    bool getCampaign();
+
     void log();
-    boost::posix_time::ptime startCoreTime, endCoreTime;
 };
 
 #endif // CORE_H

@@ -18,7 +18,6 @@
 #include "base64.h"
 #include "EBranch.h"
 
-#define CMD_SIZE 8192
 #ifndef DUMMY
 int HistoryManager::request_processed_ = 0;
 int HistoryManager::offer_processed_ = 0;
@@ -28,29 +27,19 @@ Core::Core()
 {
     tid = pthread_self();
 
-    cmd = new char[CMD_SIZE];
-
-    pDb = Config::Instance()->pDb;
-
-    tmpTable = new TempTable(cmd, CMD_SIZE);
-    geo = new Geo(cmd, CMD_SIZE);
-
 #ifndef DUMMY
     hm = new HistoryManager();
     hm->initDB();
 #endif // DUMMY
 
-    Log::info("[%ld]core start",tid);
+    std::clog<<"["<<tid<<"]core start"<<std::endl;
 }
 //-------------------------------------------------------------------------------------------------------------------
 Core::~Core()
 {
-    delete []cmd;
 #ifndef DUMMY
     delete hm;
 #endif // DUMMY
-    delete tmpTable;
-    delete geo;
 }
 
 /** Функтор составляет ссылку перенаправления на предложение item.
@@ -105,7 +94,7 @@ std::string Core::Process(Params *prms)
 
     params = prms;
 
-    if(!getInformer())
+    if(!getInformer(params->informer_id_))
     {
         std::clog<<"there is no informer id: "<<prms->getInformerId()<<std::endl;
         return Config::Instance()->template_error_;
@@ -120,13 +109,12 @@ std::string Core::Process(Params *prms)
     hm->getTailOffersAsync();
 
     //get geo
-    geo->compute(params->getCountry(), params->getRegion());
+    getGeo(params->getCountry(), params->getRegion());
 
     //get campaign list
     getCampaign();
 
-
-    getOffers();
+    getOffers(items);
 
     //process history
     hm->sphinxProcess(items);
@@ -337,7 +325,7 @@ void Core::ProcessSaveResults()
     OutPutCampaignMap.clear();
 
     //clear tmp table
-    tmpTable->clear();
+    clearTmpTable();
 
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
@@ -355,205 +343,6 @@ void Core::ProcessSaveResults()
         delete informer;
 
     std::clog<<std::endl;
-}
-//-------------------------------------------------------------------------------------------------------------------
-bool Core::getInformer()
-{
-    bool ret = false;
-    Kompex::SQLiteStatement *pStmt;
-
-    informer = nullptr;
-
-    pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
-
-    sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->informerSqlStr.c_str(), params->informer_id_.c_str());
-
-    try
-    {
-        pStmt->Sql(cmd);
-
-        while(pStmt->FetchRow())
-        {
-            informer =  new Informer(pStmt->GetColumnInt64(0),
-                                     pStmt->GetColumnInt(1),
-                                     pStmt->GetColumnString(2),
-                                     pStmt->GetColumnString(3),
-                                     pStmt->GetColumnInt64(4),
-                                     pStmt->GetColumnInt64(5),
-                                     pStmt->GetColumnDouble(6),
-                                     pStmt->GetColumnDouble(7),
-                                     pStmt->GetColumnDouble(8),
-                                     pStmt->GetColumnDouble(9),
-                                     pStmt->GetColumnInt(10),
-                                     pStmt->GetColumnBool(11)
-                                    );
-            ret = true;
-            break;
-        }
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        std::clog<<__func__<<" error: " <<ex.GetString()<<std::endl;
-    }
-
-    delete pStmt;
-
-    return ret;
-}
-//-------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------
-bool Core::getOffers(bool getAll)
-{
-    Kompex::SQLiteStatement *pStmt;
-    bool ret = true;
-    all_social = true;
-
-#ifndef DUMMY
-    if(!getAll)
-    {
-        sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
-                         tmpTable->str(),
-                         params->getUserKeyLong(),
-                         informer->id);
-    }
-    else
-    {
-        sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStrAll.c_str(),
-                         geo->str(),
-                         informer->domainId,
-                         informer->domainId,
-                         informer->domainId,
-                         informer->accountId,
-                         informer->accountId,
-                         informer->id,
-                         informer->id,
-                         informer->id,
-                         informer->capacity);
-    }
-#else
-    sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
-                     geo->str(),
-                     informer->domainId,
-                     informer->domainId,
-                     informer->accountId,
-                     informer->id,
-                     informer->capacity);
-#endif
-
-#ifdef DEBUG
-    printf("%s\n",cmd);
-#endif // DEBUG
-
-    pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
-    try
-    {
-        teasersCount = 0;
-        teasersMediumRating = 0;
-        teasersMaxRating = 0;
-
-        pStmt->Sql(cmd);
-        while(pStmt->FetchRow())
-        {
-
-            if(items.count(pStmt->GetColumnInt64(0)) > 0)
-            {
-                continue;
-            }
-
-            Offer *off = new Offer(pStmt->GetColumnString(1),
-                                   pStmt->GetColumnInt64(0),
-                                   pStmt->GetColumnString(2),
-                                   pStmt->GetColumnString(3),
-                                   pStmt->GetColumnString(4),
-                                   pStmt->GetColumnString(5),
-                                   pStmt->GetColumnString(6),
-                                   pStmt->GetColumnString(7),
-                                   pStmt->GetColumnInt64(8),
-                                   pStmt->GetColumnBool(9),
-                                   pStmt->GetColumnInt(10),
-                                   pStmt->GetColumnDouble(11),
-                                   pStmt->GetColumnBool(12),
-                                   pStmt->GetColumnInt(13),
-                                   pStmt->GetColumnInt(14),
-                                   pStmt->GetColumnInt(15),
-                                   pStmt->GetColumnBool(16),
-                                   pStmt->GetColumnString(17),
-                                   pStmt->GetColumnInt(18)
-                                  );
-
-            if(!off->social)
-                all_social = false;
-
-            if(off->rating > teasersMaxRating)
-            {
-                teasersMaxRating = off->rating;
-            }
-            items.insert(Offer::Pair(off->id_int,off));
-        }
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        std::clog<<"["<<tid<<"] error: "<<__func__
-                 <<ex.GetString()
-                 <<std::endl;
-
-        ret = false;
-    }
-
-
-    pStmt->FreeQuery();
-    delete pStmt;
-
-    offersTotal = items.size();
-
-    return ret;
-}
-//-------------------------------------------------------------------------------------------------------------------
-bool Core::getCampaign()
-{
-    bool ret = false;
-    Kompex::SQLiteStatement *pStmt;
-
-    sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->campaingSqlStr.c_str(),
-                         tmpTable->str(),
-                         geo->str(),
-                         informer->domainId,
-                         informer->domainId,
-                         informer->domainId,
-                         informer->domainId,
-                         informer->accountId,
-                         informer->accountId,
-                         informer->accountId,
-                         informer->id,
-                         informer->id,
-                         informer->id,
-                         informer->blocked ? " AND ca.social=1 " : ""
-                         );
-
-    pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
-
-#ifdef DEBUG
-    printf("%s\n",cmd);
-#endif // DEBUG
-
-    try
-    {
-        pStmt->SqlStatement(cmd);
-        ret = true;
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        std::clog<<"["<<tid<<"] error: "<<__func__
-                 <<ex.GetString()
-                 <<std::endl;
-        ret = false;
-    }
-
-
-    pStmt->FreeQuery();
-    delete pStmt;
-
-    return ret;
 }
 //-------------------------------------------------------------------------------------------------------------------
 std::string Core::OffersToHtml(const Offer::Vector &items, const std::string &url) const
