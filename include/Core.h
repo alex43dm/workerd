@@ -19,9 +19,10 @@
 #endif
 
 #include "TempTable.h"
+#include "Geo.h"
 
 /// Класс, который связывает воедино все части системы.
-class Core : public TempTable
+class Core
 {
 public:
     /** \brief  Создаёт ядро.
@@ -53,21 +54,9 @@ private:
     boost::posix_time::ptime time_service_started_;
     /// Время начала последнего запроса
     boost::posix_time::ptime time_request_started_;
-    /** \brief Проверка размеров РП.
-      *
-      * @param offer РП, которое нужно проверить по размеру.
-      * @param informer Информер, для которого модуль формирует ответ.
-      *
-      * Добавлено RealInvest Soft.
-      *
-      * Если РП offer является баннером и его размеры не равны размерам РБ informer, возвращает false. Иначе - true.
-      */
-    bool checkBannerSize(const Offer *offer);
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
     void RISAlgorithm(const Offer::Map &items, Offer::Vector &RISresult);
-
-    bool isSocial (Offer& i);
 
     DataBase *pDb;
 
@@ -90,6 +79,9 @@ private:
     Offer::Vector result;
     Offer::Map items;
 
+    TempTable *tmpTable;
+    Geo *geo;
+
     bool getOffers(bool getAll=false);
     bool getInformer();
     void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult);
@@ -103,7 +95,6 @@ private:
     std::string OffersToJson(const Offer::Vector &items) const;
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
-    std::string getGeo();
     bool getCampaign();
     void log();
     boost::posix_time::ptime startCoreTime, endCoreTime;

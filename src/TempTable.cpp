@@ -7,17 +7,17 @@
 
 #define CMD_SIZE 8192
 
-TempTable::TempTable()
+TempTable::TempTable(char *cmd, size_t len):
+    cmd(cmd),
+    len(len)
 {
     tmpTableName = "tmp" + std::to_string((long long int)getpid()) + std::to_string((long long int)pthread_self());
-
-    cmd = new char[CMD_SIZE];
 
     Kompex::SQLiteStatement *p;
     try
     {
         p = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
-        sqlite3_snprintf(CMD_SIZE, cmd, "CREATE TABLE IF NOT EXISTS %s(id INT8 NOT NULL);",
+        sqlite3_snprintf(len, cmd, "CREATE TABLE IF NOT EXISTS %s(id INT8 NOT NULL);",
                          tmpTableName.c_str());
         p->SqlStatement(cmd);
         /*
@@ -36,15 +36,14 @@ TempTable::TempTable()
 
 TempTable::~TempTable()
 {
-    delete []cmd;
 }
 
-bool TempTable::clearTable()
+bool TempTable::clear()
 {
     Kompex::SQLiteStatement *pStmt;
 
     pStmt = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
-    sqlite3_snprintf(CMD_SIZE,cmd,"DELETE FROM %s;",tmpTableName.c_str());
+    sqlite3_snprintf(len,cmd,"DELETE FROM %s;",tmpTableName.c_str());
     try
     {
         pStmt->SqlStatement(cmd);

@@ -32,6 +32,9 @@ Core::Core()
 
     pDb = Config::Instance()->pDb;
 
+    tmpTable = new TempTable(cmd, CMD_SIZE);
+    geo = new Geo(cmd, CMD_SIZE);
+
 #ifndef DUMMY
     hm = new HistoryManager();
     hm->initDB();
@@ -46,6 +49,8 @@ Core::~Core()
 #ifndef DUMMY
     delete hm;
 #endif // DUMMY
+    delete tmpTable;
+    delete geo;
 }
 
 /** Функтор составляет ссылку перенаправления на предложение item.
@@ -106,21 +111,20 @@ std::string Core::Process(Params *prms)
         return Config::Instance()->template_error_;
     }
 
-//    Log::gdb("[%ld]getInformer: done",tid);
-
 #ifndef DUMMY
     //init history search
     hm->startGetUserHistory(params, informer);
 
-    //load all history async
-    //hm->getDeprecatedOffersAsync();
+    hm->getRetargetingAsync();
+
+    hm->getTailOffersAsync();
+
+    //get geo
+    geo->compute(params->getCountry(), params->getRegion());
 
     //get campaign list
     getCampaign();
 
-    hm->getRetargetingAsync();
-
-    hm->getTailOffersAsync();
 
     getOffers();
 
@@ -205,7 +209,6 @@ std::string Core::Process(Params *prms)
         ret = cfg->template_error_;
     }
 //printf("%s\n",ret.c_str());
-
 
     endCoreTime = boost::posix_time::microsec_clock::local_time();
 
@@ -334,7 +337,7 @@ void Core::ProcessSaveResults()
     OutPutCampaignMap.clear();
 
     //clear tmp table
-    TempTable::clearTable();
+    tmpTable->clear();
 
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
@@ -398,58 +401,6 @@ bool Core::getInformer()
     return ret;
 }
 //-------------------------------------------------------------------------------------------------------------------
-std::string Core::getGeo()
-{
-    std::string geo;
-
-    if(params->getCountry().size() || params->getRegion().size())
-    {
-        if(params->getRegion().size())
-        {
-            try
-            {
-                Kompex::SQLiteStatement *pStmt;
-                pStmt = new Kompex::SQLiteStatement(pDb->pDatabase);
-                sqlite3_snprintf(CMD_SIZE, cmd,"SELECT geo.id_cam FROM geoTargeting AS geo \
-                INNER JOIN GeoLiteCity AS reg INDEXED BY idx_GeoRerions_locId_city ON geo.id_geo = reg.locId AND reg.city='%q';",
-                                 params->getRegion().c_str());
-
-                pStmt->Sql(cmd);
-
-                if(pStmt->GetDataCount() > 0)
-                {
-                    geo =
-                        "INNER JOIN geoTargeting AS geo INDEXED BY idx_geoTargeting_id_geo_id_cam ON geo.id_cam=cn.id \
-                    INNER JOIN GeoLiteCity AS reg INDEXED BY idx_GeoRerions_country_city ON geo.id_geo = reg.locId AND reg.city='"+params->getRegion()+"'";
-                }
-                else if(params->getCountry().size())
-                {
-
-                    geo =
-                        "INNER JOIN geoTargeting AS geo INDEXED BY idx_geoTargeting_id_geo_id_cam ON geo.id_cam=cn.id \
-                    INNER JOIN GeoLiteCity AS reg INDEXED BY idx_GeoRerions_country_city ON geo.id_geo = reg.locId \
-                    AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND (reg.city='' OR reg.city='NOT FOUND'))";
-                }
-                pStmt->FreeQuery();
-                delete pStmt;
-            }
-            catch(Kompex::SQLiteException &ex)
-            {
-                std::clog<<"Core::getGeo error: "<<ex.GetString()<<std::endl;
-            }
-
-        }
-        else if(params->getCountry().size())
-        {
-
-            geo =
-                "INNER JOIN geoTargeting AS geo INDEXED BY idx_geoTargeting_id_geo_id_cam ON geo.id_cam=cn.id \
-            INNER JOIN GeoLiteCity AS reg INDEXED BY idx_GeoRerions_country_city ON geo.id_geo = reg.locId \
-            AND((reg.country='"+params->getCountry()+"' OR reg.country='O1') AND (reg.city='' OR reg.city='NOT FOUND'))";
-        }
-    }
-    return geo;
-}
 //-------------------------------------------------------------------------------------------------------------------
 bool Core::getOffers(bool getAll)
 {
@@ -461,14 +412,14 @@ bool Core::getOffers(bool getAll)
     if(!getAll)
     {
         sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
-                         tmpTable(),
+                         tmpTable->str(),
                          params->getUserKeyLong(),
                          informer->id);
     }
     else
     {
         sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStrAll.c_str(),
-                         getGeo().c_str(),
+                         geo->str(),
                          informer->domainId,
                          informer->domainId,
                          informer->domainId,
@@ -481,7 +432,7 @@ bool Core::getOffers(bool getAll)
     }
 #else
     sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->offerSqlStr.c_str(),
-                     getGeo().c_str(),
+                     geo->str(),
                      informer->domainId,
                      informer->domainId,
                      informer->accountId,
@@ -564,8 +515,8 @@ bool Core::getCampaign()
     Kompex::SQLiteStatement *pStmt;
 
     sqlite3_snprintf(CMD_SIZE, cmd, Config::Instance()->campaingSqlStr.c_str(),
-                         tmpTable(),
-                         getGeo().c_str(),
+                         tmpTable->str(),
+                         geo->str(),
                          informer->domainId,
                          informer->domainId,
                          informer->domainId,

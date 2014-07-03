@@ -6,14 +6,17 @@
 class TempTable
 {
     public:
-        TempTable();
+        TempTable(char *, size_t);
         virtual ~TempTable();
-        bool clearTable();
-        const char* tmpTable() const { return tmpTableName.c_str(); }
+
+        bool clear();
+        const char* str() const { return tmpTableName.c_str(); }
+
     protected:
     private:
         std::string tmpTableName;
         char *cmd;
+        size_t len;
 };
 
 #endif // TEMPTABLE_H
