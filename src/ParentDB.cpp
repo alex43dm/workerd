@@ -893,7 +893,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         //old masks allowed all
         if(o.getObjectField("allowed").isEmpty() && o.getObjectField("ignored").isEmpty())
         {
-            if(cType == showCoverage::all || cType == showCoverage::allowed)
+            if(cType == showCoverage::all)
             {
                 sqlite3_snprintf(sizeof(buf),buf,
                 "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",long_id);
@@ -906,6 +906,20 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                     logDb(ex);
                 }
                 std::clog<<"warn: campaign id: "<<long_id<<" guid: "<<id<<" allowed for all"<<std::endl;
+            }
+            else if(cType == showCoverage::allowed)
+            {
+                sqlite3_snprintf(sizeof(buf),buf,
+                "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,0);",long_id);
+                try
+                {
+                    pStmt->SqlStatement(buf);
+                }
+                catch(Kompex::SQLiteException &ex)
+                {
+                    logDb(ex);
+                }
+                std::clog<<"warn: campaign id: "<<long_id<<" guid: "<<id<<" ignored for all"<<std::endl;
             }
         }
         else
