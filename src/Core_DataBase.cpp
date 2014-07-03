@@ -19,7 +19,7 @@ Core_DataBase::~Core_DataBase()
     delete []cmd;
 }
 //-------------------------------------------------------------------------------------------------------------------
-std::string Core_DataBase::getGeo(const std::string &country, const std::string &region)
+bool Core_DataBase::getGeo(const std::string &country, const std::string &region)
 {
     if(country.size() || region.size())
     {
@@ -50,6 +50,7 @@ std::string Core_DataBase::getGeo(const std::string &country, const std::string 
             catch(Kompex::SQLiteException &ex)
             {
                 std::clog<<"Geo::compute error: "<<ex.GetString()<<std::endl;
+                return false;
             }
         }
         else if(country.size())
@@ -59,7 +60,7 @@ std::string Core_DataBase::getGeo(const std::string &country, const std::string 
                 "INNER JOIN geoTargeting AS geo INDEXED BY idx_geoTargeting_id_geo_id_cam ON geo.id_cam=cn.id INNER JOIN GeoLiteCity AS reg INDEXED BY idx_GeoRerions_country_city ON geo.id_geo = reg.locId AND((reg.country='"+country+"' OR reg.country='O1') AND (reg.city='' OR reg.city='NOT FOUND'))";
         }
     }
-    return geo;
+    return true;
 }
 //-------------------------------------------------------------------------------------------------------------------
 bool Core_DataBase::getOffers(Offer::Map &items)

@@ -19,7 +19,7 @@ class Core_DataBase
         Core_DataBase();
         virtual ~Core_DataBase();
 
-        std::string getGeo(const std::string &country, const std::string &region);
+        bool getGeo(const std::string &country, const std::string &region);
         bool getOffers(Offer::Map &items);
         bool getInformer(const std::string informer_id);
         bool getCampaign();
