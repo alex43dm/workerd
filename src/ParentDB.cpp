@@ -1054,7 +1054,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 else
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
-                                     "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,0);",
+                                     "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
                                      long_id
                                     );
                     try
@@ -1122,7 +1122,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                 else
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
-                                     "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,1);",
+                                     "INSERT INTO Campaign2Accounts(id_cam,id_acc,allowed) VALUES(%lld,1,0);",
                                      long_id
                                     );
                     try
