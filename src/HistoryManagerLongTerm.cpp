@@ -14,11 +14,7 @@ void HistoryManager::getLongTerm()
 
     std::string strSH = pLongTerm->get(key);
 
-    if(strSH.empty())
-    {
-        std::clog<<"["<<tid<<"]HistoryManager::"<<__func__<<" long term empty"<<std::endl;
-    }
-    else
+    if(!strSH.empty())
     {
         std::string q = getKeywordsString(strSH);
         if (!q.empty())
