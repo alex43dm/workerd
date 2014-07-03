@@ -1134,6 +1134,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                         logDb(ex);
                     }
                 }
+                /*
                 else
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
@@ -1148,7 +1149,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
                     {
                         logDb(ex);
                     }
-                }
+                }*/
             }
             else if(cType == showCoverage::all)
             {
