@@ -60,7 +60,7 @@ db_dump/requests/01.sql \
 db_dump/requests/05.sql \
 db_dump/requests/04.sql \
 db_dump/requests/03.sql \
-db_dump/requests/all.sql \
+db_dump/requests/getCampaings.sql \
 db_dump/UA_RU \
 db_dump/tables/11_GeoCountries.sql \
 db_dump/tables/00_Campaign.sql \
