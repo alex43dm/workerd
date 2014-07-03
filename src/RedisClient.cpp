@@ -679,7 +679,7 @@ std::string RedisClient::get(const std::string &key)
     {
         if(reply_type == RT_ERROR)
         {
-            std::clog<<"redis:"<<__func__<<" Batch_next_reply error"<<std::endl;
+            //std::clog<<"redis:"<<__func__<<" Batch_next_reply error"<<std::endl;
             break;
         }
         else if(reply_type == RT_BULK)
