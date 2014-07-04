@@ -21,13 +21,14 @@ Core_DataBase::~Core_DataBase()
 //-------------------------------------------------------------------------------------------------------------------
 bool Core_DataBase::getGeo(const std::string &country, const std::string &region)
 {
+    Kompex::SQLiteStatement *pStmt;
+
     if(country.size() || region.size())
     {
         if(region.size())
         {
             try
             {
-                Kompex::SQLiteStatement *pStmt;
                 pStmt = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
                 sqlite3_snprintf(len, cmd,"SELECT geo.id_cam FROM geoTargeting AS geo INNER JOIN GeoLiteCity AS reg INDEXED BY idx_GeoRerions_locId_city ON geo.id_geo = reg.locId AND reg.city='%q';",region.c_str());
 
@@ -49,7 +50,9 @@ bool Core_DataBase::getGeo(const std::string &country, const std::string &region
             }
             catch(Kompex::SQLiteException &ex)
             {
-                std::clog<<"Geo::compute error: "<<ex.GetString()<<std::endl;
+                std::clog<<"["<<pthread_self()<<"] error: "<<__func__
+                         <<ex.GetString()
+                         <<std::endl;
                 return false;
             }
         }
@@ -88,14 +91,16 @@ bool Core_DataBase::getOffers(Offer::Map &items,unsigned long long sessionId)
     printf("%s\n",cmd);
 #endif // DEBUG
 
-    pStmt = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
     try
     {
         teasersCount = 0;
         teasersMediumRating = 0;
         teasersMaxRating = 0;
 
+        pStmt = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
+
         pStmt->Sql(cmd);
+
         while(pStmt->FetchRow())
         {
 
@@ -136,6 +141,8 @@ bool Core_DataBase::getOffers(Offer::Map &items,unsigned long long sessionId)
         }
 
         pStmt->FreeQuery();
+
+        delete pStmt;
     }
     catch(Kompex::SQLiteException &ex)
     {
@@ -147,7 +154,6 @@ bool Core_DataBase::getOffers(Offer::Map &items,unsigned long long sessionId)
     }
 
 
-    delete pStmt;
 
     offersTotal = items.size();
 
@@ -175,7 +181,6 @@ bool Core_DataBase::getCampaign()
                          informer->blocked ? " AND ca.social=1 " : ""
                          );
 
-    pStmt = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
 
 #ifdef DEBUG
     printf("%s\n",cmd);
@@ -183,7 +188,13 @@ bool Core_DataBase::getCampaign()
 
     try
     {
+        pStmt = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
+
         pStmt->SqlStatement(cmd);
+
+        //pStmt->FreeQuery();
+        delete pStmt;
+
         ret = true;
     }
     catch(Kompex::SQLiteException &ex)
@@ -195,8 +206,6 @@ bool Core_DataBase::getCampaign()
     }
 
 
-    pStmt->FreeQuery();
-    delete pStmt;
 
     return ret;
 }
@@ -208,12 +217,12 @@ bool Core_DataBase::getInformer(const std::string informer_id)
 
     informer = nullptr;
 
-    pStmt = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
-
     sqlite3_snprintf(CMD_SIZE, cmd, cfg->informerSqlStr.c_str(), informer_id.c_str());
 
     try
     {
+        pStmt = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
+
         pStmt->Sql(cmd);
 
         while(pStmt->FetchRow())
@@ -234,13 +243,17 @@ bool Core_DataBase::getInformer(const std::string informer_id)
             ret = true;
             break;
         }
+
+        pStmt->FreeQuery();
+
+        delete pStmt;
     }
     catch(Kompex::SQLiteException &ex)
     {
-        std::clog<<__func__<<" error: " <<ex.GetString()<<std::endl;
+        std::clog<<"["<<pthread_self()<<"] error: "<<__func__
+                 <<ex.GetString()
+                 <<std::endl;
     }
-
-    delete pStmt;
 
     return ret;
 }
