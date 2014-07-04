@@ -94,6 +94,8 @@ bool HistoryManager::setTailOffers(const Offer::Map &items, const Offer::Vector 
 
 bool HistoryManager::moveUpTailOffers(Offer::Map &items, float teasersMaxRating)
 {
+    getTailOffersAsyncWait();
+
     if(mtailOffers.size())
     {
         for(auto i = mtailOffers.begin(); i != mtailOffers.end(); ++i)

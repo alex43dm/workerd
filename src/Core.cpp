@@ -41,8 +41,6 @@ Core::~Core()
 //-------------------------------------------------------------------------------------------------------------------
 std::string Core::Process(Params *prms)
 {
-    Offer::Vector vRIS;
-
 //    Log::gdb("Core::Process start");
     startCoreTime = boost::posix_time::microsec_clock::local_time();
 
@@ -58,10 +56,6 @@ std::string Core::Process(Params *prms)
     //init history search
     hm->startGetUserHistory(params, informer);
 
-    hm->getRetargetingAsync();
-
-    hm->getTailOffersAsync();
-
     //get geo
     getGeo(params->getCountry(), params->getRegion());
 
@@ -74,37 +68,36 @@ std::string Core::Process(Params *prms)
     hm->sphinxProcess(items);
 
     //set tail
-    hm->getTailOffersAsyncWait();
     hm->moveUpTailOffers(items, teasersMaxRating);
 
     hm->getRetargetingAsyncWait();
-    RISAlgorithmRetagreting(hm->vretg, vOutPut);
+    RISAlgorithmRetagreting(hm->vretg);
 
-    RetargetingCount = vOutPut.size();
+    RetargetingCount = vResult.size();
 
-    RISAlgorithm(items, vRIS);
+    RISAlgorithm(items);
 
     //merge
-    mergeWithRetargeting(vRIS);
+    mergeWithRetargeting();
 
 #else
     getOffers(items);
 
     for(auto i = items.begin(); i != items.end(); ++i)
     {
-        vOutPut.push_back(p);
+        vResult.push_back(p);
     }
 
 #endif//DUMMY
 
     std::string ret;
 
-    if(!vOutPut.empty())
+    if(!vResult.empty())
     {
         if (params->json_)
-            ret = OffersToJson(vOutPut);
+            ret = OffersToJson(vResult);
         else
-            ret = OffersToHtml(vOutPut, params->getUrl());
+            ret = OffersToHtml(vResult, params->getUrl());
     }
     else
     {
@@ -128,7 +121,7 @@ void Core::log()
     }
 
     if(cfg->logOutPutSize)
-        std::clog<<" out:"<<vOutPut.size();
+        std::clog<<" out:"<<vResult.size();
 
     if(cfg->logIP)
         std::clog<<" ip:"<<params->getIP();
@@ -178,13 +171,13 @@ void Core::ProcessSaveResults()
                                   append("context", params->getContext()).
                                   obj();
 #ifndef DUMMY
-        hm->updateUserHistory(items, vOutPut, RetargetingCount);
+        hm->updateUserHistory(items, vResult, RetargetingCount);
 #endif // DUMMY
         try
         {
             mongo::DB db("log");
 
-            for(auto i = vOutPut.begin(); i != vOutPut.end(); ++i)
+            for(auto i = vResult.begin(); i != vResult.end(); ++i)
             {
                 std::tm dt_tm;
                 dt_tm = boost::posix_time::to_tm(params->time_);
@@ -243,7 +236,8 @@ void Core::ProcessSaveResults()
     //clear all offers map
     items.clear();
     //clear output offers vector
-    vOutPut.clear();
+    vResult.clear();
+    vRISResult.clear();
 
     OutPutCampaignSet.clear();
     OutPutOfferSet.clear();
@@ -307,7 +301,7 @@ std::string Core::OffersToJson(Offer::Vector &items)
     return json.str();
 }
 //-------------------------------------------------------------------------------------------------------------------
-void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
+void Core::RISAlgorithm(const Offer::Map &items)
 {
     Offer::MapRate result;
     unsigned loopCount;
@@ -325,8 +319,8 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
         {
             if((*i).second->type == Offer::Type::banner)
             {
-                RISResult.clear();
-                RISResult.insert(RISResult.begin(),(*i).second);
+                vRISResult.clear();
+                vRISResult.insert(vRISResult.begin(),(*i).second);
                 return;
             }
 
@@ -356,11 +350,11 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
         if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            RISResult.push_back((*p).second);
+            vRISResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
 
-            if(RISResult.size() >= informer->capacity)
+            if(vRISResult.size() >= informer->capacity)
                 return;
         }
     }
@@ -371,11 +365,11 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
         if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            RISResult.push_back((*p).second);
+            vRISResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
 
-            if(RISResult.size() >= informer->capacity)
+            if(vRISResult.size() >= informer->capacity)
                 return;
         }
     }
@@ -385,20 +379,20 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     {
         if(OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            RISResult.push_back((*p).second);
+            vRISResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
 
-            if(RISResult.size() >= informer->capacity)
+            if(vRISResult.size() >= informer->capacity)
                 return;
         }
     }
 
     //expand to return size
-    loopCount = RISResult.size();
+    loopCount = vRISResult.size();
     for(auto p = result.begin(); loopCount < informer->capacity && p != result.end(); ++p, loopCount++)
     {
-        RISResult.push_back((*p).second);
+        vRISResult.push_back((*p).second);
     }
 
     //user history view clean
@@ -408,7 +402,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
 #endif // DUMMY
 }
 //-------------------------------------------------------------------------------------------------------------------
-void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult)
+void Core::RISAlgorithmRetagreting(const Offer::Vector &result)
 {
     if(result.size() == 0)
     {
@@ -420,82 +414,82 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
     {
         if((*p)->type == Offer::Type::banner)
         {
-            RISResult.clear();
-            RISResult.insert(RISResult.begin(),*p);
+            vResult.clear();
+            vResult.insert(vResult.begin(),*p);
             return;
         }
 
         if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
                 && OutPutOfferSet.count((*p)->id_int) == 0)
         {
-            RISResult.push_back(*p);
+            vResult.push_back(*p);
             OutPutOfferSet.insert((*p)->id_int);
             OutPutCampaignSet.insert((*p)->campaign_id);
 
-            if(RISResult.size() >= informer->retargeting_capacity)
+            if(vResult.size() >= informer->retargeting_capacity)
                 return;
         }
     }
 
     //add teaser when teaser unique id and with company unique and any rating
-    if(RISResult.size() < informer->retargeting_capacity)
+    if(vResult.size() < informer->retargeting_capacity)
     {
         for(auto p = result.begin(); p!=result.end(); ++p)
         {
             if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
                     && OutPutOfferSet.count((*p)->id_int) == 0)
             {
-                RISResult.push_back(*p);
+                vResult.push_back(*p);
                 OutPutOfferSet.insert((*p)->id_int);
                 OutPutCampaignSet.insert((*p)->campaign_id);
 
-                if(RISResult.size() >= informer->retargeting_capacity)
+                if(vResult.size() >= informer->retargeting_capacity)
                     return;
             }
         }
     }
 
     //add teaser when teaser unique id
-    if(RISResult.size() < informer->retargeting_capacity)
+    if(vResult.size() < informer->retargeting_capacity)
     {
         for(auto p = result.begin(); p != result.end(); ++p)
         {
             if(OutPutOfferSet.count((*p)->id_int) == 0)
             {
-                RISResult.push_back(*p);
+                vResult.push_back(*p);
                 OutPutOfferSet.insert((*p)->id_int);
                 OutPutCampaignSet.insert((*p)->campaign_id);
 
-                if(RISResult.size() >= informer->retargeting_capacity)
+                if(vResult.size() >= informer->retargeting_capacity)
                     return;
             }
         }
     }
 }
 //-------------------------------------------------------------------------------------------------------------------
-void Core::mergeWithRetargeting(const Offer::Vector &vRIS)
+void Core::mergeWithRetargeting()
 {
-    if( (vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner) ||
-            (vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner) )
+    if( (vResult.size() && (*vResult.begin())->type == Offer::Type::banner) ||
+            (vRISResult.size() && (*vRISResult.begin())->type == Offer::Type::banner) )
     {
-        if( vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner )
+        if( vResult.size() && (*vResult.begin())->type == Offer::Type::banner )
         {
 
         }
-        else if( vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner )
+        else if( vRISResult.size() && (*vRISResult.begin())->type == Offer::Type::banner )
         {
-            vOutPut.insert(vOutPut.begin(),
-                           vRIS.begin(),
-                           vRIS.begin()+1);
+            vResult.insert(vResult.begin(),
+                           vRISResult.begin(),
+                           vRISResult.begin()+1);
         }
     }
     else
     {
-        vOutPut.insert(vOutPut.end(),
-                       vRIS.begin(),
-                       informer->capacity - vOutPut.size() < vRIS.size() ?
-                       vRIS.begin() + (informer->capacity - vOutPut.size()) :
-                       vRIS.end());
+        vResult.insert(vResult.end(),
+                       vRISResult.begin(),
+                       informer->capacity - vResult.size() < vRISResult.size() ?
+                       vRISResult.begin() + (informer->capacity - vResult.size()) :
+                       vRISResult.end());
 
     }
 }

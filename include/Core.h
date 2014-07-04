@@ -48,7 +48,7 @@ private:
     ///retargeting offers count
     unsigned RetargetingCount;
     ///result offers vector
-    Offer::Vector vOutPut;
+    Offer::Vector vResult, vRISResult;
     ///all offers to show
     Offer::Map items;
     ///campaigns to show
@@ -56,8 +56,8 @@ private:
     std::set<unsigned long long> OutPutOfferSet;
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
-    void RISAlgorithm(const Offer::Map &items, Offer::Vector &RISresult);
-    void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult);
+    void RISAlgorithm(const Offer::Map &items);
+    void RISAlgorithmRetagreting(const Offer::Vector &result);
     //bool contains( const Offer::Vector &v, const Offer::itV p) const {return std::find(v.begin(), v.end(), *p) != v.end();}
     //bool containsInRetargeting(const Offer::itV p)const {return contains(resultRetargeting, p);}
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
@@ -68,7 +68,7 @@ private:
     static std::string EscapeJson(const std::string &str);
     /** \brief logging Core result in syslog */
     void log();
-    void mergeWithRetargeting(const Offer::Vector &);
+    void mergeWithRetargeting();
 };
 
 #endif // CORE_H
