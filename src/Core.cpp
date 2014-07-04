@@ -76,9 +76,6 @@ std::string Core::Process(Params *prms)
 
     RISAlgorithm(items);
 
-    //merge
-    mergeWithRetargeting();
-
 #else
     getOffers(items);
 
@@ -224,7 +221,6 @@ void Core::ProcessSaveResults()
     items.clear();
     //clear output offers vector
     vResult.clear();
-    vRISResult.clear();
 
     OutPutCampaignSet.clear();
     OutPutOfferSet.clear();
@@ -319,10 +315,9 @@ void Core::RISAlgorithm(const Offer::Map &items)
     {
         if((*i).second)
         {
-            if((*i).second->type == Offer::Type::banner)
+            if((*i).second->type == Offer::Type::banner && vResult.size() == 0)
             {
-                vRISResult.clear();
-                vRISResult.insert(vRISResult.begin(),(*i).second);
+                vResult.insert(vResult.begin(),(*i).second);
                 return;
             }
 
@@ -352,11 +347,11 @@ void Core::RISAlgorithm(const Offer::Map &items)
         if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            vRISResult.push_back((*p).second);
+            vResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
 
-            if(vRISResult.size() >= informer->capacity)
+            if(vResult.size() >= informer->capacity)
                 return;
         }
     }
@@ -367,11 +362,11 @@ void Core::RISAlgorithm(const Offer::Map &items)
         if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            vRISResult.push_back((*p).second);
+            vResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
 
-            if(vRISResult.size() >= informer->capacity)
+            if(vResult.size() >= informer->capacity)
                 return;
         }
     }
@@ -381,20 +376,20 @@ void Core::RISAlgorithm(const Offer::Map &items)
     {
         if(OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            vRISResult.push_back((*p).second);
+            vResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
 
-            if(vRISResult.size() >= informer->capacity)
+            if(vResult.size() >= informer->capacity)
                 return;
         }
     }
 
     //expand to return size
-    loopCount = vRISResult.size();
+    loopCount = vResult.size();
     for(auto p = result.begin(); loopCount < informer->capacity && p != result.end(); ++p, loopCount++)
     {
-        vRISResult.push_back((*p).second);
+        vResult.push_back((*p).second);
     }
 
     //user history view clean
@@ -414,13 +409,6 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result)
     //add teaser when teaser unique id and with company unique and rating > 0
     for(auto p = result.begin(); p != result.end(); ++p)
     {
-        if((*p)->type == Offer::Type::banner)
-        {
-            vResult.clear();
-            vResult.insert(vResult.begin(),*p);
-            return;
-        }
-
         if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
                 && OutPutOfferSet.count((*p)->id_int) == 0)
         {
@@ -469,6 +457,7 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result)
     }
 }
 //-------------------------------------------------------------------------------------------------------------------
+/*
 void Core::mergeWithRetargeting()
 {
     if( (vResult.size() && (*vResult.begin())->type == Offer::Type::banner) ||
@@ -495,3 +484,4 @@ void Core::mergeWithRetargeting()
 
     }
 }
+*/
