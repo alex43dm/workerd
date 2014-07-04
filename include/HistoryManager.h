@@ -41,10 +41,6 @@ public:
     static int social_processed_;
     //Задаем значение очистки истории показов
     bool clean;
-    //Задаем обнавление краткосрочной истории
-    bool updateShort;
-    //Задаём обнавление долгосрочной истории
-    bool updateContext;
 
     Offer::Vector vretg;
 
@@ -92,12 +88,15 @@ public:
 
     mongo::BSONObj BSON_Keywords();
 
+    bool isSphinxProcessed(){ return isProcessed;}
+
 protected:
 private:
-    std::string key, key_inv;
+    bool isProcessed;
+    std::string key;
     Params *params;
     Informer *inf;
-    RedisClient *pViewHistory,*pShortTerm,*pLongTerm,*pRetargeting;
+    RedisClient *pShortTerm,*pLongTerm,*pRetargeting;
     std::vector<sphinxRequests> stringQuery;
     XXXSearcher *sphinx;
 

@@ -161,8 +161,11 @@ void Core::log()
 {
     std::clog<<"["<<tid<<"]";
 
-   if(cfg->logCoreTime)
-        std::clog<<" core time:"<< boost::posix_time::to_simple_string(endCoreTime - startCoreTime);
+    if(cfg->logCoreTime)
+    {
+        std::clog<<" core time:"<< boost::posix_time::to_simple_string(endCoreTime - startCoreTime)
+        <<" use sphinx:"<<hm->isSphinxProcessed();
+    }
 
     if(cfg->logOutPutSize)
         std::clog<<" out:"<<vOutPut.size();
@@ -196,8 +199,6 @@ void Core::log()
         std::clog<<" key:"<<params->getUserKey();
         std::clog<<" offers: total:"<<offersTotal;
     }
-
-
 }
 //-------------------------------------------------------------------------------------------------------------------
 void Core::ProcessSaveResults()
@@ -402,13 +403,13 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
             }
         }
     }
-/*
-    //vector by rating
-    for(auto i = resultAll.begin(); i != resultAll.end(); ++i)
-    {
-        result.push_back((*i).second);
-    }
-*/
+    /*
+        //vector by rating
+        for(auto i = resultAll.begin(); i != resultAll.end(); ++i)
+        {
+            result.push_back((*i).second);
+        }
+    */
 #ifndef DUMMY
     if(result.size() <= informer->capacity * 2)
     {
@@ -536,8 +537,8 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
     {
         for(auto p = result.begin(); p!=result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
         {
-        if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
-                && OutPutOfferSet.count((*p)->id_int) == 0)
+            if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
+                    && OutPutOfferSet.count((*p)->id_int) == 0)
             {
                 if(RISResult.size() < informer->retargeting_capacity)
                 {
@@ -554,25 +555,25 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
     }
 
     //add teaser when teaser unique id
-        if(RISResult.size() < informer->retargeting_capacity)
+    if(RISResult.size() < informer->retargeting_capacity)
+    {
+        for(auto p = result.begin(); p != result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
         {
-            for(auto p = result.begin(); p != result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
+            if(OutPutOfferSet.count((*p)->id_int) == 0)
             {
-                if(OutPutOfferSet.count((*p)->id_int) == 0)
+                if(RISResult.size() < informer->retargeting_capacity)
                 {
-                    if(RISResult.size() < informer->retargeting_capacity)
-                    {
-                        RISResult.push_back(*p);
-                        OutPutOfferSet.insert((*p)->id_int);
-                        OutPutCampaignSet.insert((*p)->campaign_id);
-                    }
-                    else
-                    {
-                        goto make_return;
-                    }
+                    RISResult.push_back(*p);
+                    OutPutOfferSet.insert((*p)->id_int);
+                    OutPutCampaignSet.insert((*p)->campaign_id);
+                }
+                else
+                {
+                    goto make_return;
                 }
             }
         }
+    }
 
 make_return:
     //redirect links make
@@ -591,3 +592,4 @@ make_return:
     }
 }
 //-------------------------------------------------------------------------------------------------------------------
+

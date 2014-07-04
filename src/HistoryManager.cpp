@@ -27,7 +27,6 @@ HistoryManager::~HistoryManager()
 
     delete sphinx;
 
-    delete pViewHistory;
     delete pShortTerm;
     delete pLongTerm;
     delete pRetargeting;
@@ -38,12 +37,6 @@ bool HistoryManager::initDB()
 {
 
     Config *cfg = Config::Instance();
-
-    pViewHistory = new RedisClient(cfg->redis_user_view_history_host_,
-                                   cfg->redis_user_view_history_port_,
-                                   cfg->views_expire_,
-                                   cfg->redis_long_term_history_timeout_);
-    pViewHistory->connect();
 
     pShortTerm = new RedisClient(cfg->redis_short_term_history_host_,
                                  cfg->redis_short_term_history_port_,
@@ -69,14 +62,11 @@ bool HistoryManager::initDB()
 void HistoryManager::startGetUserHistory(Params *_params, Informer *inf_)
 {
     clean = false;
-    updateShort = false;
-    updateContext = false;
 
     inf = inf_;
 
     params = _params;
     key = params->getUserKey();
-    key_inv = key+"-inv";
 
     if( !inf->sphinxProcessEnable() )
     {
@@ -126,6 +116,8 @@ void HistoryManager::sphinxProcess(Offer::Map &items)
     {
         return;
     }
+
+    isProcessed = true;
 
     sphinx->makeFilter(items);
 
@@ -196,11 +188,12 @@ bool HistoryManager::updateUserHistory(
 
     if(mtailOffers.size())
     {
-        pViewHistory->del(key_inv);
         mtailOffers.clear();
     }
 
     stringQuery.clear();
+
+    isProcessed = false;
 
     return true;
 }
@@ -209,9 +202,6 @@ RedisClient *HistoryManager::getHistoryPointer(const HistoryType type) const
 {
     switch(type)
     {
-    case ViewHistory:
-        return pViewHistory;
-        break;
     case ShortTerm:
         return pShortTerm;
         break;
