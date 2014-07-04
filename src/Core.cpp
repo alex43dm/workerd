@@ -218,13 +218,7 @@ void Core::ProcessSaveResults()
                                   append("context", params->getContext()).
                                   obj();
 #ifndef DUMMY
-        //cycle view
-        if(hm->clean)
-        {
-            hm->setTailOffers(items,vOutPut);
-        }
-
-        hm->updateUserHistory(vOutPut, RetargetingCount);
+        hm->updateUserHistory(items, vOutPut, RetargetingCount);
 #endif // DUMMY
         try
         {

@@ -175,13 +175,19 @@ mongo::BSONObj HistoryManager::BSON_Keywords()
 }
 
 bool HistoryManager::updateUserHistory(
-    const Offer::Vector &items,
+    const Offer::Map &items,
+    const Offer::Vector &outItems,
     unsigned RetargetingCount)
 {
+    if(clean)
+    {
+        setTailOffers(items,outItems);
+    }
+
     //обновление deprecated
-    setDeprecatedOffers(items, RetargetingCount);
+    setDeprecatedOffers(outItems, RetargetingCount);
     //обновление retargeting
-    RetargetingUpdate(items, RetargetingCount);
+    RetargetingUpdate(outItems, RetargetingCount);
 
     vshortTerm.clear();
     vlongTerm.clear();

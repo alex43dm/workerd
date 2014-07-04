@@ -59,7 +59,7 @@ public:
     //main methods
     void startGetUserHistory(Params *params, Informer *);
     void sphinxProcess(Offer::Map &items);
-    bool updateUserHistory(const Offer::Vector &items, unsigned RetargetingCount);
+    bool updateUserHistory(const Offer::Map &items, const Offer::Vector &outItems, unsigned RetargetingCount);
 
     bool setDeprecatedOffers(const Offer::Vector &items,unsigned);
     bool getDeprecatedOffers(std::string &);
