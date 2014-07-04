@@ -221,10 +221,10 @@ void Core::ProcessSaveResults()
     items.clear();
     //clear output offers vector
     vResult.clear();
-
+#ifndef DUMMY
     OutPutCampaignSet.clear();
     OutPutOfferSet.clear();
-
+#endif // DUMMY
     std::clog<<std::endl;
 }
 //-------------------------------------------------------------------------------------------------------------------
@@ -299,6 +299,7 @@ void Core::resultHtml()
     }
 }
 //-------------------------------------------------------------------------------------------------------------------
+#ifndef DUMMY
 void Core::RISAlgorithm(const Offer::Map &items)
 {
     Offer::MapRate result;
@@ -334,14 +335,13 @@ void Core::RISAlgorithm(const Offer::Map &items)
             }
         }
     }
-#ifndef DUMMY
+
     if(result.size() <= informer->capacity * 2)
     {
         hm->clean = true;
     }
-#endif // DUMMY
 
-    //add teaser when teaser unique id and with company unique and rating > 0
+    //add teaser when teaser unique id and with company unique
     for(auto p = result.begin(); p != result.end(); ++p)
     {
         if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
@@ -356,22 +356,7 @@ void Core::RISAlgorithm(const Offer::Map &items)
         }
     }
 
-    //add teaser when teaser unique id and with company unique and with any rating
-    for(auto p = result.begin(); p!=result.end(); ++p)
-    {
-        if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
-                && OutPutOfferSet.count((*p).second->id_int) == 0)
-        {
-            vResult.push_back((*p).second);
-            OutPutOfferSet.insert((*p).second->id_int);
-            OutPutCampaignSet.insert((*p).second->campaign_id);
-
-            if(vResult.size() >= informer->capacity)
-                return;
-        }
-    }
-
-    //add teaser when teaser unique id and with id unique and with any rating
+    //add teaser when teaser unique id and with id unique
     for(auto p = result.begin(); p != result.end(); ++p)
     {
         if(OutPutOfferSet.count((*p).second->id_int) == 0)
@@ -393,10 +378,8 @@ void Core::RISAlgorithm(const Offer::Map &items)
     }
 
     //user history view clean
-#ifndef DUMMY
     hm->clean = true;
     std::clog<<"["<<tid<<"] "<<__func__<<" clean offer history"<<std::endl;
-#endif // DUMMY
 }
 //-------------------------------------------------------------------------------------------------------------------
 void Core::RISAlgorithmRetagreting(const Offer::Vector &result)
@@ -421,67 +404,19 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result)
         }
     }
 
-    //add teaser when teaser unique id and with company unique and any rating
-    if(vResult.size() < informer->retargeting_capacity)
-    {
-        for(auto p = result.begin(); p!=result.end(); ++p)
-        {
-            if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
-                    && OutPutOfferSet.count((*p)->id_int) == 0)
-            {
-                vResult.push_back(*p);
-                OutPutOfferSet.insert((*p)->id_int);
-                OutPutCampaignSet.insert((*p)->campaign_id);
-
-                if(vResult.size() >= informer->retargeting_capacity)
-                    return;
-            }
-        }
-    }
-
     //add teaser when teaser unique id
-    if(vResult.size() < informer->retargeting_capacity)
+    for(auto p = result.begin(); p!=result.end(); ++p)
     {
-        for(auto p = result.begin(); p != result.end(); ++p)
+        if(OutPutOfferSet.count((*p)->id_int) == 0)
         {
-            if(OutPutOfferSet.count((*p)->id_int) == 0)
-            {
-                vResult.push_back(*p);
-                OutPutOfferSet.insert((*p)->id_int);
-                OutPutCampaignSet.insert((*p)->campaign_id);
+            vResult.push_back(*p);
+            OutPutOfferSet.insert((*p)->id_int);
+            OutPutCampaignSet.insert((*p)->campaign_id);
 
-                if(vResult.size() >= informer->retargeting_capacity)
-                    return;
-            }
+            if(vResult.size() >= informer->retargeting_capacity)
+                return;
         }
     }
 }
+#endif // DUMMY
 //-------------------------------------------------------------------------------------------------------------------
-/*
-void Core::mergeWithRetargeting()
-{
-    if( (vResult.size() && (*vResult.begin())->type == Offer::Type::banner) ||
-            (vRISResult.size() && (*vRISResult.begin())->type == Offer::Type::banner) )
-    {
-        if( vResult.size() && (*vResult.begin())->type == Offer::Type::banner )
-        {
-
-        }
-        else if( vRISResult.size() && (*vRISResult.begin())->type == Offer::Type::banner )
-        {
-            vResult.insert(vResult.begin(),
-                           vRISResult.begin(),
-                           vRISResult.begin()+1);
-        }
-    }
-    else
-    {
-        vResult.insert(vResult.end(),
-                       vRISResult.begin(),
-                       informer->capacity - vResult.size() < vRISResult.size() ?
-                       vRISResult.begin() + (informer->capacity - vResult.size()) :
-                       vRISResult.end());
-
-    }
-}
-*/
