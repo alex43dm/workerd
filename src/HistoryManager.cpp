@@ -135,8 +135,6 @@ void HistoryManager::sphinxProcess(Offer::Map &items)
     }
 
     sphinx->processKeywords(stringQuery, items);
-
-    sphinx->cleanFilter();
 }
 
 
@@ -195,6 +193,8 @@ bool HistoryManager::updateUserHistory(
     }
 
     stringQuery.clear();
+
+    sphinx->cleanFilter();
 
     isProcessed = false;
 

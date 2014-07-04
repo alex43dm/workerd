@@ -41,7 +41,6 @@ Core::~Core()
 //-------------------------------------------------------------------------------------------------------------------
 std::string Core::Process(Params *prms)
 {
-//    Log::gdb("Core::Process start");
     startCoreTime = boost::posix_time::microsec_clock::local_time();
 
     params = prms;
@@ -90,24 +89,12 @@ std::string Core::Process(Params *prms)
 
 #endif//DUMMY
 
-    std::string ret;
-
-    if(!vResult.empty())
-    {
-        if (params->json_)
-            ret = OffersToJson(vResult);
-        else
-            ret = OffersToHtml(vResult, params->getUrl());
-    }
-    else
-    {
-        ret = cfg->template_error_;
-    }
-//printf("%s\n",ret.c_str());
+    resultHtml();
 
     endCoreTime = boost::posix_time::microsec_clock::local_time();
 
-    return ret;
+    //printf("%s\n",retHtml.c_str());
+    return retHtml;
 }
 //-------------------------------------------------------------------------------------------------------------------
 void Core::log()
@@ -299,6 +286,21 @@ std::string Core::OffersToJson(Offer::Vector &items)
     json << "]";
 
     return json.str();
+}
+//-------------------------------------------------------------------------------------------------------------------
+void Core::resultHtml()
+{
+    if(!vResult.empty())
+    {
+        if (params->json_)
+            retHtml = OffersToJson(vResult);
+        else
+            retHtml = OffersToHtml(vResult, params->getUrl());
+    }
+    else
+    {
+        retHtml = cfg->template_error_;
+    }
 }
 //-------------------------------------------------------------------------------------------------------------------
 void Core::RISAlgorithm(const Offer::Map &items)

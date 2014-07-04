@@ -45,6 +45,8 @@ private:
     ///history manager
     HistoryManager *hm;
 #endif
+    ///return string
+    std::string retHtml;
     ///retargeting offers count
     unsigned RetargetingCount;
     ///result offers vector
@@ -69,6 +71,7 @@ private:
     /** \brief logging Core result in syslog */
     void log();
     void mergeWithRetargeting();
+    void resultHtml();
 };
 
 #endif // CORE_H
