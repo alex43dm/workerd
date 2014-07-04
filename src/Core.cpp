@@ -366,9 +366,9 @@ std::string Core::OffersToJson(const Offer::Vector &items) const
 #define FULL RISResult.size() >= informer->capacity
 void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
 {
-    Offer::itV p;
-    Offer::Vector result;
-    Offer::MapRate resultAll;
+    //Offer::itV p;
+    //Offer::Vector result;
+    Offer::MapRate result;
     unsigned loopCount;
 
     if( items.size() == 0 )
@@ -382,33 +382,33 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     {
         if((*i).second)
         {
-            resultAll.insert(Offer::PairRate((*i).second->rating, (*i).second));
+            if((*i).second->type == Offer::Type::banner)
+            {
+                RISResult.clear();
+                RISResult.insert(RISResult.begin(),(*i).second);
+                goto links_make;
+            }
+
+            if(!all_social)
+            {
+                if(!(*i).second->social)
+                {
+                    result.insert(Offer::PairRate((*i).second->rating, (*i).second));
+                }
+            }
+            else
+            {
+                result.insert(Offer::PairRate((*i).second->rating, (*i).second));
+            }
         }
     }
-
+/*
     //vector by rating
     for(auto i = resultAll.begin(); i != resultAll.end(); ++i)
     {
-        if((*i).second->type == Offer::Type::banner)
-        {
-            RISResult.clear();
-            RISResult.insert(RISResult.begin(),(*i).second);
-            goto links_make;
-        }
-        //add if all not social and not social offer(skip social)
-        if(!all_social)
-        {
-            if(!(*i).second->social)
-            {
-                result.push_back((*i).second);
-            }
-        }
-        else//all social
-        {
-            result.push_back((*i).second);
-        }
+        result.push_back((*i).second);
     }
-
+*/
 #ifndef DUMMY
     if(result.size() <= informer->capacity * 2)
     {
@@ -418,61 +418,61 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
 #endif // DUMMY
 
     //add teaser when teaser unique id and with company unique and rating > 0
-    for(p = result.begin(); p != result.end(); ++p)
+    for(auto p = result.begin(); p != result.end(); ++p)
     {
-        if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
-                && OutPutOfferSet.count((*p)->id_int) == 0)
+        if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
+                && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
 
-            RISResult.push_back(*p);
+            RISResult.push_back((*p).second);
 
             if(FULL)
             {
                 goto links_make;
             }
-            OutPutOfferSet.insert((*p)->id_int);
-            OutPutCampaignSet.insert((*p)->campaign_id);
+            OutPutOfferSet.insert((*p).second->id_int);
+            OutPutCampaignSet.insert((*p).second->campaign_id);
         }
     }
 
     //add teaser when teaser unique id and with company unique and with any rating
-    for(p = result.begin(); p!=result.end() && RISResult.size() < informer->capacity; ++p)
+    for(auto p = result.begin(); p!=result.end(); ++p)
     {
-        if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
-                && OutPutOfferSet.count((*p)->id_int) == 0)
+        if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
+                && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            RISResult.push_back(*p);
+            RISResult.push_back((*p).second);
 
             if(FULL)
             {
                 goto links_make;
             }
-            OutPutOfferSet.insert((*p)->id_int);
-            OutPutCampaignSet.insert((*p)->campaign_id);
+            OutPutOfferSet.insert((*p).second->id_int);
+            OutPutCampaignSet.insert((*p).second->campaign_id);
         }
     }
 
     //add teaser when teaser unique id and with id unique and with any rating
-    for(p = result.begin(); p != result.end() && RISResult.size() < informer->capacity; ++p)
+    for(auto p = result.begin(); p != result.end(); ++p)
     {
-        if(OutPutOfferSet.count((*p)->id_int) == 0)
+        if(OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            RISResult.push_back(*p);
+            RISResult.push_back((*p).second);
 
             if(FULL)
             {
                 goto links_make;
             }
-            OutPutOfferSet.insert((*p)->id_int);
-            OutPutCampaignSet.insert((*p)->campaign_id);
+            OutPutOfferSet.insert((*p).second->id_int);
+            OutPutCampaignSet.insert((*p).second->campaign_id);
         }
     }
 
     //expand to return size
     loopCount = RISResult.size();
-    for(p = result.begin(); loopCount < informer->capacity && p != result.end(); ++p, loopCount++)
+    for(auto p = result.begin(); loopCount < informer->capacity && p != result.end(); ++p, loopCount++)
     {
-        RISResult.push_back(*p);
+        RISResult.push_back((*p).second);
     }
 
     //user history view clean
@@ -483,7 +483,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
 
 links_make:
     //redirect links make
-    for(p = RISResult.begin(); p != RISResult.end(); ++p)
+    for(auto p = RISResult.begin(); p != RISResult.end(); ++p)
     {
         (*p)->redirect_url =
             cfg->redirect_script_ + "?" + base64_encode(boost::str(
