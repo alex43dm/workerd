@@ -65,7 +65,7 @@ void HistoryManager::getRetargeting()
                                    pStmt->GetColumnInt(18)
                                   );
 
-            off->branch = EBranchL::L30;
+            off->branch = EBranchL::L32;
 
             vretg.push_back(off);
         }
@@ -138,9 +138,9 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items, unsigned len)
     char buf[8192];
     int viewTime = 0;
 
-    if(cfg->logRetargetingOfferIds)
+    if(cfg->logRetargetingOfferIds && vretageting.size())
     {
-        std::clog<<" RetargetingOfferIds: (redis):";
+        std::clog<<" retargeting offer redis:";
         for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
         {
             std::clog<<" "<<*i;
@@ -156,14 +156,8 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items, unsigned len)
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
     //pStmt->BeginTransaction();
 
-    if(cfg->logRetargetingOfferIds)
-    {
-        std::clog<<" (pickup):";
-    }
-
     for(unsigned i = 0; i < len && i < items.size(); i++)
     {
-        std::clog<<" "<<items[i]->id<<" "<<items[i]->id_int<<" hits:"<<items[i]->uniqueHits<<";";
         try
         {
             sqlite3_snprintf(sizeof(buf),buf,
