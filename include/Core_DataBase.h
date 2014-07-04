@@ -11,8 +11,8 @@ class Core_DataBase
 {
     public:
         bool all_social;
-        unsigned teasersCount, offersTotal;
-        float teasersMediumRating,teasersMaxRating;
+        unsigned offersTotal;
+        float teasersMaxRating;
 
         Informer *informer;
 

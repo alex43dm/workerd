@@ -1,25 +1,16 @@
 #ifndef CORE_H
 #define CORE_H
 
-#include <list>
-#include <vector>
-//#include <map>
-#include <utility>
-#include <algorithm>
-#include <set>
-
 #include <boost/date_time.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include "Offer.h"
-#include "Informer.h"
 #include "Params.h"
-#include "DataBase.h"
+#include "Core_DataBase.h"
+
 #ifndef DUMMY
 #include "HistoryManager.h"
 #endif
 
-#include "Core_DataBase.h"
 
 /// Класс, который связывает воедино все части системы.
 class Core : public Core_DataBase
@@ -54,8 +45,6 @@ private:
 #endif
     ///retargeting offers count
     unsigned RetargetingCount;
-    ///campaigns to show
-    std::multiset<unsigned long long> OutPutCampaignSet;
     ///result offers vector
     Offer::Vector vOutPut;
     ///all offers to show

@@ -4,25 +4,23 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "../config.h"
-
+#include <set>
 #include <ctime>
 #include <cstdlib>
 
+#include "../config.h"
+
 #include "Config.h"
-#include "Log.h"
 #include "Core.h"
 #include "DB.h"
-#include "KompexSQLiteStatement.h"
-#include "KompexSQLiteException.h"
 #include "base64.h"
-#include "EBranch.h"
 
 #ifndef DUMMY
 int HistoryManager::request_processed_ = 0;
 int HistoryManager::offer_processed_ = 0;
 int HistoryManager::social_processed_ = 0;
 #endif // DUMMY
+
 Core::Core()
 {
     tid = pthread_self();
@@ -41,49 +39,6 @@ Core::~Core()
     delete hm;
 #endif // DUMMY
 }
-
-/** Функтор составляет ссылку перенаправления на предложение item.
-
-    Вся строка запроса кодируется в base64 и после распаковки содержит
-    следующие параметры:
-
-    \param id        guid рекламного предложения
-    \param inf       guid информера, с которого осуществляется переход
-    \param url       ссылка, ведущая на товарное предложение
-    \param server    адрес сервера, выдавшего ссылку
-    \param token     токен для проверки действительности перехода
-    \param loc	      адрес страницы, на которой показывается информер
-    \param ref	      адрес страницы, откуда пришёл посетитель
-
-    Пары (параметр=значение) разделяются символом \c '\\n' (перевод строки).
-    Значения никак не экранируются, считается, что они не должны содержать
-    символа-разделителя \c '\\n'.
-*/
-//-------------------------------------------------------------------------------------------------------------------
-class GenerateRedirectLink
-{
-    std::string informerId;
-    std::string location_;
-public:
-    GenerateRedirectLink( std::string &informerId,
-                          const std::string &location)
-        : informerId(informerId),
-          location_(location) { }
-
-    void operator ()(Offer *p)
-    {
-        p->redirect_url =
-            cfg->redirect_script_ + "?" + base64_encode(boost::str(
-                        boost::format("id=%s\ninf=%d\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
-                        % p->id
-                        % informerId
-                        % p->gen()
-                        % p->url
-                        % Config::Instance()->server_ip_
-                        % location_
-                    ));
-    }
-};
 //-------------------------------------------------------------------------------------------------------------------
 std::string Core::Process(Params *prms)
 {
@@ -322,8 +277,6 @@ void Core::ProcessSaveResults()
         }
     }
 
-    OutPutCampaignSet.clear();
-
     //clear tmp values: informer & temp table
     clearTmp();
 
@@ -421,6 +374,9 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     Offer::Vector result;
     Offer::MapRate resultAll;
     unsigned loopCount;
+    ///campaigns to show
+    std::multiset<unsigned long long> OutPutCampaignSet;
+    std::set<unsigned long long> OutPutOfferSet;
 
 //    RISResult.clear();
 
@@ -442,32 +398,25 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     //vector by rating
     for(auto i = resultAll.begin(); i != resultAll.end(); ++i)
     {
-        if((*i).second->type == Offer::Type::teazer)
+        if((*i).second->type == Offer::Type::banner)
         {
-            teasersCount++;
-            teasersMediumRating += (*i).second->rating;
-        }
-        else if((*i).second->type == Offer::Type::banner)
-        {
-            RISResult.push_back((*i).second);
+            RISResult.clear();
+            RISResult.insert(RISResult.begin(),(*i).second);
             goto links_make;
         }
         //add if all not social and not social offer(skip social)
         if(!all_social)
         {
-            if(!((*i).second->social))
+            if(!(*i).second->social)
             {
                 result.push_back((*i).second);
             }
-
         }
         else//all social
         {
             result.push_back((*i).second);
         }
     }
-    //medium reting
-    teasersMediumRating /= teasersCount;
 
 #ifndef DUMMY
     if(result.size() <= informer->capacity * 2)
@@ -481,7 +430,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     for(p = result.begin(); p != result.end(); ++p)
     {
         if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
-                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+                && OutPutOfferSet.count((*p)->id_int) == 0)
         {
 
             RISResult.push_back(*p);
@@ -490,7 +439,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
             {
                 goto links_make;
             }
-
+            OutPutOfferSet.insert((*p)->id_int);
             OutPutCampaignSet.insert((*p)->campaign_id);
         }
     }
@@ -499,7 +448,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     for(p = result.begin(); p!=result.end() && RISResult.size() < informer->capacity; ++p)
     {
         if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
-                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+                && OutPutOfferSet.count((*p)->id_int) == 0)
         {
             RISResult.push_back(*p);
 
@@ -507,7 +456,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
             {
                 goto links_make;
             }
-
+            OutPutOfferSet.insert((*p)->id_int);
             OutPutCampaignSet.insert((*p)->campaign_id);
         }
     }
@@ -515,7 +464,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     //add teaser when teaser unique id and with id unique and with any rating
     for(p = result.begin(); p != result.end() && RISResult.size() < informer->capacity; ++p)
     {
-        if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+        if(OutPutOfferSet.count((*p)->id_int) == 0)
         {
             RISResult.push_back(*p);
 
@@ -523,7 +472,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
             {
                 goto links_make;
             }
-
+            OutPutOfferSet.insert((*p)->id_int);
             OutPutCampaignSet.insert((*p)->campaign_id);
         }
     }
@@ -533,7 +482,6 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     for(p = result.begin(); loopCount < informer->capacity && p != result.end(); ++p, loopCount++)
     {
         RISResult.push_back(*p);
-        OutPutCampaignSet.insert((*p)->campaign_id);
     }
 
     //user history view clean
@@ -547,13 +495,13 @@ links_make:
     for(p = RISResult.begin(); p != RISResult.end(); ++p)
     {
         (*p)->redirect_url =
-            Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
+            cfg->redirect_script_ + "?" + base64_encode(boost::str(
                         boost::format("id=%s\ninf=%s\ntoken=%s\nurl=%s\nserver=%s\nloc=%s")
                         % (*p)->id
                         % params->informer_id_
                         % (*p)->gen()
                         % (*p)->url
-                        % Config::Instance()->server_ip_
+                        % cfg->server_ip_
                         % params->location_
                     ));
     }
@@ -561,6 +509,10 @@ links_make:
 //-------------------------------------------------------------------------------------------------------------------
 void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult)
 {
+    ///campaigns to show
+    std::multiset<unsigned long long> OutPutCampaignSet;
+    std::set<unsigned long long> OutPutOfferSet;
+
     RISResult.clear();
 
     if(result.size() == 0)
@@ -574,17 +526,17 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
         if((*p)->type == Offer::Type::banner)
         {
             RISResult.clear();
-            RISResult.push_back(*p);
-            OutPutCampaignSet.insert((*p)->campaign_id);
+            RISResult.insert(RISResult.begin(),*p);
             goto make_return;
         }
 
         if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
-                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+                && OutPutOfferSet.count((*p)->id_int) == 0)
         {
             if(RISResult.size() < informer->retargeting_capacity)
             {
                 RISResult.push_back(*p);
+                OutPutOfferSet.insert((*p)->id_int);
                 OutPutCampaignSet.insert((*p)->campaign_id);
             }
             else
@@ -600,11 +552,12 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
         for(auto p = result.begin(); p!=result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
         {
         if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
-                && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+                && OutPutOfferSet.count((*p)->id_int) == 0)
             {
                 if(RISResult.size() < informer->retargeting_capacity)
                 {
                     RISResult.push_back(*p);
+                    OutPutOfferSet.insert((*p)->id_int);
                     OutPutCampaignSet.insert((*p)->campaign_id);
                 }
                 else
@@ -620,11 +573,12 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
         {
             for(auto p = result.begin(); p != result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
             {
-                if(std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
+                if(OutPutOfferSet.count((*p)->id_int) == 0)
                 {
                     if(RISResult.size() < informer->retargeting_capacity)
                     {
                         RISResult.push_back(*p);
+                        OutPutOfferSet.insert((*p)->id_int);
                         OutPutCampaignSet.insert((*p)->campaign_id);
                     }
                     else
@@ -640,13 +594,13 @@ make_return:
     for(auto p = RISResult.begin(); p != RISResult.end(); ++p)
     {
         (*p)->redirect_url =
-            Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
+            cfg->redirect_script_ + "?" + base64_encode(boost::str(
                         boost::format("id=%s\ninf=%s\ntoken=%s\nurl=%s\nserver=%s\nloc=%s")
                         % (*p)->id
                         % params->informer_id_
                         % (*p)->gen()
                         % (*p)->url
-                        % Config::Instance()->server_ip_
+                        % cfg->server_ip_
                         % params->location_
                     ));
     }

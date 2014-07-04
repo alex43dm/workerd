@@ -102,8 +102,6 @@ bool Core_DataBase::getOffers(Offer::Map &items,unsigned long long sessionId)
 
     try
     {
-        teasersCount = 0;
-        teasersMediumRating = 0;
         teasersMaxRating = 0;
 
         pStmt = new Kompex::SQLiteStatement(cfg->pDb->pDatabase);
