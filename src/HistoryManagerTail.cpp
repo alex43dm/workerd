@@ -45,7 +45,8 @@ bool HistoryManager::getTailOffers()
     return true;
 }
 
-bool HistoryManager::setTailOffers(const Offer::Map &items, const Offer::Vector &toShow)
+bool HistoryManager::setTailOffers(const Offer::Map &items,
+                                   const Offer::Vector &toShow, bool all_social)
 {
     bool fFound;
     char buf[8192];
@@ -55,6 +56,9 @@ bool HistoryManager::setTailOffers(const Offer::Map &items, const Offer::Vector 
 
     for(auto it = items.begin(); it != items.end(); ++it)
     {
+        if(!all_social && (*it).second->social)
+            continue;
+
         fFound = false;
         for(auto i = toShow.begin(); i != toShow.end(); ++i)
         {

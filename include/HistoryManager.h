@@ -55,7 +55,7 @@ public:
     //main methods
     void startGetUserHistory(Params *params, Informer *);
     void sphinxProcess(Offer::Map &items);
-    bool updateUserHistory(const Offer::Map &items, const Offer::Vector &outItems, unsigned RetargetingCount);
+    bool updateUserHistory(const Offer::Map &items, const Offer::Vector &outItems, unsigned RetargetingCount, bool);
 
     bool setDeprecatedOffers(const Offer::Vector &items,unsigned);
     bool getDeprecatedOffers(std::string &);
@@ -64,7 +64,7 @@ public:
     bool getDeprecatedOffersAsyncWait();
     bool clearDeprecatedOffers();
 
-    bool setTailOffers(const Offer::Map &items, const Offer::Vector &toShow);
+    bool setTailOffers(const Offer::Map &items, const Offer::Vector &toShow, bool);
     bool getTailOffersAsyncWait();
     bool getTailOffersAsync();
     bool moveUpTailOffers(Offer::Map &items, float teasersMaxRating);

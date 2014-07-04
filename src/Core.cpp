@@ -155,7 +155,7 @@ void Core::ProcessSaveResults()
                                   append("context", params->getContext()).
                                   obj();
 #ifndef DUMMY
-        hm->updateUserHistory(items, vResult, RetargetingCount);
+        hm->updateUserHistory(items, vResult, RetargetingCount, all_social);
 #endif // DUMMY
         try
         {

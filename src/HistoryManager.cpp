@@ -170,11 +170,12 @@ mongo::BSONObj HistoryManager::BSON_Keywords()
 bool HistoryManager::updateUserHistory(
     const Offer::Map &items,
     const Offer::Vector &outItems,
-    unsigned RetargetingCount)
+    unsigned RetargetingCount,
+    bool all_social)
 {
     if(clean)
     {
-        setTailOffers(items,outItems);
+        setTailOffers(items, outItems, all_social);
     }
 
     //обновление deprecated
