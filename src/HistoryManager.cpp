@@ -61,14 +61,14 @@ bool HistoryManager::initDB()
 
 void HistoryManager::startGetUserHistory(Params *_params, Informer *inf_)
 {
-    getRetargetingAsync();
-
-    getTailOffersAsync();
-
     clean = false;
     inf = inf_;
     params = _params;
     key = params->getUserKey();
+
+    getRetargetingAsync();
+
+    getTailOffersAsync();
 
     if( !inf->sphinxProcessEnable() )
     {
