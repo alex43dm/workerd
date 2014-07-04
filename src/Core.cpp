@@ -80,58 +80,18 @@ std::string Core::Process(Params *prms)
     hm->getRetargetingAsyncWait();
     RISAlgorithmRetagreting(hm->vretg, vOutPut);
 
-    RISAlgorithm(items, vRIS);
-
     RetargetingCount = vOutPut.size();
 
+    RISAlgorithm(items, vRIS);
+
     //merge
-    if( (vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner) ||
-            (vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner) )
-    {
-        if( vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner )
-        {
+    mergeWithRetargeting(vRIS);
 
-        }
-        else if( vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner )
-        {
-            vOutPut.insert(vOutPut.begin(),
-                           vRIS.begin(),
-                           vRIS.begin()+1);
-        }
-    }
-    else
-    {
-        Offer::itV last;
-        if( informer->capacity - vOutPut.size() < vRIS.size())
-        {
-            last = vRIS.begin() + (informer->capacity - vOutPut.size());
-        }
-        else
-        {
-            last = vRIS.end();
-        }
-
-        vOutPut.insert(vOutPut.end(),
-                       vRIS.begin(),
-                       last);
-
-    }
 #else
     getOffers(items);
 
     for(auto i = items.begin(); i != items.end(); ++i)
     {
-        Offer *p = (*i).second;
-        p->redirect_url =
-            Config::Instance()->redirect_script_ + "?" + base64_encode(boost::str(
-                        boost::format("id=%s\ninf=%s\ntoken=%X\nurl=%s\nserver=%s\nloc=%s")
-                        % p->id
-                        % params->informer_id_
-                        % p->gen()
-                        % p->url
-                        % Config::Instance()->server_ip_
-                        % params->location_
-                    ));
         vOutPut.push_back(p);
     }
 
@@ -513,3 +473,29 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
     }
 }
 //-------------------------------------------------------------------------------------------------------------------
+void Core::mergeWithRetargeting(const Offer::Vector &vRIS)
+{
+    if( (vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner) ||
+            (vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner) )
+    {
+        if( vOutPut.size() && (*vOutPut.begin())->type == Offer::Type::banner )
+        {
+
+        }
+        else if( vRIS.size() && (*vRIS.begin())->type == Offer::Type::banner )
+        {
+            vOutPut.insert(vOutPut.begin(),
+                           vRIS.begin(),
+                           vRIS.begin()+1);
+        }
+    }
+    else
+    {
+        vOutPut.insert(vOutPut.end(),
+                       vRIS.begin(),
+                       informer->capacity - vOutPut.size() < vRIS.size() ?
+                       vRIS.begin() + (informer->capacity - vOutPut.size()) :
+                       vRIS.end());
+
+    }
+}

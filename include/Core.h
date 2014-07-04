@@ -68,6 +68,7 @@ private:
     static std::string EscapeJson(const std::string &str);
     /** \brief logging Core result in syslog */
     void log();
+    void mergeWithRetargeting(const Offer::Vector &);
 };
 
 #endif // CORE_H
