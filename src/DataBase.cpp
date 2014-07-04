@@ -111,30 +111,6 @@ bool DataBase::openDb()
     return true;
 }
 
-bool DataBase::gen(int from, unsigned int len)
-{
-    char buf[2048];
-
-    try
-    {
-        pStmt->BeginTransaction();
-
-        for(unsigned long i = 0; i < len; i++)
-        {
-            bzero(buf,sizeof(buf));
-            snprintf(buf,sizeof(buf),INSERTSTATMENT, from + i);
-            pStmt->SqlStatement(buf);
-        }
-
-        pStmt->CommitTransaction();
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        printf("DataBase DB error: %s", ex.GetString().c_str());
-    }
-    return true;
-}
-
 long DataBase::fileSize(int fd)
 {
     struct stat stat_buf;
@@ -165,13 +141,6 @@ void DataBase::readDir(const std::string &dname)
         if(strstr(sql_name->d_name, ".sql") != NULL)
         {
             files.push_back(dname + "/" + sql_name->d_name);
-            Log::gdb("DataBase::readDir: add file: %s", sql_name->d_name);
-        }
-        else
-        {
-            #ifdef DEBUG
-            Log::warn("DataBase::readDir: file %s does not included!", sql_name->d_name);
-            #endif // DEBUG
         }
     }
     closedir(dir);
@@ -268,7 +237,6 @@ bool DataBase::runSqlFile(const std::string &file)
     }
 
     free(buf);
-    Log::gdb("DataBase::runSqlFile: run %s", file.c_str());
     return true;
 }
 
