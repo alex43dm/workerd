@@ -61,9 +61,9 @@ private:
     //bool contains( const Offer::Vector &v, const Offer::itV p) const {return std::find(v.begin(), v.end(), *p) != v.end();}
     //bool containsInRetargeting(const Offer::itV p)const {return contains(resultRetargeting, p);}
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
-    std::string OffersToHtml(const Offer::Vector &items, const std::string &url) const;
+    std::string OffersToHtml(Offer::Vector &items, const std::string &url);
     /** \brief  Возвращает json-представление предложений ``items`` */
-    std::string OffersToJson(const Offer::Vector &items) const;
+    std::string OffersToJson(Offer::Vector &items);
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
     /** \brief logging Core result in syslog */

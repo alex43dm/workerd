@@ -43,7 +43,8 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
             std::clog<<" "<<(*it)->id<<" "<<(*it)->id_int
             <<" hits:"<<(*it)->uniqueHits
             <<" rate:"<<(*it)->rating
-            <<" cam:"<<(*it)->campaign_id;
+            <<" cam:"<<(*it)->campaign_id
+            <<" branch:"<<(*it)->getBranch();
         }
 
         try

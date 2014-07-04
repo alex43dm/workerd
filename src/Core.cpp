@@ -291,30 +291,25 @@ void Core::ProcessSaveResults()
     std::clog<<std::endl;
 }
 //-------------------------------------------------------------------------------------------------------------------
-std::string Core::OffersToHtml(const Offer::Vector &items, const std::string &url) const
+std::string Core::OffersToHtml(Offer::Vector &items, const std::string &url)
 {
     std::string informer_html;
-
-    if(items.size() == 0)
-    {
-        return std::string();
-    }
 
     //для отображения передаётся или один баннер, или вектор тизеров. это и проверяем
     if( (*items.begin())->type == Offer::Type::banner )
     {
         // Получаем HTML-код информера для отображение баннера
         informer_html =
-            boost::str(boost::format(Config::Instance()->template_banner_)
+            boost::str(boost::format(cfg->template_banner_)
                        % informer->bannersCss
-                       % Config::Instance()->swfobject_
+                       % cfg->swfobject_
                        % OffersToJson(items));
     }
     else
     {
         // Получаем HTML-код информера для отображение тизера
         informer_html =
-            boost::str(boost::format(Config::Instance()->template_teaser_)
+            boost::str(boost::format(cfg->template_teaser_)
                        % informer->teasersCss
                        % OffersToJson(items)
                        % informer->capacity
@@ -324,17 +319,25 @@ std::string Core::OffersToHtml(const Offer::Vector &items, const std::string &ur
     return informer_html;
 }
 //-------------------------------------------------------------------------------------------------------------------
-std::string Core::OffersToJson(const Offer::Vector &items) const
+std::string Core::OffersToJson(Offer::Vector &items)
 {
-
-    if(!items.size()) Log::warn("No impressions items to show");
-
     std::stringstream json;
     json << "[";
     for (auto it = items.begin(); it != items.end(); ++it)
     {
         if (it != items.begin())
             json << ",";
+
+        (*it)->redirect_url =
+            cfg->redirect_script_ + "?" + base64_encode(boost::str(
+                        boost::format("id=%s\ninf=%s\ntoken=%s\nurl=%s\nserver=%s\nloc=%s")
+                        % (*it)->id
+                        % params->informer_id_
+                        % (*it)->gen()
+                        % (*it)->url
+                        % cfg->server_ip_
+                        % params->location_
+                    ));
 
         json << (*it)->toJson();
     }
@@ -344,31 +347,8 @@ std::string Core::OffersToJson(const Offer::Vector &items) const
     return json.str();
 }
 //-------------------------------------------------------------------------------------------------------------------
-/**
- * Основной алгоритм.
-	1. если первое РП - баннер - выбрать баннер. конец работы алгоритма.
-	2. посчитать тизеры:
-	    кол-во тизеров < кол-ва мест на РБ -> шаг 12.
-	    нет -> шаг 14.
-	шаг 12 :
-	вычислить средний рейтинг РП типа тизер в последовательности.
-	найти первый баннер.
-	если баннер есть и его рейтинг > среднего рейтинга по тизерам - отобразить баннер.
-	иначе - выбрать все тизеры с дублированием.
-	шаг 14 :
-	выбрать самый левый тизер.
-	его РК занести в список РК
-	искать тизер, принадлежащий не к выбранным РК.
-	повторяем, пока не просмотрен весь список.
-	если выбранных тизеров достаточно для РБ, показываем.
-	если нет - добираем из исходного массива стоящие слева тизеры.
- */
-//-------------------------------------------------------------------------------------------------------------------
-#define FULL RISResult.size() >= informer->capacity
 void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
 {
-    //Offer::itV p;
-    //Offer::Vector result;
     Offer::MapRate result;
     unsigned loopCount;
 
@@ -387,7 +367,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
             {
                 RISResult.clear();
                 RISResult.insert(RISResult.begin(),(*i).second);
-                goto links_make;
+                return;
             }
 
             if(!all_social)
@@ -403,17 +383,9 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
             }
         }
     }
-    /*
-        //vector by rating
-        for(auto i = resultAll.begin(); i != resultAll.end(); ++i)
-        {
-            result.push_back((*i).second);
-        }
-    */
 #ifndef DUMMY
     if(result.size() <= informer->capacity * 2)
     {
-//        std::clog<<"["<<tid<<"]"<<typeid(this).name()<<"::"<<__func__<< "result size less or equal: "<<result.size()<<" outLen: "<<informer->capacity<<", clean history"<<std::endl;
         hm->clean = true;
     }
 #endif // DUMMY
@@ -424,15 +396,12 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
         if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-
             RISResult.push_back((*p).second);
-
-            if(FULL)
-            {
-                goto links_make;
-            }
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
+
+            if(RISResult.size() >= informer->capacity)
+                return;
         }
     }
 
@@ -443,13 +412,11 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
             RISResult.push_back((*p).second);
-
-            if(FULL)
-            {
-                goto links_make;
-            }
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
+
+            if(RISResult.size() >= informer->capacity)
+                return;
         }
     }
 
@@ -459,13 +426,11 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
         if(OutPutOfferSet.count((*p).second->id_int) == 0)
         {
             RISResult.push_back((*p).second);
-
-            if(FULL)
-            {
-                goto links_make;
-            }
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
+
+            if(RISResult.size() >= informer->capacity)
+                return;
         }
     }
 
@@ -479,24 +444,8 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     //user history view clean
 #ifndef DUMMY
     hm->clean = true;
-    Log::warn("RISAlgorithm: clean offer history");
+    std::clog<<"["<<tid<<"] "<<__func__<<" clean offer history"<<std::endl;
 #endif // DUMMY
-
-links_make:
-    //redirect links make
-    for(auto p = RISResult.begin(); p != RISResult.end(); ++p)
-    {
-        (*p)->redirect_url =
-            cfg->redirect_script_ + "?" + base64_encode(boost::str(
-                        boost::format("id=%s\ninf=%s\ntoken=%s\nurl=%s\nserver=%s\nloc=%s")
-                        % (*p)->id
-                        % params->informer_id_
-                        % (*p)->gen()
-                        % (*p)->url
-                        % cfg->server_ip_
-                        % params->location_
-                    ));
-    }
 }
 //-------------------------------------------------------------------------------------------------------------------
 void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult)
@@ -513,43 +462,35 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
         {
             RISResult.clear();
             RISResult.insert(RISResult.begin(),*p);
-            goto make_return;
+            return;
         }
 
         if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
                 && OutPutOfferSet.count((*p)->id_int) == 0)
         {
-            if(RISResult.size() < informer->retargeting_capacity)
-            {
-                RISResult.push_back(*p);
-                OutPutOfferSet.insert((*p)->id_int);
-                OutPutCampaignSet.insert((*p)->campaign_id);
-            }
-            else
-            {
-                goto make_return;
-            }
+            RISResult.push_back(*p);
+            OutPutOfferSet.insert((*p)->id_int);
+            OutPutCampaignSet.insert((*p)->campaign_id);
+
+            if(RISResult.size() >= informer->retargeting_capacity)
+                return;
         }
     }
 
     //add teaser when teaser unique id and with company unique and any rating
     if(RISResult.size() < informer->retargeting_capacity)
     {
-        for(auto p = result.begin(); p!=result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
+        for(auto p = result.begin(); p!=result.end(); ++p)
         {
             if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
                     && OutPutOfferSet.count((*p)->id_int) == 0)
             {
-                if(RISResult.size() < informer->retargeting_capacity)
-                {
-                    RISResult.push_back(*p);
-                    OutPutOfferSet.insert((*p)->id_int);
-                    OutPutCampaignSet.insert((*p)->campaign_id);
-                }
-                else
-                {
-                    goto make_return;
-                }
+                RISResult.push_back(*p);
+                OutPutOfferSet.insert((*p)->id_int);
+                OutPutCampaignSet.insert((*p)->campaign_id);
+
+                if(RISResult.size() >= informer->retargeting_capacity)
+                    return;
             }
         }
     }
@@ -557,39 +498,18 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
     //add teaser when teaser unique id
     if(RISResult.size() < informer->retargeting_capacity)
     {
-        for(auto p = result.begin(); p != result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
+        for(auto p = result.begin(); p != result.end(); ++p)
         {
             if(OutPutOfferSet.count((*p)->id_int) == 0)
             {
-                if(RISResult.size() < informer->retargeting_capacity)
-                {
-                    RISResult.push_back(*p);
-                    OutPutOfferSet.insert((*p)->id_int);
-                    OutPutCampaignSet.insert((*p)->campaign_id);
-                }
-                else
-                {
-                    goto make_return;
-                }
+                RISResult.push_back(*p);
+                OutPutOfferSet.insert((*p)->id_int);
+                OutPutCampaignSet.insert((*p)->campaign_id);
+
+                if(RISResult.size() >= informer->retargeting_capacity)
+                    return;
             }
         }
     }
-
-make_return:
-    //redirect links make
-    for(auto p = RISResult.begin(); p != RISResult.end(); ++p)
-    {
-        (*p)->redirect_url =
-            cfg->redirect_script_ + "?" + base64_encode(boost::str(
-                        boost::format("id=%s\ninf=%s\ntoken=%s\nurl=%s\nserver=%s\nloc=%s")
-                        % (*p)->id
-                        % params->informer_id_
-                        % (*p)->gen()
-                        % (*p)->url
-                        % cfg->server_ip_
-                        % params->location_
-                    ));
-    }
 }
 //-------------------------------------------------------------------------------------------------------------------
-
