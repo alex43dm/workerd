@@ -107,6 +107,7 @@ bool HistoryManager::moveUpTailOffers(Offer::Map &items, float teasersMaxRating)
             if(items[*i])
             {
                 items[*i]->rating = items[*i]->rating + teasersMaxRating;
+                items[*i]->branch = EBranchL::L31;
             }
         }
     }
