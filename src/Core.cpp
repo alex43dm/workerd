@@ -4,7 +4,6 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <set>
 #include <ctime>
 #include <cstdlib>
 
@@ -285,6 +284,9 @@ void Core::ProcessSaveResults()
     //clear output offers vector
     vOutPut.clear();
 
+    OutPutCampaignSet.clear();
+    OutPutOfferSet.clear();
+
     std::clog<<std::endl;
 }
 //-------------------------------------------------------------------------------------------------------------------
@@ -368,11 +370,6 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     Offer::Vector result;
     Offer::MapRate resultAll;
     unsigned loopCount;
-    ///campaigns to show
-    std::multiset<unsigned long long> OutPutCampaignSet;
-    std::set<unsigned long long> OutPutOfferSet;
-
-//    RISResult.clear();
 
     if( items.size() == 0 )
     {
@@ -503,12 +500,6 @@ links_make:
 //-------------------------------------------------------------------------------------------------------------------
 void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult)
 {
-    ///campaigns to show
-    std::multiset<unsigned long long> OutPutCampaignSet;
-    std::set<unsigned long long> OutPutOfferSet;
-
-    RISResult.clear();
-
     if(result.size() == 0)
     {
         return;

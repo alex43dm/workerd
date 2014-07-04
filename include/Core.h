@@ -1,6 +1,8 @@
 #ifndef CORE_H
 #define CORE_H
 
+#include <set>
+
 #include <boost/date_time.hpp>
 
 #include "Offer.h"
@@ -49,6 +51,9 @@ private:
     Offer::Vector vOutPut;
     ///all offers to show
     Offer::Map items;
+    ///campaigns to show
+    std::multiset<unsigned long long> OutPutCampaignSet;
+    std::set<unsigned long long> OutPutOfferSet;
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
     void RISAlgorithm(const Offer::Map &items, Offer::Vector &RISresult);
