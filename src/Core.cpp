@@ -322,10 +322,10 @@ void Core::ProcessSaveResults()
         }
     }
 
-    OutPutCampaignMap.clear();
+    OutPutCampaignSet.clear();
 
-    //clear tmp table
-    clearTmpTable();
+    //clear tmp values: informer & temp table
+    clearTmp();
 
     for (Offer::it o = items.begin(); o != items.end(); ++o)
     {
@@ -333,14 +333,10 @@ void Core::ProcessSaveResults()
             delete o->second;
 //        items.erase(o);
     }
-
+    //clear all offers map
     items.clear();
-    result.clear();
-
+    //clear output offers vector
     vOutPut.clear();
-
-    if(informer)
-        delete informer;
 
     std::clog<<std::endl;
 }
@@ -484,7 +480,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     //add teaser when teaser unique id and with company unique and rating > 0
     for(p = result.begin(); p != result.end(); ++p)
     {
-        if(OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign
+        if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
 
@@ -495,14 +491,14 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
                 goto links_make;
             }
 
-            OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+            OutPutCampaignSet.insert((*p)->campaign_id);
         }
     }
 
     //add teaser when teaser unique id and with company unique and with any rating
     for(p = result.begin(); p!=result.end() && RISResult.size() < informer->capacity; ++p)
     {
-        if(OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign
+        if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
             RISResult.push_back(*p);
@@ -512,7 +508,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
                 goto links_make;
             }
 
-            OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+            OutPutCampaignSet.insert((*p)->campaign_id);
         }
     }
 
@@ -528,7 +524,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
                 goto links_make;
             }
 
-            OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+            OutPutCampaignSet.insert((*p)->campaign_id);
         }
     }
 
@@ -537,7 +533,7 @@ void Core::RISAlgorithm(const Offer::Map &items, Offer::Vector &RISResult)
     for(p = result.begin(); loopCount < informer->capacity && p != result.end(); ++p, loopCount++)
     {
         RISResult.push_back(*p);
-        OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+        OutPutCampaignSet.insert((*p)->campaign_id);
     }
 
     //user history view clean
@@ -579,17 +575,17 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
         {
             RISResult.clear();
             RISResult.push_back(*p);
-            OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+            OutPutCampaignSet.insert((*p)->campaign_id);
             goto make_return;
         }
 
-        if(OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign
+        if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
         {
             if(RISResult.size() < informer->retargeting_capacity)
             {
                 RISResult.push_back(*p);
-                OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+                OutPutCampaignSet.insert((*p)->campaign_id);
             }
             else
             {
@@ -603,13 +599,13 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
     {
         for(auto p = result.begin(); p!=result.end() && RISResult.size() < informer->retargeting_capacity; ++p)
         {
-        if(OutPutCampaignMap.count((*p)->campaign_id) < (*p)->unique_by_campaign
+        if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
                 && std::find(RISResult.begin(), RISResult.end(), *p) == RISResult.end())
             {
                 if(RISResult.size() < informer->retargeting_capacity)
                 {
                     RISResult.push_back(*p);
-                    OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+                    OutPutCampaignSet.insert((*p)->campaign_id);
                 }
                 else
                 {
@@ -629,7 +625,7 @@ void Core::RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &R
                     if(RISResult.size() < informer->retargeting_capacity)
                     {
                         RISResult.push_back(*p);
-                        OutPutCampaignMap.insert(std::pair<const long, long>((*p)->campaign_id,(*p)->campaign_id));
+                        OutPutCampaignSet.insert((*p)->campaign_id);
                     }
                     else
                     {

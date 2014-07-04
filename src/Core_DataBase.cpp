@@ -18,6 +18,15 @@ Core_DataBase::~Core_DataBase()
     delete tmpTable;
     delete []cmd;
 }
+
+bool Core_DataBase::clearTmp()
+{
+    if(informer)
+        delete informer;
+
+    return tmpTable->clear();
+}
+
 //-------------------------------------------------------------------------------------------------------------------
 bool Core_DataBase::getGeo(const std::string &country, const std::string &region)
 {

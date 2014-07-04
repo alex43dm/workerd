@@ -3,9 +3,10 @@
 
 #include <list>
 #include <vector>
-#include <map>
+//#include <map>
 #include <utility>
 #include <algorithm>
+#include <set>
 
 #include <boost/date_time.hpp>
 #include <boost/algorithm/string.hpp>
@@ -24,20 +25,7 @@
 class Core : public Core_DataBase
 {
 public:
-    /** \brief  Создаёт ядро.
-     *
-     * Производит все необходимые инициализации:
-     *
-     * - Загружает все сущности из базы данных;
-     * - Подключается к RabbitMQ и создаёт очереди сообщений;
-     * - При необходимости создаёт локальную базу данных MongoDB с нужными
-     *   параметрами.
-     */
     Core();
-
-    /** Пытается красиво закрыть очереди RabbitMQ, но при работе с FastCGI
-     *  никогда не вызывается (как правило, процессы просто снимаются).
-     */
     ~Core();
 
     /** \brief  Обработка запроса на показ рекламы.
@@ -49,42 +37,42 @@ public:
     void ProcessSaveResults();
 
 private:
+    boost::posix_time::ptime
     /// Время запуска службы
-    boost::posix_time::ptime time_service_started_;
+    time_service_started_,
     /// Время начала последнего запроса
-    boost::posix_time::ptime time_request_started_;
-    boost::posix_time::ptime startCoreTime, endCoreTime;
-
+    time_request_started_,
+    ///start and ent time core process
+    startCoreTime, endCoreTime;
+    ///core thread id
     pthread_t tid;
-
+    ///parameters to process: from http GET
     Params *params;
-
 #ifndef DUMMY
+    ///history manager
     HistoryManager *hm;
 #endif
-
+    ///retargeting offers count
     unsigned RetargetingCount;
-
-    std::multimap<long,long> OutPutCampaignMap;
-
+    ///campaigns to show
+    std::multiset<unsigned long long> OutPutCampaignSet;
+    ///result offers vector
     Offer::Vector vOutPut;
-    Offer::Vector result;
+    ///all offers to show
     Offer::Map items;
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
     void RISAlgorithm(const Offer::Map &items, Offer::Vector &RISresult);
     void RISAlgorithmRetagreting(const Offer::Vector &result, Offer::Vector &RISResult);
-
     //bool contains( const Offer::Vector &v, const Offer::itV p) const {return std::find(v.begin(), v.end(), *p) != v.end();}
     //bool containsInRetargeting(const Offer::itV p)const {return contains(resultRetargeting, p);}
-
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
     std::string OffersToHtml(const Offer::Vector &items, const std::string &url) const;
     /** \brief  Возвращает json-представление предложений ``items`` */
     std::string OffersToJson(const Offer::Vector &items) const;
     /** \brief  Возвращает безопасную json строку (экранирует недопустимые символы) */
     static std::string EscapeJson(const std::string &str);
-
+    /** \brief logging Core result in syslog */
     void log();
 };
 
