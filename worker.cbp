@@ -47,6 +47,7 @@
 			<Add option="-std=c++0x" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add directory="libs/libredis/" />
 		</Compiler>
 		<Linker>
 			<Add option="/usr/local/lib/libamqpcpp.a" />

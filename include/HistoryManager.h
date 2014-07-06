@@ -42,7 +42,7 @@ public:
     //Задаем значение очистки истории показов
     bool clean;
 
-    Offer::Vector vretg;
+    Offer::Vector vRISRetargetingResult;
 
     HistoryManager();
     virtual ~HistoryManager();
@@ -55,9 +55,9 @@ public:
     //main methods
     void startGetUserHistory(Params *params, Informer *);
     void sphinxProcess(Offer::Map &items);
-    bool updateUserHistory(const Offer::Map &items, const Offer::Vector &outItems, unsigned RetargetingCount, bool);
+    bool updateUserHistory(const Offer::Map &items, const Offer::Vector &outItems, bool);
 
-    bool setDeprecatedOffers(const Offer::Vector &items,unsigned);
+    bool setDeprecatedOffers(const Offer::Vector &items);
     bool getDeprecatedOffers(std::string &);
     bool getDeprecatedOffers();
     bool getDeprecatedOffersAsync();
@@ -83,8 +83,9 @@ public:
 
     bool getRetargetingAsync();
     void getRetargetingAsyncWait();
-    void RetargetingUpdate(const Offer::Vector &,unsigned);
+    void RetargetingUpdate(const Offer::Vector &);
     void RetargetingClear();
+    unsigned RetargetingCount() const { return vRISRetargetingResult.size(); }
 
     mongo::BSONObj BSON_Keywords();
 
@@ -131,5 +132,7 @@ private:
     static void signalHanlerRetargeting(int);
     static void *getTailOffersEnv(void *data);
     RedisClient *getHistoryPointer(const HistoryType type) const;
+
+    void RISAlgorithmRetagreting(const Offer::MapRate &result);
 };
 #endif

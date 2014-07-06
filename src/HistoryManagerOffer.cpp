@@ -4,7 +4,7 @@
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
 
-bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned len)
+bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
 {
     char buf[8192];
     Kompex::SQLiteStatement *pStmt;
@@ -36,7 +36,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items, unsigned le
         std::clog<<" output ids:";
     }
 
-    for(auto it = items.begin()+len; it != items.end(); ++it)
+    for(auto it = items.begin()+vRISRetargetingResult.size(); it != items.end(); ++it)
     {
         if(cfg->logOutPutOfferIds)
         {

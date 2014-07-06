@@ -47,8 +47,6 @@ private:
 #endif
     ///return string
     std::string retHtml;
-    ///retargeting offers count
-    unsigned RetargetingCount;
     ///result offers vector
     Offer::Vector vResult;
     ///all offers to show
@@ -70,7 +68,7 @@ private:
     static std::string EscapeJson(const std::string &str);
     /** \brief logging Core result in syslog */
     void log();
-    //void mergeWithRetargeting();
+    void mergeWithRetargeting();
     void resultHtml();
 };
 

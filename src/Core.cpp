@@ -61,7 +61,7 @@ std::string Core::Process(Params *prms)
     //get campaign list
     getCampaign();
 
-    getOffers(items,params->getUserKeyLong());
+    getOffers(items, params->getUserKeyLong());
 
     //process history
     hm->sphinxProcess(items);
@@ -69,12 +69,9 @@ std::string Core::Process(Params *prms)
     //set tail
     hm->moveUpTailOffers(items, teasersMaxRating);
 
-    hm->getRetargetingAsyncWait();
-    RISAlgorithmRetagreting(hm->vretg);
-
-    RetargetingCount = vResult.size();
-
     RISAlgorithm(items);
+
+    mergeWithRetargeting();
 
 #else
     getOffers(items);
@@ -155,7 +152,7 @@ void Core::ProcessSaveResults()
                                   append("context", params->getContext()).
                                   obj();
 #ifndef DUMMY
-        hm->updateUserHistory(items, vResult, RetargetingCount, all_social);
+        hm->updateUserHistory(items, vResult, all_social);
 #endif // DUMMY
         try
         {
@@ -381,42 +378,16 @@ void Core::RISAlgorithm(const Offer::Map &items)
     hm->clean = true;
     std::clog<<"["<<tid<<"] "<<__func__<<" clean offer history"<<std::endl;
 }
-//-------------------------------------------------------------------------------------------------------------------
-void Core::RISAlgorithmRetagreting(const Offer::Vector &result)
-{
-    if(result.size() == 0)
-    {
-        return;
-    }
-
-    //add teaser when teaser unique id and with company unique and rating > 0
-    for(auto p = result.begin(); p != result.end(); ++p)
-    {
-        if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
-                && OutPutOfferSet.count((*p)->id_int) == 0)
-        {
-            vResult.push_back(*p);
-            OutPutOfferSet.insert((*p)->id_int);
-            OutPutCampaignSet.insert((*p)->campaign_id);
-
-            if(vResult.size() >= informer->retargeting_capacity)
-                return;
-        }
-    }
-
-    //add teaser when teaser unique id
-    for(auto p = result.begin(); p!=result.end(); ++p)
-    {
-        if(OutPutOfferSet.count((*p)->id_int) == 0)
-        {
-            vResult.push_back(*p);
-            OutPutOfferSet.insert((*p)->id_int);
-            OutPutCampaignSet.insert((*p)->campaign_id);
-
-            if(vResult.size() >= informer->retargeting_capacity)
-                return;
-        }
-    }
-}
 #endif // DUMMY
 //-------------------------------------------------------------------------------------------------------------------
+void Core::mergeWithRetargeting()
+{
+    hm->getRetargetingAsyncWait();
+
+    if(vResult.size()
+       && (*vResult.begin())->type != Offer::Type::banner
+       && hm->vRISRetargetingResult.size())
+    {
+        vResult.insert(vResult.begin(),hm->vRISRetargetingResult.begin(),hm->vRISRetargetingResult.end());
+    }
+}

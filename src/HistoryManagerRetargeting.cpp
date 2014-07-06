@@ -12,6 +12,7 @@ void HistoryManager::getRetargeting()
     std::string ids;
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
+    Offer::MapRate result;
 
     if(params->newClient)
     {
@@ -67,7 +68,7 @@ void HistoryManager::getRetargeting()
 
             off->branch = EBranchL::L32;
 
-            vretg.push_back(off);
+            result.insert(Offer::PairRate(off->rating,off));
         }
         pStmt->FreeQuery();
         delete pStmt;
@@ -75,6 +76,47 @@ void HistoryManager::getRetargeting()
     catch(Kompex::SQLiteException &ex)
     {
         std::clog<<__func__<<" Kompex::SQLiteException: "<<ex.GetString()<<std::endl;
+    }
+
+    RISAlgorithmRetagreting(result);
+}
+//-------------------------------------------------------------------------------------------------------------------
+void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
+{
+    std::multiset<unsigned long long> OutPutCampaignSet;
+    std::set<unsigned long long> OutPutOfferSet;
+
+    if(result.size() == 0)
+    {
+        return;
+    }
+
+    //add teaser when teaser unique id and with company unique and rating > 0
+    for(auto p = result.begin(); p != result.end(); ++p)
+    {
+        if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
+                && OutPutOfferSet.count((*p).second->id_int) == 0)
+        {
+            vRISRetargetingResult.push_back((*p).second);
+            OutPutOfferSet.insert((*p).second->id_int);
+            OutPutCampaignSet.insert((*p).second->campaign_id);
+
+            if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
+                return;
+        }
+    }
+
+    //add teaser when teaser unique id
+    for(auto p = result.begin(); p!=result.end(); ++p)
+    {
+        if(OutPutOfferSet.count((*p).second->id_int) == 0)
+        {
+            vRISRetargetingResult.push_back((*p).second);
+            OutPutOfferSet.insert((*p).second->id_int);
+
+            if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
+                return;
+        }
     }
 }
 
@@ -132,7 +174,7 @@ void HistoryManager::getRetargetingAsyncWait()
     return;
 }
 
-void HistoryManager::RetargetingUpdate(const Offer::Vector &items, unsigned len)
+void HistoryManager::RetargetingUpdate(const Offer::Vector &items)
 {
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
@@ -156,7 +198,7 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items, unsigned len)
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
     //pStmt->BeginTransaction();
 
-    for(unsigned i = 0; i < len && i < items.size(); i++)
+    for(unsigned i = 0; i < vRISRetargetingResult.size() && i < items.size(); i++)
     {
         try
         {
