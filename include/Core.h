@@ -26,15 +26,11 @@ public:
      * пользователю.
      */
     std::string Process(Params *params);
-
+    /** \brief save process results to mongodb log */
     void ProcessSaveResults();
 
 private:
     boost::posix_time::ptime
-    /// Время запуска службы
-    time_service_started_,
-    /// Время начала последнего запроса
-    time_request_started_,
     ///start and ent time core process
     startCoreTime, endCoreTime;
     ///core thread id
@@ -51,15 +47,13 @@ private:
     Offer::Vector vResult;
     ///all offers to show
     Offer::Map items;
-    ///campaigns to show
+    ///campaigns to show set
     std::multiset<unsigned long long> OutPutCampaignSet;
+    ///offers to show set
     std::set<unsigned long long> OutPutOfferSet;
 
     /** \brief Основной алгоритм отбора РП RealInvest Soft. */
     void RISAlgorithm(const Offer::Map &items);
-    void RISAlgorithmRetagreting(const Offer::Vector &result);
-    //bool contains( const Offer::Vector &v, const Offer::itV p) const {return std::find(v.begin(), v.end(), *p) != v.end();}
-    //bool containsInRetargeting(const Offer::itV p)const {return contains(resultRetargeting, p);}
     /** \brief  Возвращает HTML для информера, содержащего предложения items */
     std::string OffersToHtml(Offer::Vector &items, const std::string &url);
     /** \brief  Возвращает json-представление предложений ``items`` */
@@ -68,7 +62,9 @@ private:
     static std::string EscapeJson(const std::string &str);
     /** \brief logging Core result in syslog */
     void log();
+    /** \brief merge ris and retargeting ris */
     void mergeWithRetargeting();
+    /** \brief make result html */
     void resultHtml();
 };
 

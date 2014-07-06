@@ -85,23 +85,12 @@ else
 AC_DEFINE(DUMMY,[1],[dummy worker])
 fi
 
-dnl AC_CONFIG_LIBOBJ_DIR([libs/amqpcpp])
+AC_CONFIG_LIBOBJ_DIR([libs/amqpcpp])
 
-AC_CHECK_LIB([amqpcpp],[main],[],[AC_MSG_ERROR([amqpcpp library missing])])
 AC_CHECK_LIB([mongoclient],[main],[],[AC_MSG_ERROR([mongoclient(mongodb build with client shared library) missing])])
 
 AC_LANG(C++)
 SAVED_LDFLAGS=$LDFLAGS
-LDFLAGS="$LDFLAGS -lamqpcpp"
-AC_LINK_IFELSE(
-    [AC_LANG_PROGRAM([#include <AMQPcpp.h>],
-    [AMQPMessage *m;
-    unsigned len;
-    char *pMes;
-    pMes = m->getMessage(&len);])],
-    [],
-    [AC_DEFINE(AMQPCPP_OLD,[1],[amqpcpp library old])])
-
 LDFLAGS="$SAVED_LDFLAGS -lmongoclient -lboost_system"
 AC_LINK_IFELSE(
     [AC_LANG_PROGRAM([#include <mongo/client/connpool.h>],

@@ -212,7 +212,6 @@ void Core::ProcessSaveResults()
     {
         if(o->second)
             delete o->second;
-//        items.erase(o);
     }
     //clear all offers map
     items.clear();
@@ -378,7 +377,6 @@ void Core::RISAlgorithm(const Offer::Map &items)
     hm->clean = true;
     std::clog<<"["<<tid<<"] "<<__func__<<" clean offer history"<<std::endl;
 }
-#endif // DUMMY
 //-------------------------------------------------------------------------------------------------------------------
 void Core::mergeWithRetargeting()
 {
@@ -391,3 +389,4 @@ void Core::mergeWithRetargeting()
         vResult.insert(vResult.begin(),hm->vRISRetargetingResult.begin(),hm->vRISRetargetingResult.end());
     }
 }
+#endif // DUMMY
