@@ -57,35 +57,10 @@ public:
     void sphinxProcess(Offer::Map &items);
     bool updateUserHistory(const Offer::Map &items, const Offer::Vector &outItems, bool);
 
-    bool setDeprecatedOffers(const Offer::Vector &items);
-    bool getDeprecatedOffers(std::string &);
-    bool getDeprecatedOffers();
-    bool getDeprecatedOffersAsync();
-    bool getDeprecatedOffersAsyncWait();
-    bool clearDeprecatedOffers();
 
-    bool setTailOffers(const Offer::Map &items, const Offer::Vector &toShow, bool);
-    bool getTailOffersAsyncWait();
-    bool getTailOffersAsync();
     bool moveUpTailOffers(Offer::Map &items, float teasersMaxRating);
-    bool getTailOffers();
-
-    bool getLongTermAsync();
-    bool getLongTermAsyncWait();
-
-    bool getShortTermAsync();
-    bool getShortTermAsyncWait();
-
-    bool getPageKeywordsAsync();
-    bool getPageKeywordsAsyncWait();
-    void *getPageKeywordsEnv(void *data);
-    void getPageKeywordsHistory();
-
-    bool getRetargetingAsync();
+    void RISAlgorithmRetagreting(const Offer::MapRate &result);
     void getRetargetingAsyncWait();
-    void RetargetingUpdate(const Offer::Vector &);
-    void RetargetingClear();
-    unsigned RetargetingCount() const { return vRISRetargetingResult.size(); }
 
     mongo::BSONObj BSON_Keywords();
 
@@ -107,7 +82,6 @@ private:
                 thrGetLongTermAsync,
                 thrGetShortTermAsync,
                 thrGetRetargetingAsync,
-                thrGetPageKeywordsAsync,
                 thrGetTailOffersAsync;
 
     std::list<std::string> vshortTerm, vlongTerm, vretageting;
@@ -133,6 +107,27 @@ private:
     static void *getTailOffersEnv(void *data);
     RedisClient *getHistoryPointer(const HistoryType type) const;
 
-    void RISAlgorithmRetagreting(const Offer::MapRate &result);
+    bool getRetargetingAsync();
+    void RetargetingUpdate(const Offer::Vector &);
+    void RetargetingClear();
+    unsigned RetargetingCount() const { return vRISRetargetingResult.size(); }
+
+    bool setDeprecatedOffers(const Offer::Vector &items);
+    bool getDeprecatedOffers(std::string &);
+    bool getDeprecatedOffers();
+    bool getDeprecatedOffersAsync();
+    bool getDeprecatedOffersAsyncWait();
+    bool clearDeprecatedOffers();
+
+    bool setTailOffers(const Offer::Map &items, const Offer::Vector &toShow, bool);
+    bool getTailOffersAsyncWait();
+    bool getTailOffersAsync();
+    bool getTailOffers();
+
+    bool getLongTermAsync();
+    bool getLongTermAsyncWait();
+
+    bool getShortTermAsync();
+    bool getShortTermAsyncWait();
 };
 #endif
