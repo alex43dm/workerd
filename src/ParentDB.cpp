@@ -552,7 +552,7 @@ bool ParentDB::InformerUpdate(mongo::Query query)
                          x.hasField("range_search") ? x.getField("range_search").numberDouble() : cfg->range_search_,
                          x.hasField("retargeting_capacity") ?
                             (unsigned)(capacity * x.getField("retargeting_capacity").numberDouble()) :
-                            (unsigned)(cfg->retargeting_percentage_ * capacity / 100)
+                            (unsigned)(cfg->retargeting_percentage_ * capacity / 100),
                          long_id
                         );
         try
