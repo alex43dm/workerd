@@ -99,10 +99,13 @@ void XXXSearcher::makeFilter(Offer::Map &items)
 
 void XXXSearcher::cleanFilter()
 {
-    sphinx_reset_filters ( client );
-    if(filter)
-        delete [] filter;
-    makeFilterOn = false;
+    if(makeFilterOn)
+    {
+        sphinx_reset_filters ( client );
+        if(filter)
+            delete [] filter;
+        makeFilterOn = false;
+    }
 }
 
 //select 1 as doc, count(*) from worker group by doc;
