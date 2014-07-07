@@ -162,7 +162,7 @@ void ParentDB::OfferLoad(mongo::Query q_correct)
 
 
     bzero(buf,sizeof(buf));
-    snprintf(buf,sizeof(buf),"INSERT INTO Offer(id,guid,campaignId,categoryId,accountId,rating,retargeting,image,height,width,isOnClick,cost\
+    snprintf(buf,sizeof(buf),"INSERT OR REPLACE INTO Offer(id,guid,campaignId,categoryId,accountId,rating,retargeting,image,height,width,isOnClick,cost\
              ,uniqueHits,swf,description,price,url,title,type,valid) VALUES(");
     sz = strlen(buf);
     pData = buf + sz;
