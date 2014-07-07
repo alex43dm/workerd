@@ -71,7 +71,7 @@ void XXXSearcher::makeFilter(Offer::Map &items)
     if(makeFilterOn)
         return;
 
-    sphinx_set_select(client,"guidint,rating,match,sphrases,skeywords,sexactly_phrases");
+    sphinx_set_select(client,"fguid");
 
     //Создаем фильтр
     filter = (sphinx_int64_t *)new sphinx_int64_t[(int)items.size()];
@@ -81,7 +81,7 @@ void XXXSearcher::makeFilter(Offer::Map &items)
 
     for(Offer::it it = items.begin(); it != items.end(); ++it)
     {
-        filter[counts++] = (*it).first;
+        filter[counts++] = (*it).second->id_int;
         midleRange += (*it).second->rating;
         //max
         if(maxRating < (*it).second->rating)
@@ -90,7 +90,7 @@ void XXXSearcher::makeFilter(Offer::Map &items)
 
     midleRange /= counts;
 
-    if(sphinx_add_filter( client, "guidint", counts, filter, SPH_FALSE)!=SPH_TRUE)
+    if(sphinx_add_filter( client, "fguid", counts, filter, SPH_FALSE)!=SPH_TRUE)
     {
         Log::warn("sphinx filter is not working: %s", sphinx_error(client));
     }
@@ -210,7 +210,7 @@ void XXXSearcher::processKeywords(
                                              const sphinx_int64_t * values );
                 }*/
 
-                pOffer->matching =  sphinx_get_string(res, i, 2);
+                //pOffer->matching =  sphinx_get_string(res, i, 2);
 
                 pOffer->setBranch(sr[tt].branches);
 
