@@ -100,7 +100,8 @@ void XXXSearcher::makeFilter(Offer::Map &items)
 void XXXSearcher::cleanFilter()
 {
     sphinx_reset_filters ( client );
-    delete [] filter;
+    if(filter)
+        delete [] filter;
     makeFilterOn = false;
 }
 
