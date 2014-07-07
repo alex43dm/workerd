@@ -434,7 +434,9 @@ bool ParentDB::InformerLoadAll()
                          x.hasField("range_long_term") ? x.getField("range_long_term").numberDouble() : cfg->range_long_term_,
                          x.hasField("range_context") ? x.getField("range_context").numberDouble() : cfg->range_context_,
                          x.hasField("range_search") ? x.getField("range_search").numberDouble() : cfg->range_search_,
-                         x.hasField("retargeting_capacity") ? x.getIntField("retargeting_capacity") : (unsigned)(cfg->retargeting_percentage_*capacity/100)
+                         x.hasField("retargeting_capacity") ?
+                            (unsigned)(capacity * x.getField("retargeting_capacity").numberDouble()) :
+                            (unsigned)(cfg->retargeting_percentage_ * capacity / 100)
                         );
         try
         {
@@ -548,7 +550,9 @@ bool ParentDB::InformerUpdate(mongo::Query query)
                          x.hasField("range_long_term") ? x.getField("range_long_term").numberDouble() : cfg->range_long_term_,
                          x.hasField("range_context") ? x.getField("range_context").numberDouble() : cfg->range_context_,
                          x.hasField("range_search") ? x.getField("range_search").numberDouble() : cfg->range_search_,
-                         x.hasField("retargeting_capacity") ? x.getIntField("retargeting_capacity") : (unsigned)(cfg->retargeting_percentage_*capacity/100),
+                         x.hasField("retargeting_capacity") ?
+                            (unsigned)(capacity * x.getField("retargeting_capacity").numberDouble()) :
+                            (unsigned)(cfg->retargeting_percentage_ * capacity / 100)
                          long_id
                         );
         try
