@@ -132,6 +132,21 @@ void Core::log()
     {
         std::clog<<" key:"<<params->getUserKey();
         std::clog<<" offers: total:"<<offersTotal;
+
+        if(hm->clean)
+        {
+            std::clog<<"[clean],";
+        }
+
+        std::clog<<" output ids:";
+        for(auto it = vResult.begin(); it != vResult.end(); ++it)
+        {
+            std::clog<<" "<<(*it)->id<<" "<<(*it)->id_int
+            <<" hits:"<<(*it)->uniqueHits
+            <<" rate:"<<(*it)->rating
+            <<" cam:"<<(*it)->campaign_id
+            <<" branch:"<<(*it)->getBranch();
+        }
     }
 }
 //-------------------------------------------------------------------------------------------------------------------

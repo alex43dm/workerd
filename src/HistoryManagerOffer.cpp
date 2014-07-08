@@ -14,11 +14,6 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
 
     if(clean)
     {
-        if(cfg->logOutPutOfferIds)
-        {
-            std::clog<<"[clean],";
-        }
-
         try
         {
             sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE id=%llu AND tail=0;",params->getUserKeyLong());
@@ -30,23 +25,8 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
         }
     }
 
-
-    if(cfg->logOutPutOfferIds)
-    {
-        std::clog<<" output ids:";
-    }
-
     for(auto it = items.begin()+vRISRetargetingResult.size(); it != items.end(); ++it)
     {
-        if(cfg->logOutPutOfferIds)
-        {
-            std::clog<<" "<<(*it)->id<<" "<<(*it)->id_int
-            <<" hits:"<<(*it)->uniqueHits
-            <<" rate:"<<(*it)->rating
-            <<" cam:"<<(*it)->campaign_id
-            <<" branch:"<<(*it)->getBranch();
-        }
-
         try
         {
             sqlite3_snprintf(sizeof(buf),buf,

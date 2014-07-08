@@ -218,15 +218,6 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items)
 
     for(unsigned i = 0; i < vRISRetargetingResult.size() && i < items.size(); i++)
     {
-        if(cfg->logRetargetingOfferIds)
-        {
-            std::clog<<" "<<items[i]->id<<" "<<items[i]->id_int
-            <<" hits:"<<items[i]->uniqueHits
-            <<" rate:"<<items[i]->rating
-            <<" cam:"<<items[i]->campaign_id
-            <<" branch:"<<items[i]->getBranch();
-        }
-
         try
         {
             sqlite3_snprintf(sizeof(buf),buf,
