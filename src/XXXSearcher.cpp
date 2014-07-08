@@ -124,13 +124,13 @@ void XXXSearcher::processKeywords(
 
             for( int i=0; i<res->num_matches; i++ )
             {
-                if (res->num_attrs != 6)
+                if (res->num_attrs < 8)
                 {
                     std::clog<<"num_attrs: "<<res->num_attrs<<std::endl;
                     continue;
                 }
 
-                long long id = sphinx_get_int(res, i, 0);
+                unsigned long long id = sphinx_get_int(res, i, 7);
 
                 Offer::it p;
                 p = items.find(id);
