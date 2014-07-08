@@ -81,7 +81,6 @@ bool BaseCore::ProcessMQ()
                     std::string CampaignId = toString(m);
                     pdb->CampaignLoad(CampaignId);
                     pdb->OfferLoad(QUERY("campaignId" << CampaignId));
-                    Config::Instance()->pDb->postDataLoad();
                 }
                 else if(m->getRoutingKey() == "campaign.delete")
                 {
