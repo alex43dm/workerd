@@ -192,6 +192,8 @@ bool HistoryManager::updateUserHistory(
 
     stringQuery.clear();
 
+    sphinx->cleanFilter();
+
     isProcessed = false;
 
     return true;

@@ -57,6 +57,7 @@ XXXSearcher::XXXSearcher()
                              Config::Instance()->sphinx_field_len_,
                              Config::Instance()->sphinx_field_names_,
                              Config::Instance()->sphinx_field_weights_);
+    makeFilterOn = false;
 }
 
 XXXSearcher::~XXXSearcher()
@@ -85,6 +86,9 @@ void XXXSearcher::processKeywords(
 
     try
     {
+
+        makeFilter(items);
+
         sphinx_result * res;
 
         //Создаем запросы
@@ -234,5 +238,40 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
         }
 
         std::clog<<std::endl;
+    }
+}
+
+void XXXSearcher::makeFilter(Offer::Map &items)
+{
+    if(makeFilterOn)
+        return;
+
+    sphinx_set_select(client,"fguid");
+
+    //Создаем фильтр
+    filter = (sphinx_int64_t *)new sphinx_int64_t[(int)items.size()];
+    int counts = 0;
+
+    for(Offer::it it = items.begin(); it != items.end(); ++it)
+    {
+        filter[counts++] = (*it).second->id_int;
+    }
+
+    if(sphinx_add_filter( client, "fguid", counts, filter, SPH_FALSE)!=SPH_TRUE)
+    {
+        Log::warn("sphinx filter is not working: %s", sphinx_error(client));
+    }
+
+    makeFilterOn = true;
+}
+
+void XXXSearcher::cleanFilter()
+{
+    if(makeFilterOn)
+    {
+        sphinx_reset_filters ( client );
+        if(filter)
+            delete [] filter;
+        makeFilterOn = false;
     }
 }
