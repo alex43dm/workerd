@@ -87,7 +87,7 @@ private:
     std::list<std::string> vshortTerm, vlongTerm, vretageting;
     std::list<long> mtailOffers;
 
-    unsigned minUniqueHits, maxUniqueHits;
+    int minUniqueHits, maxUniqueHits;
 
     bool getHistoryByType(HistoryType type, std::list<std::string> &rr);
     boost::int64_t currentDateToInt();

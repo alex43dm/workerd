@@ -104,7 +104,7 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
         return;
     }
 
-    for(unsigned i = minUniqueHits; i < maxUniqueHits; i++)
+    for(int i = minUniqueHits; i < maxUniqueHits; i++)
     {
         //add teaser when teaser unique id and with company unique
         for(auto p = result.begin(); p != result.end(); ++p)
@@ -217,13 +217,13 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items)
     pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
     //pStmt->BeginTransaction();
 
-    for(unsigned i = 0; i < vRISRetargetingResult.size() && i < items.size(); i++)
+    for(auto o = vRISRetargetingResult.begin(); o != vRISRetargetingResult.end() ; ++o)
     {
         try
         {
             sqlite3_snprintf(sizeof(buf),buf,
                              "SELECT viewTime FROM Retargeting WHERE id=%lli AND offerId=%lli;",
-                             params->getUserKeyLong(), items[i]->id_int);
+                             params->getUserKeyLong(), (*o)->id_int);
 
             pStmt->Sql(buf);
             pStmt->FetchRow();
@@ -236,20 +236,20 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items)
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
                                      "UPDATE Retargeting SET uniqueHits=uniqueHits-1 WHERE id=%lli AND offerId=%lli;",
-                                     params->getUserKeyLong(), items[i]->id_int);
+                                     params->getUserKeyLong(), (*o)->id_int);
                 }
                 else
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
                                      "DELETE FROM Retargeting WHERE id=%lli AND offerId=%lli;",
-                                     params->getUserKeyLong(), items[i]->id_int);
+                                     params->getUserKeyLong(), (*o)->id_int);
                 }
             }
             else
             {
                 sqlite3_snprintf(sizeof(buf),buf,
                                  "INSERT INTO Retargeting(id,offerId,uniqueHits,viewTime) VALUES(%lli,%lli,%d,%lli);",
-                                 params->getUserKeyLong(), items[i]->id_int, items[i]->uniqueHits-1,std::time(0));
+                                 params->getUserKeyLong(), (*o)->id_int, (*o)->uniqueHits-1,std::time(0));
             }
             pStmt->SqlStatement(buf);
         }

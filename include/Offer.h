@@ -43,7 +43,7 @@ public:
     std::string matching;       ///< Фраза соответствия
     float rating;				///< рейтинг РП
     bool retargeting;
-    unsigned uniqueHits;		///< максимальное количество показов одному пользователю
+    int uniqueHits;		///< максимальное количество показов одному пользователю
     unsigned height;					///< высота РП (имеет значение для баннеров)
     unsigned width;					///< ширина РП (имеет значение для баннеров)
     bool social;
