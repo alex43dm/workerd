@@ -59,7 +59,6 @@ public:
 
 
     bool moveUpTailOffers(Offer::Map &items, float teasersMaxRating);
-    void RISAlgorithmRetagreting(const Offer::MapRate &result);
     void getRetargetingAsyncWait();
 
     mongo::BSONObj BSON_Keywords();
@@ -113,6 +112,7 @@ private:
     void RetargetingUpdate(const Offer::Vector &);
     void RetargetingClear();
     unsigned RetargetingCount() const { return vRISRetargetingResult.size(); }
+    void RISAlgorithmRetagreting(const Offer::Vector &result);
 
     bool setDeprecatedOffers(const Offer::Vector &items);
     bool getDeprecatedOffers(std::string &);
