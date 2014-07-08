@@ -110,8 +110,8 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
         for(auto p = result.begin(); p != result.end(); ++p)
         {
             if(OutPutCampaignSet.count((*p).second->campaign_id) == 0
-//                && OutPutOfferSet.count((*p).second->id_int) == 0
-                && (*p).second->uniqueHits == i)
+                    && OutPutOfferSet.count((*p).second->id_int) == 0
+                    && (*p).second->uniqueHits == i)
             {
                 vRISRetargetingResult.push_back((*p).second);
                 OutPutOfferSet.insert((*p).second->id_int);
@@ -121,22 +121,22 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
                     return;
             }
         }
+    }
 
-        //add teaser when teaser unique id
-        for(auto p = result.begin(); p!=result.end(); ++p)
+    //add teaser when teaser unique id
+    for(auto p = result.begin(); p!=result.end(); ++p)
+    {
+        if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
+                && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
-                && OutPutOfferSet.count((*p).second->id_int) == 0
-                && (*p).second->uniqueHits == i)
-            {
-                vRISRetargetingResult.push_back((*p).second);
-                OutPutOfferSet.insert((*p).second->id_int);
+            vRISRetargetingResult.push_back((*p).second);
+            OutPutOfferSet.insert((*p).second->id_int);
 
-                if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
-                    return;
-            }
+            if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
+                return;
         }
     }
+
 }
 
 void *HistoryManager::getRetargetingEnv(void *data)
@@ -298,3 +298,4 @@ void HistoryManager::signalHanlerRetargeting(int sigNum)
 {
     std::clog<<"get signal: "<<sigNum<<std::endl;
 }
+
