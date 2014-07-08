@@ -152,7 +152,8 @@ void XXXSearcher::processKeywords(
                     * (teasersMaxRating + weight);
                     //+ sphinx_get_float(res, i, 1);
 
-                //pOffer->matching =  sphinx_get_string(res, i, 2);
+                for (int i=0; i<res->num_words; i++ )
+                    pOffer->matching += " " + std::string(res->words[i].word);
 
                 pOffer->setBranch(sr[tt].branches);
 
