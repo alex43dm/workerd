@@ -54,7 +54,7 @@ public:
 
     //main methods
     void startGetUserHistory(Params *params, Informer *);
-    void sphinxProcess(Offer::Map &items);
+    void sphinxProcess(Offer::Map &items, float teasersMaxRating);
     bool updateUserHistory(const Offer::Map &items, const Offer::Vector &outItems, bool);
 
 

@@ -64,7 +64,7 @@ std::string Core::Process(Params *prms)
     getOffers(items, params->getUserKeyLong());
 
     //process history
-    hm->sphinxProcess(items);
+    hm->sphinxProcess(items,teasersMaxRating);
 
     //set tail
     hm->moveUpTailOffers(items, teasersMaxRating);

@@ -57,7 +57,6 @@ XXXSearcher::XXXSearcher()
                              Config::Instance()->sphinx_field_len_,
                              Config::Instance()->sphinx_field_names_,
                              Config::Instance()->sphinx_field_weights_);
-    makeFilterOn = false;
 }
 
 XXXSearcher::~XXXSearcher()
@@ -66,52 +65,11 @@ XXXSearcher::~XXXSearcher()
     sphinx_destroy ( client );
 }
 
-void XXXSearcher::makeFilter(Offer::Map &items)
-{
-    if(makeFilterOn)
-        return;
-
-    sphinx_set_select(client,"fguid");
-
-    //Создаем фильтр
-    filter = (sphinx_int64_t *)new sphinx_int64_t[(int)items.size()];
-    int counts = 0;
-    midleRange = 0;
-    maxRating = 0;
-
-    for(Offer::it it = items.begin(); it != items.end(); ++it)
-    {
-        filter[counts++] = (*it).second->id_int;
-        midleRange += (*it).second->rating;
-        //max
-        if(maxRating < (*it).second->rating)
-            maxRating = (*it).second->rating;
-    }
-
-    midleRange /= counts;
-
-    if(sphinx_add_filter( client, "fguid", counts, filter, SPH_FALSE)!=SPH_TRUE)
-    {
-        Log::warn("sphinx filter is not working: %s", sphinx_error(client));
-    }
-    makeFilterOn = true;
-}
-
-void XXXSearcher::cleanFilter()
-{
-    if(makeFilterOn)
-    {
-        sphinx_reset_filters ( client );
-        if(filter)
-            delete [] filter;
-        makeFilterOn = false;
-    }
-}
-
 //select 1 as doc, count(*) from worker group by doc;
 void XXXSearcher::processKeywords(
     const std::vector<sphinxRequests> &sr,
-    Offer::Map &items)
+    Offer::Map &items,
+    float teasersMaxRating)
 {
     float oldRating;
 
@@ -189,7 +147,7 @@ void XXXSearcher::processKeywords(
                 oldRating = pOffer->rating;
                 pOffer->rating = pOffer->rating
                     + (sr.size()>(unsigned)tt ? sr[tt].rate : 1)
-                    * (maxRating + weight);
+                    * (teasersMaxRating + weight);
                     //+ sphinx_get_float(res, i, 1);
 
                 //pOffer->rating = weight * (int)sr.size() > tt ? sr[tt].rate : 1;// * startRating;
@@ -241,7 +199,6 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
     std::clog<<"sphinx: total: "<< res->total
     <<" total_found: "<<res->total_found
     <<" num_matches: "<<res->num_matches
-    <<" rating line: "<<midleRange
     <<std::endl;
 
     for (i=0; i<res->num_words; i++ )

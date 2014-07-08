@@ -112,7 +112,7 @@ void HistoryManager::startGetUserHistory(Params *_params, Informer *inf_)
     }
 }
 
-void HistoryManager::sphinxProcess(Offer::Map &items)
+void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
 {
 
     if( inf->capacity * SPHINX_CAPACITY_COUNT >= items.size() || !inf->sphinxProcessEnable() )
@@ -121,8 +121,6 @@ void HistoryManager::sphinxProcess(Offer::Map &items)
     }
 
     isProcessed = true;
-
-    sphinx->makeFilter(items);
 
     if(inf->isShortTerm())
     {
@@ -134,7 +132,7 @@ void HistoryManager::sphinxProcess(Offer::Map &items)
         getLongTermAsyncWait();
     }
 
-    sphinx->processKeywords(stringQuery, items);
+    sphinx->processKeywords(stringQuery, items, teasersMaxRating);
 }
 
 
@@ -193,8 +191,6 @@ bool HistoryManager::updateUserHistory(
     }
 
     stringQuery.clear();
-
-    sphinx->cleanFilter();
 
     isProcessed = false;
 
