@@ -183,6 +183,15 @@ bool HistoryManager::updateUserHistory(
     vshortTerm.clear();
     vlongTerm.clear();
     vretageting.clear();
+
+    for(auto p = vRISRetargetingResult.begin(); p != vRISRetargetingResult.end(); ++p)
+    {
+        if(*p)
+        {
+            delete (*p);
+        }
+    }
+
     vRISRetargetingResult.clear();
 
     if(mtailOffers.size())

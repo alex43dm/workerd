@@ -12,7 +12,7 @@ void HistoryManager::getRetargeting()
     std::string ids;
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
-    Offer::Vector result;
+    //Offer::Vector result;
 
     if(params->newClient)
     {
@@ -35,11 +35,14 @@ void HistoryManager::getRetargeting()
             ids += ',';
         ids += (*i);
     }
-
+/*
     minUniqueHits = 0;
     maxUniqueHits = 0;
-
-    sqlite3_snprintf(sizeof(buf), buf, cfg->retargetingOfferSqlStr.c_str(), params->getUserKeyLong(), ids.c_str());
+*/
+    sqlite3_snprintf(sizeof(buf), buf, cfg->retargetingOfferSqlStr.c_str(),
+                     params->getUserKeyLong(),
+                     ids.c_str(),
+                     inf->retargeting_capacity);
 
     try
     {
@@ -69,9 +72,9 @@ void HistoryManager::getRetargeting()
                                    pStmt->GetColumnInt(18)
                                   );
 
-            off->showCount = pStmt->GetColumnInt(19);
+//            off->showCount = pStmt->GetColumnInt(19);
             off->branch = EBranchL::L32;
-
+/*
             if(minUniqueHits > off->showCount)
             {
                 minUniqueHits = off->showCount;
@@ -81,8 +84,8 @@ void HistoryManager::getRetargeting()
             {
                 maxUniqueHits = off->showCount;
             }
-
-            result.push_back(off);
+*/
+            vRISRetargetingResult.push_back(off);
         }
         pStmt->FreeQuery();
         delete pStmt;
@@ -92,7 +95,7 @@ void HistoryManager::getRetargeting()
         std::clog<<__func__<<" Kompex::SQLiteException: "<<ex.GetString()<<std::endl;
     }
 
-    RISAlgorithmRetagreting(result);
+    //RISAlgorithmRetagreting(result);
 }
 //-------------------------------------------------------------------------------------------------------------------
 void HistoryManager::RISAlgorithmRetagreting(const Offer::Vector &result)

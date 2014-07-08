@@ -28,5 +28,5 @@ LEFT JOIN Retargeting AS ret1 INDEXED BY idx_Retargeting_offerId ON ofrs.id = re
 WHERE ofrs.id IN(%s)
 	AND ofrs.valid=1
 	AND ret.id IS NULL
-ORDER BY ret1.viewTime ASC,showCount DESC
-LIMIT 200;
+ORDER BY showCount DESC,ret1.viewTime ASC
+LIMIT %u;
