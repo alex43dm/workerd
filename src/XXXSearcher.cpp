@@ -132,15 +132,13 @@ void XXXSearcher::processKeywords(
 
                 unsigned long long id = sphinx_get_int(res, i, 7);
 
-                Offer::it p;
-                p = items.find(id);
-                if( p == items.end() )
+                if(items.count(id) == 0)
                 {
                     std::clog<<__func__<<": not found in items: "<<id<<std::endl;
                     continue;
                 }
 
-                Offer *pOffer = p->second;
+                Offer *pOffer = items[id];
 
                 float weight = sphinx_get_weight (res, i ) / 1000;
 
@@ -149,24 +147,6 @@ void XXXSearcher::processKeywords(
                     + (sr.size()>(unsigned)tt ? sr[tt].rate : 1)
                     * (teasersMaxRating + weight);
                     //+ sphinx_get_float(res, i, 1);
-
-                //pOffer->rating = weight * (int)sr.size() > tt ? sr[tt].rate : 1;// * startRating;
-
-                //user search update
-                /*
-                if(sr.size()>(unsigned)tt && sr[tt].branches == EBranchT::T1)//user search
-                {
-                    const char * attr = "rating";
-                    sphinx_uint64_t * docids;
-                    sphinx_int64_t * values;
-
-                    sphinx_update_attributes(client, indexName.c_str(),
-                                             1,
-                                             attr,
-                                             int num_docs,
-                                             const sphinx_uint64_t * docids,
-                                             const sphinx_int64_t * values );
-                }*/
 
                 //pOffer->matching =  sphinx_get_string(res, i, 2);
 
