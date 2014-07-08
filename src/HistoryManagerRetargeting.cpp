@@ -109,8 +109,8 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
         //add teaser when teaser unique id and with company unique
         for(auto p = result.begin(); p != result.end(); ++p)
         {
-            if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
-                && OutPutOfferSet.count((*p).second->id_int) == 0
+            if(OutPutCampaignSet.count((*p).second->campaign_id) == 0
+//                && OutPutOfferSet.count((*p).second->id_int) == 0
                 && (*p).second->uniqueHits == i)
             {
                 vRISRetargetingResult.push_back((*p).second);
@@ -125,7 +125,8 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
         //add teaser when teaser unique id
         for(auto p = result.begin(); p!=result.end(); ++p)
         {
-            if(OutPutOfferSet.count((*p).second->id_int) == 0
+            if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
+                && OutPutOfferSet.count((*p).second->id_int) == 0
                 && (*p).second->uniqueHits == i)
             {
                 vRISRetargetingResult.push_back((*p).second);

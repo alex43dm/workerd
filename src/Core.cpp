@@ -138,7 +138,7 @@ void Core::log()
             std::clog<<"[clean],";
         }
 
-        std::clog<<" output ids:";
+        std::clog<<" output ids:[";
         for(auto it = vResult.begin(); it != vResult.end(); ++it)
         {
             std::clog<<" "<<(*it)->id<<" "<<(*it)->id_int
@@ -147,6 +147,7 @@ void Core::log()
             <<" cam:"<<(*it)->campaign_id
             <<" branch:"<<(*it)->getBranch();
         }
+        std::clog<<"]";
     }
 }
 //-------------------------------------------------------------------------------------------------------------------
