@@ -69,7 +69,7 @@ void HistoryManager::getRetargeting()
                                    pStmt->GetColumnInt(18)
                                   );
 
-            off-showCount = pStmt->GetColumnInt(19);
+            off->showCount = pStmt->GetColumnInt(19);
             off->branch = EBranchL::L32;
 
             if(minUniqueHits > off->showCount)
@@ -105,7 +105,7 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
         return;
     }
 
-    for(int i = minUniqueHits; i <= maxUniqueHits; i++)
+    for(unsigned i = minUniqueHits; i <= maxUniqueHits; i++)
     {
         //add teaser when teaser unique id and with company unique
         for(auto p = result.begin(); p != result.end(); ++p)
