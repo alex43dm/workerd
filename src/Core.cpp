@@ -402,7 +402,7 @@ void Core::mergeWithRetargeting()
        && hm->vRISRetargetingResult.size())
     {
         vResult.insert(vResult.begin(),hm->vRISRetargetingResult.begin(),hm->vRISRetargetingResult.end());
-        vResult.erase(vResult.begin()+hm->vRISRetargetingResult.size(),vResult.end());
+        vResult.erase(vResult.end()-hm->vRISRetargetingResult.size(),vResult.end());
     }
 }
 #endif // DUMMY
