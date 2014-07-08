@@ -65,7 +65,7 @@ std::string ParamParse::getKeywordsString(const std::string& str)
                 keywords += " " + *it;
             }
         }
-        std::string str = "((@exactly_phrases \"" + exactly_phrases + "\"~1) | (@title \"" + qsn + "\"/3)| (@description \"" + qsn + "\"/3) | (@keywords " + keywords + " ) | (@phrases \"" + qs + "\"~5))";
+        std::string str = "@exactly_phrases \"" + exactly_phrases + "\"~1 | @title \"" + qsn + "\"/3| @description \"" + qsn + "\"/3 | @keywords " + keywords + " | @phrases \"" + qs + "\"~5";
         return str;
     }
     catch (std::exception const &ex)
@@ -108,11 +108,11 @@ std::string ParamParse::getContextKeywordsString(const std::string& query)
             }
             if(i)
             {
-                ret += "|("+iret+")";
+                ret += "| "+iret+" ";
             }
             else
             {
-                ret += "("+iret+")";
+                ret += " "+iret+" ";
             }
         }
 /*
