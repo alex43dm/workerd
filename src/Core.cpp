@@ -167,9 +167,6 @@ void Core::ProcessSaveResults()
                                   append("search", params->getSearch()).
                                   append("context", params->getContext()).
                                   obj();
-#ifndef DUMMY
-        hm->updateUserHistory(items, vResult, all_social);
-#endif // DUMMY
         try
         {
             mongo::DB db("log");
@@ -220,6 +217,10 @@ void Core::ProcessSaveResults()
             Log::err("DBException: insert into log db: %s", ex.what());
         }
     }
+
+#ifndef DUMMY
+        hm->updateUserHistory(items, vResult, all_social);
+#endif // DUMMY
 
     //clear tmp values: informer & temp table
     clearTmp();
