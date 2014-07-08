@@ -128,13 +128,13 @@ void XXXSearcher::processKeywords(
 
             for( int i=0; i<res->num_matches; i++ )
             {
-                if (res->num_attrs < 8)
+                if (res->num_attrs < 1)
                 {
                     std::clog<<"num_attrs: "<<res->num_attrs<<std::endl;
                     continue;
                 }
 
-                unsigned long long id = sphinx_get_int(res, i, 7);
+                unsigned long long id = sphinx_get_int(res, i, 0);
 
                 if(items.count(id) == 0)
                 {
