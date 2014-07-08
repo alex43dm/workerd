@@ -53,6 +53,7 @@ public:
     long long int token_int;
     std::string token;          ///< Токен для проверки ссылки
     std::string redirect_url;   ///< Cсылка перенаправления
+    unsigned showCount;
 
     //Offer(){};
 

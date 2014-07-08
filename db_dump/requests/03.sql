@@ -11,15 +11,16 @@ ofrs.isOnClick,
 ofrs.type,
 ofrs.rating,
 ofrs.retargeting,
-CASE WHEN ret.uniqueHits IS NULL
-THEN ofrs.uniqueHits
-ELSE ret.uniqueHits
-END AS uniqueHits,
+ofrs.uniqueHits,
 ofrs.height,
 ofrs.width,
 ca.social,
 ca.guid,
-ca.offer_by_campaign_unique
+ca.offer_by_campaign_unique,
+CASE WHEN ret.uniqueHits IS NULL
+THEN 0
+ELSE ofrs.uniqueHits-ret.uniqueHits
+END AS showCount,
 FROM Offer AS ofrs INDEXED BY idx_Offer_id
 INNER JOIN Campaign AS ca INDEXED BY idx_Campaign_id ON ca.valid=1 AND ca.retargeting=1 AND ofrs.campaignId=ca.id
 LEFT JOIN Retargeting AS ret INDEXED BY idx_Retargeting_offerId_uniqueHits ON ret.id=%llu AND ret.uniqueHits <= 0 AND ofrs.id = ret.offerId

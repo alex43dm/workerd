@@ -69,16 +69,17 @@ void HistoryManager::getRetargeting()
                                    pStmt->GetColumnInt(18)
                                   );
 
+            off-showCount = pStmt->GetColumnInt(19);
             off->branch = EBranchL::L32;
 
-            if(minUniqueHits > off->uniqueHits)
+            if(minUniqueHits > off->showCount)
             {
-                minUniqueHits = off->uniqueHits;
+                minUniqueHits = off->showCount;
             }
 
-            if(maxUniqueHits < off->uniqueHits)
+            if(maxUniqueHits < off->showCount)
             {
-                maxUniqueHits = off->uniqueHits;
+                maxUniqueHits = off->showCount;
             }
 
             result.insert(Offer::PairRate(off->rating,off));
@@ -104,14 +105,14 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
         return;
     }
 
-    for(int i = minUniqueHits; i < maxUniqueHits; i++)
+    for(int i = minUniqueHits; i <= maxUniqueHits; i++)
     {
         //add teaser when teaser unique id and with company unique
         for(auto p = result.begin(); p != result.end(); ++p)
         {
             if(OutPutCampaignSet.count((*p).second->campaign_id) == 0
                     && OutPutOfferSet.count((*p).second->id_int) == 0
-                    && (*p).second->uniqueHits == i)
+                    && (*p).second->showCount == i)
             {
                 vRISRetargetingResult.push_back((*p).second);
                 OutPutOfferSet.insert((*p).second->id_int);
