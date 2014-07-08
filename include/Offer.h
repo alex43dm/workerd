@@ -43,9 +43,9 @@ public:
     std::string matching;       ///< Фраза соответствия
     float rating;				///< рейтинг РП
     bool retargeting;
-    int uniqueHits;				///< максимальное количество показов одному пользователю
-    int height;					///< высота РП (имеет значение для баннеров)
-    int width;					///< ширина РП (имеет значение для баннеров)
+    unsigned uniqueHits;		///< максимальное количество показов одному пользователю
+    unsigned height;					///< высота РП (имеет значение для баннеров)
+    unsigned width;					///< ширина РП (имеет значение для баннеров)
     bool social;
     std::string campaign_guid;
     unsigned unique_by_campaign;
