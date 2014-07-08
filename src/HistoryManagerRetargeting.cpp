@@ -37,6 +37,7 @@ void HistoryManager::getRetargeting()
     }
 
     minUniqueHits = 0;
+    maxUniqueHits = 0;
 
     sqlite3_snprintf(sizeof(buf), buf, cfg->retargetingOfferSqlStr.c_str(), params->getUserKeyLong(), ids.c_str());
 
@@ -70,9 +71,14 @@ void HistoryManager::getRetargeting()
 
             off->branch = EBranchL::L32;
 
-            if(minUniqueHits < off->uniqueHits)
+            if(minUniqueHits > off->uniqueHits)
             {
                 minUniqueHits = off->uniqueHits;
+            }
+
+            if(maxUniqueHits < off->uniqueHits)
+            {
+                maxUniqueHits = off->uniqueHits;
             }
 
             result.insert(Offer::PairRate(off->rating,off));
@@ -98,61 +104,36 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
         return;
     }
 
-    //add teaser when teaser unique id and with company unique and rating > 0
-    for(auto p = result.begin(); p != result.end(); ++p)
+    for(unsigned i = minUniqueHits; i < maxUniqueHits; i++)
     {
-        if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
-            && OutPutOfferSet.count((*p).second->id_int) == 0
-            && (*p).second->uniqueHits == minUniqueHits)
+        //add teaser when teaser unique id and with company unique
+        for(auto p = result.begin(); p != result.end(); ++p)
         {
-            vRISRetargetingResult.push_back((*p).second);
-            OutPutOfferSet.insert((*p).second->id_int);
-            OutPutCampaignSet.insert((*p).second->campaign_id);
+            if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
+                && OutPutOfferSet.count((*p).second->id_int) == 0
+                && (*p).second->uniqueHits == i)
+            {
+                vRISRetargetingResult.push_back((*p).second);
+                OutPutOfferSet.insert((*p).second->id_int);
+                OutPutCampaignSet.insert((*p).second->campaign_id);
 
-            if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
-                return;
+                if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
+                    return;
+            }
         }
-    }
 
-    //add teaser when teaser unique id
-    for(auto p = result.begin(); p!=result.end(); ++p)
-    {
-        if(OutPutOfferSet.count((*p).second->id_int) == 0
-            && (*p).second->uniqueHits == minUniqueHits)
+        //add teaser when teaser unique id
+        for(auto p = result.begin(); p!=result.end(); ++p)
         {
-            vRISRetargetingResult.push_back((*p).second);
-            OutPutOfferSet.insert((*p).second->id_int);
+            if(OutPutOfferSet.count((*p).second->id_int) == 0
+                && (*p).second->uniqueHits == i)
+            {
+                vRISRetargetingResult.push_back((*p).second);
+                OutPutOfferSet.insert((*p).second->id_int);
 
-            if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
-                return;
-        }
-    }
-
-        //add teaser when teaser unique id and with company unique and rating > 0
-    for(auto p = result.begin(); p != result.end(); ++p)
-    {
-        if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
-            && OutPutOfferSet.count((*p).second->id_int) == 0)
-        {
-            vRISRetargetingResult.push_back((*p).second);
-            OutPutOfferSet.insert((*p).second->id_int);
-            OutPutCampaignSet.insert((*p).second->campaign_id);
-
-            if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
-                return;
-        }
-    }
-
-    //add teaser when teaser unique id
-    for(auto p = result.begin(); p!=result.end(); ++p)
-    {
-        if(OutPutOfferSet.count((*p).second->id_int) == 0)
-        {
-            vRISRetargetingResult.push_back((*p).second);
-            OutPutOfferSet.insert((*p).second->id_int);
-
-            if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
-                return;
+                if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
+                    return;
+            }
         }
     }
 }
