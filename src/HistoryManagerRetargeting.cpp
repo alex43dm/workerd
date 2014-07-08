@@ -239,7 +239,7 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items)
                 if(viewTime + cfg->retargeting_by_time_ > std::time(0))
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
-                                     "UPDATE Retargeting SET uniqueHits=uniqueHits-1 WHERE id=%lli AND offerId=%lli;",
+                                     "UPDATE Retargeting SET uniqueHits=uniqueHits-1,showCount=showCount+1 WHERE id=%lli AND offerId=%lli;",
                                      params->getUserKeyLong(), (*o)->id_int);
                 }
                 else

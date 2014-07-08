@@ -16,11 +16,7 @@ ofrs.height,
 ofrs.width,
 ca.social,
 ca.guid,
-ca.offer_by_campaign_unique,
-CASE WHEN ret.uniqueHits IS NULL
-THEN 0
-ELSE ofrs.uniqueHits-ret.uniqueHits
-END AS showCount
+ca.offer_by_campaign_unique
 FROM Offer AS ofrs INDEXED BY idx_Offer_id
 INNER JOIN Campaign AS ca INDEXED BY idx_Campaign_id ON ca.valid=1 AND ca.retargeting=1 AND ofrs.campaignId=ca.id
 LEFT JOIN Retargeting AS ret INDEXED BY idx_Retargeting_offerId_uniqueHits ON ret.id=%llu AND ret.uniqueHits <= 0 AND ofrs.id = ret.offerId
@@ -28,5 +24,5 @@ LEFT JOIN Retargeting AS ret1 INDEXED BY idx_Retargeting_offerId ON ofrs.id = re
 WHERE ofrs.id IN(%s)
 	AND ofrs.valid=1
 	AND ret.id IS NULL
-ORDER BY showCount DESC,ret1.viewTime ASC
+ORDER BY ret.showCount ASC,ret1.viewTime ASC
 LIMIT %u;
