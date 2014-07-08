@@ -11,7 +11,10 @@ ofrs.isOnClick,
 ofrs.type,
 ofrs.rating,
 ofrs.retargeting,
-ret.uniqueHits,
+CASE WHEN ret.uniqueHits IS NULL
+THEN ofrs.uniqueHits
+ELSE ret.uniqueHits
+END AS uniqueHits,
 ofrs.height,
 ofrs.width,
 ca.social,
