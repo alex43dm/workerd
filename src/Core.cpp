@@ -331,6 +331,7 @@ void Core::RISAlgorithm(const Offer::Map &items)
         {
             if((*i).second->type == Offer::Type::banner && vResult.size() == 0)
             {
+                (*i).second->branch = EBranchL::L1;
                 vResult.insert(vResult.begin(),(*i).second);
                 return;
             }
@@ -354,12 +355,13 @@ void Core::RISAlgorithm(const Offer::Map &items)
         hm->clean = true;
     }
 
-    //add teaser when teaser unique id and with company unique
+    //teaser by unique id and company
     for(auto p = result.begin(); p != result.end(); ++p)
     {
         if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
+            (*p).second->branch = EBranchL::L2;
             vResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
@@ -369,11 +371,12 @@ void Core::RISAlgorithm(const Offer::Map &items)
         }
     }
 
-    //add teaser when teaser unique id and with id unique
+    //teaser by unique id
     for(auto p = result.begin(); p != result.end(); ++p)
     {
         if(OutPutOfferSet.count((*p).second->id_int) == 0)
         {
+            (*p).second->branch = EBranchL::L3;
             vResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
@@ -387,6 +390,7 @@ void Core::RISAlgorithm(const Offer::Map &items)
     loopCount = vResult.size();
     for(auto p = result.begin(); loopCount < informer->capacity && p != result.end(); ++p, loopCount++)
     {
+        (*p).second->branch = EBranchL::L4;
         vResult.push_back((*p).second);
     }
 

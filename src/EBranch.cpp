@@ -15,10 +15,10 @@ const std::string EBranchL2String(EBranchL b)
 {
     switch(b)
     {
-        case EBranchL::L1: return "NL1";
-        case EBranchL::L2: return "NL2";
-        case EBranchL::L3: return "NL3";
-        case EBranchL::L4: return "NL4";
+        case EBranchL::L1: return "NL1";//ris: banner select
+        case EBranchL::L2: return "NL2";//ris: teaser by unique id and company
+        case EBranchL::L3: return "NL3";//ris: teaser by unique id
+        case EBranchL::L4: return "NL4";//ris: expand to return size
         case EBranchL::L5: return "NL5";
         case EBranchL::L6: return "NL6";
         case EBranchL::L7: return "NL7";
@@ -46,7 +46,8 @@ const std::string EBranchL2String(EBranchL b)
         case EBranchL::L29: return "NL29";
         case EBranchL::L30: return "NL30";
         case EBranchL::L31: return "NL31";//tail
-        case EBranchL::L32: return "NL32";//retargeting
-        default: return "NL31";
+        case EBranchL::L32: return "NL32";//retargeting ris 1(teaser when teaser unique id and with company unique)
+        case EBranchL::L33: return "NL33";//retargeting ris 2(teaser when teaser unique id and company <= unique_by_campaign)
+        default: return "NOP";
     }
 };
