@@ -31,7 +31,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
         try
         {
             sqlite3_snprintf(sizeof(buf),buf,
-                             "SELECT viewTime FROM Session WHERE id=%llu AND offerId=%llu AND tail=0 AND retargeting=0;",
+                             "SELECT viewTime FROM Session WHERE id=%llu AND offerId=%llu AND tail=0;",
                              params->getUserKeyLong(), (*it)->id_int);
 
             pStmt->Sql(buf);
@@ -47,12 +47,13 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
                                      "UPDATE Session SET uniqueHits=uniqueHits-1 WHERE id=%llu AND offerId=%llu;",
                                      params->getUserKeyLong(), (*it)->id_int);
                 }
+                /*
                 else
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
                                      "DELETE FROM Session WHERE id=%llu AND offerId=%llu;",
                                      params->getUserKeyLong(), (*it)->id_int);
-                }
+                }*/
             }
             else
             {
