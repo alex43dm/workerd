@@ -26,8 +26,6 @@ void HistoryManager::getRetargeting()
         return;
     }
 
-//    RetargetingClear();
-
     //fill
     for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
     {
@@ -178,110 +176,8 @@ void HistoryManager::getRetargetingAsyncWait()
     pthread_join(thrGetRetargetingAsync, 0);
     return;
 }
-/*
-void HistoryManager::RetargetingUpdate()
-{
-    Kompex::SQLiteStatement *pStmt;
-    char buf[8192];
-    int viewTime = 0;
 
-    if(cfg->logRetargetingOfferIds && vretageting.size())
-    {
-        std::clog<<" retargeting offer redis:";
-        for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
-        {
-            std::clog<<" "<<*i;
-        }
-
-    }
-
-    if(params->newClient)
-    {
-        return;
-    }
-
-    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-    //pStmt->BeginTransaction();
-
-    for(auto o = vRISRetargetingResult.begin(); o != vRISRetargetingResult.end() ; ++o)
-    {
-        try
-        {
-            sqlite3_snprintf(sizeof(buf),buf,
-                             "SELECT viewTime FROM Retargeting WHERE id=%lli AND offerId=%lli;",
-                             params->getUserKeyLong(), (*o)->id_int);
-
-            pStmt->Sql(buf);
-            pStmt->FetchRow();
-            viewTime = pStmt->GetColumnInt64(0);
-            pStmt->Reset();
-
-            if(viewTime)
-            {
-                if(viewTime + cfg->retargeting_by_time_ > std::time(0))
-                {
-                    sqlite3_snprintf(sizeof(buf),buf,
-                                     "UPDATE Retargeting SET uniqueHits=uniqueHits-1,showCount=showCount+1 WHERE id=%lli AND offerId=%lli;",
-                                     params->getUserKeyLong(), (*o)->id_int);
-                }
-                else
-                {
-                    sqlite3_snprintf(sizeof(buf),buf,
-                                     "DELETE FROM Retargeting WHERE id=%lli AND offerId=%lli;",
-                                     params->getUserKeyLong(), (*o)->id_int);
-                }
-            }
-            else
-            {
-                sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO Retargeting(id,offerId,uniqueHits,viewT:ime) VALUES(%lli,%lli,%d,%lli);",
-                                 params->getUserKeyLong(), (*o)->id_int, (*o)->uniqueHits-1,std::time(0));
-            }
-            pStmt->SqlStatement(buf);
-        }
-        catch(Kompex::SQLiteException &ex)
-        {
-            Log::err("HistoryManager::RetargetingUpdate select(%s) error: %s", buf, ex.GetString().c_str());
-        }
-    }//for
-
-    //pStmt->CommitTransaction();
-    pStmt->FreeQuery();
-    delete pStmt;
-}
-
-void HistoryManager::RetargetingClear()
-{
-    Kompex::SQLiteStatement *pStmt;
-    char buf[8192];
-
-    if(params->newClient)
-    {
-        return;
-    }
-
-    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-//   pStmt->BeginTransaction();
-
-    try
-    {
-        sqlite3_snprintf(sizeof(buf),buf,
-                         "DELETE FROM Retargeting WHERE id=%lli AND viewTime<%lli;",
-                         params->getUserKeyLong(), std::time(0) - Config::Instance()->retargeting_by_time_);
-        pStmt->SqlStatement(buf);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        Log::err("HistoryManager::RetargetingClear(%s) error: %s", buf, ex.GetString().c_str());
-    }
-
-//    pStmt->CommitTransaction();
-    pStmt->FreeQuery();
-    delete pStmt;
-}
-*/
 void HistoryManager::signalHanlerRetargeting(int sigNum)
 {
     std::clog<<__func__<<"get signal: "<<sigNum<<std::endl;
 }
-

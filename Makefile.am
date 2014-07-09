@@ -64,7 +64,6 @@ db_dump/requests/getCampaings.sql \
 db_dump/UA_RU \
 db_dump/tables/11_GeoCountries.sql \
 db_dump/tables/00_Campaign.sql \
-db_dump/tables/17_Retargeting.sql \
 db_dump/tables/12_GeoRerions.sql \
 db_dump/tables/20_GeoLiteCity.sql \
 db_dump/tables/06_Accounts.sql \
