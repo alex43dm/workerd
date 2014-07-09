@@ -47,13 +47,12 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
                                      "UPDATE Session SET uniqueHits=uniqueHits-1 WHERE id=%llu AND offerId=%llu;",
                                      params->getUserKeyLong(), (*it)->id_int);
                 }
-                /*
                 else
                 {
                     sqlite3_snprintf(sizeof(buf),buf,
-                                     "DELETE FROM Session WHERE id=%llu AND offerId=%llu;",
+                                     "DELETE FROM Session WHERE id=%llu AND offerId=%llu AND retargeting=0;",
                                      params->getUserKeyLong(), (*it)->id_int);
-                }*/
+                }
             }
             else
             {
