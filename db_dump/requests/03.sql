@@ -27,6 +27,6 @@ LEFT JOIN Session AS ses INDEXED BY idx_Session_id_offerId ON ofrs.id=ses.offerI
 WHERE ofrs.id IN(%s)
 	AND ofrs.valid = 1
 	AND ses.uniqueHits > 0
-ORDER BY ret1.viewTime ASC
+--ORDER BY ses.viewTime ASC
 --LIMIT 100
 ;
