@@ -16,7 +16,8 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
     {
         try
         {
-            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE id=%llu AND tail=0 AND retargeting=0;",params->getUserKeyLong());
+            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE id=%llu AND tail=0 AND retargeting=0;"
+                             ,params->getUserKeyLong());
             pStmt->SqlStatement(buf);
         }
         catch(Kompex::SQLiteException &ex)
@@ -56,7 +57,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
             else
             {
                 sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO Session(id,offerId,uniqueHits,viewTime,tail,retargeting) VALUES(%llu,%llu,%d,%llu,0);",
+                                 "INSERT INTO Session(id,offerId,uniqueHits,viewTime,tail,retargeting) VALUES(%llu,%llu,%d,%llu,0,%u);",
                                  params->getUserKeyLong(), (*it)->id_int, (*it)->uniqueHits-1,std::time(0),(*it)->retargeting);
             }
             pStmt->SqlStatement(buf);
