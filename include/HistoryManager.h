@@ -109,10 +109,7 @@ private:
     RedisClient *getHistoryPointer(const HistoryType type) const;
 
     bool getRetargetingAsync();
-    void RetargetingUpdate(const Offer::Vector &);
-    void RetargetingClear();
-    unsigned RetargetingCount() const { return vRISRetargetingResult.size(); }
-    void RISAlgorithmRetagreting(const Offer::Vector &result);
+    void RISAlgorithmRetagreting(const Offer::MapRate &result);
 
     bool setDeprecatedOffers(const Offer::Vector &items);
     bool getDeprecatedOffers(std::string &);

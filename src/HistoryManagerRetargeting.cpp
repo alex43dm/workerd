@@ -12,7 +12,7 @@ void HistoryManager::getRetargeting()
     std::string ids;
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
-    //Offer::Vector result;
+    Offer::MapRate rateMap;
 
     if(params->newClient)
     {
@@ -26,7 +26,7 @@ void HistoryManager::getRetargeting()
         return;
     }
 
-    RetargetingClear();
+//    RetargetingClear();
 
     //fill
     for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
@@ -35,14 +35,10 @@ void HistoryManager::getRetargeting()
             ids += ',';
         ids += (*i);
     }
-/*
-    minUniqueHits = 0;
-    maxUniqueHits = 0;
-*/
+
     sqlite3_snprintf(sizeof(buf), buf, cfg->retargetingOfferSqlStr.c_str(),
                      params->getUserKeyLong(),
-                     ids.c_str(),
-                     inf->retargeting_capacity);
+                     ids.c_str());
 
     try
     {
@@ -72,20 +68,9 @@ void HistoryManager::getRetargeting()
                                    pStmt->GetColumnInt(18)
                                   );
 
-//            off->showCount = pStmt->GetColumnInt(19);
             off->branch = EBranchL::L32;
-/*
-            if(minUniqueHits > off->showCount)
-            {
-                minUniqueHits = off->showCount;
-            }
 
-            if(maxUniqueHits < off->showCount)
-            {
-                maxUniqueHits = off->showCount;
-            }
-*/
-            vRISRetargetingResult.push_back(off);
+            rateMap.insert(Offer::PairRate(off->rating,off));
         }
         pStmt->FreeQuery();
         delete pStmt;
@@ -95,10 +80,10 @@ void HistoryManager::getRetargeting()
         std::clog<<__func__<<" Kompex::SQLiteException: "<<ex.GetString()<<std::endl;
     }
 
-    //RISAlgorithmRetagreting(result);
+    RISAlgorithmRetagreting(rateMap);
 }
 //-------------------------------------------------------------------------------------------------------------------
-void HistoryManager::RISAlgorithmRetagreting(const Offer::Vector &result)
+void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
 {
     std::multiset<unsigned long long> OutPutCampaignSet;
     std::set<unsigned long long> OutPutOfferSet;
@@ -108,39 +93,36 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::Vector &result)
         return;
     }
 
-    for(unsigned i = minUniqueHits; i <= maxUniqueHits; i++)
+    //add teaser when teaser unique id and with company unique
+    for(auto p = result.begin(); p != result.end(); ++p)
     {
-        //add teaser when teaser unique id and with company unique
-        for(auto p = result.begin(); p != result.end(); ++p)
+        if(OutPutCampaignSet.count((*p).second->campaign_id) == 0
+                && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            if(OutPutCampaignSet.count((*p)->campaign_id) == 0
-                    && OutPutOfferSet.count((*p)->id_int) == 0
-                    && (*p)->showCount == i)
-            {
-                vRISRetargetingResult.push_back((*p));
-                OutPutOfferSet.insert((*p)->id_int);
-                OutPutCampaignSet.insert((*p)->campaign_id);
-
-                if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
-                    return;
-            }
-        }
-    }
-
-    //add teaser when teaser unique id
-    for(auto p = result.begin(); p!=result.end(); ++p)
-    {
-        if(OutPutCampaignSet.count((*p)->campaign_id) < (*p)->unique_by_campaign
-                && OutPutOfferSet.count((*p)->id_int) == 0)
-        {
-            vRISRetargetingResult.push_back((*p));
-            OutPutOfferSet.insert((*p)->id_int);
+            (*p).second->branch = EBranchL::L3;
+            vRISRetargetingResult.push_back((*p).second);
+            OutPutOfferSet.insert((*p).second->id_int);
+            OutPutCampaignSet.insert((*p).second->campaign_id);
 
             if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
                 return;
         }
     }
 
+    //add teaser when teaser unique id
+    for(auto p = result.begin(); p!=result.end(); ++p)
+    {
+        if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
+                && OutPutOfferSet.count((*p).second->id_int) == 0)
+        {
+            (*p).second->branch = EBranchL::L4;
+            vRISRetargetingResult.push_back((*p).second);
+            OutPutOfferSet.insert((*p).second->id_int);
+
+            if(vRISRetargetingResult.size() >= inf->retargeting_capacity)
+                return;
+        }
+    }
 }
 
 void *HistoryManager::getRetargetingEnv(void *data)
@@ -196,8 +178,8 @@ void HistoryManager::getRetargetingAsyncWait()
     pthread_join(thrGetRetargetingAsync, 0);
     return;
 }
-
-void HistoryManager::RetargetingUpdate(const Offer::Vector &items)
+/*
+void HistoryManager::RetargetingUpdate()
 {
     Kompex::SQLiteStatement *pStmt;
     char buf[8192];
@@ -252,7 +234,7 @@ void HistoryManager::RetargetingUpdate(const Offer::Vector &items)
             else
             {
                 sqlite3_snprintf(sizeof(buf),buf,
-                                 "INSERT INTO Retargeting(id,offerId,uniqueHits,viewTime) VALUES(%lli,%lli,%d,%lli);",
+                                 "INSERT INTO Retargeting(id,offerId,uniqueHits,viewT:ime) VALUES(%lli,%lli,%d,%lli);",
                                  params->getUserKeyLong(), (*o)->id_int, (*o)->uniqueHits-1,std::time(0));
             }
             pStmt->SqlStatement(buf);
@@ -297,9 +279,9 @@ void HistoryManager::RetargetingClear()
     pStmt->FreeQuery();
     delete pStmt;
 }
-
+*/
 void HistoryManager::signalHanlerRetargeting(int sigNum)
 {
-    std::clog<<"get signal: "<<sigNum<<std::endl;
+    std::clog<<__func__<<"get signal: "<<sigNum<<std::endl;
 }
 

@@ -178,7 +178,7 @@ bool HistoryManager::updateUserHistory(
     //обновление deprecated
     setDeprecatedOffers(outItems);
     //обновление retargeting
-    RetargetingUpdate(outItems);
+//    RetargetingUpdate();
 
     vshortTerm.clear();
     vlongTerm.clear();

@@ -25,7 +25,7 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
         }
     }
 
-    for(auto it = items.begin()+vRISRetargetingResult.size(); it != items.end(); ++it)
+    for(auto it = items.begin(); it != items.end(); ++it)
     {
         try
         {
