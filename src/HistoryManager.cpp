@@ -73,28 +73,11 @@ void HistoryManager::startGetUserHistory(Params *_params, Informer *inf_)
     if(inf->isSearch())
     {
         sphinx->addRequest(params->getSearch(),inf->range_search,EBranchT::T1);
-        /*
-        q = getContextKeywordsString(params->getSearch());
-        if (!q.empty())
-        {
-            lock();
-            stringQuery.push_back(sphinxRequests(q,inf->range_search,EBranchT::T1));
-            unlock();
-        }
-        */
     }
     //Запрос по контексту страницы
     if(inf->isContext())
     {
         sphinx->addRequest(params->getContext(),inf->range_context,EBranchT::T2);
-        /*
-        q = getContextKeywordsString(params->getContext());
-        if (!q.empty())
-        {
-            lock();
-            stringQuery.push_back(sphinxRequests(q,inf->range_context,EBranchT::T2));
-            unlock();
-        }*/
     }
 
     if(inf->isLongTerm())
@@ -174,7 +157,6 @@ bool HistoryManager::updateUserHistory(
     //обновление deprecated
     setDeprecatedOffers(outItems);
     //обновление retargeting
-//    RetargetingUpdate();
 
     vshortTerm.clear();
     vlongTerm.clear();
@@ -194,8 +176,6 @@ bool HistoryManager::updateUserHistory(
     {
         mtailOffers.clear();
     }
-
-    //stringQuery.clear();
 
     sphinx->cleanFilter();
 
