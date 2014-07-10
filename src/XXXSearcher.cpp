@@ -434,11 +434,11 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
         {
             if(p == vStr.begin())
             {
-                res = col + " " + *p;
+                res = "@" + col + " " + *p;
             }
             else
             {
-                res += " |" + col + " " + *p;
+                res += " | @" + col + " " + *p;
             }
         }
 
