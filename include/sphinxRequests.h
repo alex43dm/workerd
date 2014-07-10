@@ -2,6 +2,7 @@
 #define SPHINXREQUESTS_H
 
 #include <string>
+
 #include "EBranch.h"
 
 class sphinxRequests

@@ -3,6 +3,8 @@
 
 #include <typeinfo>
 
+#include <boost/algorithm/string.hpp>
+
 #include "Log.h"
 #include "Config.h"
 #include "XXXSearcher.h"
@@ -44,6 +46,17 @@ std::map<std::string,int> map_sph_sort =
 
 XXXSearcher::XXXSearcher()
 {
+    replaceSymbol = boost::make_u32regex("[^а-яА-Яa-zA-Z0-9-]");
+    replaceExtraSpace = boost::make_u32regex("\\s+");
+    replaceNumber = boost::make_u32regex("(\\b)\\d+(\\b)");
+
+    m_pPrivate = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init((pthread_mutex_t*)m_pPrivate, &attr);
+    pthread_mutexattr_destroy(&attr);
+
     client = sphinx_create ( SPH_TRUE );
     sphinx_set_server ( client, Config::Instance()->sphinx_host_.c_str(), Config::Instance()->sphinx_port_ );
     sphinx_open ( client );
@@ -62,20 +75,21 @@ XXXSearcher::XXXSearcher()
 
 XXXSearcher::~XXXSearcher()
 {
+    pthread_mutex_destroy((pthread_mutex_t*)m_pPrivate);
+
     sphinx_close ( client );
     sphinx_destroy ( client );
 }
 
 //select 1 as doc, count(*) from worker group by doc;
 void XXXSearcher::processKeywords(
-    const std::vector<sphinxRequests> &sr,
     Offer::Map &items,
     float teasersMaxRating)
 {
     float oldRating;
 
 
-    if( sr.size() == 0 )
+    if( stringQuery.size() == 0 )
     {
         if(cfg->logSphinx)
         {
@@ -92,7 +106,7 @@ void XXXSearcher::processKeywords(
         sphinx_result * res;
 
         //Создаем запросы
-        for (auto it = sr.begin(); it != sr.end(); ++it)
+        for (auto it = stringQuery.begin(); it != stringQuery.end(); ++it)
         {
             sphinx_add_query( client, (*it).query.c_str(), cfg->sphinx_index_.c_str(), NULL );
         }
@@ -121,7 +135,7 @@ void XXXSearcher::processKeywords(
 
             if(cfg->logSphinx)
             {
-                std::clog<<"sphinx: request #"<<tt<<" by: "<<sr[tt].getBranchName()<<" query: "<<sr[tt].query<<std::endl;
+                std::clog<<"sphinx: request #"<<tt<<" by: "<<stringQuery[tt].getBranchName()<<" query: "<<stringQuery[tt].query<<std::endl;
 
                 dumpResult(res);
             }
@@ -148,14 +162,14 @@ void XXXSearcher::processKeywords(
 
                 oldRating = pOffer->rating;
                 pOffer->rating = pOffer->rating
-                    + (sr.size()>(unsigned)tt ? sr[tt].rate : 1)
+                    + (stringQuery.size()>(unsigned)tt ? stringQuery[tt].rate : 1)
                     * (teasersMaxRating + weight);
                     //+ sphinx_get_float(res, i, 1);
 
                 for (int i=0; i<res->num_words; i++ )
                     pOffer->matching += " " + std::string(res->words[i].word);
 
-                pOffer->setBranch(sr[tt].branches);
+                pOffer->setBranch(stringQuery[tt].branches);
 
                 if(cfg->logSphinx)
                 {
@@ -275,4 +289,161 @@ void XXXSearcher::cleanFilter()
             delete [] filter;
         makeFilterOn = false;
     }
+
+    stringQuery.clear();
+}
+
+
+
+/**
+      \brief Нормализирует строку строку.
+  */
+std::string XXXSearcher::stringWrapper(const std::string &str, bool replaceNumbers)
+{
+    std::string t = str;
+    //Заменяю все не буквы, не цифры, не минус на пробел
+    t = boost::u32regex_replace(t,replaceSymbol," ");
+    if (replaceNumbers)
+    {
+        //Заменяю отдельностояшие цифры на пробел, тоесть "у 32 п" замениться на
+        //"у    п", а "АТ-23" останеться как "АТ-23"
+        t = boost::u32regex_replace(t,replaceNumber," ");
+    }
+    //Заменяю дублируюшие пробелы на один пробел
+    t = boost::u32regex_replace(t,replaceExtraSpace," ");
+    boost::trim(t);
+    return t;
+}
+
+std::string XXXSearcher::getKeywordsString(const std::string& str)
+{
+    try
+    {
+        std::string q = str;
+        boost::algorithm::trim(q);
+        if (q.empty())
+        {
+            return std::string();
+        }
+        std::string qs  = stringWrapper(q, false);
+        std::string qsn = stringWrapper(q, true);
+
+        std::vector<std::string> strs;
+        std::string exactly_phrases;
+        std::string keywords;
+        boost::split(strs,qs,boost::is_any_of("\t "),boost::token_compress_on);
+        for (std::vector<std::string>::iterator it = strs.begin(); it != strs.end(); ++it)
+        {
+            exactly_phrases += "<<" + *it + " ";
+            if (it != strs.begin())
+            {
+                keywords += " | " + *it;
+            }
+            else
+            {
+                keywords += " " + *it;
+            }
+        }
+        std::string str = "@exactly_phrases \"" + exactly_phrases + "\"~1 | @title \"" + qsn + "\"/3| @description \"" + qsn + "\"/3 | @keywords " + keywords + " | @phrases \"" + qs + "\"~5";
+        return str;
+    }
+    catch (std::exception const &ex)
+    {
+        Log::err("exception %s: %s", typeid(ex).name(), ex.what());
+        return std::string();
+    }
+}
+
+std::string XXXSearcher::getContextKeywordsString(const std::string& query)
+{
+    try
+    {
+        std::string q, ret;
+
+        q = query;
+        boost::trim(q);
+        if (q.empty())
+        {
+            return std::string();
+        }
+        std::string qs = stringWrapper(q);
+        std::string qsn = stringWrapper(q, true);
+        std::vector<std::string> strs;
+        boost::split(strs,qs,boost::is_any_of("\t "),boost::token_compress_on);
+
+        for(int i=0; i<Config::Instance()->sphinx_field_len_; i++)
+        {
+            std::string col = std::string(Config::Instance()->sphinx_field_names_[i]);
+            std::string iret;
+            for (std::vector<std::string>::iterator it = strs.begin(); it != strs.end(); ++it)
+            {
+                    if (it != strs.begin())
+                    {
+                        iret += " | @"+col+" "+*it;
+                    }
+                    else
+                    {
+                        iret += "@"+col+" "+*it;
+                    }
+                //exactly_phrases += "<<" + *it + " ";
+            }
+            if(i)
+            {
+                ret += "| "+iret+" ";
+            }
+            else
+            {
+                ret += " "+iret+" ";
+            }
+        }
+
+        return ret;
+
+    }
+    catch (std::exception const &ex)
+    {
+        Log::err("exception %s: %s", typeid(ex).name(), ex.what());
+        return std::string();
+    }
+}
+
+void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT br)
+{
+    if(req.empty())
+    {
+        return;
+    }
+
+    std::string q = req;
+    boost::trim(q);
+    if(q.empty())
+    {
+        return;
+    }
+
+    std::vector<std::string> vStr;
+    std::string res, col;
+
+    boost::split(vStr,q,boost::is_any_of("\t "),boost::token_compress_on);
+
+    for(int i=0; i<cfg->sphinx_field_len_; i++)
+    {
+        col = std::string(cfg->sphinx_field_names_[i]);
+
+        for(auto p=vStr.begin(); p != vStr.end(); ++p)
+        {
+            if(p == vStr.begin())
+            {
+                res = col + " " + *p;
+            }
+            else
+            {
+                res += " |" + col + " " + *p;
+            }
+        }
+    }
+
+    pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
+    stringQuery.push_back(sphinxRequests(req, rate, br));
+    pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
 }

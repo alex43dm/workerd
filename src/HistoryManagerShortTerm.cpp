@@ -12,22 +12,7 @@ void HistoryManager::getShortTerm()
         return;
     }
 
-    std::string strSH = pShortTerm->get(key);
-
-    if(strSH.empty())
-    {
-        std::clog<<"["<<tid<<"]HistoryManager::"<<__func__<<" sort term empty"<<std::endl;
-    }
-    else
-    {
-        std::string q = getKeywordsString(strSH);
-        if (!q.empty())
-        {
-            lock();
-            stringQuery.push_back(sphinxRequests(q,inf->range_short_term,EBranchT::T3));
-            unlock();
-        }
-    }
+    sphinx->addRequest(pShortTerm->get(key),inf->range_short_term,EBranchT::T3);
 }
 
 void *HistoryManager::getShortTermEnv(void *data)

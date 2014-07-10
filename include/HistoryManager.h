@@ -72,10 +72,8 @@ private:
     Params *params;
     Informer *inf;
     RedisClient *pShortTerm,*pLongTerm,*pRetargeting;
-    std::vector<sphinxRequests> stringQuery;
-    XXXSearcher *sphinx;
 
-    pthread_mutex_t *m_pPrivate;
+    XXXSearcher *sphinx;
 
     pthread_t   tid, thrGetDeprecatedOffersAsync,
                 thrGetLongTermAsync,
@@ -90,8 +88,6 @@ private:
 
     bool getHistoryByType(HistoryType type, std::list<std::string> &rr);
     boost::int64_t currentDateToInt();
-    void lock();
-    void unlock();
     void getLongTerm();
     void getShortTerm();
     void getRetargeting();

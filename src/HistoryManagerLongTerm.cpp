@@ -12,18 +12,7 @@ void HistoryManager::getLongTerm()
         return;
     }
 
-    std::string strSH = pLongTerm->get(key);
-
-    if(!strSH.empty())
-    {
-        std::string q = getKeywordsString(strSH);
-        if (!q.empty())
-        {
-            lock();
-            stringQuery.push_back(sphinxRequests(q,inf->range_long_term,EBranchT::T5));
-            unlock();
-        }
-    }
+    sphinx->addRequest(pLongTerm->get(key),inf->range_long_term,EBranchT::T5);
 }
 
 void *HistoryManager::getLongTermEnv(void *data)

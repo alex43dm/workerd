@@ -2,8 +2,7 @@
 #define XXXSEARCHER_H
 
 #include <vector>
-
-//#define _UNICODE
+#include <boost/regex/icu.hpp>
 #include <sphinxclient.h>
 
 #include "Offer.h"
@@ -16,20 +15,25 @@ public:
     XXXSearcher();
     ~XXXSearcher();
 
-    /** \brief Метод обработки запроса к индексу.
-     *
-     */
-    void processKeywords(const std::vector<sphinxRequests> &sr, Offer::Map &items, float teasersMaxRating);
+    void addRequest(const std::string, float,  const EBranchT);
+    void processKeywords(Offer::Map &items, float teasersMaxRating);
     void makeFilter(Offer::Map &items);
     void cleanFilter();
 
 protected:
 private:
+    pthread_mutex_t *m_pPrivate;
     sphinx_client* client;
-    void dumpResult(sphinx_result *res) const;
+    boost::u32regex replaceSymbol,replaceExtraSpace,replaceNumber;
     bool makeFilterOn;
     sphinx_int64_t *filter;
+    std::vector<sphinxRequests> stringQuery;
 
+
+    void dumpResult(sphinx_result *res) const;
+    std::string stringWrapper(const std::string &str, bool replaceNumbers = false);
+    std::string getKeywordsString(const std::string& str);
+    std::string getContextKeywordsString(const std::string& query);
 };
 
 #endif // XXXSEARCHER_H

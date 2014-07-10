@@ -9,13 +9,6 @@ static const char * EnumHistoryTypeStrings[] = {"ShortTerm", "LongTerm", "ViewHi
 
 HistoryManager::HistoryManager()
 {
-    m_pPrivate = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
-    pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init((pthread_mutex_t*)m_pPrivate, &attr);
-    pthread_mutexattr_destroy(&attr);
-
     tid = pthread_self();
 
     sphinx = new XXXSearcher();
@@ -23,8 +16,6 @@ HistoryManager::HistoryManager()
 
 HistoryManager::~HistoryManager()
 {
-    pthread_mutex_destroy((pthread_mutex_t*)m_pPrivate);
-
     delete sphinx;
 
     delete pShortTerm;
@@ -81,6 +72,8 @@ void HistoryManager::startGetUserHistory(Params *_params, Informer *inf_)
     std::string q;
     if(inf->isSearch())
     {
+        sphinx->addRequest(params->getSearch(),inf->range_search,EBranchT::T1);
+        /*
         q = getContextKeywordsString(params->getSearch());
         if (!q.empty())
         {
@@ -88,17 +81,20 @@ void HistoryManager::startGetUserHistory(Params *_params, Informer *inf_)
             stringQuery.push_back(sphinxRequests(q,inf->range_search,EBranchT::T1));
             unlock();
         }
+        */
     }
     //Запрос по контексту страницы
     if(inf->isContext())
     {
+        sphinx->addRequest(params->getContext(),inf->range_context,EBranchT::T2);
+        /*
         q = getContextKeywordsString(params->getContext());
         if (!q.empty())
         {
             lock();
             stringQuery.push_back(sphinxRequests(q,inf->range_context,EBranchT::T2));
             unlock();
-        }
+        }*/
     }
 
     if(inf->isLongTerm())
@@ -132,7 +128,7 @@ void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
         getLongTermAsyncWait();
     }
 
-    sphinx->processKeywords(stringQuery, items, teasersMaxRating);
+    sphinx->processKeywords(items, teasersMaxRating);
 }
 
 
@@ -199,7 +195,7 @@ bool HistoryManager::updateUserHistory(
         mtailOffers.clear();
     }
 
-    stringQuery.clear();
+    //stringQuery.clear();
 
     sphinx->cleanFilter();
 
@@ -259,15 +255,6 @@ boost::int64_t HistoryManager::currentDateToInt()
 }
 
 //------------------------------------------sync functions----------------------------------------
-void HistoryManager::lock()
-{
-    pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
-}
-
-void HistoryManager::unlock()
-{
-    pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
-}
 /** \brief  Возвращает статус подключения к одной из баз данных Redis.
 
 	\param t     		тип базы данных </BR>
