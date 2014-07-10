@@ -441,9 +441,9 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
                 res += " |" + col + " " + *p;
             }
         }
-    }
 
-    pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
-    stringQuery.push_back(sphinxRequests(req, rate, br));
-    pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
+        pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
+        stringQuery.push_back(sphinxRequests(res, rate, br));
+        pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
+    }
 }
