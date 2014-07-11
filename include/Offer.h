@@ -41,10 +41,10 @@ public:
     EBranchL branch;			///< ветка алгоритма по которой было выбрано РП
     std::string matching;       ///< Фраза соответствия
     float rating;				///< рейтинг РП
-    bool isOnClick;
     int uniqueHits;		///< максимальное количество показов одному пользователю
     unsigned height;					///< высота РП (имеет значение для баннеров)
     unsigned width;					///< ширина РП (имеет значение для баннеров)
+    bool isOnClick;
     bool social;
     std::string campaign_guid;
     unsigned unique_by_campaign;
@@ -64,13 +64,13 @@ public:
           const std::string &url,
           const std::string &image_url,
           const std::string &swf,
-//          bool isOnClick,
           long long campaign_id,
           int type,
           float rating,
           int uniqueHits,
           int height,
           int width,
+          bool isOnClick,
           bool social,
           std::string campaign_guid,
           int unique_by_campaign,

@@ -58,9 +58,10 @@ void HistoryManager::getRetargeting()
                                    pStmt->GetColumnBool(10),    //uniqueHits
                                    pStmt->GetColumnInt(11),     //height
                                    pStmt->GetColumnInt(12),     //width
-                                   pStmt->GetColumnBool(13),    //social
-                                   pStmt->GetColumnString(14),  //campaign_guid
-                                   pStmt->GetColumnInt(15),      //offer_by_campaign_unique
+                                   pStmt->GetColumnBool(13),    //isOnClick
+                                   pStmt->GetColumnBool(14),    //social
+                                   pStmt->GetColumnString(15),  //campaign_guid
+                                   pStmt->GetColumnInt(16),      //offer_by_campaign_unique
                                    true
                                   );
 

@@ -14,6 +14,7 @@ END AS rating,
 ofrs.uniqueHits,
 ofrs.height,
 ofrs.width,
+ofrs.isOnClick,
 ca.social,
 ca.guid AS campaign_guid,
 ca.offer_by_campaign_unique

@@ -198,7 +198,7 @@ void Core::ProcessSaveResults()
                                         append("social", (*i)->social).
                                         append("token", (*i)->token).
                                         append("type", Offer::typeToString((*i)->type)).
-                                        append("isOnClick", true).//(*i)->isOnClick).
+                                        append("isOnClick", (*i)->isOnClick).
                                         append("campaignId", c->guid).
                                         append("campaignId_int", (unsigned int)(*i)->campaign_id).
                                         append("campaignTitle", c->title).
