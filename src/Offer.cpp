@@ -7,42 +7,38 @@
 Offer::Offer(const std::string &id,
              long long id_int,
              const std::string &title,
-             const std::string &price,
              const std::string &description,
              const std::string &url,
              const std::string &image_url,
              const std::string &swf,
              long long campaign_id,
-             bool isOnClick,
              int type_int,
              float rating,
-             bool retargeting,
              int uniqueHits,
              int height,
              int width,
              bool social,
              std::string campaign_guid,
-             int unique_by_campaign):
+             int unique_by_campaign,
+             bool retargeting):
     id(id),
     id_int(id_int),
     title(title),
-    price(price),
     description(description),
     url(url),
     image_url(image_url),
     swf(swf),
     campaign_id(campaign_id),
-    isOnClick(isOnClick),
     type(typeFromInt(type_int)),
     branch(EBranchL::L30),
     rating(rating),
-    retargeting(retargeting),
     uniqueHits(uniqueHits),
     height(height),
     width(width),
     social(social),
     campaign_guid(campaign_guid),
-    unique_by_campaign((unsigned)unique_by_campaign)
+    unique_by_campaign((unsigned)unique_by_campaign),
+    retargeting(retargeting)
 {
 }
 
@@ -60,7 +56,7 @@ std::string Offer::toJson() const
          "\t\"guid\": \"" << id << "\",\n" <<
          "\t\"title\": \"" << Json::Utils::Escape(title) << "\",\n" <<
          "\t\"description\": \"" << Json::Utils::Escape(description) << "\",\n" <<
-         "\t\"price\": \"" << Json::Utils::Escape(price) << "\",\n" <<
+         "\t\"price\": \"\",\n" <<
          "\t\"image\": \"" << Json::Utils::Escape(image_url) << "\",\n" <<
          "\t\"swf\": \"" << Json::Utils::Escape(swf) << "\",\n" <<
          "\t\"url\": \"" << Json::Utils::Escape(redirect_url) << "\",\n" <<

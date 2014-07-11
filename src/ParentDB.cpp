@@ -150,23 +150,14 @@ void ParentDB::OfferLoad(mongo::Query q_correct)
     if(!fConnectedToMainDatabase)
         return;
 
-    //mongo::DB db;
     Kompex::SQLiteStatement *pStmt;
-    char *pData;
-    int sz, i = 0;
-    int skipped = 0;
+    int i = 0,
+    skipped = 0;
 
     auto cursor = monga_main->query(cfg->mongo_main_db_ + ".offer", q_correct);
 
     pStmt = new Kompex::SQLiteStatement(pdb);
 
-
-    bzero(buf,sizeof(buf));
-    snprintf(buf,sizeof(buf),"INSERT OR REPLACE INTO %s(id,guid,campaignId,categoryId,accountId,rating,retargeting,image,height,width,isOnClick,cost\
-             ,uniqueHits,swf,description,price,url,title,type,valid) VALUES(");
-    sz = strlen(buf);
-    pData = buf + sz;
-    sz = sizeof(buf) - sz;
 
     pStmt->BeginTransaction();
     while (cursor->more())
@@ -192,30 +183,27 @@ void ParentDB::OfferLoad(mongo::Query q_correct)
 
         bool isRet = x.getBoolField("retargeting") ? 1 : 0;
 
-        bzero(pData,sz);
-        sqlite3_snprintf(sz,pData,
-                         "%lli,'%q',%lli,%lli,'%q',%f,%d,'%q',%d,%d,%d,%f,%d,'%q','%q','%q','%q','%q',%d,%d);",
-                         isRet ? "OfferR" : "Offer"
+        bzero(buf,sizeof(buf));
+        sqlite3_snprintf(sizeof(buf),buf,"INSERT OR REPLACE INTO Offer%s\
+                         (id,guid,campaignId,categoryId,rating,\
+                         image,height,width,isOnClick,uniqueHits,swf,description,url,title,type) \
+                         VALUES(%llu,'%q',%llu,%llu,%f,'%q',%d,%d,%d,%d,'%q','%q','%q','%q');",
+                         isRet ? "R" : "",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getField("campaignId_int").numberLong(),
                          x.getField("category").numberLong(),
-                         x.getStringField("accountId"),
                          x.getField("full_rating").numberDouble(),
-                         isRet,
                          x.getStringField("image"),
                          x.getIntField("height"),
                          x.getIntField("width"),
                          x.getBoolField("isOnClick") ? 1 : 0,
-                         x.getField("cost").numberDouble(),
                          x.getIntField("uniqueHits"),
                          swf.c_str(),
                          x.getStringField("description"),
-                         x.getStringField("price"),
                          x.getStringField("url"),
                          x.getStringField("title"),
-                         Offer::typeFromString(x.getStringField("type")),
-                         1
+                         Offer::typeFromString(x.getStringField("type"))
                         );
 
         try

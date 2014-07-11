@@ -116,25 +116,23 @@ bool Core_DataBase::getOffers(Offer::Map &items,unsigned long long sessionId)
                 continue;
             }
 
-            Offer *off = new Offer(pStmt->GetColumnString(1),
-                                   pStmt->GetColumnInt64(0),
-                                   pStmt->GetColumnString(2),
-                                   pStmt->GetColumnString(3),
-                                   pStmt->GetColumnString(4),
-                                   pStmt->GetColumnString(5),
-                                   pStmt->GetColumnString(6),
-                                   pStmt->GetColumnString(7),
-                                   pStmt->GetColumnInt64(8),
-                                   pStmt->GetColumnBool(9),
-                                   pStmt->GetColumnInt(10),
-                                   pStmt->GetColumnDouble(11),
-                                   pStmt->GetColumnBool(12),
-                                   pStmt->GetColumnInt(13),
-                                   pStmt->GetColumnInt(14),
-                                   pStmt->GetColumnInt(15),
-                                   pStmt->GetColumnBool(16),
-                                   pStmt->GetColumnString(17),
-                                   pStmt->GetColumnInt(18)
+            Offer *off = new Offer(pStmt->GetColumnString(1),     //guid
+                                   pStmt->GetColumnInt64(0),    //id
+                                   pStmt->GetColumnString(2),   //title
+                                   pStmt->GetColumnString(3),   //description
+                                   pStmt->GetColumnString(4),   //url
+                                   pStmt->GetColumnString(5),   //image
+                                   pStmt->GetColumnString(6),   //swf
+                                   pStmt->GetColumnInt64(7),    //campaignId
+                                   pStmt->GetColumnInt(8),      //type
+                                   pStmt->GetColumnDouble(9),   //rating
+                                   pStmt->GetColumnBool(10),    //uniqueHits
+                                   pStmt->GetColumnInt(11),     //height
+                                   pStmt->GetColumnInt(12),     //width
+                                   pStmt->GetColumnBool(13),    //social
+                                   pStmt->GetColumnString(14),  //campaign_guid
+                                   pStmt->GetColumnInt(15),      //offer_by_campaign_unique
+                                   false
                                   );
 
             if(!off->social)

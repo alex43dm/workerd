@@ -30,25 +30,25 @@ public:
     std::string id;             ///< ID предложения
     unsigned long long id_int;                 ///< ID предложения
     std::string title;          ///< Заголовок
-    std::string price;          ///< Цена
     std::string description;    ///< Описание
     std::string url;            ///< URL перехода на предложение
     std::string image_url;      ///< URL картинки
     std::string swf;            ///< URL Flash
     unsigned long long campaign_id;    ///< ID кампании, к которой относится предложение
-    bool isOnClick;             ///< Реклама по кликам или показам
+//    bool isOnClick;             ///< Реклама по кликам или показам
     Type type;			///< тип РП
-    std::string conformity;		///< тип соответствия РП и запроса, изменяеться после выбора РП из индекса
+//    std::string conformity;		///< тип соответствия РП и запроса, изменяеться после выбора РП из индекса
     EBranchL branch;			///< ветка алгоритма по которой было выбрано РП
     std::string matching;       ///< Фраза соответствия
     float rating;				///< рейтинг РП
-    bool retargeting;
+    bool isOnClick;
     int uniqueHits;		///< максимальное количество показов одному пользователю
     unsigned height;					///< высота РП (имеет значение для баннеров)
     unsigned width;					///< ширина РП (имеет значение для баннеров)
     bool social;
     std::string campaign_guid;
     unsigned unique_by_campaign;
+    bool retargeting;
 
     long long int token_int;
     std::string token;          ///< Токен для проверки ссылки
@@ -60,22 +60,21 @@ public:
     Offer(const std::string &id,
           long long id_int,
           const std::string &title,
-          const std::string &price,
           const std::string &description,
           const std::string &url,
           const std::string &image_url,
           const std::string &swf,
+//          bool isOnClick,
           long long campaign_id,
-          bool isOnClick,
           int type,
           float rating,
-          bool retargeting,
           int uniqueHits,
           int height,
           int width,
           bool social,
           std::string campaign_guid,
-          int unique_by_campaign);
+          int unique_by_campaign,
+          bool retargeting);
 
     virtual ~Offer();
 
