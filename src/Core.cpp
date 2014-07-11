@@ -61,6 +61,8 @@ std::string Core::Process(Params *prms)
     //get campaign list
     getCampaign();
 
+    endCampaignTime = boost::posix_time::microsec_clock::local_time();
+
     getOffers(items, params->getUserKeyLong());
 
     //process history
@@ -148,6 +150,11 @@ void Core::log()
             <<" branch:"<<(*it)->getBranch();
         }
         std::clog<<"]";
+    }
+
+    if(cfg->logCoreTime)
+    {
+        std::clog<<" camp time:"<< boost::posix_time::to_simple_string(endCampaignTime - startCoreTime)
     }
 }
 //-------------------------------------------------------------------------------------------------------------------

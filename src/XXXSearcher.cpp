@@ -180,7 +180,7 @@ void XXXSearcher::processKeywords(
     }
     catch (std::exception const &ex)
     {
-        std::clog<<"Непонятная sphinx ошибка: "<<typeid(ex).name()<<" "<<ex.what()<<" "<<sphinx_error(client);
+        std::clog<<"sphinx: error: "<<typeid(ex).name()<<" "<<ex.what()<<" "<<sphinx_error(client);
     }
 
     return;
@@ -192,14 +192,14 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
     unsigned int * mva;
 
     std::clog<<"sphinx: total: "<< res->total
-    <<" total_found: "<<res->total_found
-    <<" num_matches: "<<res->num_matches
+    <<" found: "<<res->total_found
+    <<" match: "<<res->num_matches
     <<std::endl;
 
     for (i=0; i<res->num_words; i++ )
-        std::clog<<"sphinx: query stats: "<<res->words[i].word
+        std::clog<<"sphinx: query: "<<res->words[i].word
         <<" found "<<res->words[i].hits
-        <<" times in "<<res->words[i].docs<<" documents"<<std::endl;
+        <<" times in "<<res->words[i].docs<<" docs"<<std::endl;
 
     for( i=0; i<res->num_matches; i++ )
     {

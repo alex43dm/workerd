@@ -32,7 +32,7 @@ public:
 private:
     boost::posix_time::ptime
     ///start and ent time core process
-    startCoreTime, endCoreTime;
+    startCoreTime, endCoreTime, endCampaignTime;
     ///core thread id
     pthread_t tid;
     ///parameters to process: from http GET
