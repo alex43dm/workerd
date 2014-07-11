@@ -35,7 +35,7 @@ boost_regex
 Build
 -------------------------------
 $libtoolize --install --copy --force --automake
-$aclocal -I config/m4
+$aclocal -I m4
 $autoconf
 $autoheader
 $automake --add-missing --copy --foreign --force-missing
