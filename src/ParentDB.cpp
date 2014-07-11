@@ -184,10 +184,10 @@ void ParentDB::OfferLoad(mongo::Query q_correct)
         bool isRet = x.getBoolField("retargeting") ? 1 : 0;
 
         bzero(buf,sizeof(buf));
-        sqlite3_snprintf(sizeof(buf),buf,"INSERT OR REPLACE INTO Offer%s\
-                         (id,guid,campaignId,categoryId,rating,\
-                         image,height,width,isOnClick,uniqueHits,swf,description,url,title,type) \
-                         VALUES(%llu,'%q',%llu,%llu,%f,'%q',%d,%d,%d,%d,'%q','%q','%q','%q');",
+        sqlite3_snprintf(sizeof(buf),buf,
+"INSERT OR REPLACE INTO Offer%s\
+(id,guid,campaignId,categoryId,rating,image,height,width,isOnClick,uniqueHits,swf,description,url,title,type) \
+VALUES(%llu,'%q',%llu,%llu,%f,'%q',%d,%d,%d,%d,'%q','%q','%q','%q',%d);",
                          isRet ? "R" : "",
                          x.getField("guid_int").numberLong(),
                          id.c_str(),

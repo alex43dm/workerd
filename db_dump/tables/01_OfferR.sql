@@ -22,6 +22,6 @@ FOREIGN KEY(campaignId) REFERENCES Campaign(id),
 FOREIGN KEY(categoryId) REFERENCES Category(id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_OfferR_id ON Offer (id);
-CREATE INDEX IF NOT EXISTS idx_OfferR_valid ON Offer (valid) WHERE valid=1;
-CREATE INDEX IF NOT EXISTS idx_OfferR_id_valid_camp ON Offer (id,valid,campaignId) WHERE valid=1;
+CREATE INDEX IF NOT EXISTS idx_OfferR_id ON OfferR (id);
+CREATE INDEX IF NOT EXISTS idx_OfferR_valid ON OfferR (valid) WHERE valid=1;
+CREATE INDEX IF NOT EXISTS idx_OfferR_id_valid_camp ON OfferR (id,valid,campaignId) WHERE valid=1;
