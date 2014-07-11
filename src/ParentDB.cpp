@@ -755,7 +755,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
 
     cursor = monga_main->query(cfg->mongo_main_db_ +".campaign", query);
 
-    pStmt->BeginTransaction();
+//    pStmt->BeginTransaction();
     while (cursor->more())
     {
         mongo::BSONObj x = cursor->next();
@@ -1467,21 +1467,30 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
         {
             logDb(ex);
         }
+
+    }//while
+/*
+    try
+    {
+        pStmt->CommitTransaction();
     }
+    catch(Kompex::SQLiteException &ex)
+    {
+        logDb(ex);
+    }
+*/
 
     sqlite3_snprintf(sizeof(buf),buf,"REINDEX Campaign;");
 
     try
     {
         pStmt->SqlStatement(buf);
+        pStmt->FreeQuery();
     }
     catch(Kompex::SQLiteException &ex)
     {
         logDb(ex);
     }
-
-    pStmt->CommitTransaction();
-    pStmt->FreeQuery();
 
 
     delete pStmt;
