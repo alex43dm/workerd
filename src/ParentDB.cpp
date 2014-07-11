@@ -162,7 +162,7 @@ void ParentDB::OfferLoad(mongo::Query q_correct)
 
 
     bzero(buf,sizeof(buf));
-    snprintf(buf,sizeof(buf),"INSERT OR REPLACE INTO Offer(id,guid,campaignId,categoryId,accountId,rating,retargeting,image,height,width,isOnClick,cost\
+    snprintf(buf,sizeof(buf),"INSERT OR REPLACE INTO %s(id,guid,campaignId,categoryId,accountId,rating,retargeting,image,height,width,isOnClick,cost\
              ,uniqueHits,swf,description,price,url,title,type,valid) VALUES(");
     sz = strlen(buf);
     pData = buf + sz;
@@ -190,16 +190,19 @@ void ParentDB::OfferLoad(mongo::Query q_correct)
             }
         }
 
+        bool isRet = x.getBoolField("retargeting") ? 1 : 0;
+
         bzero(pData,sz);
         sqlite3_snprintf(sz,pData,
                          "%lli,'%q',%lli,%lli,'%q',%f,%d,'%q',%d,%d,%d,%f,%d,'%q','%q','%q','%q','%q',%d,%d);",
+                         isRet ? "OfferR" : "Offer"
                          x.getField("guid_int").numberLong(),
                          id.c_str(),
                          x.getField("campaignId_int").numberLong(),
                          x.getField("category").numberLong(),
                          x.getStringField("accountId"),
                          x.getField("full_rating").numberDouble(),
-                         x.getBoolField("retargeting") ? 1 : 0,
+                         isRet,
                          x.getStringField("image"),
                          x.getIntField("height"),
                          x.getIntField("width"),

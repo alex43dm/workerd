@@ -20,7 +20,7 @@ ofrs.width,
 ca.social,
 ca.guid,
 ca.offer_by_campaign_unique
-FROM Offer AS ofrs INDEXED BY idx_Offer_id
+FROM OfferR AS ofrs INDEXED BY idx_OfferR_id
 INNER JOIN Campaign AS ca INDEXED BY idx_Campaign_id ON ca.valid=1 AND ca.retargeting=1 AND ofrs.campaignId=ca.id
 LEFT JOIN Session AS ses INDEXED BY idx_Session_id_offerId ON ofrs.id=ses.offerId
     AND ses.id=%llu AND ses.tail=0
