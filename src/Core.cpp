@@ -154,7 +154,7 @@ void Core::log()
 
     if(cfg->logCoreTime)
     {
-        std::clog<<" camp time:"<< boost::posix_time::to_simple_string(endCampaignTime - startCoreTime)
+        std::clog<<" camp time:"<< boost::posix_time::to_simple_string(endCampaignTime - startCoreTime);
     }
 }
 //-------------------------------------------------------------------------------------------------------------------
