@@ -21,10 +21,9 @@ url VARCHAR(2048),
 title  VARCHAR(70),
 valid SMALLINT DEFAULT 1,
 UNIQUE (id) ON CONFLICT IGNORE,
-UNIQUE (guid) ON CONFLICT IGNORE
+UNIQUE (guid) ON CONFLICT IGNORE,
 FOREIGN KEY(campaignId) REFERENCES Campaign(id),
 FOREIGN KEY(categoryId) REFERENCES Category(id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_Offer_id ON Offer (id);
-CREATE INDEX IF NOT EXISTS idx_Offer_valid ON Offer (valid) WHERE valid=1;
+CREATE INDEX IF NOT EXISTS idx_Offer_id ON Offer (id,valid,campaignId) WHERE valid=1;

@@ -20,8 +20,8 @@ ofrs.width,
 ca.social,
 ca.guid,
 ca.offer_by_campaign_unique
-FROM Offer AS ofrs
-INNER JOIN Campaign AS ca ON ofrs.campaignId=ca.id
+FROM Offer AS ofrs INDEXED BY idx_Offer_id
+INNER JOIN Campaign AS ca INDEXED BY idx_Campaign_id ON ofrs.campaignId=ca.id
 INNER JOIN %s AS cn ON ca.id=cn.id
 LEFT JOIN Session AS ses INDEXED BY idx_Session_id_offerId ON ofrs.id=ses.offerId AND ses.id=%llu AND ses.tail=0
 LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=%lld AND ofrs.id=iret.id_ofr
