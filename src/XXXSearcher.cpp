@@ -60,7 +60,7 @@ XXXSearcher::XXXSearcher()
     sphinx_set_match_mode(client,map_sph_match[cfg->shpinx_match_mode_]);
     sphinx_set_ranking_mode(client, map_sph_rank[cfg->shpinx_rank_mode_], NULL);
     sphinx_set_sort_mode(client, map_sph_sort[cfg->shpinx_sort_mode_], NULL);
-//   sphinx_set_limits(client, 0, 800, 800, 800);
+    sphinx_set_limits(client, 0, 800, 800, 800);
 
     sphinx_set_field_weights( client,
                               cfg->sphinx_field_len_,
@@ -135,6 +135,7 @@ void XXXSearcher::processKeywords(
                     dumpResult(res);
                 }
 
+                //process matches
                 for( int i=0; i<res->num_matches; i++ )
                 {
                     if (res->num_attrs < 1)
@@ -174,11 +175,11 @@ void XXXSearcher::processKeywords(
                                  <<" branch: "<<pOffer->getBranch()
                                  <<std::endl;
                     }
-                }
-            }
+                }//process matches
+            }//process sphinx results
 
             sphinx_cleanup( client );
-        }
+        }//Создаем запросы
     }
     catch (std::exception const &ex)
     {
@@ -325,12 +326,7 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
                 res += " | @" + col + " " + *p;
             }
         }
-/*
-        if((*it).query.find("minus") != std::string::npos)
-        {
-            (*it).rate = -(*it).rate;
-        }
-*/
+
         pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
         stringQuery.push_back(sphinxRequests(res, rate * cfg->sphinx_field_weights_[i]/100, br));
         pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
