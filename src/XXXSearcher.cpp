@@ -178,9 +178,6 @@ void XXXSearcher::processKeywords(
                 }
             }//process matches
         }//process sphinx results
-
-        sphinx_cleanup( client );
-        //}//Создаем запросы
     }
     catch (std::exception const &ex)
     {
@@ -207,11 +204,17 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
 
     for( i=0; i<res->num_matches; i++ )
     {
-        std::clog<<"sphinx:  matches:#"<<1+i
+        std::clog<<"sphinx: matches:#"<<1+i
                  <<" doc_id="<<(int)sphinx_get_id ( res, i )
-                 <<", weight="<<sphinx_get_weight ( res, i )
-                 <<" by: ";
+                 <<", weight="<<sphinx_get_weight ( res, i );
 
+        std::clog<<" fields: ";
+        for( j=0; j<res->num_fields; j++ )
+        {
+            std::clog<<res->fields[j]<<" ";
+        }
+
+        std::clog<<" attrs: ";
         for( j=0; j<res->num_attrs; j++ )
         {
             if(res->attr_types[j] == SPH_ATTR_STRING)
@@ -291,6 +294,8 @@ void XXXSearcher::cleanFilter()
     }
 
     stringQuery.clear();
+
+    sphinx_cleanup( client );
 }
 
 void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT br)
