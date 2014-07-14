@@ -326,7 +326,7 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
     }
 
     pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
-    stringQuery.push_back(sphinxRequests(res +" "+words, rate , br));
+    stringQuery.push_back(sphinxRequests(res+words, rate , br));
     pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
 }
 
