@@ -155,11 +155,6 @@ void XXXSearcher::processKeywords(
 
                     float weight = sphinx_get_weight (res, i ) / 1000;
 
-                    if((*it).query.find("minus") != std::string::npos)
-                    {
-                        (*it).rate = -(*it).rate;
-                    }
-
                     oldRating = pOffer->rating;
                     pOffer->rating = pOffer->rating
                                      + (*it).rate * (teasersMaxRating + weight);
@@ -330,9 +325,14 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
                 res += " | @" + col + " " + *p;
             }
         }
-
+/*
+        if((*it).query.find("minus") != std::string::npos)
+        {
+            (*it).rate = -(*it).rate;
+        }
+*/
         pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
-        stringQuery.push_back(sphinxRequests(res, rate, br));
+        stringQuery.push_back(sphinxRequests(res, rate * cfg->sphinx_field_weights_[i]/100, br));
         pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
     }
 }
