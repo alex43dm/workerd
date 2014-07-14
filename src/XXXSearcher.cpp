@@ -207,13 +207,13 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
         std::clog<<"sphinx: matches:#"<<1+i
                  <<" doc_id="<<(int)sphinx_get_id ( res, i )
                  <<", weight="<<sphinx_get_weight ( res, i );
-
+/*
         std::clog<<" fields: ";
         for( j=0; j<res->num_fields; j++ )
         {
             std::clog<<res->fields[j]<<" ";
         }
-
+*/
         std::clog<<" attrs: ";
         for( j=0; j<res->num_attrs; j++ )
         {
@@ -317,29 +317,27 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
     for(int i=1; i<cfg->sphinx_field_len_; i++)
     {
         res += "," + std::string(cfg->sphinx_field_names_[i]);
-
     }
     res += ") ";
 
+    std::string words;
     std::vector<std::string> vStr;
-
     boost::split(vStr,q,boost::is_any_of("\t "),boost::token_compress_on);
-
-
     for(auto p=vStr.begin(); p != vStr.end(); ++p)
     {
         if(p == vStr.begin())
         {
-            res += *p;
+            words += *p;
         }
         else
         {
-            res += " | " + *p;
+            words += " | " + *p;
         }
     }
 
     pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
-    stringQuery.push_back(sphinxRequests(res, rate , br));
+    stringQuery.push_back(sphinxRequests(res +" "+words, rate , br));
+    stringQuery.push_back(sphinxRequests("@minuswords "+words, -rate , br));
     pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
 }
 
