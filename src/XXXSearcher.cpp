@@ -130,7 +130,7 @@ void XXXSearcher::processKeywords(
 
                 if(cfg->logSphinx)
                 {
-                    std::clog<<"sphinx: request #"<<tt<<" by: "<<stringQuery[tt].getBranchName()<<" query: "<<stringQuery[tt].query<<std::endl;
+                    std::clog<<"sphinx: request by: "<<(*it).getBranchName()<<" query: "<<(*it).query<<std::endl;
 
                     dumpResult(res);
                 }
