@@ -214,19 +214,9 @@ void XXXSearcher::dumpResult(sphinx_result *res) const
             std::clog<<res->fields[j]<<" ";
         }
 */
-        std::clog<<" attrs: ";
+        std::clog<<" attrs:";
         for( j=0; j<res->num_attrs; j++ )
         {
-            if(res->attr_types[j] == SPH_ATTR_STRING)
-            {
-                std::string mstring = sphinx_get_string(res,i,j);
-                if(!mstring.empty() && mstring.size()>1)
-                {
-                    std::clog<<" "<<res->attr_names[j]<<"="<<mstring;
-                    continue;
-                }
-            }
-
             std::clog<<" "<<res->attr_names[j]<<"=";
 
             switch ( res->attr_types[j] )
@@ -331,13 +321,12 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
         }
         else
         {
-            words += " | " + *p;
+            words += "|" + *p;
         }
     }
 
     pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
     stringQuery.push_back(sphinxRequests(res +" "+words, rate , br));
-    stringQuery.push_back(sphinxRequests("@minuswords "+words, -rate , br));
     pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
 }
 
