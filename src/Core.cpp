@@ -368,7 +368,7 @@ void Core::RISAlgorithm(const Offer::Map &items)
         if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            if((*p).second->branch !=  EBranchL::L30) (*p).second->branch = EBranchL::L2;
+            if((*p).second->branch ==  EBranchL::L30) (*p).second->branch = EBranchL::L2;
             vResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
