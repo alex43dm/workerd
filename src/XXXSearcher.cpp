@@ -105,81 +105,81 @@ void XXXSearcher::processKeywords(
         for (auto it = stringQuery.begin(); it != stringQuery.end(); ++it)
         {
             sphinx_add_query( client, (*it).query.c_str(), cfg->sphinx_index_.c_str(), NULL );
+        }
+        res = sphinx_run_queries(client);
+        if(!res)
+        {
+            std::clog<<__func__<<": unligal sphinx result: "<<sphinx_error(client)<<std::endl;
+            continue;
+        }
 
-            res = sphinx_run_queries(client);
-            if(!res)
+        //process sphinx results
+        int numRes = sphinx_get_num_results(client);
+        for (int tt=0; tt < numRes; tt++, res++)
+        {
+            if (res->status == SEARCHD_ERROR)
             {
-                std::clog<<__func__<<": unligal sphinx result: "<<sphinx_error(client)<<std::endl;
+                std::clog<<__func__<<": SEARCHD_ERROR: "<<res->error<<std::endl;
                 continue;
             }
 
-            //process sphinx results
-            int numRes = sphinx_get_num_results(client);
-            for (int tt=0; tt < numRes; tt++, res++)
+            if(res->status == SEARCHD_WARNING)
             {
-                if (res->status == SEARCHD_ERROR)
+                std::clog<<__func__<<": SEARCHD_WARNING: "<<res->warning<<std::endl;
+            }
+
+            if(cfg->logSphinx)
+            {
+                std::clog<<"sphinx: request by: "<<(*it).getBranchName()<<" query: "<<(*it).query<<std::endl;
+
+                dumpResult(res);
+            }
+
+            //process matches
+            for( int i=0; i<res->num_matches; i++ )
+            {
+                if (res->num_attrs < 1)
                 {
-                    std::clog<<__func__<<": SEARCHD_ERROR: "<<res->error<<std::endl;
+                    std::clog<<"num_attrs: "<<res->num_attrs<<std::endl;
                     continue;
                 }
 
-                if(res->status == SEARCHD_WARNING)
+                unsigned long long id = sphinx_get_int(res, i, 0);
+
+                if(items.count(id) == 0)
                 {
-                    std::clog<<__func__<<": SEARCHD_WARNING: "<<res->warning<<std::endl;
+                    std::clog<<__func__<<": not found in items: "<<id<<std::endl;
+                    continue;
                 }
+
+                Offer *pOffer = items[id];
+
+                float weight = sphinx_get_weight (res, i ) / 1000;
+
+                oldRating = pOffer->rating;
+                pOffer->rating = pOffer->rating
+                                 + (*it).rate * (teasersMaxRating + weight);
+
+                //+ sphinx_get_float(res, i, 1);
+
+                for (int i=0; i<res->num_words; i++ )
+                    pOffer->matching += " " + std::string(res->words[i].word);
+
+                pOffer->setBranch((*it).branches);
 
                 if(cfg->logSphinx)
                 {
-                    std::clog<<"sphinx: request by: "<<(*it).getBranchName()<<" query: "<<(*it).query<<std::endl;
-
-                    dumpResult(res);
+                    std::clog<<"sphinx: offer id: "<<pOffer->id_int
+                             <<" old rating: "<<oldRating
+                             <<" new: "<< pOffer->rating
+                             <<" branch: "<<pOffer->getBranch()
+                             <<std::endl;
                 }
+            }//process matches
+        }//process sphinx results
 
-                //process matches
-                for( int i=0; i<res->num_matches; i++ )
-                {
-                    if (res->num_attrs < 1)
-                    {
-                        std::clog<<"num_attrs: "<<res->num_attrs<<std::endl;
-                        continue;
-                    }
-
-                    unsigned long long id = sphinx_get_int(res, i, 0);
-
-                    if(items.count(id) == 0)
-                    {
-                        std::clog<<__func__<<": not found in items: "<<id<<std::endl;
-                        continue;
-                    }
-
-                    Offer *pOffer = items[id];
-
-                    float weight = sphinx_get_weight (res, i ) / 1000;
-
-                    oldRating = pOffer->rating;
-                    pOffer->rating = pOffer->rating
-                                     + (*it).rate * (teasersMaxRating + weight);
-
-                    //+ sphinx_get_float(res, i, 1);
-
-                    for (int i=0; i<res->num_words; i++ )
-                        pOffer->matching += " " + std::string(res->words[i].word);
-
-                    pOffer->setBranch((*it).branches);
-
-                    if(cfg->logSphinx)
-                    {
-                        std::clog<<"sphinx: offer id: "<<pOffer->id_int
-                                 <<" old rating: "<<oldRating
-                                 <<" new: "<< pOffer->rating
-                                 <<" branch: "<<pOffer->getBranch()
-                                 <<std::endl;
-                    }
-                }//process matches
-            }//process sphinx results
-
-            sphinx_cleanup( client );
-        }//Создаем запросы
+        sphinx_cleanup( client );
+        //}//Создаем запросы
     }
     catch (std::exception const &ex)
     {
@@ -306,30 +306,34 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
         return;
     }
 
+    res = "@("+std::string(cfg->sphinx_field_names_[0]);
+    for(int i=1; i<cfg->sphinx_field_len_; i++)
+    {
+        res += "," + std::string(cfg->sphinx_field_names_[i]);
+
+    }
+    res += ") ";
+
     std::vector<std::string> vStr;
     std::string res, col;
 
     boost::split(vStr,q,boost::is_any_of("\t "),boost::token_compress_on);
 
-    for(int i=0; i<cfg->sphinx_field_len_; i++)
+
+    for(auto p=vStr.begin(); p != vStr.end(); ++p)
     {
-        col = std::string(cfg->sphinx_field_names_[i]);
-
-        for(auto p=vStr.begin(); p != vStr.end(); ++p)
+        if(p == vStr.begin())
         {
-            if(p == vStr.begin())
-            {
-                res = "@" + col + " " + *p;
-            }
-            else
-            {
-                res += " | @" + col + " " + *p;
-            }
+            res += *p;
         }
-
-        pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
-        stringQuery.push_back(sphinxRequests(res, rate * cfg->sphinx_field_weights_[i]/100, br));
-        pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
+        else
+        {
+            res += " | " + *p;
+        }
     }
+
+    pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
+    stringQuery.push_back(sphinxRequests(res, rate * cfg->sphinx_field_weights_[i]/100, br));
+    pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
 }
 
