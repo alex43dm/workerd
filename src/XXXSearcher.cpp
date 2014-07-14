@@ -106,11 +106,12 @@ void XXXSearcher::processKeywords(
         {
             sphinx_add_query( client, (*it).query.c_str(), cfg->sphinx_index_.c_str(), NULL );
         }
+
         res = sphinx_run_queries(client);
         if(!res)
         {
             std::clog<<__func__<<": unligal sphinx result: "<<sphinx_error(client)<<std::endl;
-            continue;
+            return;
         }
 
         //process sphinx results
@@ -130,7 +131,7 @@ void XXXSearcher::processKeywords(
 
             if(cfg->logSphinx)
             {
-                std::clog<<"sphinx: request by: "<<(*it).getBranchName()<<" query: "<<(*it).query<<std::endl;
+                std::clog<<"sphinx: request "<<tt<<" by: "<<stringQuery[tt].getBranchName()<<" query: "<<stringQuery[tt].query<<std::endl;
 
                 dumpResult(res);
             }
@@ -158,14 +159,14 @@ void XXXSearcher::processKeywords(
 
                 oldRating = pOffer->rating;
                 pOffer->rating = pOffer->rating
-                                 + (*it).rate * (teasersMaxRating + weight);
+                                 + stringQuery[tt].rate * (teasersMaxRating + weight);
 
                 //+ sphinx_get_float(res, i, 1);
 
                 for (int i=0; i<res->num_words; i++ )
                     pOffer->matching += " " + std::string(res->words[i].word);
 
-                pOffer->setBranch((*it).branches);
+                pOffer->setBranch(stringQuery[tt].branches);
 
                 if(cfg->logSphinx)
                 {
@@ -306,6 +307,7 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
         return;
     }
 
+    std::string res;
     res = "@("+std::string(cfg->sphinx_field_names_[0]);
     for(int i=1; i<cfg->sphinx_field_len_; i++)
     {
@@ -315,7 +317,6 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
     res += ") ";
 
     std::vector<std::string> vStr;
-    std::string res, col;
 
     boost::split(vStr,q,boost::is_any_of("\t "),boost::token_compress_on);
 
@@ -333,7 +334,7 @@ void XXXSearcher::addRequest(const std::string req, float rate, const EBranchT b
     }
 
     pthread_mutex_lock((pthread_mutex_t*)m_pPrivate);
-    stringQuery.push_back(sphinxRequests(res, rate * cfg->sphinx_field_weights_[i]/100, br));
+    stringQuery.push_back(sphinxRequests(res, rate , br));
     pthread_mutex_unlock((pthread_mutex_t*)m_pPrivate);
 }
 
