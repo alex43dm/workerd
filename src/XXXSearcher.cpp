@@ -155,16 +155,21 @@ void XXXSearcher::processKeywords(
 
                     float weight = sphinx_get_weight (res, i ) / 1000;
 
+                    if((*it).query.find("minus") != std::string::npos)
+                    {
+                        (*it).rate = -(*it).rate;
+                    }
+
                     oldRating = pOffer->rating;
                     pOffer->rating = pOffer->rating
-                                     + stringQuery[tt].rate * (teasersMaxRating + weight);
+                                     + (*it).rate * (teasersMaxRating + weight);
 
                     //+ sphinx_get_float(res, i, 1);
 
                     for (int i=0; i<res->num_words; i++ )
                         pOffer->matching += " " + std::string(res->words[i].word);
 
-                    pOffer->setBranch(stringQuery[tt].branches);
+                    pOffer->setBranch((*it).branches);
 
                     if(cfg->logSphinx)
                     {
