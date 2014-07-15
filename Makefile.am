@@ -57,9 +57,9 @@ dist_doc_DATA=README
 sysconf_DATA= \
 db_dump/requests/02.sql \
 db_dump/requests/01.sql \
-db_dump/requests/05.sql \
 db_dump/requests/04.sql \
 db_dump/requests/03.sql \
+db_dump/requests/05.sql \
 db_dump/requests/getCampaings.sql \
 db_dump/UA_RU \
 db_dump/tables/11_GeoCountries.sql \
@@ -74,10 +74,12 @@ db_dump/tables/16_Informer.sql \
 db_dump/tables/18_Informer2OfferRating.sql \
 db_dump/tables/10_CronCampaign.sql \
 db_dump/tables/05_Campaign2Informer.sql \
+db_dump/tables/01_OfferR.sql \
 db_dump/tables/14_regionTargeting.sql \
 db_dump/tables/08_Domains.sql \
 db_dump/tables/19_Campaign2Categories.sql \
 db_dump/tables/04_Categories2Domain.sql \
+db_dump/tables/21_Session.sql \
 db_dump/tables/13_geoTargeting.sql \
 db_dump/tables/03_Categories.sql \
 db_dump/tables/09_Campaign2Domains.sql \
@@ -87,7 +89,6 @@ db_dump/view/03_Campaign2Acnts.sql \
 db_dump/view/02_Campaign2Doms.sql \
 db_dump/view/04_Campaign2Infs.sql \
 db_dump/post/01.sql \
-db_dump/schema/CampaignNow.sql \
 template/swfobject.js \
 template/banner.html \
 template/error.html \
@@ -97,7 +98,6 @@ install_f =\
 echo -n "install to $1"; \
 $(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/template; \
 $(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump; \
-$(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/schema; \
 $(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/post; \
 $(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/view; \
 $(MKDIR_P) $(1)/etc/$(bin_PROGRAMS)/db_dump/tables; \
