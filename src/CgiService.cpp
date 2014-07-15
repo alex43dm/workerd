@@ -71,7 +71,7 @@ void CgiService::run()
 {
     boost::posix_time::ptime now;
     bool loaded = false;
-    int memSize = 0, newMemSize;
+  //  int memSize = 0, newMemSize;
 
    //main loop
     for(;;)
@@ -92,17 +92,18 @@ void CgiService::run()
         {
             loaded = false;
         }
-
+/*
         newMemSize = Log::memUsage();
         if(newMemSize != memSize)
         {
             std::clog<<"VmSize:"<<newMemSize<<" diff:"<<newMemSize - memSize<<std::endl;
             memSize = newMemSize;
         }
-
-        stat->cpuUsage();
-
-        //std::clog<<"cpu: sys:"<<stat->cpu_sys<<" user:"<<stat->cpu_user<<std::endl;
+*/
+        if(cfg->logMonitor)
+        {
+            stat->cpuUsage();
+        }
 
         sleep(1);
     }

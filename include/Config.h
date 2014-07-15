@@ -100,7 +100,8 @@ public:
         logRetargetingOfferIds,
         //output offer ids
         logOutPutOfferIds,
-        logSphinx
+        logSphinx,
+        logMonitor
         ;
 
     DataBase *pDb;
