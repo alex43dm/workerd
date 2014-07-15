@@ -139,28 +139,15 @@ int Log::memUsage()
     return result;
 }
 
-static unsigned long long proc_times,total_cpu_usage;
+//static unsigned long long proc_times,total_cpu_usage;
 
+
+/*
+ * read /proc data into the passed struct pstat
+ * returns 0 on success, -1 on error
+*/
 float Log::cpuUsage()
 {
-    FILE* file = fopen("/proc/self/stat", "r");
-    char line[1024];
-    unsigned long long user,nice,system,idle;
-    float ret;
-
-    fgets(line, sizeof(line), file);
-    sscanf(line,"%*s %llu %llu %llu %llu",&user,&nice,&system,&idle);
-    fclose(file);
-
-    ret = (float)(user + nice + system + idle - total_cpu_usage);
-    if(ret != 0)
-    {
-        ret = sysconf(_SC_NPROCESSORS_ONLN)*(user + system - proc_times)*100/ret;
-    }
-
-    proc_times = user + system;
-    total_cpu_usage = user + nice + system + idle;
-
-    return ret;
+    return 0;
 }
 

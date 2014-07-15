@@ -24,6 +24,8 @@ CgiService::CgiService()
 
     bcore = new BaseCore();
 
+    stat = new CpuStat();
+
     FCGX_Init();
 
     mongo::DB::ConnectLogDatabase();
@@ -97,7 +99,9 @@ void CgiService::run()
             memSize = newMemSize;
         }
 
-        std::clog<<"cpu:"<<Log::cpuUsage()<<std::endl;
+        stat->cpuUsage();
+
+        std::clog<<"cpu: sys:"<<stat->cpu_sys<<" user:"<<stat->cpu_user<<std::endl;
 
         sleep(1);
     }

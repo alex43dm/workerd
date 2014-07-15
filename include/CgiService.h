@@ -5,6 +5,7 @@
 
 #include "BaseCore.h"
 #include "Config.h"
+#include "CpuStat.h"
 
 #include <fcgiapp.h>
 #include <mongo/client/dbclient_rs.h>
@@ -86,6 +87,7 @@ private:
 private:
     BaseCore *bcore;
     pthread_t *threads;
+    CpuStat *stat;
     bool fConnectedToLogDatabase;
 
     mongo::DBClientReplicaSet *monga_log;
