@@ -97,6 +97,8 @@ void CgiService::run()
             memSize = newMemSize;
         }
 
+        std::clog<<"cpu:"<<Log::cpuUsage()<<std::endl;
+
         sleep(1);
     }
 }

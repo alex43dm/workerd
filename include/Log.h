@@ -44,11 +44,11 @@ public:
     static void gdb(const char* fmt, ... );
 
     static int memUsage();
+    static float cpuUsage();
 
 protected:
     int sync();
     int overflow(int c);
-
 private:
     friend std::ostream& operator<< (std::ostream& os, const LogPriority& log_priority);
     std::string buffer_;
