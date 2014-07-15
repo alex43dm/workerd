@@ -55,9 +55,6 @@ bool BaseCore::ProcessMQ()
     AMQPMessage *m;
     int stopCount;
 
-    //clear session table
-    pdb->ClearSession();
-
     time_mq_check_ = boost::posix_time::second_clock::local_time();
 
     if(mq_log_.size() > 100*1024)

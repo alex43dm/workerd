@@ -47,6 +47,10 @@ public:
     /** \brief  Выводит состояние службы и некоторую статистику */
     std::string Status();
 
+       //clear session table
+    bool ClearSession() { return pdb->ClearSession(); }
+
+
 private:
     void InitMessageQueue();
 

@@ -84,6 +84,7 @@ void CgiService::run()
            && !loaded)
         {
             bcore->ReloadAllEntities();
+            bcore->ClearSession();
             loaded = true;
         }
         else if( now.time_of_day().minutes() % Config::Instance()->time_update_ != 0
