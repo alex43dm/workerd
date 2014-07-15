@@ -1,6 +1,7 @@
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <ostream>
 
@@ -154,7 +155,7 @@ float Log::cpuUsage()
     ret = (float)(user + nice + system + idle - total_cpu_usage);
     if(ret != 0)
     {
-        ret = 8*(user + system - proc_times)*100/ret;
+        ret = sysconf(_SC_NPROCESSORS_ONLN)*(user + system - proc_times)*100/ret;
     }
 
     proc_times = user + system;
