@@ -3,14 +3,15 @@
 <!--настройки сервера-->
 <server>
     <!--IP сервера. Ссылка на редирект по рекламному предложению содержит в себе адрес сервера, который её создал-->
-    <ip>10.0.0.125</ip>
-    <lock_file>/tmp/workerd/lock</lock_file>
-    <pid_file>/tmp/workerd/pid</pid_file>
-    <user>alex</user>
+    <ip>212.113.32.149</ip>
+    <lock_file>/run/workerd/lock</lock_file>
+    <pid_file>/run/workerd/pid</pid_file>
+    <user>www-data</user>
+    <group>www-data</group>
     <!--путь к файлу сокета-->
-    <socket_path>/tmp/workerd/sock</socket_path>
+    <socket_path>/run/workerd/sock</socket_path>
     <!--количество ниток-->
-    <children>13</children>
+    <children>30</children>
 
     <!--путь к очереди сообщений-->
     <mq_path>guest:guest@localhost//</mq_path>
@@ -19,7 +20,7 @@
     <sqlite>
         <!--файл базы-->
         <!--db>:memory:</db-->
-        <db>/run/alex/db</db>
+        <db>/run/workerd/db</db>
         <!--путь к каталогу дампа sqlite базы-->
         <schema>db_dump</schema>
         <!--путь к csv файлу содержимого таблицы GeoRerions-->
@@ -30,8 +31,8 @@
     <geocity_path>/usr/share/GeoIP/GeoLiteCity.dat</geocity_path>
 
     <cookie>
-        <name>YSID</name>
-        <domain>yottos.com</domain>
+        <name>yottos_unique_id</name>
+        <domain>.yottos.com.</domain>
         <path>/</path>
     </cookie>
 
@@ -55,7 +56,7 @@
     </templates>
 
     <!--время обновление временных кампаний(HH:MM:SS)-->
-    <time_update>00:05:00</time_update>
+    <time_update>00:15:00</time_update>
 </server>
 
 <!--ретаргетинг-->
@@ -67,8 +68,8 @@
             <!--IP-адрес-->
             <host>127.0.0.1</host>
             <!--порт-->
-            <port>6380</port>
-            <timeout>1000</timeout>
+            <port>6385</port>
+            <timeout>100</timeout>
     </redis>
     <!--период жизни(ЧЧ:ММ:СС)-->
     <ttl>06:00:00</ttl>
@@ -76,8 +77,7 @@
 
 <!--история-->
 <history>
-    <!--количество предложений одной кампании в блоке(1..100)-->
-    <offer_by_campaign_unique>2</offer_by_campaign_unique>
+    <offer_by_campaign_unique>1</offer_by_campaign_unique>
 
     <!--история показа-->
     <views>
@@ -87,8 +87,8 @@
             <!--IP-адрес-->
             <host>127.0.0.1</host>
             <!--порт-->
-            <port>6377</port>
-            <timeout>1000</timeout>
+            <port>6381</port>
+            <timeout>10000</timeout>
         </redis>
     </views>
     <!--кратскосрочная история-->
@@ -97,15 +97,15 @@
                 0 - отключить
                 1 - максимальный рейтинг
         -->
-        <value>0.5</value>
+        <value>0.8</value>
         <ttl>24:00:00</ttl>
         <!--Redis-сервер с БД о краткосрочной истории пользователя-->
         <redis>
             <!--IP-адрес-->
             <host>127.0.0.1</host>
             <!--порт-->
-            <port>6379</port>
-            <timeout>1000</timeout>
+            <port>6380</port>
+            <timeout>100</timeout>
         </redis>
     </short_term>
     <!--долгосрочная история-->
@@ -120,8 +120,8 @@
             <!--IP-адрес-->
             <host>127.0.0.1</host>
             <!--порт-->
-            <port>6378</port>
-            <timeout>1000</timeout>
+            <port>6382</port>
+            <timeout>100</timeout>
         </redis>
     </long_term>
     <!--контекст страницы-->
@@ -130,7 +130,7 @@
                 0 - отключить
                 1 - максимальный рейтинг
         -->
-        <value>0.1</value>
+        <value>0.2</value>
         <!--"Продолжительность жизни" ключей в базе истории контекста страницы-->
     </context>
     <!--поисковым запросам пользователя страницы-->
@@ -148,10 +148,6 @@
     <!--Параметры подключения к основной базе данных-->
     <main>
         <!--Адрес сервера баз данных-->
-        <host>212.113.32.146:27018</host>
-        <host>212.113.32.147:27018</host>
-        <host>srv-1.yottos.com:27017</host>
-        <host>srv-2.yottos.com:27018</host>
         <host>srv-3.yottos.com:27018</host>
         <!--Название базы данных-->
         <db>getmyad_db</db>
@@ -162,7 +158,7 @@
         Это балансирует нагрузку в режиме только для чтения, но появляется
         вероятность чтения не самых свежих данных (разница от мастера до
         нескольких секунд).-->
-        <slave>true</slave>
+        <slave>false</slave>
 
         <login></login>
         <passwd></passwd>
@@ -170,13 +166,11 @@
     <!--Параметры подключения к базе данных журнала-->
     <log>
         <!--Адрес сервера баз данных-->
-        <host>10.0.0.8:27017</host>
-        <host>10.0.0.8:27018</host>
-        <host>10.0.0.8:27019</host>
+        <host>127.0.0.1:27017</host>
         <!--Название базы данных-->
-        <db>worker_log</db>
+        <db>getmyad</db>
         <!--Название группы реплик (если база данных находится в Replica Set)-->
-        <set>vsrv</set>
+        <set></set>
         <!--Может ли сервис подключаться к slave серверам базам данных.
         Это балансирует нагрузку в режиме только для чтения, но появляется
         вероятность чтения не самых свежих данных (разница от мастера до
@@ -193,18 +187,18 @@
 <sphinx>
     <!--host>213.186.121.76</host-->
     <host>127.0.0.1</host>
-    <port>9312</port>
+    <port>8312</port>
     <index>worker</index>
     <!--all from /usr/include/sphinxclient.h-->
     <mach_mode>SPH_MATCH_EXTENDED2</mach_mode>
     <rank_mode>SPH_RANK_SPH04</rank_mode>
     <sort_mode>SPH_SORT_RELEVANCE</sort_mode>
     <fields>
+        <exactly_phrases>100</exactly_phrases>
         <title>80</title>
         <description>30</description>
-        <!--keywords>70</keywords-->
-        <!--exactly_phrases>100</exactly_phrases-->
-        <!--phrases>90</phrases-->
+        <keywords>70</keywords>
+        <phrases>90</phrases>
         <!--minuswords>100</minuswords-->
     </fields>
 </sphinx>
@@ -213,14 +207,14 @@
     <coretime>1</coretime>
     <outsize>1</outsize>
     <ip>1</ip>
-    <country>0</country>
+    <country>1</country>
     <region>0</region>
     <cookie>0</cookie>
     <context>0</context>
     <search>0</search>
     <informerId>0</informerId>
     <location>0</location>
-    <sphinx>1</sphinx>
+    <sphinx>0</sphinx>
     <RetargetingOfferIds>1</RetargetingOfferIds>
     <OutPutOfferIds>1</OutPutOfferIds>
 </log>
