@@ -147,13 +147,16 @@ float Log::cpuUsage()
     unsigned long long user,nice,system,idle;
     float ret;
 
-    while(fgets(line, 1024, file) != NULL)
-    {
-        sscanf(line,"%*s %llu %llu %llu %llu",&user,&nice,&system,&idle);
-    }
+    fgets(line, sizeof(line), file);
+    sscanf(line,"%*s %llu %llu %llu %llu",&user,&nice,&system,&idle);
     fclose(file);
 
-    ret = 2 *(user + system - proc_times) * 100/ (float)(user + nice + system + idle - total_cpu_usage);
+    ret = (float)(user + nice + system + idle - total_cpu_usage);
+    if(ret != 0)
+    {
+        ret = 8*(user + system - proc_times)*100/ret;
+    }
+
     proc_times = user + system;
     total_cpu_usage = user + nice + system + idle;
 
