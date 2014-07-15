@@ -20,6 +20,7 @@ DESC=workerd
 RUNDIR=/run/workerd
 PIDFILE=$RUNDIR/pid
 SOKET=$RUNDIR/sock
+LOCKFILE=$RUNDIR/lock
 USER=www-data
 GROUP=www-data
 
@@ -51,7 +52,7 @@ case "$1" in
 	else
 		echo "failed"
 	fi
-	rm -f $PIDFILE
+	rm -f $PIDFILE $LOCKFILE $SOCKET
 	;;
 
   restart|force-reload)
