@@ -102,7 +102,7 @@ void CgiService::run()
 
         stat->cpuUsage();
 
-        std::clog<<"cpu: sys:"<<stat->cpu_sys<<" user:"<<stat->cpu_user<<std::endl;
+        //std::clog<<"cpu: sys:"<<stat->cpu_sys<<" user:"<<stat->cpu_user<<std::endl;
 
         sleep(1);
     }

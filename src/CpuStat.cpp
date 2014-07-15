@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
 #include "CpuStat.h"
 
@@ -90,6 +91,8 @@ void CpuStat::cpuUsage()
                     - (last_usage.stime_ticks + last_usage.cstime_ticks))) /
                     (double) total_time_diff);
     last_usage = cur_usage;
+
+    syslog(LOG_INFO, "cpu: sys:%.2f user:%.2f vs:%lu", cpu_sys, cpu_user,last_usage.vsize/1024);
 }
 /*
 //calculates the elapsed CPU usage between 2 measuring points in ticks
