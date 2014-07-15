@@ -80,6 +80,7 @@ public:
     std::string lock_file_;
     std::string pid_file_;
     std::string user_;
+    std::string group_;
 
     int retargeting_percentage_;
     int retargeting_by_time_;

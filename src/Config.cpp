@@ -282,6 +282,11 @@ bool Config::Load()
             user_ = mel->GetText();
         }
 
+        if( (mel = mElem->FirstChildElement("group")) && (mel->GetText()) )
+        {
+            group_ = mel->GetText();
+        }
+
         if( (mel = mElem->FirstChildElement("time_update")) && (mel->GetText()) )
         {
             if((time_update_ = BoostHelpers::getSeconds(mel->GetText())) == -1)

@@ -33,6 +33,27 @@ Server::Server(const std::string &lockFileName, const std::string &pidFileName) 
 	/* already a daemon */
 	if(getppid() == 1) return;
 
+    if(getuid() == 0 || geteuid() == 0)
+	{
+		struct passwd *pw = getpwnam(Config::Instance()->user_.c_str());
+
+		if(pw)
+		{
+		    //pw->pw_dir
+			syslog(LOG_NOTICE, "setting user to %s", Config::Instance()->user_.c_str());
+
+			if(setuid(pw->pw_uid)!=0)
+            {
+                syslog(LOG_ERR,"error setuid to: %s",Config::Instance()->user_.c_str());
+            }
+
+			if(setgid(pw->pw_gid)!=0)
+            {
+                syslog(LOG_ERR,"error setgid to: %s",Config::Instance()->group_.c_str());
+            }
+		}
+	}
+
 	if(m_lockFileName.size())
 	{
 	    if (stat(m_lockFileName.c_str(), &sb) != -1)
@@ -59,19 +80,6 @@ Server::Server(const std::string &lockFileName, const std::string &pidFileName) 
 		}
 	}
 
-	if(getuid() == 0 || geteuid() == 0)
-	{
-		struct passwd *pw = getpwnam(Config::Instance()->user_.c_str());
-
-		if(pw)
-		{
-			syslog(LOG_NOTICE, "setting user to %s", Config::Instance()->user_.c_str());
-			if(setuid(pw->pw_uid)!=0)
-            {
-                syslog(LOG_ERR,"error setuid to: %s",Config::Instance()->user_.c_str());
-            }
-		}
-	}
 
 	signal(SIGCHLD,child_handler);
 	signal(SIGUSR1,child_handler);
