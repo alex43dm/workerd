@@ -82,11 +82,11 @@ void CpuStat::cpuUsage()
     const long unsigned int total_time_diff = cur_usage.cpu_total_time -
                                               last_usage.cpu_total_time;
 
-    cpu_user = 100 * (((cur_usage.utime_ticks + cur_usage.cutime_ticks)
+    cpu_user = 1000 * (((cur_usage.utime_ticks + cur_usage.cutime_ticks)
                     - (last_usage.utime_ticks + last_usage.cutime_ticks))
                     / (double) total_time_diff);
 
-    cpu_sys = 100 * ((((cur_usage.stime_ticks + cur_usage.cstime_ticks)
+    cpu_sys = 1000 * ((((cur_usage.stime_ticks + cur_usage.cstime_ticks)
                     - (last_usage.stime_ticks + last_usage.cstime_ticks))) /
                     (double) total_time_diff);
     last_usage = cur_usage;
