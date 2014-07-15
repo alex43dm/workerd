@@ -631,9 +631,6 @@ bool Config::Load()
         std::clog<<"using default log mode: CoreTime OutPutSize IP"<<std::endl;
     }
 
-
-    pDb = new DataBase(true);
-
     request_processed_ = 0;
     last_time_request_processed = 0;
     offer_processed_ = 0;

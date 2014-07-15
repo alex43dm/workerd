@@ -108,6 +108,7 @@ public:
     static Config* Instance();
     bool LoadConfig(const std::string fName);
     bool Load();
+    void dbInit(){ pDb = new DataBase(true); }
     bool ReLoad();
     bool Save();
     virtual ~Config();
