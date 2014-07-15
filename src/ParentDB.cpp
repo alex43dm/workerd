@@ -1661,37 +1661,29 @@ bool ParentDB::AccountLoad(mongo::Query query)
 
 bool ParentDB::ClearSession()
 {
-    Kompex::SQLiteStatement *pStmt;
-
-    pStmt = new Kompex::SQLiteStatement(pdb);
-
-    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE retargeting=0 AND viewTime<%llu;",
-        std::time(0) - cfg->views_expire_);
-
     try
     {
+        Kompex::SQLiteStatement *pStmt;
+
+        pStmt = new Kompex::SQLiteStatement(pdb);
+
+        sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE retargeting=0 AND viewTime<%llu;",
+            std::time(0) - cfg->views_expire_);
+
         pStmt->SqlStatement(buf);
+
+        sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE retargeting=1 AND viewTime<%llu;",
+            std::time(0) - cfg->retargeting_by_time_);
+
+        pStmt->SqlStatement(buf);
+
+        delete pStmt;
     }
     catch(Kompex::SQLiteException &ex)
     {
         logDb(ex);
+        return false;
     }
-
-    sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE retargeting=1 AND viewTime<%llu;",
-        std::time(0) - cfg->retargeting_by_time_);
-
-    try
-    {
-        pStmt->SqlStatement(buf);
-    }
-    catch(Kompex::SQLiteException &ex)
-    {
-        logDb(ex);
-    }
-
-    pStmt->FreeQuery();
-
-    delete pStmt;
 
     return true;
 }
