@@ -33,6 +33,36 @@ Server::Server(const std::string &lockFileName, const std::string &pidFileName) 
 	/* already a daemon */
 	if(getppid() == 1) return;
 
+	signal(SIGCHLD,child_handler);
+	signal(SIGUSR1,child_handler);
+	signal(SIGALRM,child_handler);
+
+	pid = fork();
+
+	if(pid < 0)
+	{
+		syslog(LOG_ERR, "unable to fork daemon, code=%d (%s)", errno, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	if(pid > 0)
+	{
+		alarm(2);
+		pause();
+		exit(EXIT_FAILURE);
+	}
+
+	parent = getppid();
+
+	signal(SIGHUP,SIG_DFL);
+	signal(SIGCHLD,SIG_DFL);
+	signal(SIGTSTP,SIG_IGN);
+	signal(SIGTTOU,SIG_IGN);
+	signal(SIGTTIN,SIG_IGN);
+	signal(SIGTERM,SIG_DFL);
+	signal(SIGPIPE,SIG_DFL);
+	signal(SIGRTMIN,SIG_DFL);
+
     if(getuid() == 0 || geteuid() == 0)
 	{
 		struct passwd *pw = getpwnam(Config::Instance()->user_.c_str());
@@ -80,36 +110,6 @@ Server::Server(const std::string &lockFileName, const std::string &pidFileName) 
 		}
 	}
 
-
-	signal(SIGCHLD,child_handler);
-	signal(SIGUSR1,child_handler);
-	signal(SIGALRM,child_handler);
-
-	pid = fork();
-
-	if(pid < 0)
-	{
-		syslog(LOG_ERR, "unable to fork daemon, code=%d (%s)", errno, strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-
-	if(pid > 0)
-	{
-		alarm(2);
-		pause();
-		exit(EXIT_FAILURE);
-	}
-
-	parent = getppid();
-
-	signal(SIGHUP,SIG_DFL);
-	signal(SIGCHLD,SIG_DFL);
-	signal(SIGTSTP,SIG_IGN);
-	signal(SIGTTOU,SIG_IGN);
-	signal(SIGTTIN,SIG_IGN);
-	signal(SIGTERM,SIG_DFL);
-	signal(SIGPIPE,SIG_DFL);
-	signal(SIGRTMIN,SIG_DFL);
 
 	umask(007);
 
