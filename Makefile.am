@@ -109,6 +109,7 @@ $(INSTALL) $(bin_PROGRAMS) $(1)/usr/sbin; \
 if [ $(MAKEINIT) -eq 1 ]; then \
 $(SED) 's|/etc/workerd/config.xml|/etc/$(bin_PROGRAMS)/config-$(bin_PROGRAMS).xml|;s|/usr/sbin/workerd|/usr/sbin/$(bin_PROGRAMS)|' < ./install/workerd > $(1)/etc/init.d/$(bin_PROGRAMS); \
 fi; \
+chmod +x  $(1)/etc/init.d/$(bin_PROGRAMS); \
 for p in $(sysconf_DATA); do \
 $(INSTALL_DATA) $$p "$(1)/etc/$(bin_PROGRAMS)/$$p" || exit $$?; \
 done; \
