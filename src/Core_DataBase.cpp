@@ -126,10 +126,10 @@ bool Core_DataBase::getOffers(Offer::Map &items,unsigned long long sessionId)
                                    pStmt->GetColumnInt64(7),    //campaignId
                                    pStmt->GetColumnInt(8),      //type
                                    pStmt->GetColumnDouble(9),   //rating
-                                   pStmt->GetColumnBool(10),    //uniqueHits
+                                   pStmt->GetColumnInt(10),    //uniqueHits
                                    pStmt->GetColumnInt(11),     //height
                                    pStmt->GetColumnInt(12),     //width
-                                   pStmt->GetColumnBool(13),    //social
+                                   pStmt->GetColumnBool(13),    //isOnClick
                                    pStmt->GetColumnBool(14),    //social
                                    pStmt->GetColumnString(15),  //campaign_guid
                                    pStmt->GetColumnInt(16),      //offer_by_campaign_unique
