@@ -28,7 +28,7 @@ bool HistoryManager::initDB()
 {
 
     Config *cfg = Config::Instance();
-
+/*
     pShortTerm = new RedisClient(cfg->redis_short_term_history_host_,
                                  cfg->redis_short_term_history_port_,
                                  REDIS_EXPIRE,
@@ -46,6 +46,18 @@ bool HistoryManager::initDB()
                                    REDIS_EXPIRE,
                                    cfg->redis_retargeting_timeout_);
     pRetargeting->connect();
+*/
+    pShortTerm = new SimpleRedisClient();
+    pShortTerm->setHost(cfg->redis_short_term_history_host_.c_str());
+    pShortTerm->setPort(strtol(cfg->redis_short_term_history_port_.c_str(),NULL,10));
+
+    pLongTerm = new SimpleRedisClient();
+    pLongTerm->setHost(cfg->redis_long_term_history_host_.c_str());
+    pLongTerm->setPort(strtol(cfg->redis_long_term_history_port_.c_str(),NULL,10));
+
+    pRetargeting = new SimpleRedisClient();
+    pRetargeting->setHost(cfg->redis_retargeting_host_.c_str());
+    pRetargeting->setPort(strtol(cfg->redis_retargeting_port_.c_str(),NULL,10));
 
     return true;
 }
@@ -184,7 +196,7 @@ bool HistoryManager::updateUserHistory(
     return true;
 }
 
-RedisClient *HistoryManager::getHistoryPointer(const HistoryType type) const
+SimpleRedisClient *HistoryManager::getHistoryPointer(const HistoryType type) const
 {
     switch(type)
     {
@@ -208,8 +220,8 @@ RedisClient *HistoryManager::getHistoryPointer(const HistoryType type) const
  */
 bool HistoryManager::getHistoryByType(HistoryType type, std::list<std::string> &rr)
 {
-    RedisClient *r = getHistoryPointer(type);
-    if(r->exists(key))
+    SimpleRedisClient *r = getHistoryPointer(type);
+    if(r->exists(key.c_str()))
     {
         if(!r->getRange(key, 0, -1, rr))
         {
@@ -248,10 +260,12 @@ boost::int64_t HistoryManager::currentDateToInt()
 */
 bool HistoryManager::getDBStatus(HistoryType t)
 {
+    /*
     if(!getHistoryPointer(t)->isConnected())
     {
         std::clog<<"HistoryManager::getDBStatus HistoryType: "<<(int)t<<std::endl;
         return false;
     }
+    */
     return true;
 }

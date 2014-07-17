@@ -3,16 +3,20 @@
 #include "HistoryManager.h"
 #include "Config.h"
 #include "Log.h"
+#include "base64.h"
 
 //----------------------------short term---------------------------------------
 void HistoryManager::getShortTerm()
 {
-    if(!pShortTerm->exists(key))
+    if(!pShortTerm->exists(key.c_str()))
     {
         return;
     }
 
-    sphinx->addRequest(pShortTerm->get(key),inf->range_short_term,EBranchT::T3);
+    if(pLongTerm->get(key.c_str()))
+    {
+        sphinx->addRequest(base64_decode(std::string(pLongTerm->getData())),inf->range_short_term,EBranchT::T4);
+    }
 }
 
 void *HistoryManager::getShortTermEnv(void *data)

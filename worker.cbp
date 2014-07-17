@@ -80,6 +80,7 @@
 		<Unit filename="db_dump/schema/wokers.mwb" />
 		<Unit filename="db_dump/schema/wokers.mwb.bak" />
 		<Unit filename="db_dump/tables/00_Campaign.sql" />
+		<Unit filename="db_dump/tables/01_OfferR.sql" />
 		<Unit filename="db_dump/tables/02_Offer.sql" />
 		<Unit filename="db_dump/tables/03_Categories.sql" />
 		<Unit filename="db_dump/tables/04_Categories2Domain.sql" />
@@ -111,6 +112,7 @@
 		<Unit filename="include/Cookie.h" />
 		<Unit filename="include/Core.h" />
 		<Unit filename="include/Core_DataBase.h" />
+		<Unit filename="include/CpuStat.h" />
 		<Unit filename="include/DB.h" />
 		<Unit filename="include/DataBase.h" />
 		<Unit filename="include/EBranch.h" />
@@ -128,6 +130,7 @@
 		<Unit filename="include/ParentDB.h" />
 		<Unit filename="include/RedisClient.h" />
 		<Unit filename="include/Server.h" />
+		<Unit filename="include/SimpleRedisClient.h" />
 		<Unit filename="include/TempTable.h" />
 		<Unit filename="include/UrlParser.h" />
 		<Unit filename="include/XXXSearcher.h" />
@@ -143,6 +146,7 @@
 		<Unit filename="src/Cookie.cpp" />
 		<Unit filename="src/Core.cpp" />
 		<Unit filename="src/Core_DataBase.cpp" />
+		<Unit filename="src/CpuStat.cpp" />
 		<Unit filename="src/DB.cpp" />
 		<Unit filename="src/DataBase.cpp" />
 		<Unit filename="src/EBranch.cpp" />
@@ -164,6 +168,7 @@
 		<Unit filename="src/ParentDB.cpp" />
 		<Unit filename="src/RedisClient.cpp" />
 		<Unit filename="src/Server.cpp" />
+		<Unit filename="src/SimpleRedisClient.cpp" />
 		<Unit filename="src/TempTable.cpp" />
 		<Unit filename="src/UrlParser.cpp" />
 		<Unit filename="src/XXXSearcher.cpp" />

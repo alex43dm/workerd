@@ -3,16 +3,20 @@
 #include "HistoryManager.h"
 #include "Config.h"
 #include "Log.h"
+#include "base64.h"
 
 //----------------------------long term---------------------------------------
 void HistoryManager::getLongTerm()
 {
-    if(!pLongTerm->exists(key))
+    if(!pLongTerm->exists(key.c_str()))
     {
         return;
     }
 
-    sphinx->addRequest(pLongTerm->get(key),inf->range_long_term,EBranchT::T5);
+    if(pLongTerm->get(key.c_str()))
+    {
+        sphinx->addRequest(base64_decode(std::string(pLongTerm->getData())),inf->range_long_term,EBranchT::T5);
+    }
 }
 
 void *HistoryManager::getLongTermEnv(void *data)

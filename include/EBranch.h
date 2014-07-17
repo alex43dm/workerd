@@ -8,8 +8,8 @@ enum class EBranchT
     T1, //user search
     T2, //context
     T3,
-    T4,
-    T5,
+    T4, //short
+    T5, //long
     TMAX
 };
 

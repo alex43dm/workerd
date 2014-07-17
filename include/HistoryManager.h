@@ -16,6 +16,7 @@
 #include "ParamParse.h"
 #include "XXXSearcher.h"
 #include "Config.h"
+#include "SimpleRedisClient.h"
 
 typedef enum
 {
@@ -71,7 +72,7 @@ private:
     std::string key;
     Params *params;
     Informer *inf;
-    RedisClient *pShortTerm,*pLongTerm,*pRetargeting;
+    SimpleRedisClient *pShortTerm,*pLongTerm,*pRetargeting;
 
     XXXSearcher *sphinx;
 
@@ -102,7 +103,7 @@ private:
     static void *getRetargetingEnv(void *);
     static void signalHanlerRetargeting(int);
     static void *getTailOffersEnv(void *data);
-    RedisClient *getHistoryPointer(const HistoryType type) const;
+    SimpleRedisClient *getHistoryPointer(const HistoryType type) const;
 
     bool getRetargetingAsync();
     void RISAlgorithmRetagreting(const Offer::MapRate &result);
