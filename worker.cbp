@@ -41,7 +41,6 @@
 			<Add option="-std=c++0x" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
-			<Add directory="libs/libredis/" />
 		</Compiler>
 		<Linker>
 			<Add library="mongoclient" />
@@ -61,7 +60,6 @@
 			<Add library="sqlite3" />
 			<Add library="pthread" />
 			<Add library="rt" />
-			<Add library="libs/libredis/lib/libredis.a" />
 			<Add library="libs/amqpcpp/libamqpcpp.a" />
 		</Linker>
 		<Unit filename="INSTALL" />
@@ -128,7 +126,6 @@
 		<Unit filename="include/ParamParse.h" />
 		<Unit filename="include/Params.h" />
 		<Unit filename="include/ParentDB.h" />
-		<Unit filename="include/RedisClient.h" />
 		<Unit filename="include/Server.h" />
 		<Unit filename="include/SimpleRedisClient.h" />
 		<Unit filename="include/TempTable.h" />
@@ -166,7 +163,6 @@
 		<Unit filename="src/ParamParse.cpp" />
 		<Unit filename="src/Params.cpp" />
 		<Unit filename="src/ParentDB.cpp" />
-		<Unit filename="src/RedisClient.cpp" />
 		<Unit filename="src/Server.cpp" />
 		<Unit filename="src/SimpleRedisClient.cpp" />
 		<Unit filename="src/TempTable.cpp" />
