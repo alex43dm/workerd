@@ -1505,13 +1505,13 @@ int SimpleRedisClient::getRange(const std::string &key,
                                 int stop,
                                 std::list<std::string> &retList)
 {
- int ret,i;
- ret = redis_send( RC_MULTIBULK, "ZREVRANGEBYSCORE %s %d %d\r\n", key.c_str(), start, stop);
- for(i = 0; i < multibulk_arg; i++)
- {
-    retList.push_back(answer_multibulk[i]);
- }
- return ret;
+    int ret,i;
+    ret = redis_send( RC_MULTIBULK, "ZREVRANGEBYSCORE %s %d %d\r\n", key.c_str(), start, stop);
+    for(i = 0; i < multibulk_arg; i++)
+    {
+        retList.push_back(answer_multibulk[i]);
+    }
+    return ret;
 }
 
 std::string SimpleRedisClient::get(const std::string &key)
@@ -1531,5 +1531,13 @@ std::string SimpleRedisClient::get(const std::string &key)
 bool SimpleRedisClient::exists(const std::string &key)
 {
     redis_send( RC_INT, "EXISTS %s\r\n", key.c_str());
-    return *data == '1' ? true : false;
+
+    if(data && *data == '1')
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
