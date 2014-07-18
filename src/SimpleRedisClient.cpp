@@ -1513,3 +1513,22 @@ int SimpleRedisClient::getRange(const std::string &key,
  return ret;
 }
 
+std::string SimpleRedisClient::get(const std::string &key)
+{
+    redis_send( RC_BULK, "GET %s\r\n", key.c_str());
+
+    if(data)
+    {
+        return std::string(data);
+    }
+    else
+    {
+        return std::string();
+    }
+}
+
+bool SimpleRedisClient::exists(const std::string &key)
+{
+    redis_send( RC_INT, "EXISTS %s\r\n", key.c_str());
+    return *data == '1' ? true : false;
+}

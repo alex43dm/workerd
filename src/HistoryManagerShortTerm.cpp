@@ -8,15 +8,12 @@
 //----------------------------short term---------------------------------------
 void HistoryManager::getShortTerm()
 {
-    if(!pShortTerm->exists(key.c_str()))
+    if(!pShortTerm->exists(key))
     {
         return;
     }
 
-    if(pLongTerm->get(key.c_str()))
-    {
-        sphinx->addRequest(base64_decode(std::string(pLongTerm->getData())),inf->range_short_term,EBranchT::T4);
-    }
+    sphinx->addRequest(base64_decode(pShortTerm->get(key)),inf->range_short_term,EBranchT::T4);
 }
 
 void *HistoryManager::getShortTermEnv(void *data)

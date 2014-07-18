@@ -8,15 +8,12 @@
 //----------------------------long term---------------------------------------
 void HistoryManager::getLongTerm()
 {
-    if(!pLongTerm->exists(key.c_str()))
+    if(!pLongTerm->exists(key))
     {
         return;
     }
 
-    if(pLongTerm->get(key.c_str()))
-    {
-        sphinx->addRequest(base64_decode(std::string(pLongTerm->getData())),inf->range_long_term,EBranchT::T5);
-    }
+    sphinx->addRequest(base64_decode(pLongTerm->get(key)),inf->range_long_term,EBranchT::T5);
 }
 
 void *HistoryManager::getLongTermEnv(void *data)

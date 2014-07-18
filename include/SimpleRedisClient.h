@@ -410,6 +410,8 @@ public:
                            int start,
                            int stop,
                            std::list<std::string> &retList);
+    std::string get(const std::string &key);
+    bool exists(const std::string &key);
 protected:
 
     int read_select(int fd, int timeout )  const;
