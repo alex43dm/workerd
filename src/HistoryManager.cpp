@@ -5,8 +5,6 @@
 #define REDIS_EXPIRE 3 * 24 * 3600
 #define SPHINX_CAPACITY_COUNT 2
 
-static const char * EnumHistoryTypeStrings[] = {"ShortTerm", "LongTerm", "ViewHistory", "Category","Retargeting"};
-
 HistoryManager::HistoryManager()
 {
     tid = pthread_self();
@@ -26,27 +24,6 @@ HistoryManager::~HistoryManager()
 
 bool HistoryManager::initDB()
 {
-
-    Config *cfg = Config::Instance();
-/*
-    pShortTerm = new RedisClient(cfg->redis_short_term_history_host_,
-                                 cfg->redis_short_term_history_port_,
-                                 REDIS_EXPIRE,
-                                 cfg->redis_short_term_history_timeout_);
-    pShortTerm->connect();
-
-    pLongTerm = new RedisClient(cfg->redis_long_term_history_host_,
-                                cfg->redis_long_term_history_port_,
-                                REDIS_EXPIRE,
-                                cfg->redis_long_term_history_timeout_);
-    pLongTerm->connect();
-
-    pRetargeting = new RedisClient(cfg->redis_retargeting_host_,
-                                   cfg->redis_retargeting_port_,
-                                   REDIS_EXPIRE,
-                                   cfg->redis_retargeting_timeout_);
-    pRetargeting->connect();
-*/
     pShortTerm = new SimpleRedisClient();
     pShortTerm->setHost(cfg->redis_short_term_history_host_.c_str());
     pShortTerm->setPort(strtol(cfg->redis_short_term_history_port_.c_str(),NULL,10));
@@ -134,9 +111,9 @@ void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
 */
 mongo::BSONObj HistoryManager::BSON_Keywords()
 {
-    std::list<std::string>::iterator it;
-    mongo::BSONArrayBuilder b1,b2;//,b3;
-
+//    std::list<std::string>::iterator it;
+//    mongo::BSONArrayBuilder b1,b2;//,b3;
+/*
     for (it=vshortTerm.begin() ; it != vshortTerm.end(); ++it )
         b1.append(*it);
     mongo::BSONArray shortTermArray = b1.arr();
@@ -144,13 +121,14 @@ mongo::BSONObj HistoryManager::BSON_Keywords()
     for (it=vlongTerm.begin() ; it != vlongTerm.end(); ++it )
         b2.append(*it);
     mongo::BSONArray longTermArray = b2.arr();
+*/
 //        for (it=vkeywords.begin() ; it != vkeywords.end(); ++it )
 //            b3.append(*it);
 //        mongo::BSONArray contextTermArray = b3.arr();
 
-    return         mongo::BSONObjBuilder().
-                   append("ShortTermHistory", shortTermArray).
-                   append("LongTermHistory", longTermArray)
+    return         mongo::BSONObjBuilder()
+//                   append("ShortTermHistory", shortTermArray).
+                   //append("LongTermHistory", longTermArray)
                    //append("contexttermhistory", contextTermArray)
                    .obj()
                    ;
@@ -169,10 +147,6 @@ bool HistoryManager::updateUserHistory(
     //обновление deprecated
     setDeprecatedOffers(outItems);
     //обновление retargeting
-
-    vshortTerm.clear();
-    vlongTerm.clear();
-    vretageting.clear();
 
     for(auto p = vRISRetargetingResult.begin(); p != vRISRetargetingResult.end(); ++p)
     {
@@ -213,27 +187,6 @@ SimpleRedisClient *HistoryManager::getHistoryPointer(const HistoryType type) con
         return nullptr;
     }
 }
-
-/** \brief Получение истории пользователя.
- *
- * \param params - параметры запроса.
- */
-bool HistoryManager::getHistoryByType(HistoryType type, std::list<std::string> &rr)
-{
-    SimpleRedisClient *r = getHistoryPointer(type);
-    if(r->exists(key.c_str()))
-    {
-        if(!r->getRange(key, 0, -1, rr))
-        {
-            std::clog<<LogPriority::Err<< "["<<tid<<"]"<< typeid(this).name()<<"::"<<__func__<<EnumHistoryTypeStrings[type]<< std::endl;
-            //Log::err("[%ld]%s::%s %s: %s", tid, typeid(this).name(), __func__,EnumHistoryTypeStrings[type], Module_last_error(module));
-            return false;
-        }
-    }
-
-    return true;
-}
-
 
 boost::int64_t HistoryManager::currentDateToInt()
 {

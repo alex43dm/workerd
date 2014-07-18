@@ -95,7 +95,10 @@ std::string Core::Process(Params *prms)
 //-------------------------------------------------------------------------------------------------------------------
 void Core::log()
 {
-    std::clog<<"["<<tid<<"]";
+    if(cfg->toLog())
+    {
+        std::clog<<"["<<tid<<"]";
+    }
 
     if(cfg->logCoreTime)
     {
@@ -151,11 +154,11 @@ void Core::log()
         }
         std::clog<<"]";
     }
-
+/*
     if(cfg->logCoreTime)
     {
         std::clog<<" camp time:"<< boost::posix_time::to_simple_string(endCampaignTime - startCoreTime);
-    }
+    }*/
 }
 //-------------------------------------------------------------------------------------------------------------------
 void Core::ProcessSaveResults()
@@ -245,7 +248,9 @@ void Core::ProcessSaveResults()
     OutPutCampaignSet.clear();
     OutPutOfferSet.clear();
 #endif // DUMMY
-    std::clog<<std::endl;
+
+    if(cfg->toLog())
+        std::clog<<std::endl;
 }
 //-------------------------------------------------------------------------------------------------------------------
 std::string Core::OffersToHtml(Offer::Vector &items, const std::string &url)

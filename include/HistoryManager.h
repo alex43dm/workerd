@@ -81,7 +81,6 @@ private:
                 thrGetRetargetingAsync,
                 thrGetTailOffersAsync;
 
-    std::list<std::string> vshortTerm, vlongTerm, vretageting;
     std::list<long> mtailOffers;
 
     unsigned minUniqueHits, maxUniqueHits;

@@ -102,6 +102,12 @@ public:
         logSphinx,
         logMonitor
         ;
+    bool toLog()
+    {
+        return logCoreTime || logOutPutSize || logIP || logCountry || logRegion || logCookie
+        || logContext || logSearch || logInformerId || logLocation || logRetargetingOfferIds
+        || logOutPutOfferIds || logSphinx;
+    }
 
     DataBase *pDb;
 

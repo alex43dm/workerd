@@ -405,11 +405,7 @@ public:
 
 
     int getError();
-
-    int getRange(const std::string &key,
-                           int start,
-                           int stop,
-                           std::list<std::string> &retList);
+    std::string getRange(const std::string &key);
     std::string get(const std::string &key);
     bool exists(const std::string &key);
 protected:

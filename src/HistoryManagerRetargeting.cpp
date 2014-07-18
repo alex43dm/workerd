@@ -19,20 +19,18 @@ void HistoryManager::getRetargeting()
         return;
     }
 
-    getHistoryByType(HistoryType::Retargeting, vretageting);
-
-    if(vretageting.size() == 0)
+    if(!pRetargeting->exists(key.c_str()))
     {
         return;
     }
 
-    //fill
-    for(auto i = vretageting.begin(); i != vretageting.end(); ++i)
+    ids = pRetargeting->getRange(key);
+
+    if(ids.empty())
     {
-        if(i != vretageting.begin())
-            ids += ',';
-        ids += (*i);
+        return;
     }
+
 
     sqlite3_snprintf(sizeof(buf), buf, cfg->retargetingOfferSqlStr.c_str(),
                      params->getUserKeyLong(),
