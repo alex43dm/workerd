@@ -8,6 +8,7 @@
 #include "Log.h"
 
 extern char *__progname;
+static char *buffer;
 
 Log::Log(int facility)
 {
