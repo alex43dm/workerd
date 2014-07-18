@@ -14,24 +14,24 @@ Log::Log(int facility)
     facility_ = facility;
     priority_ = LOG_DEBUG;
     openlog(__progname, LOG_PID, facility_);
+    buffer = new char[BUFLEN];
 }
 
 Log::~Log()
 {
     closelog();
+    delete []buffer;
 }
 
 void Log::err(const char* fmt, ... )
 {
     va_list args;
-    char* buffer = new char[BUFLEN];
 
     va_start (args, fmt);
     vsprintf(buffer, fmt, args);
     va_end (args);
 
     syslog(LOG_ERR, "%s", buffer);
-    delete []buffer;
 };
 
 void Log::err(const std::string &mes)
@@ -42,41 +42,35 @@ void Log::err(const std::string &mes)
 void Log::warn(const char* fmt, ... )
 {
     va_list args;
-    char* buffer = new char[BUFLEN];
 
     va_start (args, fmt);
     vsprintf(buffer, fmt, args);
     va_end (args);
 
     syslog(LOG_WARNING, "%s", buffer);
-    delete []buffer;
 };
 
 void Log::info(const char* fmt, ... )
 {
     va_list args;
-    char* buffer = new char[BUFLEN];
 
     va_start (args, fmt);
     vsprintf(buffer, fmt, args);
     va_end (args);
 
     syslog(LOG_INFO, "%s", buffer);
-    delete []buffer;
 };
 
 void Log::gdb(const char* fmt, ... )
 {
 #ifdef DEBUG
     va_list args;
-    char* buffer = new char[BUFLEN];
 
     va_start (args, fmt);
     vsprintf(buffer, fmt, args);
     va_end (args);
 
     syslog(LOG_DEBUG, "%s", buffer);
-    delete []buffer;
 #endif // DEBUG
 };
 
@@ -138,16 +132,3 @@ int Log::memUsage()
     fclose(file);
     return result;
 }
-
-//static unsigned long long proc_times,total_cpu_usage;
-
-
-/*
- * read /proc data into the passed struct pstat
- * returns 0 on success, -1 on error
-*/
-float Log::cpuUsage()
-{
-    return 0;
-}
-

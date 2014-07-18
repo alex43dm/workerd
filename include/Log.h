@@ -9,7 +9,7 @@
 #include <string>
 #include <streambuf>
 
-#define BUFLEN 1024*1024*1024
+#define BUFLEN 1024*1024
 #define FMTPARCE  char buffer[BUFLEN];\
   va_list args;\
   va_start (args, fmt);\
@@ -50,6 +50,7 @@ protected:
     int sync();
     int overflow(int c);
 private:
+    char *buffer;
     friend std::ostream& operator<< (std::ostream& os, const LogPriority& log_priority);
     std::string buffer_;
     int facility_;
