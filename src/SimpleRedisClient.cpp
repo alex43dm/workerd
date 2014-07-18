@@ -406,8 +406,10 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
 
     if(answer_multibulk != 0)
     {
-        delete answer_multibulk;
+        delete []answer_multibulk;
+        //delete answer_multibulk;
     }
+
     multibulk_arg = -1;
     answer_multibulk = 0;
 
@@ -1509,7 +1511,6 @@ int SimpleRedisClient::getRange(const std::string &key,
  {
     retList.push_back(answer_multibulk[i]);
  }
- delete []answer_multibulk;
  return ret;
 }
 
