@@ -11,7 +11,6 @@
 
 #include "Offer.h"
 #include "Informer.h"
-#include "RedisClient.h"
 #include "Params.h"
 #include "ParamParse.h"
 #include "XXXSearcher.h"
