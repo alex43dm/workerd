@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SRC_ALL=src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp src/BoostHelpers.cpp src/HistoryManagerTail.cpp src/TempTable.cpp src/Core_DataBase.cpp src/CpuStat.cpp
-SRC_DUMMY=src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/Offer.cpp src/CgiService.cpp src/EBranch.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp src/BoostHelpers.cpp src/HistoryManagerTail.cpp src/TempTable.cpp src/Core_DataBase.cpp src/CpuStat.cpp
+SRC_ALL=src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/HistoryManagerShortTerm.cpp src/Log.cpp src/RedisClient.cpp src/BaseCore.cpp src/DataBase.cpp src/HistoryManager.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/HistoryManagerLongTerm.cpp src/Offer.cpp src/sphinxRequests.cpp src/CgiService.cpp src/EBranch.cpp src/HistoryManagerOffer.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/XXXSearcher.cpp src/Cookie.cpp src/GeoIPTools.cpp src/HistoryManagerRetargeting.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp src/BoostHelpers.cpp src/HistoryManagerTail.cpp src/TempTable.cpp src/Core_DataBase.cpp src/CpuStat.cpp src/SimpleRedisClient.cpp
+SRC_DUMMY=src/base64.cpp src/Core.cpp src/GeoRerions.cpp src/Log.cpp src/BaseCore.cpp src/DataBase.cpp src/Informer.cpp src/main.cpp src/Server.cpp src/Campaign.cpp src/DB.cpp src/Offer.cpp src/CgiService.cpp src/EBranch.cpp src/json.cpp src/ParamParse.cpp src/UrlParser.cpp src/Config.cpp src/KompexSQLiteDatabase.cpp src/Params.cpp src/Cookie.cpp src/GeoIPTools.cpp src/KompexSQLiteStatement.cpp src/ParentDB.cpp src/BoostHelpers.cpp src/HistoryManagerTail.cpp src/TempTable.cpp src/Core_DataBase.cpp src/CpuStat.cpp src/SimpleRedisClient.cpp
 
 CMN_CPPFLAGS=-std=c++11 -Iinclude
 CMN_LDADD = $(BOOST_DATE_TIME_LIBS) $(BOOST_FILESYSTEM_LIBS) $(BOOST_THREAD_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_REGEX_LIBS)
@@ -28,13 +28,13 @@ SUBDIRS = libs/libredis
 if DEBUG
 bin_PROGRAMS = workerd-dev
 workerd_dev_SOURCES=$(SRC_ALL)
-workerd_dev_CPPFLAGS=$(CMN_CPPFLAGS) -Ilibs/libredis
-workerd_dev_LDADD=$(CMN_LDADD) libs/libredis/lib/libredis.a
+workerd_dev_CPPFLAGS=$(CMN_CPPFLAGS)
+workerd_dev_LDADD=$(CMN_LDADD)
 else
 bin_PROGRAMS = workerd
 workerd_SOURCES=$(SRC_ALL)
-workerd_CPPFLAGS=$(CMN_CPPFLAGS) -Ilibs/libredis
-workerd_LDADD=$(CMN_LDADD) libs/libredis/lib/libredis.a
+workerd_CPPFLAGS=$(CMN_CPPFLAGS)
+workerd_LDADD=$(CMN_LDADD)
 endif
 
 DEBDEP=bash (>= 2.05a-11), awk, procps (>= 1:2.0.7-8), sed (>= 3.02-8), grep (>= 2.4.2-3), coreutils (>= 5.0-5), libtinyxml2.6.2 (>=2.6.2), libsqlite3-0 (>=3.7.13), libfcgi0ldbl (>=2.4.0), sphinxsearch (>=2.1.5), geoip-database (>=20130213-1), rabbitmq-server (>=3.2.3), libboost-system1.49.0 (>=1.49.0), libboost-regex1.49.0 (>=1.49.0), libboost-thread1.49.0 (>=1.49.0), libboost-filesystem1.49.0 (>=1.49.0), libboost-date-time1.49.0 (>=1.49.0)

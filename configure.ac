@@ -79,7 +79,6 @@ AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
 
 if test "x$dummy" = "xfalse" ; then
-AC_CONFIG_LIBOBJ_DIR([libs/libredis])
 AC_CHECK_LIB([sphinxclient], [sphinx_add_query], [], [AC_MSG_ERROR([sphinxclient was not found])])
 else
 AC_DEFINE(DUMMY,[1],[dummy worker])
