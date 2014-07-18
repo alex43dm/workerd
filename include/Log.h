@@ -50,7 +50,7 @@ protected:
     int sync();
     int overflow(int c);
 private:
-    char *buffer;
+    static char *buffer;
     friend std::ostream& operator<< (std::ostream& os, const LogPriority& log_priority);
     std::string buffer_;
     int facility_;
