@@ -7,7 +7,6 @@
 #include <tinyxml.h>
 
 #include "DataBase.h"
-#include "RedisClient.h"
 
 extern unsigned long request_processed_;
 extern unsigned long last_time_request_processed;
