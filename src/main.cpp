@@ -1,5 +1,4 @@
 #include <sys/types.h>
-#include <libredis/redis.h>
 
 #include "CgiService.h"
 #include "Log.h"
