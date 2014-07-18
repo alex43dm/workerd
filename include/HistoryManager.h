@@ -4,11 +4,6 @@
 #include <string>
 #include <list>
 
-#include <boost/date_time.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-
-#include <mongo/bson/bson.h>
-
 #include "Offer.h"
 #include "Informer.h"
 #include "Params.h"
@@ -26,12 +21,6 @@ typedef enum
     Retargeting
 } HistoryType;
 
-/*
-const char * getTextEnumHistory( int enumVal )
-{
-  return EnumHistoryTypeStrings[enumVal];
-}
-*/
 class HistoryManager : public ParamParse
 {
 public:
@@ -50,7 +39,6 @@ public:
     /** \brief  Инициализация подключения к базам данных Redis
     */
     bool initDB();
-    bool getDBStatus(HistoryType t);
 
     //main methods
     void startGetUserHistory(Params *params, Informer *);
@@ -60,8 +48,6 @@ public:
 
     bool moveUpTailOffers(Offer::Map &items, float teasersMaxRating);
     void getRetargetingAsyncWait();
-
-    mongo::BSONObj BSON_Keywords();
 
     bool isSphinxProcessed(){ return isProcessed;}
 
@@ -85,7 +71,6 @@ private:
 
     unsigned minUniqueHits, maxUniqueHits;
 
-    bool getHistoryByType(HistoryType type, std::list<std::string> &rr);
     boost::int64_t currentDateToInt();
     void getLongTerm();
     void getShortTerm();

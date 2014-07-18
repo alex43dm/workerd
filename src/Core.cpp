@@ -172,7 +172,7 @@ void Core::ProcessSaveResults()
 
         mongo::BSONObj keywords = mongo::BSONObjBuilder().
 #ifndef DUMMY
-                                  appendElements(hm->BSON_Keywords()).
+//                                  appendElements(hm->BSON_Keywords()).
 #endif // DUMMY
                                   append("search", params->getSearch()).
                                   append("context", params->getContext()).

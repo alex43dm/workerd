@@ -104,35 +104,6 @@ void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
 }
 
 
-/** Обновление short и deprecated историй пользователя. */
-/** \brief  Обновление краткосрочной истории пользователя и истории его показов.
-	\param offers     		вектор рекламных предложений, выбранных к показу
-	\param params			параметры, переданный ядру процесса
-*/
-mongo::BSONObj HistoryManager::BSON_Keywords()
-{
-//    std::list<std::string>::iterator it;
-//    mongo::BSONArrayBuilder b1,b2;//,b3;
-/*
-    for (it=vshortTerm.begin() ; it != vshortTerm.end(); ++it )
-        b1.append(*it);
-    mongo::BSONArray shortTermArray = b1.arr();
-
-    for (it=vlongTerm.begin() ; it != vlongTerm.end(); ++it )
-        b2.append(*it);
-    mongo::BSONArray longTermArray = b2.arr();
-*/
-//        for (it=vkeywords.begin() ; it != vkeywords.end(); ++it )
-//            b3.append(*it);
-//        mongo::BSONArray contextTermArray = b3.arr();
-
-    return         mongo::BSONObjBuilder()
-//                   append("ShortTermHistory", shortTermArray).
-                   //append("LongTermHistory", longTermArray)
-                   //append("contexttermhistory", contextTermArray)
-                   .obj()
-                   ;
-}
 
 bool HistoryManager::updateUserHistory(
     const Offer::Map &items,
@@ -158,67 +129,11 @@ bool HistoryManager::updateUserHistory(
 
     vRISRetargetingResult.clear();
 
-    if(mtailOffers.size())
-    {
-        mtailOffers.clear();
-    }
+    mtailOffers.clear();
 
     sphinx->cleanFilter();
 
     isProcessed = false;
 
-    return true;
-}
-
-SimpleRedisClient *HistoryManager::getHistoryPointer(const HistoryType type) const
-{
-    switch(type)
-    {
-    case ShortTerm:
-        return pShortTerm;
-        break;
-    case LongTerm:
-        return pLongTerm;
-        break;
-    case Retargeting:
-        return pRetargeting;
-        break;
-    default:
-        return nullptr;
-    }
-}
-
-boost::int64_t HistoryManager::currentDateToInt()
-{
-    boost::gregorian::date d(1970,boost::gregorian::Jan,1);
-    boost::posix_time::ptime myTime = boost::posix_time::microsec_clock::local_time();
-    boost::posix_time::ptime myEpoch(d);
-    boost::posix_time::time_duration myTimeFromEpoch = myTime - myEpoch;
-    boost::int64_t myTimeAsInt = myTimeFromEpoch.ticks();
-
-    return (myTimeAsInt%10000000000);
-}
-
-//------------------------------------------sync functions----------------------------------------
-/** \brief  Возвращает статус подключения к одной из баз данных Redis.
-
-	\param t     		тип базы данных </BR>
-
-	Возможные значения:</BR>
-	1 - база данных краткосрочной истории</BR>
-	2 - база данных долгосрочной истории</BR>
-	3 - база данных истории показов</BR>
-
-	При некорректно заданном параметре метод вернет -1.
-*/
-bool HistoryManager::getDBStatus(HistoryType t)
-{
-    /*
-    if(!getHistoryPointer(t)->isConnected())
-    {
-        std::clog<<"HistoryManager::getDBStatus HistoryType: "<<(int)t<<std::endl;
-        return false;
-    }
-    */
     return true;
 }
