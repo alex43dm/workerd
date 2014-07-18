@@ -32,10 +32,11 @@ bool HistoryManager::setDeprecatedOffers(const Offer::Vector &items)
         {
             sqlite3_snprintf(sizeof(buf),buf,
             "INSERT OR REPLACE INTO Session(id,offerId,uniqueHits,viewTime,retargeting) \
-                SELECT %llu,%llu,ifnull(uniqueHits,%u),%llu,%u FROM Session WHERE id=%llu AND offerId=%llu;",
+                VALUES(%llu,%llu,\
+                ifnull((SELECT ses.uniqueHitsFROM Session AS ses WHERE ses.id=%llu AND ses.offerId=%llu),%u)-1,%llu,%u);",
                     params->getUserKeyLong(), (*it)->id_int,
-                    (*it)->uniqueHits, std::time(0),(*it)->retargeting,
-                    params->getUserKeyLong(), (*it)->id_int);
+                    params->getUserKeyLong(), (*it)->id_int, (*it)->uniqueHits,
+                             std::time(0),(*it)->retargeting);
 
             pStmt->SqlStatement(buf);
         }
