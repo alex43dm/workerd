@@ -447,6 +447,9 @@ std::string BaseCore::Status()
     //out <<  "<tr><td>Драйвер mongo: </td><td>" << mongo::versionString << "</td></tr>";
     out << "</table>";
 
+    std::vector<Campaign*> campaigns;
+    Campaign::info(campaigns,false);
+
     out << "<p>Загружено <b>" << campaigns.size() << "</b> таргеринговых кампаний: </p>\n";
     out << "<table><tr>\n"
         "<th>Наименование</th>"
@@ -455,7 +458,7 @@ std::string BaseCore::Status()
         "<th>Предложений</th>"
         "</tr>\n";
 
-    Campaign::info(campaigns,false);
+
     for (auto it = campaigns.begin(); it != campaigns.end(); it++)
     {
         out << "<tr>" <<
@@ -467,7 +470,9 @@ std::string BaseCore::Status()
         delete *it;
     }
     out << "</table>";
+    campaigns.clear();
 
+    Campaign::info(campaigns,true);
     out << "<p>Загружено <b>" << campaigns.size() << "</b> ретаргеринговых кампаний: </p>\n";
     out << "<table><tr>\n"
         "<th>Наименование</th>"
@@ -476,7 +481,6 @@ std::string BaseCore::Status()
         "<th>Предложений</th>"
         "</tr>\n";
 
-    Campaign::info(campaigns,true);
     for (auto it = campaigns.begin(); it != campaigns.end(); it++)
     {
         out << "<tr>" <<
