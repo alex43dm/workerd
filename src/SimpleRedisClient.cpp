@@ -33,8 +33,8 @@
 #include <string.h>
 
 #include "SimpleRedisClient.h"
+#include "Log.h"
 
-#define debugLine printf("\n%s:%d\n", __FILE__, __LINE__)
 
 /**
  * Читает целое число из строки, если ошибка то вернёт -1
@@ -430,7 +430,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
         return RC_ERR_BUFFER_OVERFLOW;; // Не хватило буфера
     }
 
-    if(debug > 3  ) printf("SEND:%s",buffer);
+    if(debug > 3  ) Log::gdb("SEND:%s",buffer);
     rc = send_data(buffer);
 
     if (rc != (int) strlen(buffer))
@@ -466,7 +466,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
                 int r = 0;
                 while( (r = recv(fd, nullbuf, 1000, 0)) >= 0)
                 {
-                    if(debug) printf("REDIS read %d byte\n", r);
+                    if(debug) Log::gdb("REDIS read %d byte\n", r);
                 }
 
                 last_error = RC_ERR_DATA_BUFFER_OVERFLOW;
@@ -474,7 +474,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
             }
             else if(rc >= buffer_size - offset && buffer_size * 2 < max_buffer_size)
             {
-                if(debug) printf("REDIS Удвоение размера буфера до %d\t[rc=%d, buffer_size=%d, offset=%d]\n",buffer_size *2, rc, buffer_size, offset);
+                if(debug) Log::gdb("REDIS Удвоение размера буфера до %d\t[rc=%d, buffer_size=%d, offset=%d]\n",buffer_size *2, rc, buffer_size, offset);
 
                 int last_buffer_size = buffer_size;
                 char* tbuf = buffer;
@@ -495,12 +495,12 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
 
         }
         while(1);
-        if(debug > 3) printf("REDIS BUF: recv:%d buffer[%s]",rc, buffer);
+        if(debug > 3) Log::gdb("REDIS BUF: recv:%d buffer[%s]",rc, buffer);
 
         char prefix = buffer[0];
         if (recvtype != RC_ANY && prefix != recvtype && prefix != RC_ERROR)
         {
-            printf("\x1b[31m[fd=%d]REDIS RC_ERR_PROTOCOL[%c]:%s\x1b[0m\n",fd, recvtype, buffer);
+            Log::gdb("\x1b[31m[fd=%d]REDIS RC_ERR_PROTOCOL[%c]:%s\x1b[0m\n",fd, recvtype, buffer);
             return RC_ERR_PROTOCOL;
         }
 
@@ -509,23 +509,23 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
         switch (prefix)
         {
         case RC_ERROR:
-            printf("\x1b[31mREDIS[fd=%d] RC_ERROR:%s\x1b[0m\n",fd,buffer);
+            Log::gdb("\x1b[31mREDIS[fd=%d] RC_ERROR:%s\x1b[0m\n",fd,buffer);
             data = buffer;
             data_size = rc;
             return rc;
         case RC_INLINE:
-            if(debug) printf("\x1b[33mREDIS[fd=%d] RC_INLINE:%s\x1b[0m\n", fd,buffer);
+            if(debug) Log::gdb("\x1b[33mREDIS[fd=%d] RC_INLINE:%s\x1b[0m\n", fd,buffer);
             data_size = strlen(buffer+1)-2;
             data = buffer+1;
             data[data_size] = 0;
             return rc;
         case RC_INT:
-            if(debug) printf("\x1b[33mREDIS[fd=%d] RC_INT:%s\x1b[0m\n",fd, buffer);
+            if(debug) Log::gdb("\x1b[33mREDIS[fd=%d] RC_INT:%s\x1b[0m\n",fd, buffer);
             data = buffer+1;
             data_size = rc;
             return rc;
         case RC_BULK:
-            if(debug) printf("\x1b[33mREDIS[fd=%d] RC_BULK:%s\x1b[0m\n",fd, buffer);
+            if(debug) Log::gdb("\x1b[33mREDIS[fd=%d] RC_BULK:%s\x1b[0m\n",fd, buffer);
 
             p = buffer;
             p++;
@@ -544,7 +544,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
             }
 
             /* Now p points at '\r', and the len is in bulk_len. */
-            if(debug > 3) printf("%d\n", len);
+            if(debug > 3) Log::gdb("%d\n", len);
 
             data = p+2;
             data_size = len;
@@ -552,7 +552,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
 
             return rc;
         case RC_MULTIBULK:
-            if(debug) printf("\x1b[33mREDIS[fd=%d] RC_MULTIBULK[Len=%d]:%s\x1b[0m\n", fd, rc, buffer);
+            if(debug) Log::gdb("\x1b[33mREDIS[fd=%d] RC_MULTIBULK[Len=%d]:%s\x1b[0m\n", fd, rc, buffer);
             data = buffer;
 
             p = buffer;
@@ -563,7 +563,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
             {
                 data = 0;
                 data_size = -1;
-                if(debug > 5) printf("\x1b[33mREDIS RC_MULTIBULK data_size = 0\x1b[0m\n");
+                if(debug > 5) Log::gdb("\x1b[33mREDIS RC_MULTIBULK data_size = 0\x1b[0m\n");
                 return rc;
             }
 
@@ -579,7 +579,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
                 {
                     multibulk_arg = i-1;
                     data_size = i - 1;
-                    if(debug) printf("\x1b[33mREDIS Выход по приближению к концу буфера [p=%d|multibulk_arg=%d]\x1b[0m\n", (int)(p - buffer), multibulk_arg);
+                    if(debug) Log::gdb("\x1b[33mREDIS Выход по приближению к концу буфера [p=%d|multibulk_arg=%d]\x1b[0m\n", (int)(p - buffer), multibulk_arg);
                     last_error = RC_ERR_DATA_BUFFER_OVERFLOW;
                     return rc;
                 }
@@ -600,7 +600,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
                 {
                     multibulk_arg = i-1;
                     data_size = i - 1;
-                    if(debug) printf("\x1b[33mREDIS Выход по приближению к концу буфера [p=%d|multibulk_arg=%d]\x1b[0m\n", (int)(p - buffer), multibulk_arg);
+                    if(debug) Log::gdb("\x1b[33mREDIS Выход по приближению к концу буфера [p=%d|multibulk_arg=%d]\x1b[0m\n", (int)(p - buffer), multibulk_arg);
                     last_error = RC_ERR_DATA_BUFFER_OVERFLOW;
                     return rc;
                 }
@@ -719,7 +719,7 @@ int SimpleRedisClient::redis_conect()
         setHost("127.0.0.1");
     }
 
-    if(debug > 1) printf("\x1b[31mredis host:%s %d\x1b[0m\n", host, port);
+    if(debug > 1) Log::gdb("\x1b[31mredis host:%s %d\x1b[0m\n", host, port);
 
     debug = 9;
     int rc;
@@ -731,7 +731,7 @@ int SimpleRedisClient::redis_conect()
 
     if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1 || setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void *)&yes, sizeof(yes)) == -1 || setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (void *)&yes, sizeof(yes)) == -1)
     {
-        if(debug) printf("open error %d\n", fd);
+        if(debug) Log::gdb("open error %d\n", fd);
     }
 
     struct addrinfo hints, *info = NULL;
@@ -744,7 +744,7 @@ int SimpleRedisClient::redis_conect()
         int err = getaddrinfo(host, NULL, &hints, &info);
         if (err)
         {
-            printf("\x1b[31mgetaddrinfo error: %s [%s]\x1b[0m\n", gai_strerror(err), host);
+            Log::gdb("\x1b[31mgetaddrinfo error: %s [%s]\x1b[0m\n", gai_strerror(err), host);
             return -1;
         }
 
@@ -755,7 +755,7 @@ int SimpleRedisClient::redis_conect()
     int flags = fcntl(fd, F_GETFL);
     if ((rc = fcntl(fd, F_SETFL, flags | O_NONBLOCK)) < 0)
     {
-        printf("\x1b[31mSetting socket non-blocking failed with: %d\x1b[0m\n", rc);
+        Log::gdb("\x1b[31mSetting socket non-blocking failed with: %d\x1b[0m\n", rc);
         return -1;
     }
 
@@ -780,7 +780,7 @@ int SimpleRedisClient::redis_conect()
             return RC_ERR_TIMEOUT;
         }
     }
-    if(debug >  RC_LOG_DEBUG) printf("open ok %d\n", fd);
+    if(debug >  RC_LOG_DEBUG) Log::gdb("open ok %d\n", fd);
 
     return fd;
 }
@@ -998,20 +998,20 @@ SimpleRedisClient::operator int () const
 {
     if(data_size < 1)
     {
-        printf("SimpleRedisClient::operator int (%u) \n", data_size);
+        Log::gdb("SimpleRedisClient::operator int (%u) \n", data_size);
         return data_size;
     }
 
     if(getData() == 0)
     {
-        printf("SimpleRedisClient::operator int (%u) \n", data_size);
+        Log::gdb("SimpleRedisClient::operator int (%u) \n", data_size);
         return -1;
     }
 
     int d = 0;
     int r = read_int(getData(), &d);
 
-    printf("SimpleRedisClient::operator int (%u|res=%d) \n", data_size, r);
+    Log::gdb("SimpleRedisClient::operator int (%u|res=%d) \n", data_size, r);
 
     return r;
 }
@@ -1024,20 +1024,20 @@ SimpleRedisClient::operator long () const
 {
     if(data_size < 1)
     {
-        printf("SimpleRedisClient::operator long (%u) \n", data_size);
+        Log::gdb("SimpleRedisClient::operator long (%u) \n", data_size);
         return data_size;
     }
 
     if(getData() == 0)
     {
-        printf("SimpleRedisClient::operator long (%u) \n", data_size);
+        Log::gdb("SimpleRedisClient::operator long (%u) \n", data_size);
         return -1;
     }
 
     int d = 0;
     int r = read_long(getData(), &d);
 
-    printf("SimpleRedisClient::operator long (%u|res=%d) \n", data_size, r);
+    Log::gdb("SimpleRedisClient::operator long (%u|res=%d) \n", data_size, r);
 
     return r;
 }
@@ -1173,7 +1173,7 @@ int SimpleRedisClient::delete_keys( const char *key)
 
         for(int i =0; i< num_keys; i++)
         {
-            printf("del[%d]:%s\n", i, ptr_data[i]);
+            Log::gdb("del[%d]:%s\n", i, ptr_data[i]);
             del(ptr_data[i]);
         }
 
@@ -1226,7 +1226,7 @@ int SimpleRedisClient::delete_keys_printf(const char *format, ...)
 
         for(int i =0; i< num_keys; i++)
         {
-            printf("del[%d]:%s\n", i, ptr_data[i]);
+            Log::gdb("del[%d]:%s\n", i, ptr_data[i]);
             del(ptr_data[i]);
         }
 
@@ -1471,7 +1471,7 @@ void SimpleRedisClient::setTimeout( int TimeOut)
  */
 void SimpleRedisClient::redis_close()
 {
-    if(debug > RC_LOG_DEBUG) printf("close ok %d\n", fd);
+    if(debug > RC_LOG_DEBUG) Log::gdb("close ok %d\n", fd);
     if(fd != 0 )
     {
         close(fd);
