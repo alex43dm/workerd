@@ -460,6 +460,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
 
             if(rc < 0)
             {
+                Log::err("redis: error recv");
                 return CR_ERR_RECV;
             }
 
@@ -1545,13 +1546,15 @@ std::string SimpleRedisClient::get(const std::string &key)
 
 bool SimpleRedisClient::exists(const std::string &key)
 {
-    if(redis_send( RC_INT, "EXISTS %s\r\n", key.c_str()) <0)
+    int ret;
+    ret = redis_send( RC_INT, "EXISTS %s\r\n", key.c_str());
+    if( ret < 0 )
     {
         redis_conect();
         redis_send( RC_INT, "EXISTS %s\r\n", key.c_str());
     }
 
-    if(data && *data == '1')
+    if(data && data[0] == '1')
     {
         return true;
     }
