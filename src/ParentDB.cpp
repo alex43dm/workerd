@@ -1315,7 +1315,7 @@ void ParentDB::CampaignLoad(const std::string &aCampaignId)
 
         if(o.getObjectField("daysOfWeek").isEmpty())
         {
-            for(day = 1; day < 8; day++)
+            for(day = 0; day < 7; day++)
             {
                 bzero(buf,sizeof(buf));
                 sqlite3_snprintf(sizeof(buf),buf,

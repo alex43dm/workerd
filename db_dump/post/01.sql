@@ -7,7 +7,7 @@ FROM CronCampaign AS co
 INNER JOIN(
     SELECT c.id_cam
     FROM CronCampaign AS c
-    WHERE (c.Day-1 = cast(strftime('%w','now','localtime') AS INT) OR c.Day IS NULL)
+    WHERE (c.Day = cast(strftime('%w','now','localtime') AS INT) OR c.Day IS NULL)
     AND (
             (c.Hour < cast(strftime('%H','now','localtime') AS INT) AND c.startStop=1)
             OR
@@ -21,7 +21,7 @@ INNER JOIN(
 INNER JOIN(
     SELECT c1.id_cam
     FROM CronCampaign AS c1
-    WHERE (c1.Day-1 = cast(strftime('%w','now','localtime') AS INT) OR c1.Day IS NULL)
+    WHERE (c1.Day = cast(strftime('%w','now','localtime') AS INT) OR c1.Day IS NULL)
     AND (
             (c1.Hour > cast(strftime('%H','now','localtime') AS INT) AND c1.startStop=0)
             OR
