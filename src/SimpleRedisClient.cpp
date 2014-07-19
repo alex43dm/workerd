@@ -422,11 +422,13 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
 
     if( rc < 0 )
     {
+        Log::err("redis: error format");
         return RC_ERR_DATA_FORMAT;
     }
 
     if( rc >= buffer_size )
     {
+        Log::err("redis: error buffer overflow");
         return RC_ERR_BUFFER_OVERFLOW;; // Не хватило буфера
     }
 
@@ -437,9 +439,10 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
     {
         if (rc < 0)
         {
+            Log::err("redis: error send");
             return RC_ERR_SEND;
         }
-
+        Log::err("redis: error timeout");
         return RC_ERR_TIMEOUT;
     }
 
@@ -466,7 +469,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
                 int r = 0;
                 while( (r = recv(fd, nullbuf, 1000, 0)) >= 0)
                 {
-                    if(debug) Log::gdb("REDIS read %d byte\n", r);
+                    if(debug) Log::gdb("REDIS read %d byte", r);
                 }
 
                 last_error = RC_ERR_DATA_BUFFER_OVERFLOW;
@@ -474,7 +477,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
             }
             else if(rc >= buffer_size - offset && buffer_size * 2 < max_buffer_size)
             {
-                if(debug) Log::gdb("REDIS Удвоение размера буфера до %d\t[rc=%d, buffer_size=%d, offset=%d]\n",buffer_size *2, rc, buffer_size, offset);
+                if(debug) Log::gdb("REDIS Удвоение размера буфера до %d[rc=%d, buffer_size=%d, offset=%d]",buffer_size *2, rc, buffer_size, offset);
 
                 int last_buffer_size = buffer_size;
                 char* tbuf = buffer;
@@ -500,7 +503,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
         char prefix = buffer[0];
         if (recvtype != RC_ANY && prefix != recvtype && prefix != RC_ERROR)
         {
-            Log::gdb("\x1b[31m[fd=%d]REDIS RC_ERR_PROTOCOL[%c]:%s\x1b[0m\n",fd, recvtype, buffer);
+            Log::gdb("[fd=%d]REDIS RC_ERR_PROTOCOL[%c]:%s",fd, recvtype, buffer);
             return RC_ERR_PROTOCOL;
         }
 
@@ -714,24 +717,23 @@ int SimpleRedisClient::redis_conect(const char* Host,int Port, int TimeOut)
 
 int SimpleRedisClient::redis_conect()
 {
-    if(host == 0)
-    {
-        setHost("127.0.0.1");
-    }
-
-    if(debug > 1) Log::gdb("\x1b[31mredis host:%s %d\x1b[0m\n", host, port);
-
-    debug = 9;
     int rc;
     struct sockaddr_in sa;
     bzero(&sa, sizeof(sa));
+
+    if(debug > 1) Log::gdb("redis: connect host:%s %d", host, port);
+
+    if(fd)
+    {
+        close(fd);
+    }
 
     sa.sin_family = AF_INET;
     sa.sin_port = htons(port);
 
     if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1 || setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void *)&yes, sizeof(yes)) == -1 || setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (void *)&yes, sizeof(yes)) == -1)
     {
-        if(debug) Log::gdb("open error %d\n", fd);
+        Log::err("redis: error socket");
     }
 
     struct addrinfo hints, *info = NULL;
@@ -744,7 +746,7 @@ int SimpleRedisClient::redis_conect()
         int err = getaddrinfo(host, NULL, &hints, &info);
         if (err)
         {
-            Log::gdb("\x1b[31mgetaddrinfo error: %s [%s]\x1b[0m\n", gai_strerror(err), host);
+            Log::err("redis: mgetaddrinfo error: %s [%s]", gai_strerror(err), host);
             return -1;
         }
 
@@ -755,7 +757,7 @@ int SimpleRedisClient::redis_conect()
     int flags = fcntl(fd, F_GETFL);
     if ((rc = fcntl(fd, F_SETFL, flags | O_NONBLOCK)) < 0)
     {
-        Log::gdb("\x1b[31mSetting socket non-blocking failed with: %d\x1b[0m\n", rc);
+        Log::err("redis: error setting socket non-blocking failed with: %d", rc);
         return -1;
     }
 
@@ -763,6 +765,7 @@ int SimpleRedisClient::redis_conect()
     {
         if (errno != EINPROGRESS)
         {
+            Log::err("redis: error connect");
             return RC_ERR;
         }
 
@@ -772,15 +775,17 @@ int SimpleRedisClient::redis_conect()
             unsigned int len = sizeof(err);
             if(getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &len) == -1 || err)
             {
+                Log::err("redis: error getsockopt");
                 return RC_ERR;
             }
         }
         else /* timeout or select error */
         {
+            Log::err("redis: error connect timeout");
             return RC_ERR_TIMEOUT;
         }
     }
-    if(debug >  RC_LOG_DEBUG) Log::gdb("open ok %d\n", fd);
+    if(debug >  RC_LOG_DEBUG) Log::gdb("open ok %d", fd);
 
     return fd;
 }
@@ -1537,7 +1542,11 @@ std::string SimpleRedisClient::get(const std::string &key)
 
 bool SimpleRedisClient::exists(const std::string &key)
 {
-    redis_send( RC_INT, "EXISTS %s\r\n", key.c_str());
+    if(redis_send( RC_INT, "EXISTS %s\r\n", key.c_str()) <0)
+    {
+        redis_conect();
+        redis_send( RC_INT, "EXISTS %s\r\n", key.c_str())
+    }
 
     if(data && *data == '1')
     {
