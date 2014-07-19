@@ -408,7 +408,7 @@ void Core::RISAlgorithm(const Offer::Map &items)
 
     //user history view clean
     hm->clean = true;
-    std::clog<<"["<<tid<<"] "<<__func__<<" clean offer history"<<std::endl;
+    //std::clog<<"["<<tid<<"] "<<__func__<<" clean offer history"<<std::endl;
 }
 //-------------------------------------------------------------------------------------------------------------------
 void Core::mergeWithRetargeting()
