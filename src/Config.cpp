@@ -624,6 +624,11 @@ bool Config::Load()
         {
             logMonitor = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
         }
+
+        if( (mel = mElem->FirstChildElement("commands")) && (mel->GetText()) )
+        {
+            logMonitor = strncmp(mel->GetText(),"1",1)>=0 ? true : false;
+        }
     }
     else
     {
@@ -631,7 +636,7 @@ bool Config::Load()
 
         logSphinx = logOutPutOfferIds = logRetargetingOfferIds =
         logLocation = logInformerId = logSearch =
-        logContext = logCookie = logCountry = logRegion = logMonitor = false;
+        logContext = logCookie = logCountry = logRegion = logMonitor = logMQ= false;
 
         std::clog<<"using default log mode: CoreTime OutPutSize IP"<<std::endl;
     }

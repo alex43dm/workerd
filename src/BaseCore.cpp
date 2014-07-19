@@ -71,7 +71,11 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "campaign: " + m->getRoutingKey() + "</br>";
+                mq_log_ += "campaign: " + m->getRoutingKey() + ":" +toString(m) + "</br>";
+                if(cfg->logMQ)
+                {
+                    std::clog<<"mq: cmd:"<<m->getRoutingKey()<<toString(m)<<std::endl;
+                }
 
                 if(m->getRoutingKey() == "campaign.update")
                 {
@@ -104,7 +108,12 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "advertise: " + m->getRoutingKey() + "</br>";
+                mq_log_ += "advertise: " + m->getRoutingKey() + ":" +toString(m) + "</br>";
+
+                if(cfg->logMQ)
+                {
+                    std::clog<<"mq: cmd:"<<m->getRoutingKey()<<toString(m)<<std::endl;
+                }
 
                 m1 = toString(m);
                 if(m->getRoutingKey() == "advertise.update")
@@ -138,7 +147,12 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "informer: " + m->getRoutingKey() + "</br>";
+                mq_log_ += "informer: " + m->getRoutingKey() + ":" +toString(m) + "</br>";
+
+                if(cfg->logMQ)
+                {
+                    std::clog<<"mq: cmd:"<<m->getRoutingKey()<<toString(m)<<std::endl;
+                }
 
                 if(m->getRoutingKey() == "informer.update")
                 {
@@ -163,7 +177,12 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "account: " + m->getRoutingKey() + "</br>";
+                mq_log_ += "account: " + m->getRoutingKey() + ":" +toString(m) + "</br>";
+
+                if(cfg->logMQ)
+                {
+                    std::clog<<"mq: cmd:"<<m->getRoutingKey()<<toString(m)<<std::endl;
+                }
 
                 if(m->getRoutingKey() == "account.update")
                 {
