@@ -1545,7 +1545,7 @@ bool SimpleRedisClient::exists(const std::string &key)
     if(redis_send( RC_INT, "EXISTS %s\r\n", key.c_str()) <0)
     {
         redis_conect();
-        redis_send( RC_INT, "EXISTS %s\r\n", key.c_str())
+        redis_send( RC_INT, "EXISTS %s\r\n", key.c_str());
     }
 
     if(data && *data == '1')
