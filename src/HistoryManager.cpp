@@ -35,7 +35,13 @@ bool HistoryManager::initDB()
     pRetargeting = new SimpleRedisClient();
     pRetargeting->setHost(cfg->redis_retargeting_host_.c_str());
     pRetargeting->setPort(strtol(cfg->redis_retargeting_port_.c_str(),NULL,10));
-    pRetargeting->LogLevel(RC_LOG_DEBUG);
+
+    if(cfg->logRedis)
+    {
+        pShortTerm->LogLevel(RC_LOG_DEBUG);
+        pLongTerm->LogLevel(RC_LOG_DEBUG);
+        pRetargeting->LogLevel(RC_LOG_DEBUG);
+    }
 
     return true;
 }

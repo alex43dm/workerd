@@ -100,7 +100,7 @@ public:
         //output offer ids
         logOutPutOfferIds,
         logSphinx,
-        logMonitor, logMQ
+        logMonitor, logMQ, logRedis
         ;
     bool toLog()
     {

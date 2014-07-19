@@ -6,12 +6,12 @@
     <ip>212.113.32.149</ip>
     <lock_file>/run/workerd/lock</lock_file>
     <pid_file>/run/workerd/pid</pid_file>
-    <user>www-data</user>
+    <user>alex</user>
     <group>www-data</group>
     <!--путь к файлу сокета-->
     <socket_path>/run/workerd/sock</socket_path>
     <!--количество ниток-->
-    <children>30</children>
+    <children>10</children>
 
     <!--путь к очереди сообщений-->
     <mq_path>guest:guest@localhost//</mq_path>
@@ -20,7 +20,7 @@
     <sqlite>
         <!--файл базы-->
         <!--db>:memory:</db-->
-        <db>/run/workerd/db</db>
+        <db>/home/alex/Projects/worker/db</db>
         <!--путь к каталогу дампа sqlite базы-->
         <schema>db_dump</schema>
         <!--путь к csv файлу содержимого таблицы GeoRerions-->
@@ -68,7 +68,7 @@
             <!--IP-адрес-->
             <host>127.0.0.1</host>
             <!--порт-->
-            <port>6385</port>
+            <port>6379</port>
             <timeout>100</timeout>
     </redis>
     <!--период жизни(ЧЧ:ММ:СС)-->
@@ -104,7 +104,7 @@
             <!--IP-адрес-->
             <host>127.0.0.1</host>
             <!--порт-->
-            <port>6380</port>
+            <port>6378</port>
             <timeout>100</timeout>
         </redis>
     </short_term>
@@ -120,7 +120,7 @@
             <!--IP-адрес-->
             <host>127.0.0.1</host>
             <!--порт-->
-            <port>6382</port>
+            <port>6377</port>
             <timeout>100</timeout>
         </redis>
     </long_term>
@@ -217,6 +217,9 @@
     <sphinx>0</sphinx>
     <RetargetingOfferIds>1</RetargetingOfferIds>
     <OutPutOfferIds>1</OutPutOfferIds>
+    <monitor>1</monitor>
+    <commands>1</commands>
+    <redis>1</redis>
 </log>
 
 </root>
