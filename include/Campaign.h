@@ -30,7 +30,7 @@ public:
     virtual ~Campaign();
 
     static std::string getName(long long campaign_id);
-    static void info(std::vector<Campaign*> &res);
+    static void info(std::vector<Campaign*> &res,bool);
     static showCoverage typeConv(const std::string &t);
     void setType(const std::string &t);
 };

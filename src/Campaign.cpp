@@ -54,20 +54,32 @@ Campaign::~Campaign()
 }
 
 //-------------------------------------------------------------------------------------------------------
-void Campaign::info(std::vector<Campaign*> &res)
+void Campaign::info(std::vector<Campaign*> &res, bool Retargeting)
 {
     char buf[8192];
     Kompex::SQLiteStatement *pStmt;
 
-    pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
-
+    if(Retargeting)
+    {
     sqlite3_snprintf(sizeof(buf),buf,
-                     "SELECT c.title,c.valid,c.social,count(ofr.campaignId),c.showCoverage FROM Campaign AS c \
-            LEFT JOIN Offer AS ofr ON c.id=ofr.campaignId \
-            GROUP BY ofr.campaignId;");
+"SELECT c.title,c.valid,c.social,count(ofr.campaignId),c.showCoverage FROM Campaign AS c \
+LEFT JOIN Offerr AS ofr ON c.id=ofr.campaignId \
+WHERE c.retargeting=1 \
+GROUP BY ofr.campaignId;");
+
+    }
+    else
+    {
+    sqlite3_snprintf(sizeof(buf),buf,
+"SELECT c.title,c.valid,c.social,count(ofr.campaignId),c.showCoverage FROM Campaign AS c \
+LEFT JOIN Offer AS ofr ON c.id=ofr.campaignId \
+WHERE c.retargeting=0 \
+GROUP BY ofr.campaignId;");
+    }
 
     try
     {
+        pStmt = new Kompex::SQLiteStatement(Config::Instance()->pDb->pDatabase);
         pStmt->Sql(buf);
 
         while(pStmt->FetchRow())
@@ -80,14 +92,14 @@ void Campaign::info(std::vector<Campaign*> &res)
             c->setType(pStmt->GetColumnString(4));
             res.push_back(c);
         }
+
+        pStmt->FreeQuery();
+        delete pStmt;
     }
     catch(Kompex::SQLiteException &ex)
     {
         Log::err("Campaign::info %s error: %s", buf, ex.GetString().c_str());
     }
-
-    pStmt->FreeQuery();
-    delete pStmt;
 }
 
 showCoverage Campaign::typeConv(const std::string &t)
