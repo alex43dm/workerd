@@ -512,23 +512,23 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
         switch (prefix)
         {
         case RC_ERROR:
-            Log::gdb("\x1b[31mREDIS[fd=%d] RC_ERROR:%s\x1b[0m\n",fd,buffer);
+            Log::err("redis: error [fd=%d] RC_ERROR:%s",fd,buffer);
             data = buffer;
             data_size = rc;
             return rc;
         case RC_INLINE:
-            if(debug) Log::gdb("\x1b[33mREDIS[fd=%d] RC_INLINE:%s\x1b[0m\n", fd,buffer);
+            if(debug) Log::gdb("redis[fd=%d] RC_INLINE:%s", fd,buffer);
             data_size = strlen(buffer+1)-2;
             data = buffer+1;
             data[data_size] = 0;
             return rc;
         case RC_INT:
-            if(debug) Log::gdb("\x1b[33mREDIS[fd=%d] RC_INT:%s\x1b[0m\n",fd, buffer);
+            if(debug) Log::gdb("redis[fd=%d] RC_INT:%s",fd, buffer);
             data = buffer+1;
             data_size = rc;
             return rc;
         case RC_BULK:
-            if(debug) Log::gdb("\x1b[33mREDIS[fd=%d] RC_BULK:%s\x1b[0m\n",fd, buffer);
+            if(debug) Log::gdb("redis[fd=%d] RC_BULK:%s",fd, buffer);
 
             p = buffer;
             p++;
@@ -555,7 +555,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
 
             return rc;
         case RC_MULTIBULK:
-            if(debug) Log::gdb("\x1b[33mREDIS[fd=%d] RC_MULTIBULK[Len=%d]:%s\x1b[0m\n", fd, rc, buffer);
+            if(debug) Log::gdb("redis[fd=%d] RC_MULTIBULK[Len=%d]:%s", fd, rc, buffer);
             data = buffer;
 
             p = buffer;
@@ -566,7 +566,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
             {
                 data = 0;
                 data_size = -1;
-                if(debug > 5) Log::gdb("\x1b[33mREDIS RC_MULTIBULK data_size = 0\x1b[0m\n");
+                if(debug > 5) Log::gdb("redis RC_MULTIBULK data_size = 0");
                 return rc;
             }
 
@@ -582,7 +582,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
                 {
                     multibulk_arg = i-1;
                     data_size = i - 1;
-                    if(debug) Log::gdb("\x1b[33mREDIS Выход по приближению к концу буфера [p=%d|multibulk_arg=%d]\x1b[0m\n", (int)(p - buffer), multibulk_arg);
+                    if(debug) Log::gdb("redis Выход по приближению к концу буфера [p=%d|multibulk_arg=%d]", (int)(p - buffer), multibulk_arg);
                     last_error = RC_ERR_DATA_BUFFER_OVERFLOW;
                     return rc;
                 }
@@ -603,7 +603,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
                 {
                     multibulk_arg = i-1;
                     data_size = i - 1;
-                    if(debug) Log::gdb("\x1b[33mREDIS Выход по приближению к концу буфера [p=%d|multibulk_arg=%d]\x1b[0m\n", (int)(p - buffer), multibulk_arg);
+                    if(debug) Log::gdb("redis Выход по приближению к концу буфера [p=%d|multibulk_arg=%d]", (int)(p - buffer), multibulk_arg);
                     last_error = RC_ERR_DATA_BUFFER_OVERFLOW;
                     return rc;
                 }
@@ -620,11 +620,12 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
     }
     else if (rc == 0)
     {
+        Log::err("redis: connection close");
         return RC_ERR_CONECTION_CLOSE; // Соединение закрыто
     }
     else
     {
-//            print_backtrace("Не пришли данные от redis[RC_ERR]");
+        Log::err("redis: no data");
         return RC_ERR; // error
     }
 }
@@ -659,6 +660,7 @@ int SimpleRedisClient::send_data( const char *buf ) const
             rc = send(fd, buf + sent, tosend - sent, 0);
             if (rc < 0)
             {
+                Log::err("redis: send error 1");
                 return -1;
             }
             sent += rc;
@@ -669,6 +671,7 @@ int SimpleRedisClient::send_data( const char *buf ) const
         }
         else
         {
+            Log::err("redis: send error 2");
             return -1;
         }
     }
@@ -721,7 +724,7 @@ int SimpleRedisClient::redis_conect()
     struct sockaddr_in sa;
     bzero(&sa, sizeof(sa));
 
-    if(debug > 1) Log::gdb("redis: connect host:%s %d", host, port);
+    if(debug > 1) Log::gdb("redis: connect %s:%d", host, port);
 
     if(fd)
     {
