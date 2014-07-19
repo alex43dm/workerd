@@ -19,7 +19,7 @@ void HistoryManager::getRetargeting()
         return;
     }
 
-    if(!pRetargeting->exists(key.c_str()))
+    if(!pRetargeting->exists(key))
     {
         return;
     }
