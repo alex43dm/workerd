@@ -1541,7 +1541,7 @@ std::string SimpleRedisClient::get(const std::string &key)
 
 bool SimpleRedisClient::exists(const std::string &key)
 {
-    redis_send( RC_INT, "EXISTS %s\r\n", key.c_str())
+    redis_send( RC_INT, "EXISTS %s\r\n", key.c_str());
 
     if(data && data[0] == '1')
     {
