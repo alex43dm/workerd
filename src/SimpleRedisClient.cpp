@@ -279,9 +279,14 @@ long read_long(const char* buffer, int* delta)
                         return rc;\
 
 
-SimpleRedisClient::SimpleRedisClient()
+SimpleRedisClient::SimpleRedisClient(const std::string &Host,
+                                     const std::string &Port,
+                                     const std::string &Name)
 {
     setBufferSize(2048);
+    host = Host;
+    port = strtol(Port.c_str(),NULL,10);
+    name = "redis("+Name+"): ";
 }
 
 int SimpleRedisClient::getBufferSize()
@@ -329,11 +334,6 @@ SimpleRedisClient::~SimpleRedisClient()
     }
 
     buffer_size = 0;
-
-    if(host != 0)
-    {
-        delete[] host;
-    }
 }
 
 /*
@@ -422,27 +422,34 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
 
     if( rc < 0 )
     {
-        Log::err("redis: error format");
+        std::clog<<name<<"error format"<<std::endl;
         return RC_ERR_DATA_FORMAT;
     }
 
     if( rc >= buffer_size )
     {
-        Log::err("redis: error buffer overflow");
+        std::clog<<name<<"error buffer overflow"<<std::endl;
         return RC_ERR_BUFFER_OVERFLOW;; // Не хватило буфера
     }
 
-    if(debug > 3  ) Log::gdb("SEND:%s",buffer);
+    if(debug > 3  ) std::clog<<name<<"send: "<<buffer<<std::endl;
+
     rc = send_data(buffer);
+
+    if (rc != (int) strlen(buffer))
+    {
+        redis_conect();
+        rc = send_data(buffer);
+    }
 
     if (rc != (int) strlen(buffer))
     {
         if (rc < 0)
         {
-            Log::err("redis: error send");
+            std::clog<<name<<"error send"<<std::endl;
             return RC_ERR_SEND;
         }
-        Log::err("redis: error timeout");
+        std::clog<<name<<"error timeout"<<std::endl;
         return RC_ERR_TIMEOUT;
     }
 
@@ -460,7 +467,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
 
             if(rc < 0)
             {
-                Log::err("redis: error recv");
+                std::clog<<name<<"error recv"<<std::endl;
                 return CR_ERR_RECV;
             }
 
@@ -470,7 +477,7 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
                 int r = 0;
                 while( (r = recv(fd, nullbuf, 1000, 0)) >= 0)
                 {
-                    if(debug) Log::gdb("REDIS read %d byte", r);
+                    if(debug) std::clog<<name<<"read "<<r<<"b"<<std::endl;
                 }
 
                 last_error = RC_ERR_DATA_BUFFER_OVERFLOW;
@@ -499,12 +506,12 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
 
         }
         while(1);
-        if(debug > 3) Log::gdb("REDIS BUF: recv:%d buffer[%s]",rc, buffer);
+        if(debug > 3) std::clog<<name<<"recv:"<<rc<<" buf:"<<buffer<<std::endl;
 
         char prefix = buffer[0];
         if (recvtype != RC_ANY && prefix != recvtype && prefix != RC_ERROR)
         {
-            Log::gdb("[fd=%d]REDIS RC_ERR_PROTOCOL[%c]:%s",fd, recvtype, buffer);
+            std::clog<<name<<"error protocol:"<<recvtype<<" buf:"<<buffer<<std::endl;
             return RC_ERR_PROTOCOL;
         }
 
@@ -513,24 +520,20 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
         switch (prefix)
         {
         case RC_ERROR:
-            Log::err("redis: error [fd=%d] RC_ERROR:%s",fd,buffer);
+            std::clog<<name<<"error :"<<buffer<<std::endl;
             data = buffer;
             data_size = rc;
             return rc;
         case RC_INLINE:
-            if(debug) Log::gdb("redis[fd=%d] RC_INLINE:%s", fd,buffer);
             data_size = strlen(buffer+1)-2;
             data = buffer+1;
             data[data_size] = 0;
             return rc;
         case RC_INT:
-            if(debug) Log::gdb("redis[fd=%d] RC_INT:%s",fd, buffer);
             data = buffer+1;
             data_size = rc;
             return rc;
         case RC_BULK:
-            if(debug) Log::gdb("redis[fd=%d] RC_BULK:%s",fd, buffer);
-
             p = buffer;
             p++;
 
@@ -556,7 +559,6 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
 
             return rc;
         case RC_MULTIBULK:
-            if(debug) Log::gdb("redis[fd=%d] RC_MULTIBULK[Len=%d]:%s", fd, rc, buffer);
             data = buffer;
 
             p = buffer;
@@ -621,12 +623,12 @@ int SimpleRedisClient::redis_send(char recvtype, const char *format, ...)
     }
     else if (rc == 0)
     {
-        Log::err("redis: connection close");
+        std::clog<<name<<"error: connection close"<<std::endl;
         return RC_ERR_CONECTION_CLOSE; // Соединение закрыто
     }
     else
     {
-        Log::err("redis: no data");
+        std::clog<<name<<"error: no data"<<std::endl;
         return RC_ERR; // error
     }
 }
@@ -661,7 +663,7 @@ int SimpleRedisClient::send_data( const char *buf ) const
             rc = send(fd, buf + sent, tosend - sent, 0);
             if (rc < 0)
             {
-                Log::err("redis: send error 1");
+                std::clog<<name<<"error: send error 1"<<std::endl;
                 return -1;
             }
             sent += rc;
@@ -672,7 +674,7 @@ int SimpleRedisClient::send_data( const char *buf ) const
         }
         else
         {
-            Log::err("redis: send error 2");
+            std::clog<<name<<"error: send error 2"<<std::endl;
             return -1;
         }
     }
@@ -691,14 +693,7 @@ void SimpleRedisClient::setPort(int Port)
 
 void SimpleRedisClient::setHost(const char* Host)
 {
-    if(host != 0)
-    {
-        delete host;
-    }
-
-    host = new char[64];
-    bzero(host, 64);
-    memcpy(host,Host,strlen(Host));
+    host = Host;
 }
 
 /**
@@ -725,7 +720,7 @@ int SimpleRedisClient::redis_conect()
     struct sockaddr_in sa;
     bzero(&sa, sizeof(sa));
 
-    if(debug > 1) Log::gdb("redis: connect %s:%d", host, port);
+    if(debug > 1) Log::gdb("redis: connect %s:%d", host.c_str(), port);
 
     if(fd)
     {
@@ -737,20 +732,20 @@ int SimpleRedisClient::redis_conect()
 
     if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1 || setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void *)&yes, sizeof(yes)) == -1 || setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (void *)&yes, sizeof(yes)) == -1)
     {
-        Log::err("redis: error socket");
+        std::clog<<"redis("<<name<<"): error socket"<<std::endl;
     }
 
     struct addrinfo hints, *info = NULL;
     bzero(&hints, sizeof(hints));
 
-    if (inet_aton(host, &sa.sin_addr) == 0)
+    if (inet_aton(host.c_str(), &sa.sin_addr) == 0)
     {
         hints.ai_family = AF_INET;
         hints.ai_socktype = SOCK_STREAM;
-        int err = getaddrinfo(host, NULL, &hints, &info);
+        int err = getaddrinfo(host.c_str(), NULL, &hints, &info);
         if (err)
         {
-            Log::err("redis: mgetaddrinfo error: %s [%s]", gai_strerror(err), host);
+            std::clog<<"redis("<<name<<"): mgetaddrinfo error: "<<gai_strerror(err)<<std::endl;
             return -1;
         }
 
@@ -761,7 +756,7 @@ int SimpleRedisClient::redis_conect()
     int flags = fcntl(fd, F_GETFL);
     if ((rc = fcntl(fd, F_SETFL, flags | O_NONBLOCK)) < 0)
     {
-        Log::err("redis: error setting socket non-blocking failed with: %d", rc);
+        std::clog<<"redis("<<name<<"): error setting socket non-blocking failed"<<std::endl;
         return -1;
     }
 
@@ -769,7 +764,7 @@ int SimpleRedisClient::redis_conect()
     {
         if (errno != EINPROGRESS)
         {
-            Log::err("redis: error connect");
+            std::clog<<"redis("<<name<<"): error connect"<<std::endl;
             return RC_ERR;
         }
 
@@ -779,13 +774,13 @@ int SimpleRedisClient::redis_conect()
             unsigned int len = sizeof(err);
             if(getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &len) == -1 || err)
             {
-                Log::err("redis: error getsockopt");
+                std::clog<<"redis("<<name<<"): error getsockopt"<<std::endl;
                 return RC_ERR;
             }
         }
         else /* timeout or select error */
         {
-            Log::err("redis: error connect timeout");
+                std::clog<<"redis("<<name<<"): error connect timeout"<<std::endl;
             return RC_ERR_TIMEOUT;
         }
     }

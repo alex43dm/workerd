@@ -59,7 +59,7 @@ class SimpleRedisClient
 
 
     int port = 6379;
-    char* host = 0;
+    std::string host, name;
 
     int version_major = -1;
     int version_minor = -1;
@@ -104,7 +104,7 @@ public:
     void LogLevel(int);
     int LogLevel(void);
 
-    SimpleRedisClient();
+    SimpleRedisClient(const std::string &host, const std::string &port, const std::string &name);
 
     void setPort(int Port);
 
@@ -422,7 +422,6 @@ protected:
      * @return
      */
     int send_data( const char *buf ) const;
-
 };
 
 
