@@ -82,7 +82,7 @@ bool Config::Load()
         return false;
     }
 
-    std::clog<<" config dir:"<<cfgFilePath;
+    std::clog<<" config dir:"<<cfgFilePath<<std::endl;
 
     if(!(mDoc = new TiXmlDocument(mFileName)))
     {
@@ -97,7 +97,6 @@ bool Config::Load()
              " row: "+std::to_string(mDoc->ErrorRow())+
              " col: "+std::to_string(mDoc->ErrorCol()));
     }
-
 
     mRoot = mDoc->FirstChildElement("root");
 
@@ -201,12 +200,12 @@ bool Config::Load()
         if( (mel = mElem->FirstChildElement("socket_path")) && (mel->GetText()) )
         {
             server_socket_path_ = mel->GetText();
-
+/*
             if(BoostHelpers::checkPath(server_socket_path_, true, true))
             {
                 std::clog<<"server socket path: "<<server_socket_path_<<" exists"<<std::endl;
                 unlink(server_socket_path_.c_str());
-            }
+            }*/
         }
 
         if( (mel = mElem->FirstChildElement("children")) && (mel->GetText()) )
