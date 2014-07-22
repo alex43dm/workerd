@@ -25,10 +25,13 @@ HistoryManager::~HistoryManager()
 bool HistoryManager::initDB()
 {
     pShortTerm = new SimpleRedisClient(cfg->redis_short_term_history_host_, cfg->redis_short_term_history_port_, "short");
+    pShortTerm->setTimeout(cfg->redis_short_term_history_timeout_);
 
     pLongTerm = new SimpleRedisClient(cfg->redis_long_term_history_host_,cfg->redis_long_term_history_port_, "long");
+    pLongTerm->setTimeout(cfg->redis_long_term_history_timeout_);
 
     pRetargeting = new SimpleRedisClient(cfg->redis_retargeting_host_,cfg->redis_retargeting_port_,"ret");
+    pRetargeting->setTimeout(cfg->redis_retargeting_timeout_);
 
     if(cfg->logRedis)
     {
