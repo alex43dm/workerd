@@ -264,13 +264,23 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
 
     if (url.param("show") == "status")
     {
-        Response(req, bcore->Status(false), "");
+        if( server_name.empty() && (tmp_str = FCGX_GetParam("SERVER_NAME", req->envp)) )
+        {
+            server_name = std::string(tmp_str);
+        }
+
+        Response(req, bcore->Status(server_name, false), "");
         return;
     }
 
     if (url.param("show") == "full")
     {
-        Response(req, bcore->Status(true), "");
+        if( server_name.empty() && (tmp_str = FCGX_GetParam("SERVER_NAME", req->envp)) )
+        {
+            server_name = std::string(tmp_str);
+        }
+
+        Response(req, bcore->Status(server_name, true), "");
         return;
     }
 

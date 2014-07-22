@@ -307,7 +307,7 @@ void BaseCore::InitMessageQueue()
 
 /** Возвращает расширенные данные о состоянии службы
  */
-std::string BaseCore::Status(bool fullData)
+std::string BaseCore::Status(const std::string &server_name, bool fullData)
 {
     std::stringstream out;
     // Обработано запросов на момент прошлого обращения к статистике
@@ -361,15 +361,14 @@ std::string BaseCore::Status(bool fullData)
     out << "</td></tr>";
     out << "<tr>";
     out << "<td>Общее кол-во показов:</td> <td><b>" << offer_processed_;
-    out << "</b> (" << social_processed_ << " из них социальная реклама) ";
-    out << "</td></tr>";
-    out << "<tr><td>Имя сервера: </td> <td>" <<
-        (getenv("SERVER_NAME")? getenv("SERVER_NAME"): "неизвестно") <<
-        "</td></tr>";
+    out << "</b> (" << social_processed_ << " из них социальная реклама) "<< "</td></tr>";
+
+    out << "<tr><td>Имя сервера: </td> <td>" << (server_name.empty() ? server_name : "неизвестно") <<"</td></tr>";
     out << "<tr><td>IP сервера: </td> <td>" <<Config::Instance()->server_ip_ <<"</td></tr>";
     out << "<tr><td>Текущее время: </td> <td>" <<
         boost::posix_time::second_clock::local_time() <<
         "</td></tr>";
+    out << "<tr><td>Время запуска:</td> <td>" << time_service_started_ <<"</td></tr>";
     out << "<tr><td>Количество ниток: </td> <td>" << Config::Instance()->server_children_<< "</td></tr>";
     out << "<tr><td>CPU user: </td> <td>" << CpuStat::cpu_user << "</td></tr>";
     out << "<tr><td>CPU sys: </td> <td>" << CpuStat::cpu_sys << "</td></tr>";
@@ -448,11 +447,7 @@ std::string BaseCore::Status(bool fullData)
     out << "</td></tr>";
 
 
-    out << "<tr><td>Время запуска:</td> <td>" << time_service_started_ <<
-        "</td></tr>" <<
-        "<tr><td>AMQP:</td><td>" <<
-        (amqp_? "активен" : "не активен") <<
-        "</td></tr>";
+    out << "<tr><td>AMQP:</td><td>" << (amqp_? "активен" : "не активен") << "</td></tr>";
     out <<  "<tr><td>Сборка: </td><td>" << __DATE__ << " " << __TIME__<<"</td></tr>";
     //out <<  "<tr><td>Драйвер mongo: </td><td>" << mongo::versionString << "</td></tr>";
     out << "</table>";

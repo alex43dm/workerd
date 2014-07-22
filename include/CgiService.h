@@ -85,6 +85,7 @@ private:
      */
     void ProcessRequest(FCGX_Request*, Core *);
 private:
+    std::string server_name;
     BaseCore *bcore;
     pthread_t *threads;
     CpuStat *stat;
