@@ -375,6 +375,7 @@ std::string BaseCore::Status(bool fullData)
     {
         out << "</body>";
         out << "</html>";
+        return out.str();
     }
 
     out << "<tr><td>Основная база данных:</td> <td>" <<
