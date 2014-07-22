@@ -71,7 +71,7 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "campaign: " + m->getRoutingKey() + ":" +toString(m) + "</br>";
+                mq_log_ += m->getRoutingKey() + ":" +toString(m) + "</br>";
                 if(cfg->logMQ)
                 {
                     std::clog<<"mq: cmd:"<<m->getRoutingKey()<<toString(m)<<std::endl;
@@ -108,7 +108,7 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "advertise: " + m->getRoutingKey() + ":" +toString(m) + "</br>";
+                mq_log_ += m->getRoutingKey() + ":" +toString(m) + "</br>";
 
                 if(cfg->logMQ)
                 {
@@ -121,11 +121,11 @@ bool BaseCore::ProcessMQ()
                     if(cmdParser(m1,ofrId,cmgId))
                     {
                         mongo::Query q;
-                        #ifdef DUMMY
+#ifdef DUMMY
                         q = mongo::Query("{$and: [{ \"retargeting\" : false}, {\"type\" : \"teaser\"}, { \"guid\" : \""+ofrId+"\"}]}");
-                        #else
+#else
                         q = QUERY("guid" << ofrId);
-                        #endif // DUMMY
+#endif // DUMMY
                         pdb->OfferLoad(q);
                     }
                 }
@@ -147,7 +147,7 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "informer: " + m->getRoutingKey() + ":" +toString(m) + "</br>";
+                mq_log_ += m->getRoutingKey() + ":" +toString(m) + "</br>";
 
                 if(cfg->logMQ)
                 {
@@ -177,7 +177,7 @@ bool BaseCore::ProcessMQ()
             stopCount = MAXCOUNT;
             while(m->getMessageCount() > -1 && stopCount--)
             {
-                mq_log_ += "account: " + m->getRoutingKey() + ":" +toString(m) + "</br>";
+                mq_log_ += m->getRoutingKey() + ":" +toString(m) + "</br>";
 
                 if(cfg->logMQ)
                 {
@@ -289,14 +289,14 @@ void BaseCore::InitMessageQueue()
         mq_account_ = amqp_->createQueue();
         mq_account_->Declare(mq_account_name, AMQP_AUTODELETE | AMQP_EXCLUSIVE);
 
-       // Привязываем очереди
+        // Привязываем очереди
         exchange_->Bind(mq_advertise_name, "advertise.#");
         exchange_->Bind(mq_campaign_name, "campaign.#");
         exchange_->Bind(mq_informer_name, "informer.#");
         exchange_->Bind(mq_account_name, "account.#");
 
-       std::clog<<"Created ampq queues: "<<mq_campaign_name<<","<<mq_informer_name<<","
-       <<mq_advertise_name<<","<<mq_account_name<<std::endl;
+        std::clog<<"Created ampq queues: "<<mq_campaign_name<<","<<mq_informer_name<<","
+                 <<mq_advertise_name<<","<<mq_account_name<<std::endl;
     }
     catch (AMQPException &ex)
     {
@@ -304,12 +304,11 @@ void BaseCore::InitMessageQueue()
     }
 }
 
-/** Возвращает данные о состоянии службы
- *  TODO Надоб переписать с учётом использования boost::formater красивее будет как некак :)
+/** Возвращает расширенные данные о состоянии службы
  */
-std::string BaseCore::Status()
+std::string BaseCore::Status(bool fullData)
 {
-     std::stringstream out;
+    std::stringstream out;
     // Обработано запросов на момент прошлого обращения к статистике
 //    static int last_time_request_processed = 0;
 
@@ -372,15 +371,15 @@ std::string BaseCore::Status()
         "</td></tr>";
     out << "<tr><td>Количество ниток: </td> <td>" << Config::Instance()->server_children_<< "</td></tr>";
 
-        out << "<tr><td>Основная база данных:</td> <td>" <<
-            cfg->mongo_main_db_<< "/";
-        out << "<br/>slave_ok = " << (cfg->mongo_main_slave_ok_? "true" : "false");
-        out << "<br/>replica set=";
-        if (cfg->mongo_main_set_.empty())
-            out << "no set";
-        else
-            out << cfg->mongo_main_set_;
-        out << "</td></tr>";
+    out << "<tr><td>Основная база данных:</td> <td>" <<
+        cfg->mongo_main_db_<< "/";
+    out << "<br/>slave_ok = " << (cfg->mongo_main_slave_ok_? "true" : "false");
+    out << "<br/>replica set=";
+    if (cfg->mongo_main_set_.empty())
+        out << "no set";
+    else
+        out << cfg->mongo_main_set_;
+    out << "</td></tr>";
 
     out << "<tr><td>База данных Redis (краткосрочная история):</td> <td>" <<
         Config::Instance()->redis_short_term_history_host_ << ":";
@@ -409,33 +408,33 @@ std::string BaseCore::Status()
     out << "</br>used = " << (Config::Instance()->range_context_ > 0 ? "true" : "false");
     out << "</td></tr>";
 
-/*    out << "<tr><td>База данных Redis (категорий):</td> <td>" <<
-        Config::Instance()->redis_category_host_ << ":";
-    out << Config::Instance()->redis_category_port_;
-    out << "(TTL =0)<br/>";
-    out << "used = false";
-    out << "</td></tr>";
-*/
+    /*    out << "<tr><td>База данных Redis (категорий):</td> <td>" <<
+            Config::Instance()->redis_category_host_ << ":";
+        out << Config::Instance()->redis_category_port_;
+        out << "(TTL =0)<br/>";
+        out << "used = false";
+        out << "</td></tr>";
+    */
     out << "<tr><td>База данных Redis (ретаргетинг):</td> <td>" <<
         Config::Instance()->redis_retargeting_host_ << ":";
     out << Config::Instance()->redis_retargeting_port_;
     out << "</br>ttl =" << Config::Instance()->retargeting_by_time_;
     out << "</br>used = ";
-    #ifdef DUMMY
+#ifdef DUMMY
     out<<"false";
-    #else
+#else
     out<<"true";
-    #endif // DUMMY
+#endif // DUMMY
     out << "</td></tr>\n";
 
-        out << "<tr><td>База данных журналирования: </td> <td>" << cfg->mongo_log_db_;
-        out << "</br>slave_ok = " << (cfg->mongo_log_slave_ok_? "true" : "false");
-        out << "</br>replica set = ";
-        if (cfg->mongo_log_set_.empty())
-            out << " no ";
-        else
-            out << cfg->mongo_log_set_;
-        out << "</td></tr>";
+    out << "<tr><td>База данных журналирования: </td> <td>" << cfg->mongo_log_db_;
+    out << "</br>slave_ok = " << (cfg->mongo_log_slave_ok_? "true" : "false");
+    out << "</br>replica set = ";
+    if (cfg->mongo_log_set_.empty())
+        out << " no ";
+    else
+        out << cfg->mongo_log_set_;
+    out << "</td></tr>";
 
 
     out << "<tr><td>Время запуска:</td> <td>" << time_service_started_ <<
@@ -447,59 +446,63 @@ std::string BaseCore::Status()
     //out <<  "<tr><td>Драйвер mongo: </td><td>" << mongo::versionString << "</td></tr>";
     out << "</table>";
 
-    std::vector<Campaign*> campaigns;
-    Campaign::info(campaigns,false);
-
-    out << "<p>Загружено <b>" << campaigns.size() << "</b> таргеринговых кампаний: </p>\n";
-    out << "<table><tr>\n"
-        "<th>Наименование</th>"
-        "<th>Действительна</th>"
-        "<th>Социальная</th>"
-        "<th>Предложений</th>"
-        "</tr>\n";
-
-
-    for (auto it = campaigns.begin(); it != campaigns.end(); it++)
+    if(fullData)
     {
-        out << "<tr>" <<
-            "<td>" << (*it)->title << "</td>" <<
-            "<td>" << ((*it)->valid ? "Да" : "Нет") << "</td>" <<
-            "<td>" << ((*it)->social ? "Да" : "Нет") << "</td>" <<
-            "<td>" << (*it)->offersCount << "</td>"<<
+        std::vector<Campaign*> campaigns;
+        Campaign::info(campaigns,false);
+
+        out << "<p>Загружено <b>" << campaigns.size() << "</b> таргеринговых кампаний: </p>\n";
+        out << "<table><tr>\n"
+            "<th>Наименование</th>"
+            "<th>Действительна</th>"
+            "<th>Социальная</th>"
+            "<th>Предложений</th>"
             "</tr>\n";
-        delete *it;
-    }
-    out << "</table>";
-    campaigns.clear();
 
-    Campaign::info(campaigns,true);
-    out << "<p>Загружено <b>" << campaigns.size() << "</b> ретаргеринговых кампаний: </p>\n";
-    out << "<table><tr>\n"
-        "<th>Наименование</th>"
-        "<th>Действительна</th>"
-        "<th>Социальная</th>"
-        "<th>Предложений</th>"
-        "</tr>\n";
 
-    for (auto it = campaigns.begin(); it != campaigns.end(); it++)
-    {
-        out << "<tr>" <<
-            "<td>" << (*it)->title << "</td>" <<
-            "<td>" << ((*it)->valid ? "Да" : "Нет") << "</td>" <<
-            "<td>" << ((*it)->social ? "Да" : "Нет") << "</td>" <<
-            "<td>" << (*it)->offersCount << "</td>"<<
+        for (auto it = campaigns.begin(); it != campaigns.end(); it++)
+        {
+            out << "<tr>" <<
+                "<td>" << (*it)->title << "</td>" <<
+                "<td>" << ((*it)->valid ? "Да" : "Нет") << "</td>" <<
+                "<td>" << ((*it)->social ? "Да" : "Нет") << "</td>" <<
+                "<td>" << (*it)->offersCount << "</td>"<<
+                "</tr>\n";
+            delete *it;
+        }
+        out << "</table>";
+        campaigns.clear();
+
+        Campaign::info(campaigns,true);
+        out << "<p>Загружено <b>" << campaigns.size() << "</b> ретаргеринговых кампаний: </p>\n";
+        out << "<table><tr>\n"
+            "<th>Наименование</th>"
+            "<th>Действительна</th>"
+            "<th>Социальная</th>"
+            "<th>Предложений</th>"
             "</tr>\n";
-        delete *it;
-    }
-    out << "</table>";
-    campaigns.clear();
 
-    // Журнал сообщений AMQP
-    out << "<p>Журнал AMQP: </p>"
-        "<table>";
-    out << "<tr><td>Последнее сообщение:</td><td>"<< mq_log_<< "</td></tr>";
-    out << "<tr><td>Последняя проверка сообщений:</td><td>"<< time_mq_check_ <<"</td><tr>"
-        "</table>";
+        for (auto it = campaigns.begin(); it != campaigns.end(); it++)
+        {
+            out << "<tr>" <<
+                "<td>" << (*it)->title << "</td>" <<
+                "<td>" << ((*it)->valid ? "Да" : "Нет") << "</td>" <<
+                "<td>" << ((*it)->social ? "Да" : "Нет") << "</td>" <<
+                "<td>" << (*it)->offersCount << "</td>"<<
+                "</tr>\n";
+            delete *it;
+        }
+        out << "</table>";
+        campaigns.clear();
+
+        // Журнал сообщений AMQP
+        out << "<p>Журнал AMQP: </p>"
+            "<table>";
+        out << "<tr><td>Последнее сообщение:</td><td>"<< mq_log_<< "</td></tr>";
+        out << "<tr><td>Последняя проверка сообщений:</td><td>"<< time_mq_check_ <<"</td><tr>"
+            "</table>";
+
+    }
     out << "</body>";
     out << "</html>";
 

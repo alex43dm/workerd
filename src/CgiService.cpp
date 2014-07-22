@@ -264,7 +264,13 @@ void CgiService::ProcessRequest(FCGX_Request *req, Core *core)
 
     if (url.param("show") == "status")
     {
-        Response(req, bcore->Status(), "");
+        Response(req, bcore->Status(false), "");
+        return;
+    }
+
+    if (url.param("show") == "full")
+    {
+        Response(req, bcore->Status(true), "");
         return;
     }
 
