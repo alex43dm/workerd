@@ -5,7 +5,7 @@
 #include "json.h"
 
 Offer::Offer(const std::string &id,
-             long long id_int,
+             unsigned long long id_int,
              const std::string &title,
              const std::string &description,
              const std::string &url,

@@ -192,7 +192,7 @@ void Core::ProcessSaveResults()
                 mongo::BSONObj record = mongo::BSONObjBuilder().genOID().
                                         append("dt", dt).
                                         append("id", (*i)->id).
-                                        append("id_int", (unsigned int)(*i)->id_int).
+                                        append("id_int",(long long)(*i)->id_int).
                                         append("title", (*i)->title).
                                         append("inf", params->informer_id_).
                                         append("inf_int", informer->id).
@@ -203,7 +203,7 @@ void Core::ProcessSaveResults()
                                         append("type", Offer::typeToString((*i)->type)).
                                         append("isOnClick", (*i)->isOnClick).
                                         append("campaignId", c->guid).
-                                        append("campaignId_int", (unsigned int)(*i)->campaign_id).
+                                        append("campaignId_int", (long long)(*i)->campaign_id).
                                         append("campaignTitle", c->title).
                                         append("project", c->project).
                                         append("country", (params->getCountry().empty()?"NOT FOUND":params->getCountry().c_str())).
