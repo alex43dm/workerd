@@ -371,6 +371,12 @@ std::string BaseCore::Status(bool fullData)
         "</td></tr>";
     out << "<tr><td>Количество ниток: </td> <td>" << Config::Instance()->server_children_<< "</td></tr>";
 
+    if(!fullData)
+    {
+        out << "</body>";
+        out << "</html>";
+    }
+
     out << "<tr><td>Основная база данных:</td> <td>" <<
         cfg->mongo_main_db_<< "/";
     out << "<br/>slave_ok = " << (cfg->mongo_main_slave_ok_? "true" : "false");
@@ -446,63 +452,60 @@ std::string BaseCore::Status(bool fullData)
     //out <<  "<tr><td>Драйвер mongo: </td><td>" << mongo::versionString << "</td></tr>";
     out << "</table>";
 
-    if(fullData)
+    std::vector<Campaign*> campaigns;
+    Campaign::info(campaigns,false);
+
+    out << "<p>Загружено <b>" << campaigns.size() << "</b> таргеринговых кампаний: </p>\n";
+    out << "<table><tr>\n"
+        "<th>Наименование</th>"
+        "<th>Действительна</th>"
+        "<th>Социальная</th>"
+        "<th>Предложений</th>"
+        "</tr>\n";
+
+
+    for (auto it = campaigns.begin(); it != campaigns.end(); it++)
     {
-        std::vector<Campaign*> campaigns;
-        Campaign::info(campaigns,false);
-
-        out << "<p>Загружено <b>" << campaigns.size() << "</b> таргеринговых кампаний: </p>\n";
-        out << "<table><tr>\n"
-            "<th>Наименование</th>"
-            "<th>Действительна</th>"
-            "<th>Социальная</th>"
-            "<th>Предложений</th>"
+        out << "<tr>" <<
+            "<td>" << (*it)->title << "</td>" <<
+            "<td>" << ((*it)->valid ? "Да" : "Нет") << "</td>" <<
+            "<td>" << ((*it)->social ? "Да" : "Нет") << "</td>" <<
+            "<td>" << (*it)->offersCount << "</td>"<<
             "</tr>\n";
-
-
-        for (auto it = campaigns.begin(); it != campaigns.end(); it++)
-        {
-            out << "<tr>" <<
-                "<td>" << (*it)->title << "</td>" <<
-                "<td>" << ((*it)->valid ? "Да" : "Нет") << "</td>" <<
-                "<td>" << ((*it)->social ? "Да" : "Нет") << "</td>" <<
-                "<td>" << (*it)->offersCount << "</td>"<<
-                "</tr>\n";
-            delete *it;
-        }
-        out << "</table>";
-        campaigns.clear();
-
-        Campaign::info(campaigns,true);
-        out << "<p>Загружено <b>" << campaigns.size() << "</b> ретаргеринговых кампаний: </p>\n";
-        out << "<table><tr>\n"
-            "<th>Наименование</th>"
-            "<th>Действительна</th>"
-            "<th>Социальная</th>"
-            "<th>Предложений</th>"
-            "</tr>\n";
-
-        for (auto it = campaigns.begin(); it != campaigns.end(); it++)
-        {
-            out << "<tr>" <<
-                "<td>" << (*it)->title << "</td>" <<
-                "<td>" << ((*it)->valid ? "Да" : "Нет") << "</td>" <<
-                "<td>" << ((*it)->social ? "Да" : "Нет") << "</td>" <<
-                "<td>" << (*it)->offersCount << "</td>"<<
-                "</tr>\n";
-            delete *it;
-        }
-        out << "</table>";
-        campaigns.clear();
-
-        // Журнал сообщений AMQP
-        out << "<p>Журнал AMQP: </p>"
-            "<table>";
-        out << "<tr><td>Последнее сообщение:</td><td>"<< mq_log_<< "</td></tr>";
-        out << "<tr><td>Последняя проверка сообщений:</td><td>"<< time_mq_check_ <<"</td><tr>"
-            "</table>";
-
+        delete *it;
     }
+    out << "</table>";
+    campaigns.clear();
+
+    Campaign::info(campaigns,true);
+    out << "<p>Загружено <b>" << campaigns.size() << "</b> ретаргеринговых кампаний: </p>\n";
+    out << "<table><tr>\n"
+        "<th>Наименование</th>"
+        "<th>Действительна</th>"
+        "<th>Социальная</th>"
+        "<th>Предложений</th>"
+        "</tr>\n";
+
+    for (auto it = campaigns.begin(); it != campaigns.end(); it++)
+    {
+        out << "<tr>" <<
+            "<td>" << (*it)->title << "</td>" <<
+            "<td>" << ((*it)->valid ? "Да" : "Нет") << "</td>" <<
+            "<td>" << ((*it)->social ? "Да" : "Нет") << "</td>" <<
+            "<td>" << (*it)->offersCount << "</td>"<<
+            "</tr>\n";
+        delete *it;
+    }
+    out << "</table>";
+    campaigns.clear();
+
+    // Журнал сообщений AMQP
+    out << "<p>Журнал AMQP: </p>"
+        "<table>";
+    out << "<tr><td>Последнее сообщение:</td><td>"<< mq_log_<< "</td></tr>";
+    out << "<tr><td>Последняя проверка сообщений:</td><td>"<< time_mq_check_ <<"</td><tr>"
+        "</table>";
+
     out << "</body>";
     out << "</html>";
 
