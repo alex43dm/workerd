@@ -14,6 +14,7 @@ void HistoryManager::getLongTerm()
     }
 
     sphinx->addRequest(base64_decode(pLongTerm->get(key)),inf->range_long_term,EBranchT::T5);
+    isProcessed += "l";
 }
 
 void *HistoryManager::getLongTermEnv(void *data)

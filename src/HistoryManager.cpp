@@ -66,11 +66,13 @@ void HistoryManager::startGetUserHistory(Params *_params, Informer *inf_)
     if(inf->isSearch())
     {
         sphinx->addRequest(params->getSearch(),inf->range_search,EBranchT::T1);
+        isProcessed = "u";
     }
     //Запрос по контексту страницы
     if(inf->isContext())
     {
         sphinx->addRequest(params->getContext(),inf->range_context,EBranchT::T2);
+        isProcessed += "c";
     }
 
     if(inf->isLongTerm())
@@ -91,8 +93,6 @@ void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
     {
         return;
     }
-
-    isProcessed = true;
 
     if(inf->isShortTerm())
     {
@@ -137,7 +137,7 @@ bool HistoryManager::updateUserHistory(
 
     sphinx->cleanFilter();
 
-    isProcessed = false;
+    isProcessed.clear();
 
     return true;
 }

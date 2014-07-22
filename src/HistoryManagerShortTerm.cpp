@@ -14,6 +14,7 @@ void HistoryManager::getShortTerm()
     }
 
     sphinx->addRequest(base64_decode(pShortTerm->get(key)),inf->range_short_term,EBranchT::T4);
+    isProcessed += "s";
 }
 
 void *HistoryManager::getShortTermEnv(void *data)

@@ -103,7 +103,7 @@ void Core::log()
     if(cfg->logCoreTime)
     {
         std::clog<<" core time:"<< boost::posix_time::to_simple_string(endCoreTime - startCoreTime)
-        <<" use sphinx:"<<hm->isSphinxProcessed();
+        <<" sphinx:"<<hm->isSphinxProcessed();
     }
 
     if(cfg->logOutPutSize)

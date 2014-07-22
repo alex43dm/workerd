@@ -49,11 +49,11 @@ public:
     bool moveUpTailOffers(Offer::Map &items, float teasersMaxRating);
     void getRetargetingAsyncWait();
 
-    bool isSphinxProcessed(){ return isProcessed;}
+    std::string isSphinxProcessed(){ return isProcessed;}
 
 protected:
 private:
-    bool isProcessed;
+    std::string isProcessed;
     std::string key;
     Params *params;
     Informer *inf;
