@@ -56,7 +56,7 @@ bool HistoryManager::setTailOffers(const Offer::Map &items,
 
     for(auto it = items.begin(); it != items.end(); ++it)
     {
-        if(!all_social && (*it).second->social)
+        if(!all_social && (*it).second && (*it).second->social)
             continue;
 
         fFound = false;
