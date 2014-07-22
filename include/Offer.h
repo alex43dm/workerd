@@ -64,7 +64,7 @@ public:
           const std::string &url,
           const std::string &image_url,
           const std::string &swf,
-          long long campaign_id,
+          unsigned long long campaign_id,
           int type,
           float rating,
           int uniqueHits,
