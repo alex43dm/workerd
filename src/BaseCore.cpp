@@ -15,6 +15,7 @@
 #include "Campaign.h"
 #include "Offer.h"
 #include "Config.h"
+#include "CpuStat.h"
 
 #define MAXCOUNT 1000
 
@@ -370,6 +371,9 @@ std::string BaseCore::Status(bool fullData)
         boost::posix_time::second_clock::local_time() <<
         "</td></tr>";
     out << "<tr><td>Количество ниток: </td> <td>" << Config::Instance()->server_children_<< "</td></tr>";
+    out << "<tr><td>CPU user: </td> <td>" << CpuStat::cpu_user << "</td></tr>";
+    out << "<tr><td>CPU sys: </td> <td>" << CpuStat::cpu_sys << "</td></tr>";
+    out << "<tr><td>RAM: </td> <td>" << CpuStat::vsize << "</td></tr>";
 
     if(!fullData)
     {

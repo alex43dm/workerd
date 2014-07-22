@@ -2,6 +2,7 @@
 #define CPUSTAT_H
 
 #include <sys/types.h>
+
 struct meterage
 {
     long unsigned int utime_ticks;
@@ -16,7 +17,9 @@ struct meterage
 class CpuStat
 {
 public:
-    double cpu_user, cpu_sys;
+    static double cpu_user;
+    static double cpu_sys;
+    static long unsigned int vsize;
 
     CpuStat();
     virtual ~CpuStat();
