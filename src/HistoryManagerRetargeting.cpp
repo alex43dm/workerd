@@ -92,7 +92,7 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
         if(OutPutCampaignSet.count((*p).second->campaign_id) == 0
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            (*p).second->branch = EBranchL::L32;
+            (*p).second->branch = EBranchL::L31;
             vRISRetargetingResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
@@ -108,7 +108,7 @@ void HistoryManager::RISAlgorithmRetagreting(const Offer::MapRate &result)
         if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            (*p).second->branch = EBranchL::L33;
+            (*p).second->branch = EBranchL::L32;
             vRISRetargetingResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
 
