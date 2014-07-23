@@ -343,7 +343,7 @@ void Core::RISAlgorithm(const Offer::Map &items)
         {
             if((*i).second->type == Offer::Type::banner && vResult.size() == 0)
             {
-                if((*i).second->branch ==  EBranchL::L30) (*i).second->branch = EBranchL::L34;
+                //if((*i).second->branch ==  EBranchL::L30) (*i).second->branch = EBranchL::L34;
                 vResult.insert(vResult.begin(),(*i).second);
                 return;
             }
@@ -373,7 +373,7 @@ void Core::RISAlgorithm(const Offer::Map &items)
         if(OutPutCampaignSet.count((*p).second->campaign_id) < (*p).second->unique_by_campaign
                 && OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            if((*p).second->branch ==  EBranchL::L30) (*p).second->branch = EBranchL::L35;
+            //if((*p).second->branch ==  EBranchL::L30) (*p).second->branch = EBranchL::L35;
             vResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
@@ -388,7 +388,7 @@ void Core::RISAlgorithm(const Offer::Map &items)
     {
         if(OutPutOfferSet.count((*p).second->id_int) == 0)
         {
-            if((*p).second->branch ==  EBranchL::L30) (*p).second->branch = EBranchL::L36;
+            //if((*p).second->branch ==  EBranchL::L30) (*p).second->branch = EBranchL::L36;
             vResult.push_back((*p).second);
             OutPutOfferSet.insert((*p).second->id_int);
             OutPutCampaignSet.insert((*p).second->campaign_id);
@@ -402,7 +402,7 @@ void Core::RISAlgorithm(const Offer::Map &items)
     loopCount = vResult.size();
     for(auto p = result.begin(); loopCount < informer->capacity && p != result.end(); ++p, loopCount++)
     {
-        if((*p).second->branch ==  EBranchL::L30) (*p).second->branch = EBranchL::L37;
+        ///if((*p).second->branch ==  EBranchL::L30) (*p).second->branch = EBranchL::L37;
         vResult.push_back((*p).second);
     }
 
