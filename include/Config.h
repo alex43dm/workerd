@@ -12,6 +12,7 @@ extern unsigned long request_processed_;
 extern unsigned long last_time_request_processed;
 extern unsigned long offer_processed_;
 extern unsigned long social_processed_;
+extern unsigned long retargeting_processed_;
 
 class Config
 {

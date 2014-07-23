@@ -355,14 +355,13 @@ std::string BaseCore::Status(const std::string &server_name, bool fullData)
     out << "<h1>Состояние службы Yottos GetMyAd worker</h1>";
     out << "<table>";
     out << "<tr>";
-    out << "<td>Обработано запросов:</td> <td><b>" << request_processed_;
+    out << "<td>Обработано запросов:</td><td><b>" << request_processed_;
     out << "</b> (" << requests_per_second_current << "/сек, ";
     out << " в среднем " << requests_per_second_average << "/сек) ";
     out << "</td></tr>";
-    out << "<tr>";
-    out << "<td>Общее кол-во показов:</td> <td><b>" << offer_processed_;
+    out << "<tr><td>Общее кол-во показов:</td><td><b>" << offer_processed_;
     out << "</b> (" << social_processed_ << " из них социальная реклама) "<< "</td></tr>";
-
+    out << "<tr><td>Общее кол-во ретаргетинговых показов:</td><td><b>" << retargeting_processed_<< "</td></tr>";
     out << "<tr><td>Имя сервера: </td> <td>" << (server_name.empty() ? server_name : "неизвестно") <<"</td></tr>";
     out << "<tr><td>IP сервера: </td> <td>" <<Config::Instance()->server_ip_ <<"</td></tr>";
     out << "<tr><td>Текущее время: </td> <td>" <<

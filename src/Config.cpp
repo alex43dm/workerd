@@ -15,6 +15,7 @@ unsigned long request_processed_;
 unsigned long last_time_request_processed;
 unsigned long offer_processed_;
 unsigned long social_processed_;
+unsigned long retargeting_processed_;
 
 // Global static pointer used to ensure a single instance of the class.
 Config* Config::mInstance = NULL;
@@ -648,6 +649,7 @@ bool Config::Load()
     last_time_request_processed = 0;
     offer_processed_ = 0;
     social_processed_ = 0;
+    retargeting_processed_ = 0;
 
     mIsInited = true;
     return mIsInited;

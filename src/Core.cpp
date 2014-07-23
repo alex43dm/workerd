@@ -218,7 +218,15 @@ void Core::ProcessSaveResults()
 
                 delete c;
 
-                offer_processed_ ++;
+                if(!(*i)->retargeting)
+                {
+                  offer_processed_++;
+                }
+                else
+                {
+                  retargeting_processed_++;
+                }
+
                 if ((*i)->social) social_processed_ ++;
             }
         }
