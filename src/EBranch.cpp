@@ -74,10 +74,10 @@ const std::string EBranchL2String(EBranchL b)
         case EBranchL::L31: return "NL31";//retargeting ris 1(teaser when teaser unique id and with company unique)
         case EBranchL::L32: return "NL32";//retargeting ris 2(teaser when teaser unique id and company <= unique_by_campaign)
         case EBranchL::L33: return "NL33";//tail
-        case EBranchL::L34: return "NL34";//ris: banner select if not NL0
-        case EBranchL::L35: return "NL35";//ris: teaser by unique id and company if not NL0
-        case EBranchL::L36: return "NL36";//ris: teaser by unique id if not NL0
-        case EBranchL::L37: return "NL36";//ris: expand to return size if not NL0
+        case EBranchL::L34: return "NL34";//ris: banner select if not was changed before
+        case EBranchL::L35: return "NL35";//ris: teaser by unique id and company if not was changed before
+        case EBranchL::L36: return "NL36";//ris: teaser by unique id if not was changed before
+        case EBranchL::L37: return "NL37";//ris: expand to return size if not was changed before
         default: return "NOP";
     }
 };
