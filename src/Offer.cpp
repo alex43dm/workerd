@@ -31,7 +31,11 @@ Offer::Offer(const std::string &id,
     swf(swf),
     campaign_id(campaign_id),
     type(typeFromInt(type_int)),
+#ifndef DUMMY
     branch(EBranchL::L30),
+#else
+    branch(EBranchL::L0),
+#endif
     rating(rating),
     uniqueHits(uniqueHits),
     height(height),
