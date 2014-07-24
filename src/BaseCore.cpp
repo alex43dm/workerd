@@ -371,7 +371,7 @@ std::string BaseCore::Status(const std::string &server_name, bool fullData)
     out << "<tr><td>Количество ниток: </td> <td>" << Config::Instance()->server_children_<< "</td></tr>";
     out << "<tr><td>CPU user: </td> <td>" << CpuStat::cpu_user << "</td></tr>";
     out << "<tr><td>CPU sys: </td> <td>" << CpuStat::cpu_sys << "</td></tr>";
-    out << "<tr><td>RAM: </td> <td>" << CpuStat::vsize << "</td></tr>";
+    out << "<tr><td>RAM: </td> <td>" << CpuStat::rss << "</td></tr>";
 
     if(!fullData)
     {

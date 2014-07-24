@@ -19,7 +19,7 @@ class CpuStat
 public:
     static double cpu_user;
     static double cpu_sys;
-    static long unsigned int vsize;
+    static long unsigned int rss;
 
     CpuStat();
     virtual ~CpuStat();

@@ -85,7 +85,7 @@ void CgiService::run()
            && !loaded)
         {
             bcore->ReloadAllEntities();
-
+            /*
             mem = stat->freeMem();
             if(mem != -1 && mem <= 5)
             {
@@ -96,7 +96,8 @@ void CgiService::run()
             {
                 bcore->ClearSession(false);
             }
-
+            */
+            bcore->ClearSession(false);
             loaded = true;
         }
         else if( now.time_of_day().minutes() % Config::Instance()->time_update_ != 0

@@ -8,7 +8,7 @@
 
 double CpuStat::cpu_user = 0;
 double CpuStat::cpu_sys = 0;
-long unsigned int CpuStat::vsize = 0;
+long unsigned int CpuStat::rss = 0;
 
 CpuStat::CpuStat()
 {
@@ -96,9 +96,9 @@ void CpuStat::cpuUsage()
                     - (last_usage.stime_ticks + last_usage.cstime_ticks))) /
                     (double) total_time_diff);
     last_usage = cur_usage;
-    vsize = last_usage.vsize;
+    rss = last_usage.rss;
 
-    syslog(LOG_INFO, "cpu: sys:%02.2f user:%02.2f vs:%lu", cpu_sys, cpu_user,last_usage.vsize/1024);
+    syslog(LOG_INFO, "cpu: sys:%02.2f user:%02.2f vs:%lu", cpu_sys, cpu_user,last_usage.rss/1024);
 }
 
 int CpuStat::freeMem()
