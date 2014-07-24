@@ -48,7 +48,7 @@ public:
     std::string Status(const std::string &,bool);
 
        //clear session table
-    bool ClearSession() { return pdb->ClearSession(); }
+    bool ClearSession(bool clearAll) { return pdb->ClearSession(clearAll); }
 
 
 private:

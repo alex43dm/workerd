@@ -1659,7 +1659,7 @@ bool ParentDB::AccountLoad(mongo::Query query)
 {$and:[{ $or: [{"blocked":"banned"},{"blocked":"light"}]},{"login" 2: "vnutri.info"}]}
 */
 
-bool ParentDB::ClearSession()
+bool ParentDB::ClearSession(bool clearAll)
 {
     try
     {
@@ -1667,10 +1667,17 @@ bool ParentDB::ClearSession()
 
         pStmt = new Kompex::SQLiteStatement(pdb);
 
-        sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE \
-                         (retargeting=0 AND viewTime<%llu) OR (retargeting=1 AND viewTime<%llu);",
-            std::time(0) - cfg->views_expire_,
-            std::time(0) - cfg->retargeting_by_time_);
+        if(clearAll)
+        {
+            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session;");
+        }
+        else
+        {
+            sqlite3_snprintf(sizeof(buf),buf,"DELETE FROM Session WHERE \
+                             (retargeting=0 AND viewTime<%llu) OR (retargeting=1 AND viewTime<%llu);",
+                std::time(0) - cfg->views_expire_,
+                std::time(0) - cfg->retargeting_by_time_);
+        }
 
         pStmt->SqlStatement(buf);
 

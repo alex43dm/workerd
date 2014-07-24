@@ -37,7 +37,7 @@ public:
 
     bool AccountLoad(mongo::Query=mongo::Query());
 
-    bool ClearSession();
+    bool ClearSession(bool);
 
 private:
     bool fConnectedToMainDatabase;

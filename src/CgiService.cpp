@@ -71,6 +71,7 @@ void CgiService::run()
 {
     boost::posix_time::ptime now;
     bool loaded = false;
+    int mem;
   //  int memSize = 0, newMemSize;
 
    //main loop
@@ -84,7 +85,18 @@ void CgiService::run()
            && !loaded)
         {
             bcore->ReloadAllEntities();
-            bcore->ClearSession();
+
+            mem = stat->freeMem();
+            if(mem != -1 && mem <= 5)
+            {
+                bcore->ClearSession(true);
+                std::clog<<"free memory: "<<mem<<"%, clear all session"<<std::endl;
+            }
+            else
+            {
+                bcore->ClearSession(false);
+            }
+
             loaded = true;
         }
         else if( now.time_of_day().minutes() % Config::Instance()->time_update_ != 0

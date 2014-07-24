@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <syslog.h>
+#include <sys/sysinfo.h>
 
 #include "CpuStat.h"
 
@@ -99,6 +100,19 @@ void CpuStat::cpuUsage()
 
     syslog(LOG_INFO, "cpu: sys:%02.2f user:%02.2f vs:%lu", cpu_sys, cpu_user,last_usage.vsize/1024);
 }
+
+int CpuStat::freeMem()
+{
+    struct sysinfo info;
+
+    if( sysinfo(&info) == 0 )
+    {
+        return info.freeram * 100 /info.totalram;
+    }
+
+    return -1;
+}
+
 /*
 //calculates the elapsed CPU usage between 2 measuring points in ticks
 void CpuStat::_cpuUsage()

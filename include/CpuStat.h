@@ -24,6 +24,7 @@ public:
     CpuStat();
     virtual ~CpuStat();
     void cpuUsage();
+    int freeMem();
 //    void _cpuUsage();
 
 protected:
