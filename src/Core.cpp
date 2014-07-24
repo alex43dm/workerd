@@ -107,7 +107,7 @@ void Core::log()
     }
 
     if(cfg->logOutPutSize)
-        std::clog<<" out:"<<vResult.size();
+        std::clog<<" out:"<<vResult.size()<<" ret:"<<hm->vRISRetargetingResult.size();
 
     if(cfg->logIP)
         std::clog<<" ip:"<<params->getIP();
