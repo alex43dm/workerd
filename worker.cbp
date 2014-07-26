@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="worker" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/worker" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Option parameters="-c /home/alex/Projects/worker/config.xml" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DDEBUG" />
+					<Add directory="include" />
+					<Add directory="../libredis/" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/worker" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Option parameters="-c /home/alex/Projects/worker/config.xml -s /tmp/dcg,sock" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="include" />
+					<Add directory="../libredis" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c++0x" />
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Linker>
+			<Add library="mongoclient" />
+			<Add library="fcgi" />
+			<Add library="sphinxclient" />
+			<Add library="GeoIP" />
+			<Add library="rabbitmq" />
+			<Add library="boost_date_time" />
+			<Add library="boost_regex" />
+			<Add library="boost_filesystem" />
+			<Add library="boost_thread" />
+			<Add library="boost_system" />
+			<Add library="icui18n" />
+			<Add library="icuuc" />
+			<Add library="icudata" />
+			<Add library="tinyxml" />
+			<Add library="sqlite3" />
+			<Add library="pthread" />
+			<Add library="rt" />
+			<Add library="libs/amqpcpp/libamqpcpp.a" />
+		</Linker>
+		<Unit filename="INSTALL" />
+		<Unit filename="Makefile.am" />
+		<Unit filename="README" />
+		<Unit filename="config.h" />
+		<Unit filename="config.xml" />
+		<Unit filename="configure.ac" />
+		<Unit filename="db_dump/post/01.sql" />
+		<Unit filename="db_dump/region.csv" />
+		<Unit filename="db_dump/requests/01.sql" />
+		<Unit filename="db_dump/requests/02.sql" />
+		<Unit filename="db_dump/requests/03.sql" />
+		<Unit filename="db_dump/requests/04.sql" />
+		<Unit filename="db_dump/requests/getCampaings.sql" />
+		<Unit filename="db_dump/schema/wokers.mwb" />
+		<Unit filename="db_dump/schema/wokers.mwb.bak" />
+		<Unit filename="db_dump/tables/00_Campaign.sql" />
+		<Unit filename="db_dump/tables/01_OfferR.sql" />
+		<Unit filename="db_dump/tables/02_Offer.sql" />
+		<Unit filename="db_dump/tables/03_Categories.sql" />
+		<Unit filename="db_dump/tables/04_Categories2Domain.sql" />
+		<Unit filename="db_dump/tables/05_Campaign2Informer.sql" />
+		<Unit filename="db_dump/tables/06_Accounts.sql" />
+		<Unit filename="db_dump/tables/07_Campaign2Accounts.sql" />
+		<Unit filename="db_dump/tables/08_Domains.sql" />
+		<Unit filename="db_dump/tables/09_Campaign2Domains.sql" />
+		<Unit filename="db_dump/tables/10_CronCampaign.sql" />
+		<Unit filename="db_dump/tables/11_GeoCountries.sql" />
+		<Unit filename="db_dump/tables/12_GeoRerions.sql" />
+		<Unit filename="db_dump/tables/13_geoTargeting.sql" />
+		<Unit filename="db_dump/tables/14_regionTargeting.sql" />
+		<Unit filename="db_dump/tables/15_CampaignNow.sql" />
+		<Unit filename="db_dump/tables/16_Informer.sql" />
+		<Unit filename="db_dump/tables/18_Informer2OfferRating.sql" />
+		<Unit filename="db_dump/tables/19_Campaign2Categories.sql" />
+		<Unit filename="db_dump/tables/20_GeoLiteCity.sql" />
+		<Unit filename="db_dump/tables/21_Session.sql" />
+		<Unit filename="db_dump/view/00_Campaign2GeoRerions.sql" />
+		<Unit filename="db_dump/view/02_Campaign2Doms.sql" />
+		<Unit filename="db_dump/view/03_Campaign2Acnts.sql" />
+		<Unit filename="db_dump/view/04_Campaign2Infs.sql" />
+		<Unit filename="include/BaseCore.h" />
+		<Unit filename="include/BoostHelpers.h" />
+		<Unit filename="include/Campaign.h" />
+		<Unit filename="include/CgiService.h" />
+		<Unit filename="include/Config.h" />
+		<Unit filename="include/Cookie.h" />
+		<Unit filename="include/Core.h" />
+		<Unit filename="include/Core_DataBase.h" />
+		<Unit filename="include/CpuStat.h" />
+		<Unit filename="include/DB.h" />
+		<Unit filename="include/DataBase.h" />
+		<Unit filename="include/EBranch.h" />
+		<Unit filename="include/GeoIPTools.h" />
+		<Unit filename="include/HistoryManager.h" />
+		<Unit filename="include/Informer.h" />
+		<Unit filename="include/KompexSQLiteDatabase.h" />
+		<Unit filename="include/KompexSQLiteException.h" />
+		<Unit filename="include/KompexSQLitePrerequisites.h" />
+		<Unit filename="include/KompexSQLiteStatement.h" />
+		<Unit filename="include/Log.h" />
+		<Unit filename="include/Offer.h" />
+		<Unit filename="include/ParamParse.h" />
+		<Unit filename="include/Params.h" />
+		<Unit filename="include/ParentDB.h" />
+		<Unit filename="include/Server.h" />
+		<Unit filename="include/SimpleRedisClient.h" />
+		<Unit filename="include/TempTable.h" />
+		<Unit filename="include/UrlParser.h" />
+		<Unit filename="include/XXXSearcher.h" />
+		<Unit filename="include/base64.h" />
+		<Unit filename="include/json.h" />
+		<Unit filename="include/main.h" />
+		<Unit filename="include/sphinxRequests.h" />
+		<Unit filename="src/BaseCore.cpp" />
+		<Unit filename="src/BoostHelpers.cpp" />
+		<Unit filename="src/Campaign.cpp" />
+		<Unit filename="src/CgiService.cpp" />
+		<Unit filename="src/Config.cpp" />
+		<Unit filename="src/Cookie.cpp" />
+		<Unit filename="src/Core.cpp" />
+		<Unit filename="src/Core_DataBase.cpp" />
+		<Unit filename="src/CpuStat.cpp" />
+		<Unit filename="src/DB.cpp" />
+		<Unit filename="src/DataBase.cpp" />
+		<Unit filename="src/EBranch.cpp" />
+		<Unit filename="src/GeoIPTools.cpp" />
+		<Unit filename="src/GeoRerions.cpp" />
+		<Unit filename="src/HistoryManager.cpp" />
+		<Unit filename="src/HistoryManagerLongTerm.cpp" />
+		<Unit filename="src/HistoryManagerOffer.cpp" />
+		<Unit filename="src/HistoryManagerRetargeting.cpp" />
+		<Unit filename="src/HistoryManagerShortTerm.cpp" />
+		<Unit filename="src/HistoryManagerTail.cpp" />
+		<Unit filename="src/Informer.cpp" />
+		<Unit filename="src/KompexSQLiteDatabase.cpp" />
+		<Unit filename="src/KompexSQLiteStatement.cpp" />
+		<Unit filename="src/Log.cpp" />
+		<Unit filename="src/Offer.cpp" />
+		<Unit filename="src/ParamParse.cpp" />
+		<Unit filename="src/Params.cpp" />
+		<Unit filename="src/ParentDB.cpp" />
+		<Unit filename="src/Server.cpp" />
+		<Unit filename="src/SimpleRedisClient.cpp" />
+		<Unit filename="src/TempTable.cpp" />
+		<Unit filename="src/UrlParser.cpp" />
+		<Unit filename="src/XXXSearcher.cpp" />
+		<Unit filename="src/base64.cpp" />
+		<Unit filename="src/json.cpp" />
+		<Unit filename="src/main.cpp" />
+		<Unit filename="src/sphinxRequests.cpp" />
+		<Unit filename="template/banner.html" />
+		<Unit filename="template/swfobject.js" />
+		<Unit filename="template/teaser.html" />
+		<Extensions>
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+			<code_completion />
+			<envvars set="default" />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

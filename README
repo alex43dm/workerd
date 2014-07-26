@@ -1,0 +1,604 @@
+﻿workerd: multithread demon, to return html(inframe) with offers. Runs on background and listen unix socket(config.xml) ready to http requests from nginx.
+
+Input
+http variables:
+	QUERY_STRING
+	REMOTE_ADDR
+	SCRIPT_NAME
+	HTTP_COOKIE
+
+and url variables:
+	show(status) – show status
+	ip(REMOTE_ADDR) - ip
+	cookie_id(HTTP_COOKIE) – cookie id
+	scr – informer id
+	country – country for tests
+	region – region for tests
+	show(json) – html or json returns
+	location – return to http response
+	w - width
+	h - height
+	search – user search keywords
+	context – site context keywords
+
+Outputs:
+html with offers selected by rating from:
+cat db_dump/requests/01.sql
+
+SELECT ofrs.id,
+ofrs.guid,
+ofrs.title,
+ofrs.price,
+ofrs.description,
+ofrs.url,
+ofrs.image,
+ofrs.swf,
+ofrs.campaignId,
+ofrs.isOnClick,
+ofrs.type,
+CASE WHEN iret.rating IS NOT NULL
+THEN iret.rating
+ELSE ofrs.rating
+END AS rating,
+ofrs.retargeting,
+ofrs.uniqueHits,
+ofrs.height,
+ofrs.width,
+ca.social
+FROM Offer AS ofrs
+INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
+INNER JOIN (
+		SELECT cn.id FROM CampaignNow AS cn
+		%s
+        INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
+        INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
+                AND ct2d.id_dom=%lld
+		EXCEPT
+            SELECT c2d.id_cam AS id
+            FROM Campaign2Domains AS c2d
+            WHERE c2d.id_dom=%lld AND c2d.allowed=0
+		EXCEPT
+            SELECT c2a.id_cam AS id
+            FROM Campaign2Accounts AS c2a
+            WHERE c2a.id_acc=%lld AND c2a.allowed=0
+        EXCEPT
+            SELECT c2i.id_cam AS id
+            FROM Campaign2Informer AS c2i
+            WHERE c2i.id_inf=%lld AND c2i.allowed=0
+) AS c ON ca.id=c.id
+LEFT JOIN tmp%d%lld AS deph ON ofrs.id=deph.id
+LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=%lld AND ofrs.id=iret.id_ofr
+WHERE ofrs.valid=1
+    AND deph.id IS NULL
+;
+
+where:
+tmp%d%lld – user view offers history
+CampaignNow - campaign allowed now by time
+%s -
+IF:
+
+SELECT geo.id_cam FROM geoTargeting AS geo \
+                INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND reg.city='city by geo ip';"
+
+RETURNS COUNT > 0
+
+THEN:
+
+INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+        INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND reg.city='data from geo ip or url request'
+
+ELSE:
+
+INNER JOIN geoTargeting AS geo ON geo.id_cam=cn.id \
+            INNER JOIN GeoLiteCity AS reg ON geo.id_geo = reg.locId AND(reg.country='UA' AND reg.city='')
+ELSE:
+EMPTY STRING
+
+Core algorithm
+
+each thread wait input, so it cann't get cpu resources, after parsing intput variables(class Param) and get geo data:
+1) load informer:
+cat db_dump/requests/02.sql
+SELECT 	inf.id,
+	inf.capacity,
+	inf.bannersCss,
+	inf.teasersCss,
+	inf.domainId,
+	inf.accountId
+FROM Informer AS inf
+WHERE inf.guid=@informerUid
+LIMIT 1;
+    <short_term>0</short_term>
+    <long_term>0</long_term>
+    <context>0</context>
+    <search>1.2</search>
+</range>
+ if 0 – does not use in sphinx search and the don't make history request.
+For fine tune sphinx(Context search by offers)
+
+3) get all offers from request(Outputs)
+
+4) wait until all histories were loaded and process rating correction in sphinx(class XXXSearcher) history with zero rating does not use. The daemon can correct rating by context search(sphinx) on selected offers(“Input”) by formula:
+
+                float weight = sphinx_get_weight (res, i ) / 1000;
+
+                pOffer->rating = pOffer->rating
+                    + rate_from_config  * maxRating
+                    + weight;
+
+rate_from_config – config section:   <range></ range>
+maxRating – max rating in offers
+weight – sphinx  weight / 1000
+
+The sphinx uses config.xml sphinx.fields describes:
+
+ <sphinx>
+	<field_name>field_rating</field_name>
+</ sphinx>
+
+field_name MUST be the same as in sphinx schema: /etc/sphinx/sphinx_driver.py
+       <sphinx:schema>
+        <sphinx:field name="title"/>
+        <sphinx:field name="description"/>
+        <sphinx:field name="keywords"/>
+        <sphinx:field name="exactly_phrases"/>
+        <sphinx:field name="phrases"/>
+        <sphinx:field name="minuswords"/>
+        <sphinx:attr name="stitle" type="string"/>
+        <sphinx:attr name="sdescription" type="string"/>
+        <sphinx:attr name="skeywords" type="string"/>
+        <sphinx:attr name="sexactly_phrases" type="string"/>
+        <sphinx:attr name="sphrases" type="string"/>
+        <sphinx:attr name="guid" type="string"/>
+        <sphinx:attr name="match" type="string"/>
+        <sphinx:attr name="fguid" type="int"/>
+        </sphinx:schema>
+
+in section <index>worker-full</index> set sphinx index name: /etc/sphinx/sphinx_driver.py
+mode == "worker-full"
+
+The  mach_mode,  rank_mode, sort_mode see “Context search by offers”.
+
+5) process RIS algorithm(main)
+	input:
+		const Offer::Map &items,
+		unsigned outLen(capacity)
+	output:
+		Offer::Vector &RISResult
+
+
+	b) teaser rating and banner check: if fount first banner(max rating) return
+	c) turn on clean history flag if all offers are social
+	d) if teaser vector size less then capacity
+	e) remove social
+	f) add teaser with company unique and rating > 0
+	h) add teaser with company unique and with any rating
+
+SYSLOG-NG
+add that in /etc/syslog-ng/syslog-ng.conf:
+
+{
+    template("$R_ISODATE $MSG\n");
+    template_escape(no);
+};
+
+destination getmyad { file("/var/log/workerd.log" template(t_isots)); };
+filter f_getmyad { program("getmyad"); };
+log { source(src); filter(f_getmyad); destination(getmyad); };
+
+NIGING
+the sample nginx configuration:
+
+        upstream fastcgi_backend {
+                server unix:/tmp/workerd.sock;
+                server unix:/tmp/workerd1.sock;
+                server unix:/tmp/workerd2.sock;
+        }
+
+        server {
+                listen 0.0.0.0;
+                server_name yottos.com;
+                access_log off;#/var/log/nginx/localhost.access_log main;
+                error_log /var/log/nginx/localhost.error_log info;
+                root /var/www/localhost/htdocs;
+                keepalive_timeout 1ms;
+
+                location /adshow.fcgi {
+                        send_timeout 100ms;
+                        fastcgi_cache off;
+                        fastcgi_pass fastcgi_backend;
+                        fastcgi_buffer_size 24k;
+                        fastcgi_buffers 2 24k;
+                        fastcgi_busy_buffers_size 24k;
+                        fastcgi_keep_conn on;
+                        include fastcgi_params;
+                }
+        }
+
+DATABASES
+At start(if not configured with --enable-debug) forks in background and get data from mongo database described in config.xml section:
+<mongo>
+    <main>
+        <!--ip:port-->
+        <host>213.186.121.76:27018</host>
+        <!--the database name-->
+        <db>getmyad_db</db>
+        <!--replica set name-->
+        <set></set>
+       <!-- enable slave-->
+        <slave>true</slave>
+    </main>
+</mongo>
+
+The database will be loaded into sqlite database file(may be file on tmpfs for debug or control proposes, check write access from user):
+<dbpath>/run/mem.db</dbpath>
+ or memory:
+<dbpath>:memory:</dbpath>
+The database dump
+db_dump/requests/02.sql
+db_dump/requests/01.sql
+db_dump/requests/04.sql
+db_dump/requests/03.sql
+db_dump/UA_RU
+db_dump/tables/11_GeoCountries.sql
+db_dump/tables/00_Campaign.sql
+db_dump/tables/17_Retargeting.sql
+db_dump/tables/12_GeoRerions.sql
+db_dump/tables/20_GeoLiteCity.sql
+db_dump/tables/06_Accounts.sql
+db_dump/tables/02_Offer.sql
+db_dump/tables/07_Campaign2Accounts.sql
+db_dump/tables/15_CampaignNow.sql
+db_dump/tables/16_Informer.sql
+db_dump/tables/18_Informer2OfferRating.sql
+db_dump/tables/10_CronCampaign.sql
+db_dump/tables/05_Campaign2Informer.sql
+db_dump/tables/14_regionTargeting.sql
+db_dump/tables/08_Domains.sql
+db_dump/tables/19_Campaign2Categories.sql
+db_dump/tables/04_Categories2Domain.sql
+db_dump/tables/13_geoTargeting.sql
+db_dump/tables/03_Categories.sql
+db_dump/tables/09_Campaign2Domains.sql
+db_dump/tables/04_Categories2Informer.sql
+db_dump/view/00_Campaign2GeoRerions.sql
+db_dump/view/03_Campaign2Acnts.sql
+db_dump/view/02_Campaign2Doms.sql
+db_dump/view/04_Campaign2Infs.sql
+db_dump/post/01.sql
+db_dump/schema/CampaignNow.sql
+
+loaded from
+<db_dump_path>/etc/worker/db_dump</db_dump_path>
+all files from sub directories sort by name and load into database.
+
+THREADS
+Threads number: server/children
+
+SPHINX
+To match search
+<sphinx>
+ <!--host>213.186.121.76</host-->
+ <host>127.0.0.1</host>
+ <port>9312</port>
+ <index>worker</index>
+ <!--all from /usr/include/sphinxclient.h-->
+ <mach_mode>SPH_MATCH_EXTENDED2</mach_mode>
+ <rank_mode>SPH_RANK_SPH04</rank_mode>
+ <sort_mode>SPH_SORT_RELEVANCE</sort_mode>
+ <fields>
+ <title>80</title>
+ <description>30</description>
+ <!--keywords>70</keywords-->
+ <!--exactly_phrases>100</exactly_phrases-->
+ <!--phrases>90</phrases-->
+ <!--minuswords>100</minuswords-->
+ </fields>
+ <min_offres_process>10</min_offres_process><!-- 20 default value -->
+</sphinx>
+
+The programm can make sphinx requests by:
+    user search,
+    page context,
+    short term history,
+    long term history;
+
+The requests were shown in log file when in config.xml set root->log->sphinx turned on 1.
+
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: shpinx: request for: context : (@title bind | @title linux | @title windows | @title apache | @title nginx | @title mysql | @t
+itle сервер | @title установка | @title настройка | @title mongodb | @title mssql | @title iptables | @title hyper)|(@description bind | @description linux | @descripti
+on windows | @description apache | @description nginx | @description mysql | @description сервер | @description установка | @description настройка | @description mongod
+b | @description mssql | @description iptables | @description hyper)|(@keywords bind | @keywords linux | @keywords windows | @keywords apache | @keywords nginx | @keywo
+rds mysql | @keywords сервер | @keywords установка | @keywords настройка | @keywords mongodb | @keywords mssql | @keywords iptables | @keywords hyper)|(@exactly_phrases
+ bind | @exactly_phrases linux | @exactly_phrases windows | @exactly_phrases apache | @exactly_phrases nginx | @exactly_phrases mysql | @exactly_phrases сервер | @exact
+ly_phrases установка | @exactly_phrases настройка | @exactly_phrases mongodb | @exactly_phrases mssql | @exactly_phrases iptables | @exactly_phrases hyper)|(@phrases bi
+nd | @phrases linux | @phrases windows | @phrases apache | @phrases nginx | @phrases mysql | @phrases сервер | @phrases установка | @phrases настройка | @phrases mongod
+b | @phrases mssql | @phrases iptables | @phrases hyper)|(@minuswords bind | @minuswords linux | @minuswords windows | @minuswords apache | @minuswords nginx | @minuswo
+rds mysql | @minuswords сервер | @minuswords установка | @minuswords настройка | @minuswords mongodb | @minuswords mssql | @minuswords iptables | @minuswords hyper)
+
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: shpinx: request for: short term history : ((@exactly_phrases "<<мано <<керам <<сковор <<плюс <<придбати <<cковор <<нтернет <<м
+агазин <<shop <<замовити "~1) | (@title "мано керам сковор плюс придбати cковор нтернет магазин shop замовити"/3)| (@description "мано керам сковор плюс придбати cковор
+ нтернет магазин shop замовити"/3) | (@keywords  мано | керам | сковор | плюс | придбати | cковор | нтернет | магазин | shop | замовити ) | (@phrases "мано керам сковор
+ плюс придбати cковор нтернет магазин shop замовити"~5))
+
+When offer match the request it rating recalculated:
+
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx:  matches:#14 doc_id=21965, weight=280500 by:  guidint=1695190717  rating=721.218  match=broadmatch sphrases=  skeywords=интернет магазин топшоп sexactly_phrases=
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx:  matches:#8 doc_id=22903, weight=420500 by:  guidint=3157471387  rating=409.096  match=broadmatch sphrases=  skeywords=магазин topshop sexactly_phrases=
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx:  matches:#25 doc_id=22968, weight=280500 by:  guidint=1981191986  rating=1676.64  match=broadmatch sphrases=  skeywords=интернет магазин шланги для полива sexactly_phrases=
+~
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx: offer id: 1695190717 old rating: 625.812 new: 22045.8 weight: 420 match: broadmatch
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx: offer id: 3157471387 old rating: 610.511 new: 22030.5 weight: 420 match: broadmatch
+Jun 10 13:13:07 srv-2 workerd-dev[22003]: sphinx: offer id: 1981191986 old rating: 2787.85 new: 24207.8 weight: 420 match: broadmatch
+
+by formula:
+new offer rating =
+    old offer rating +
+    request rate[user search, page context,short term history,long term history] * max offers rating
+    + weight;
+
+ALL
+Please read and edit config.xml to fine tune.
+
+The configuration options by groups(mongo/main/db means xpath:
+<mongo><main><db/></main></mongo>):
+
+Main configuration:
+ server_ip: ip uses to redirect script
+ redirect_script: the redirect script name
+ geocity_path: geo city database file path
+ shortterm_expire: time to live keys in shortterm redis database in seconds
+	views_expire: time to live keys in  user view redis database in seconds
+	context_expire: time to live keys in site contex  redis database in seconds
+
+The  re-targeting
+	retargeting_by_persents: how match max re-targeting offers can be in result
+	retargeting_by_time: re-targeting user view history time to live
+	retargeting_unique_by_campaign: re-targeting unique by campaign
+
+The range coefficients for shpinx, 0- off, 1-max:
+	range/short_term: short term hostory
+	range/ long_term: long term history
+	range/context: page context
+	range/search: user search keywords
+
+The source database
+	 {$db} in main,log
+	main – the main database(read only),
+	log – log store
+
+	mongo/{$db}/host: host:port
+	mongo/{$db}/db: the database name
+	mongo/{$db}/set: Specifies the name of the replica set, if the mongod is a member of a replica set
+       	mongo/{$db}/slave: to use slaves data
+
+Redis servers
+	 {$db} in  short_term_history, long_term_history, user_view_history
+	short_term_history – short term history,
+	long_term_history – long term history
+	user_view_history  – user view history
+
+	redis/{$db}/host: host
+	redis/{$db}/port: port
+
+Context search by offers:
+Sphinx server:
+    sphinx/host: host(ip address)
+    sphinx/port: port
+    sphinx/index: index name
+    sphinx/mach_mode:
+	SPH_MATCH_ALL Match all query words (default mode).
+	SPH_MATCH_ANY Match any of query words.
+	SPH_MATCH_PHRASE Match query as a phrase, requiring perfect match.
+	SPH_MATCH_BOOLEAN Match query as a boolean expression.
+	SPH_MATCH_EXTENDED Match query as an expression in Sphinx internal query language.
+	SPH_MATCH_FULLSCAN Enables fullscan.
+	SPH_MATCH_EXTENDED2 The same as SPH_MATCH_EXTENDED plus ranking and quorum searching support.
+
+ sphinx/rank_mode:
+	SPH_RANK_PROXIMITY_BM25 = sum(lcs*user_weight)*1000+bm25
+	SPH_RANK_BM25 = bm25
+	SPH_RANK_NONE = 1
+	SPH_RANK_WORDCOUNT = sum(hit_count*user_weight)
+	SPH_RANK_PROXIMITY = sum(lcs*user_weight)
+	SPH_RANK_MATCHANY = sum((word_count+(lcs-1)*max_lcs)*user_weight)
+	SPH_RANK_FIELDMASK = field_mask
+	SPH_RANK_SPH04 = sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight)*1000+bm25
+
+ sphinx/sort_mode:
+	SPH_SORT_RELEVANCE Sort by relevance in descending order (best matches first).
+	SPH_SORT_ATTR_DESC Sort by an attribute in descending order (bigger attribute values first).
+	SPH_SORT_ATTR_ASC Sort by an attribute in ascending order (smaller attribute values first).
+	SPH_SORT_TIME_SEGMENTS Sort by time segments (last hour/day/week/month) in descending order, and then by relevance in descending order.
+	SPH_SORT_EXTENDED Sort by SQL-like combination of columns in ASC/DESC order.
+	SPH_SORT_EXPR Sort by an arithmetic expression.
+
+ sphinx/fields{title,description,keywords,exactly_phrases,phrases,minuswords}: search fields with weight
+
+Server configuration:
+	server/socket_path: unix socket path fast cgi, the same path must in nginx.conf:
+	        upstream fastcgi_backend {
+              	  	server unix:/tmp/workerd.sock;
+                	server unix:/tmp/workerd1.sock;
+                	server unix:/tmp/workerd2.sock;
+        		}
+ server/children: threads number
+ server/mq_path: message queue server user and password
+ server/dbpath sqlite database file path
+ server/db_dump_path sqlite database dump(without data, only schema)
+ server/db_geo_csv geo ip database file path
+ server/template_teaser teaser template file path:
+ %1%	    CSS
+ %2%	    JSON
+ %3%	    offers count
+ %4%	    next link
+ server/template_banner the banner template path
+ server/swfobject swfobject.js file
+ server/geoGity geo city file path
+ server/cookie_name coockie name
+ server/cookie_domain: coockie domain name
+ server/cookie_path coockie path
+ server/lock_file lock file path
+ server/pid_file pid file path
+ server/user: run as user
+ server/time_update: campaign by time update interval
+
+ install:
+ #aclocal -I m4 && autoconf && automake
+ #./configure
+ #make
+
+TESTING
+start:
+nginx, redis[1-6], searchd, rabbitmq, syslog-ng, mongodb
+
+compile debug version:
+make clean
+./configure ./configure --with-debug
+make
+./workerd
+
+in default browser:
+http://yottos.com/adshow.fcgi?scr=00122a9a-9f60-11e1-a3a7-00163e0301c1&location=http%3A%2F%2Fhelpers.com.ua%2F&w=1855&h=1110&search=%D0%B5%D0%B4%D0%B0%20%D0%BA%D0%B0%D0%B7%D0%B8%D0%BD%D0%BE&context=bind%20linux%20windows%20apache%20nginx%20mysql%20%D1%81%D0%B5%D1%80%D0%B2%D0%B5%D1%80%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0%20%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0%20mongodb%20mssql%20iptables%20hyper&rand=105921
+
+where
+src – informer guid
+alex@hp ~/Projects/worker $ echo "select guid from informer limit 1;"|sqlite3 /run/alex/mem.db
+00122a9a-9f60-11e1-a3a7-00163e0301c1
+search – words by space(%20)(rating.search in the config.xml must be more then 0)
+
+output:
+alex@hp ~/Projects/worker $ ./workerd
+Wed Mar 12 16:50:56.338 starting new replica set monitor for replica set vsrv with seed of 213.186.121.76:27018
+Wed Mar 12 16:50:56.364 successfully connected to seed 213.186.121.76:27018 for replica set vsrv
+Wed Mar 12 16:50:56.390 changing hosts to { 0: "213.186.121.76:27018", 1: "212.113.32.147:27018", 2: "212.113.32.146:27018", 3: "212.113.32.167:27018", 4: "212.113.33.66:27018", 5: "213.186.121.199:27018" } from vsrv/
+Wed Mar 12 16:50:56.390 trying to add new host 212.113.32.146:27018 to replica set vsrv
+Wed Mar 12 16:50:56.401 successfully connected to new host 212.113.32.146:27018 in replica set vsrv
+Wed Mar 12 16:50:56.401 trying to add new host 212.113.32.147:27018 to replica set vsrv
+Wed Mar 12 16:50:56.414 successfully connected to new host 212.113.32.147:27018 in replica set vsrv
+Wed Mar 12 16:50:56.414 trying to add new host 212.113.32.167:27018 to replica set vsrv
+Wed Mar 12 16:50:56.425 successfully connected to new host 212.113.32.167:27018 in replica set vsrv
+Wed Mar 12 16:50:56.425 trying to add new host 212.113.33.66:27018 to replica set vsrv
+Wed Mar 12 16:50:56.444 successfully connected to new host 212.113.33.66:27018 in replica set vsrv
+Wed Mar 12 16:50:56.444 trying to add new host 213.186.121.199:27018 to replica set vsrv
+Wed Mar 12 16:50:56.461 successfully connected to new host 213.186.121.199:27018 in replica set vsrv
+Wed Mar 12 16:50:56.461 trying to add new host 213.186.121.76:27018 to replica set vsrv
+Wed Mar 12 16:50:56.488 successfully connected to new host 213.186.121.76:27018 in replica set vsrv
+Wed Mar 12 16:50:56.648 Primary for replica set vsrv changed to 213.186.121.199:27018
+Wed Mar 12 16:50:56.893 replica set monitor for replica set vsrv started, address is vsrv/212.113.32.146:27018,212.113.32.147:27018,212.113.32.167:27018,212.113.33.66:27018,213.186.121.199:27018,213.186.121.76:27018
+Wed Mar 12 16:50:56.893 [ReplicaSetMonitorWatcher] starting
+SELECT ofrs.id,
+ofrs.guid,
+ofrs.title,
+ofrs.price,
+ofrs.description,
+ofrs.url,
+ofrs.image,
+ofrs.swf,
+ofrs.campaignId,
+ofrs.isOnClick,
+ofrs.type,
+CASE WHEN iret.rating IS NOT NULL
+THEN iret.rating
+ELSE ofrs.rating
+END AS rating,
+ofrs.retargeting,
+ofrs.uniqueHits,
+ofrs.height,
+ofrs.width,
+ca.social
+FROM Offer AS ofrs
+INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
+INNER JOIN (
+		SELECT cn.id FROM CampaignNow AS cn
+
+        INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
+        INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
+                AND ct2d.id_dom=324
+		EXCEPT
+            SELECT c2d.id_cam AS id
+            FROM Campaign2Domains AS c2d
+            WHERE c2d.id_dom=324 AND c2d.allowed=0
+		EXCEPT
+            SELECT c2a.id_cam AS id
+            FROM Campaign2Accounts AS c2a
+            WHERE c2a.id_acc=324 AND c2a.allowed=0
+        EXCEPT
+            SELECT c2i.id_cam AS id
+            FROM Campaign2Informer AS c2i
+            WHERE c2i.id_inf=3399645854 AND c2i.allowed=0
+) AS c ON ca.id=c.id
+LEFT JOIN tmp19507140160618098432 AS deph ON ofrs.id=deph.id
+LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=3399645854 AND ofrs.id=iret.id_ofr
+WHERE ofrs.valid=1
+    AND deph.id IS NULL
+;
+
+SELECT ofrs.id,
+ofrs.guid,
+ofrs.title,
+ofrs.price,
+ofrs.description,
+ofrs.url,
+ofrs.image,
+ofrs.swf,
+ofrs.campaignId,
+ofrs.isOnClick,
+ofrs.type,
+CASE WHEN iret.rating IS NOT NULL
+THEN iret.rating
+ELSE ofrs.rating
+END AS rating,
+ofrs.retargeting,
+ofrs.uniqueHits,
+ofrs.height,
+ofrs.width,
+ca.social
+FROM Offer AS ofrs
+INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
+INNER JOIN (
+		SELECT cn.id FROM CampaignNow AS cn
+
+        INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
+        INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
+                AND ct2d.id_dom=324
+		EXCEPT
+            SELECT c2d.id_cam AS id
+            FROM Campaign2Domains AS c2d
+            WHERE c2d.id_dom=324 AND c2d.allowed=0
+		EXCEPT
+            SELECT c2a.id_cam AS id
+            FROM Campaign2Accounts AS c2a
+            WHERE c2a.id_acc=324 AND c2a.allowed=0
+        EXCEPT
+            SELECT c2i.id_cam AS id
+            FROM Campaign2Informer AS c2i
+            WHERE c2i.id_inf=3399645854 AND c2i.allowed=0
+) AS c ON ca.id=c.id
+LEFT JOIN tmp19507140160618098432 AS deph ON ofrs.id=deph.id
+LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=3399645854 AND ofrs.id=iret.id_ofr
+WHERE ofrs.valid=1
+    AND deph.id IS NULL
+;
+
+query0: (@title еда | @title казино)|(@description еда | @description казино)
+retrieved 2 of 2 matches
+Query stats:
+	'=еда' found 2 times in 2 documents
+	'еда*' found 2 times in 2 documents
+	'ед' found 4 times in 4 documents
+	'=казино' found 9 times in 7 documents
+	'казино*' found 9 times in 7 documents
+	'казин' found 9 times in 7 documents
+
+Matches:
+1. doc_id=315, weight=120695, guidint=1379263440, rating=3993.646484, match=nomatch, sphrases=, skeywords=, sexactly_phrases=
+2. doc_id=268, weight=120660, guidint=175701722, rating=0.000000, match=nomatch, sphrases=, skeywords=, sexactly_phrases=
+
+
+
+
+
+good luck:)
+

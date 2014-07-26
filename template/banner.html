@@ -1,0 +1,75 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="robots" content="nofollow" />
+<style type="text/css">html, body {padding: 0; margin: 0; border: 0;}</style>
+ %1% 
+</head>
+<body>
+<div id="mainContainer">
+<div id='adsContainer'></div>
+</div>
+
+<script type='text/javascript' language='JavaScript'>
+ %2%  
+</script>
+
+<script type='text/javascript' language='JavaScript'>
+var initads=%3%;
+function init() {
+  if (arguments.callee.done) return; 
+  arguments.callee.done = true;
+  JsonToAds4Banners(initads);
+  showAds(cursor,cursor + count);
+  cursor+=count;
+  } 
+  if (document.addEventListener) { 
+      document.addEventListener("DOMContentLoaded", init, false);
+  } 
+  if (/WebKit/i.test(navigator.userAgent)) { 
+      var _timer = setInterval(function() { 
+          if (/loaded|complete/.test(document.readyState)) { 
+              clearInterval(_timer);
+              delete _timer;
+              init();
+          } 
+      }, 10); 
+  } 
+  window.onload = init; 
+  var count=1; 
+  var cursor=0; 
+  var t=Math.floor(10/count); 
+  var ads=new Array(); 
+  var adsView=""; 
+  var imgs = new Image(); 
+  function showAds(start,end){ 
+  	adsView="";
+  	document.getElementById('adsContainer').innerHTML ="";
+  	if (end >= ads.length) { 
+  		start = ads.length - (end - start);
+  		end = ads.length;
+  	} 
+  	for (i = start; i < end; i++) { 
+ 		if(ads[i]) 
+  			adsView+=ads[i]; 
+  	} 
+  	document.getElementById('adsContainer').innerHTML = adsView;
+	if(initads[0]['swf'].indexOf(".swf")==(initads[0]['swf'].length-4)){ 
+		var url = initads[0]['url'];
+		swfobject.embedSWF(initads[0]['swf'], "adsContainer",  "100%%",  "100%%", "9.0.0", "http://cdnt.yottos.com/getmyad/banner/expressinstall.swf", {redirectUrl:url,link1:url,clickTAG:url}, {menu:"false", wmode:"transparent",quality:"high",play:"true",loop:"true"});
+	} 
+  } 
+  function JsonToAds4Banners(r){ 
+	i=0;
+  	ads[i] = '<div class="advBlock"><a href="' + 
+  	r[i]['url'] + 
+  	'" target="_blank"><img class="advImage" src="' + 
+  	r[i]['image'] + 
+  	'" alt="' + 
+  	r[i]['title'] + 
+  	'"></a></div>';
+  	imgs.src = r[i]['image']; 
+  } 
+</script>
+</body>
+</html>
