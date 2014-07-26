@@ -110,6 +110,8 @@ public:
         || logOutPutOfferIds || logSphinx;
     }
 
+    std::map<unsigned,std::string> Categories;
+
     DataBase *pDb;
 
     static Config* Instance();

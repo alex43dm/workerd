@@ -1693,4 +1693,21 @@ bool ParentDB::ClearSession(bool clearAll)
 }
 
 
+void ParentDB::OfferCategoriesLoad()
+{
+    if(!fConnectedToMainDatabase)
+        return;
+
+    auto cursor = monga_main->query(cfg->mongo_main_db_ + ".offer.categories", mongo::Query());
+
+    while (cursor->more())
+    {
+        mongo::BSONObj x = cursor->next();
+        cfg->Categories.insert(std::pair<unsigned,std::string>(x.getIntField("guid_int"),x.getStringField("name")));
+    }
+
+    std::clog<<"Loaded offers categories"<<std::endl;
+}
+
+
 

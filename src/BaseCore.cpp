@@ -244,9 +244,11 @@ void BaseCore::LoadAllEntities()
     //загрузили рейтинг
     pdb->loadRating();
 
-    Config::Instance()->pDb->postDataLoad();
+    cfg->pDb->postDataLoad();
 
-    Config::Instance()->pDb->indexRebuild();
+    cfg->pDb->indexRebuild();
+
+    pdb->OfferCategoriesLoad();
 }
 
 

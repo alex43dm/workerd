@@ -71,7 +71,7 @@ void CgiService::run()
 {
     boost::posix_time::ptime now;
     bool loaded = false;
-    int mem;
+//    int mem;
   //  int memSize = 0, newMemSize;
 
    //main loop

@@ -38,6 +38,7 @@ public:
     bool AccountLoad(mongo::Query=mongo::Query());
 
     bool ClearSession(bool);
+    void OfferCategoriesLoad();
 
 private:
     bool fConnectedToMainDatabase;

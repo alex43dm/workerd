@@ -408,6 +408,7 @@ public:
     std::string getRange(const std::string &key);
     std::string get(const std::string &key);
     bool exists(const std::string &key);
+    bool zrange(const std::string &key, std::list<unsigned> &ret);
 protected:
 
     int read_select(int fd, int timeout )  const;

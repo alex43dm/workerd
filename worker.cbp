@@ -17,7 +17,6 @@
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
 					<Add directory="include" />
-					<Add directory="../libredis/" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -30,7 +29,6 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add directory="include" />
-					<Add directory="../libredis" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />

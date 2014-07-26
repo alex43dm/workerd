@@ -7,7 +7,7 @@ enum class EBranchT
 {
     T1, //user search
     T2, //context
-    T3,
+    T3, //category
     T4, //short
     T5, //long
     TMAX

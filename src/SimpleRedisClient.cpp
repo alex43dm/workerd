@@ -1552,3 +1552,18 @@ bool SimpleRedisClient::exists(const std::string &key)
         return false;
     }
 }
+
+bool SimpleRedisClient::zrange(const std::string &key, std::list<unsigned> &ret)
+{
+    int i;
+
+    redis_send( RC_MULTIBULK, "ZRANGE %s 0 -1\r\n", key.c_str());
+
+    for(i = 0; i < multibulk_arg; i++)
+    {
+        ret.push_back(strtol(answer_multibulk[i],NULL,10));
+    }
+
+    return i > 0 ? true : false;
+}
+

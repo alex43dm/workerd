@@ -57,7 +57,7 @@ private:
     std::string key;
     Params *params;
     Informer *inf;
-    SimpleRedisClient *pShortTerm,*pLongTerm,*pRetargeting;
+    SimpleRedisClient *pShortTerm,*pLongTerm,*pRetargeting, *pCategory;
 
     XXXSearcher *sphinx;
 
@@ -65,7 +65,8 @@ private:
                 thrGetLongTermAsync,
                 thrGetShortTermAsync,
                 thrGetRetargetingAsync,
-                thrGetTailOffersAsync;
+                thrGetTailOffersAsync,
+                thrGetCategoryAsync;
 
     std::list<long> mtailOffers;
 
@@ -75,6 +76,7 @@ private:
     void getLongTerm();
     void getShortTerm();
     void getRetargeting();
+    void getCategory();
 
     void updateShortHistory(const std::string & query);
 
@@ -86,6 +88,8 @@ private:
     static void *getRetargetingEnv(void *);
     static void signalHanlerRetargeting(int);
     static void *getTailOffersEnv(void *data);
+    static void *getCategoryEnv(void *);
+    static void signalHanlerCategory(int);
     SimpleRedisClient *getHistoryPointer(const HistoryType type) const;
 
     bool getRetargetingAsync();
@@ -108,5 +112,8 @@ private:
 
     bool getShortTermAsync();
     bool getShortTermAsyncWait();
+
+    bool getCategoryAsync();
+    void getCategoryAsyncWait();
 };
 #endif
