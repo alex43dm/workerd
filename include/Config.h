@@ -46,8 +46,6 @@ public:
     std::string redis_category_host_;
     std::string redis_category_port_;
     unsigned redis_category_timeout_;
-
-
     int views_expire_;
     //int shortterm_expire_;
 

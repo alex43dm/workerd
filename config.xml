@@ -141,6 +141,7 @@
         -->
         <value>1</value>
     </search>
+<<<<<<< HEAD
     <category>
         <value>1</value>
         <!--Redis-сервер с БД о категориях пользователя-->
@@ -152,6 +153,8 @@
             <timeout>100</timeout>
         </redis>
     </category>
+=======
+>>>>>>> e567f23c5c4000a3a58302b34a5433781cec32f2
 </history>
 
 <!--Параметры подключения к базам данных-->

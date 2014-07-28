@@ -71,7 +71,6 @@ LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=%lld AND ofrs.id=iret.id_o
 WHERE ofrs.valid=1
     AND deph.id IS NULL
 ;
-
 where:
 tmp%d%lld – user view offers history
 CampaignNow - campaign allowed now by time
@@ -174,7 +173,6 @@ The  mach_mode,  rank_mode, sort_mode see “Context search by offers”.
 	e) remove social
 	f) add teaser with company unique and rating > 0
 	h) add teaser with company unique and with any rating
-
 SYSLOG-NG
 add that in /etc/syslog-ng/syslog-ng.conf:
 
@@ -188,7 +186,7 @@ destination getmyad { file("/var/log/workerd.log" template(t_isots)); };
 filter f_getmyad { program("getmyad"); };
 log { source(src); filter(f_getmyad); destination(getmyad); };
 
-NIGING
+NGINX
 the sample nginx configuration:
 
         upstream fastcgi_backend {
@@ -423,7 +421,8 @@ Server configuration:
               	  	server unix:/tmp/workerd.sock;
                 	server unix:/tmp/workerd1.sock;
                 	server unix:/tmp/workerd2.sock;
-        		}
+       		}
+
  server/children: threads number
  server/mq_path: message queue server user and password
  server/dbpath sqlite database file path
@@ -596,8 +595,6 @@ Query stats:
 Matches:
 1. doc_id=315, weight=120695, guidint=1379263440, rating=3993.646484, match=nomatch, sphrases=, skeywords=, sexactly_phrases=
 2. doc_id=268, weight=120660, guidint=175701722, rating=0.000000, match=nomatch, sphrases=, skeywords=, sexactly_phrases=
-
-
 
 
 

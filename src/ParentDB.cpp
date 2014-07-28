@@ -1692,7 +1692,6 @@ bool ParentDB::ClearSession(bool clearAll)
     return true;
 }
 
-
 void ParentDB::OfferCategoriesLoad()
 {
     if(!fConnectedToMainDatabase)
@@ -1708,6 +1707,4 @@ void ParentDB::OfferCategoriesLoad()
 
     std::clog<<"Loaded offers categories"<<std::endl;
 }
-
-
 
