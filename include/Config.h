@@ -43,6 +43,9 @@ public:
     std::string redis_retargeting_host_;
     std::string redis_retargeting_port_;
     unsigned redis_retargeting_timeout_;
+    std::string redis_category_host_;
+    std::string redis_category_port_;
+    unsigned redis_category_timeout_;
 
 
     int views_expire_;
@@ -52,6 +55,7 @@ public:
     float range_long_term_;
     float range_context_;
     float range_search_;
+    float range_category_;
 
     //new params
     std::string server_ip_;

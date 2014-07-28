@@ -148,6 +148,7 @@
 		<Unit filename="src/GeoIPTools.cpp" />
 		<Unit filename="src/GeoRerions.cpp" />
 		<Unit filename="src/HistoryManager.cpp" />
+		<Unit filename="src/HistoryManagerCategory.cpp" />
 		<Unit filename="src/HistoryManagerLongTerm.cpp" />
 		<Unit filename="src/HistoryManagerOffer.cpp" />
 		<Unit filename="src/HistoryManagerRetargeting.cpp" />

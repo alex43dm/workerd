@@ -25,7 +25,7 @@ public:
         long domainId;
         long accountId;
         unsigned retargeting_capacity;
-        double range_short_term, range_long_term, range_context, range_search;
+        double range_short_term, range_long_term, range_context, range_search, range_category;
 
         bool blocked;                           //Статус активности РБ
         ShowNonRelevant nonrelevant;            //Что отображать при отсутствии платных РП
@@ -39,7 +39,7 @@ public:
     Informer(long id);
     Informer(long id, int capacity,
              const std::string &bannersCss,
-             const std::string &teasersCss, long , long, double, double, double, double, int, bool);//, int);
+             const std::string &teasersCss, long , long, double, double, double, double, double, int, bool);//, int);
     virtual ~Informer();
 
     bool is_null() const
@@ -54,8 +54,10 @@ public:
     bool isLongTerm() const {return range_long_term > 0;}
     bool isContext() const {return range_context > 0;}
     bool isSearch() const {return range_search > 0;}
+    bool isCategory() const {return range_category > 0;}
     bool sphinxProcessEnable() const {
-        return range_short_term > 0 || range_long_term > 0 || range_context > 0 || range_search > 0;}
+        return range_short_term > 0 || range_long_term > 0 || range_context > 0 || range_search > 0
+        || range_category > 0;}
 
 private:
 

@@ -243,6 +243,7 @@ bool Core_DataBase::getInformer(const std::string informer_id)
                                      pStmt->GetColumnDouble(7),
                                      pStmt->GetColumnDouble(8),
                                      pStmt->GetColumnDouble(9),
+                                     cfg->range_category_,
                                      pStmt->GetColumnInt(10),
                                      pStmt->GetColumnBool(11)
                                     );

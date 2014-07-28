@@ -19,7 +19,7 @@ HistoryManager::~HistoryManager()
     delete pShortTerm;
     delete pLongTerm;
     delete pRetargeting;
-
+    delete pCategory;
 }
 
 bool HistoryManager::initDB()
@@ -33,11 +33,15 @@ bool HistoryManager::initDB()
     pRetargeting = new SimpleRedisClient(cfg->redis_retargeting_host_,cfg->redis_retargeting_port_,"ret");
     pRetargeting->setTimeout(cfg->redis_retargeting_timeout_);
 
+    pCategory = new SimpleRedisClient(cfg->redis_category_host_,cfg->redis_category_port_,"cat");
+    pCategory->setTimeout(cfg->redis_category_timeout_);
+
     if(cfg->logRedis)
     {
         pShortTerm->LogLevel(RC_LOG_DEBUG);
         pLongTerm->LogLevel(RC_LOG_DEBUG);
         pRetargeting->LogLevel(RC_LOG_DEBUG);
+        pCategory->LogLevel(RC_LOG_DEBUG);
     }
 
     return true;
@@ -84,6 +88,11 @@ void HistoryManager::startGetUserHistory(Params *_params, Informer *inf_)
     {
         getShortTermAsync();
     }
+
+    if(inf->isCategory())
+    {
+        getCategoryAsync();
+    }
 }
 
 void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
@@ -102,6 +111,11 @@ void HistoryManager::sphinxProcess(Offer::Map &items, float teasersMaxRating)
     if(inf->isLongTerm())
     {
         getLongTermAsyncWait();
+    }
+
+    if(inf->isCategory())
+    {
+        getCategoryAsyncWait();
     }
 
     sphinx->processKeywords(items, teasersMaxRating);

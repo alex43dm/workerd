@@ -488,6 +488,17 @@ bool Config::Load()
                 range_search_ = ::atof(mel->GetText());
             }
         }
+        //category
+        if( (section = history->FirstChildElement("category")) )
+        {
+            if( (mel = section->FirstChildElement("value")) && (mel->GetText()) )
+            {
+                range_category_ = ::atof(mel->GetText());
+            }
+
+            redisHostAndPort(section, redis_category_host_, redis_category_port_,
+                             redis_category_timeout_);
+        }
     }
     else
     {
