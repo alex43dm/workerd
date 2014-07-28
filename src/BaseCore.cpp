@@ -218,7 +218,10 @@ bool BaseCore::ProcessMQ()
 void BaseCore::LoadAllEntities()
 {
     if(Config::Instance()->pDb->reopen)
+    {
+        pdb->OfferCategoriesLoad();
         return;
+    }
 
     //accounts load
     pdb->AccountLoad();

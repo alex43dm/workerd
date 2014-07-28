@@ -1,4 +1,4 @@
-﻿workerd: multithread demon, to return html(inframe) with offers. Runs on background and listen unix socket(config.xml) ready to http requests from nginx.
+workerd: multithread demon, to return html(inframe) with offers. Runs on background and listen unix socket(config.xml) ready to http requests from nginx.
 
 Input
 http variables:
@@ -178,6 +178,7 @@ The  mach_mode,  rank_mode, sort_mode see “Context search by offers”.
 SYSLOG-NG
 add that in /etc/syslog-ng/syslog-ng.conf:
 
+template t_isots
 {
     template("$R_ISODATE $MSG\n");
     template_escape(no);
@@ -464,137 +465,137 @@ http://yottos.com/adshow.fcgi?scr=00122a9a-9f60-11e1-a3a7-00163e0301c1&location=
 
 where
 src – informer guid
-alex@hp ~/Projects/worker $ echo "select guid from informer limit 1;"|sqlite3 /run/alex/mem.db
-00122a9a-9f60-11e1-a3a7-00163e0301c1
+alex@hp ~/Projects/worker $ echo "select guid from informer limit 1;"|sqlite3 /run/alex/mem.db
+00122a9a-9f60-11e1-a3a7-00163e0301c1
 search – words by space(%20)(rating.search in the config.xml must be more then 0)
 
 output:
-alex@hp ~/Projects/worker $ ./workerd
-Wed Mar 12 16:50:56.338 starting new replica set monitor for replica set vsrv with seed of 213.186.121.76:27018
-Wed Mar 12 16:50:56.364 successfully connected to seed 213.186.121.76:27018 for replica set vsrv
-Wed Mar 12 16:50:56.390 changing hosts to { 0: "213.186.121.76:27018", 1: "212.113.32.147:27018", 2: "212.113.32.146:27018", 3: "212.113.32.167:27018", 4: "212.113.33.66:27018", 5: "213.186.121.199:27018" } from vsrv/
-Wed Mar 12 16:50:56.390 trying to add new host 212.113.32.146:27018 to replica set vsrv
-Wed Mar 12 16:50:56.401 successfully connected to new host 212.113.32.146:27018 in replica set vsrv
-Wed Mar 12 16:50:56.401 trying to add new host 212.113.32.147:27018 to replica set vsrv
-Wed Mar 12 16:50:56.414 successfully connected to new host 212.113.32.147:27018 in replica set vsrv
-Wed Mar 12 16:50:56.414 trying to add new host 212.113.32.167:27018 to replica set vsrv
-Wed Mar 12 16:50:56.425 successfully connected to new host 212.113.32.167:27018 in replica set vsrv
-Wed Mar 12 16:50:56.425 trying to add new host 212.113.33.66:27018 to replica set vsrv
-Wed Mar 12 16:50:56.444 successfully connected to new host 212.113.33.66:27018 in replica set vsrv
-Wed Mar 12 16:50:56.444 trying to add new host 213.186.121.199:27018 to replica set vsrv
-Wed Mar 12 16:50:56.461 successfully connected to new host 213.186.121.199:27018 in replica set vsrv
-Wed Mar 12 16:50:56.461 trying to add new host 213.186.121.76:27018 to replica set vsrv
-Wed Mar 12 16:50:56.488 successfully connected to new host 213.186.121.76:27018 in replica set vsrv
-Wed Mar 12 16:50:56.648 Primary for replica set vsrv changed to 213.186.121.199:27018
-Wed Mar 12 16:50:56.893 replica set monitor for replica set vsrv started, address is vsrv/212.113.32.146:27018,212.113.32.147:27018,212.113.32.167:27018,212.113.33.66:27018,213.186.121.199:27018,213.186.121.76:27018
-Wed Mar 12 16:50:56.893 [ReplicaSetMonitorWatcher] starting
-SELECT ofrs.id,
-ofrs.guid,
-ofrs.title,
-ofrs.price,
-ofrs.description,
-ofrs.url,
-ofrs.image,
-ofrs.swf,
-ofrs.campaignId,
-ofrs.isOnClick,
-ofrs.type,
-CASE WHEN iret.rating IS NOT NULL
-THEN iret.rating
-ELSE ofrs.rating
-END AS rating,
-ofrs.retargeting,
-ofrs.uniqueHits,
-ofrs.height,
-ofrs.width,
-ca.social
-FROM Offer AS ofrs
-INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
-INNER JOIN (
-		SELECT cn.id FROM CampaignNow AS cn
-
-        INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
-        INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
-                AND ct2d.id_dom=324
-		EXCEPT
-            SELECT c2d.id_cam AS id
-            FROM Campaign2Domains AS c2d
-            WHERE c2d.id_dom=324 AND c2d.allowed=0
-		EXCEPT
-            SELECT c2a.id_cam AS id
-            FROM Campaign2Accounts AS c2a
-            WHERE c2a.id_acc=324 AND c2a.allowed=0
-        EXCEPT
-            SELECT c2i.id_cam AS id
-            FROM Campaign2Informer AS c2i
-            WHERE c2i.id_inf=3399645854 AND c2i.allowed=0
-) AS c ON ca.id=c.id
-LEFT JOIN tmp19507140160618098432 AS deph ON ofrs.id=deph.id
-LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=3399645854 AND ofrs.id=iret.id_ofr
-WHERE ofrs.valid=1
-    AND deph.id IS NULL
-;
-
-SELECT ofrs.id,
-ofrs.guid,
-ofrs.title,
-ofrs.price,
-ofrs.description,
-ofrs.url,
-ofrs.image,
-ofrs.swf,
-ofrs.campaignId,
-ofrs.isOnClick,
-ofrs.type,
-CASE WHEN iret.rating IS NOT NULL
-THEN iret.rating
-ELSE ofrs.rating
-END AS rating,
-ofrs.retargeting,
-ofrs.uniqueHits,
-ofrs.height,
-ofrs.width,
-ca.social
-FROM Offer AS ofrs
-INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
-INNER JOIN (
-		SELECT cn.id FROM CampaignNow AS cn
-
-        INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
-        INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
-                AND ct2d.id_dom=324
-		EXCEPT
-            SELECT c2d.id_cam AS id
-            FROM Campaign2Domains AS c2d
-            WHERE c2d.id_dom=324 AND c2d.allowed=0
-		EXCEPT
-            SELECT c2a.id_cam AS id
-            FROM Campaign2Accounts AS c2a
-            WHERE c2a.id_acc=324 AND c2a.allowed=0
-        EXCEPT
-            SELECT c2i.id_cam AS id
-            FROM Campaign2Informer AS c2i
-            WHERE c2i.id_inf=3399645854 AND c2i.allowed=0
-) AS c ON ca.id=c.id
-LEFT JOIN tmp19507140160618098432 AS deph ON ofrs.id=deph.id
-LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=3399645854 AND ofrs.id=iret.id_ofr
-WHERE ofrs.valid=1
-    AND deph.id IS NULL
-;
-
-query0: (@title еда | @title казино)|(@description еда | @description казино)
-retrieved 2 of 2 matches
-Query stats:
-	'=еда' found 2 times in 2 documents
-	'еда*' found 2 times in 2 documents
-	'ед' found 4 times in 4 documents
-	'=казино' found 9 times in 7 documents
-	'казино*' found 9 times in 7 documents
-	'казин' found 9 times in 7 documents
-
-Matches:
-1. doc_id=315, weight=120695, guidint=1379263440, rating=3993.646484, match=nomatch, sphrases=, skeywords=, sexactly_phrases=
-2. doc_id=268, weight=120660, guidint=175701722, rating=0.000000, match=nomatch, sphrases=, skeywords=, sexactly_phrases=
+alex@hp ~/Projects/worker $ ./workerd
+Wed Mar 12 16:50:56.338 starting new replica set monitor for replica set vsrv with seed of 213.186.121.76:27018
+Wed Mar 12 16:50:56.364 successfully connected to seed 213.186.121.76:27018 for replica set vsrv
+Wed Mar 12 16:50:56.390 changing hosts to { 0: "213.186.121.76:27018", 1: "212.113.32.147:27018", 2: "212.113.32.146:27018", 3: "212.113.32.167:27018", 4: "212.113.33.66:27018", 5: "213.186.121.199:27018" } from vsrv/
+Wed Mar 12 16:50:56.390 trying to add new host 212.113.32.146:27018 to replica set vsrv
+Wed Mar 12 16:50:56.401 successfully connected to new host 212.113.32.146:27018 in replica set vsrv
+Wed Mar 12 16:50:56.401 trying to add new host 212.113.32.147:27018 to replica set vsrv
+Wed Mar 12 16:50:56.414 successfully connected to new host 212.113.32.147:27018 in replica set vsrv
+Wed Mar 12 16:50:56.414 trying to add new host 212.113.32.167:27018 to replica set vsrv
+Wed Mar 12 16:50:56.425 successfully connected to new host 212.113.32.167:27018 in replica set vsrv
+Wed Mar 12 16:50:56.425 trying to add new host 212.113.33.66:27018 to replica set vsrv
+Wed Mar 12 16:50:56.444 successfully connected to new host 212.113.33.66:27018 in replica set vsrv
+Wed Mar 12 16:50:56.444 trying to add new host 213.186.121.199:27018 to replica set vsrv
+Wed Mar 12 16:50:56.461 successfully connected to new host 213.186.121.199:27018 in replica set vsrv
+Wed Mar 12 16:50:56.461 trying to add new host 213.186.121.76:27018 to replica set vsrv
+Wed Mar 12 16:50:56.488 successfully connected to new host 213.186.121.76:27018 in replica set vsrv
+Wed Mar 12 16:50:56.648 Primary for replica set vsrv changed to 213.186.121.199:27018
+Wed Mar 12 16:50:56.893 replica set monitor for replica set vsrv started, address is vsrv/212.113.32.146:27018,212.113.32.147:27018,212.113.32.167:27018,212.113.33.66:27018,213.186.121.199:27018,213.186.121.76:27018
+Wed Mar 12 16:50:56.893 [ReplicaSetMonitorWatcher] starting
+SELECT ofrs.id,
+ofrs.guid,
+ofrs.title,
+ofrs.price,
+ofrs.description,
+ofrs.url,
+ofrs.image,
+ofrs.swf,
+ofrs.campaignId,
+ofrs.isOnClick,
+ofrs.type,
+CASE WHEN iret.rating IS NOT NULL
+THEN iret.rating
+ELSE ofrs.rating
+END AS rating,
+ofrs.retargeting,
+ofrs.uniqueHits,
+ofrs.height,
+ofrs.width,
+ca.social
+FROM Offer AS ofrs
+INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
+INNER JOIN (
+		SELECT cn.id FROM CampaignNow AS cn
+
+        INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
+        INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
+                AND ct2d.id_dom=324
+		EXCEPT
+            SELECT c2d.id_cam AS id
+            FROM Campaign2Domains AS c2d
+            WHERE c2d.id_dom=324 AND c2d.allowed=0
+		EXCEPT
+            SELECT c2a.id_cam AS id
+            FROM Campaign2Accounts AS c2a
+            WHERE c2a.id_acc=324 AND c2a.allowed=0
+        EXCEPT
+            SELECT c2i.id_cam AS id
+            FROM Campaign2Informer AS c2i
+            WHERE c2i.id_inf=3399645854 AND c2i.allowed=0
+) AS c ON ca.id=c.id
+LEFT JOIN tmp19507140160618098432 AS deph ON ofrs.id=deph.id
+LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=3399645854 AND ofrs.id=iret.id_ofr
+WHERE ofrs.valid=1
+    AND deph.id IS NULL
+;
+
+SELECT ofrs.id,
+ofrs.guid,
+ofrs.title,
+ofrs.price,
+ofrs.description,
+ofrs.url,
+ofrs.image,
+ofrs.swf,
+ofrs.campaignId,
+ofrs.isOnClick,
+ofrs.type,
+CASE WHEN iret.rating IS NOT NULL
+THEN iret.rating
+ELSE ofrs.rating
+END AS rating,
+ofrs.retargeting,
+ofrs.uniqueHits,
+ofrs.height,
+ofrs.width,
+ca.social
+FROM Offer AS ofrs
+INNER JOIN Campaign AS ca ON ca.valid=1 AND ca.retargeting=0 AND ofrs.campaignId=ca.id
+INNER JOIN (
+		SELECT cn.id FROM CampaignNow AS cn
+
+        INNER JOIN Campaign2Categories AS c2c ON cn.id=c2c.id_cam
+        INNER JOIN Categories2Domain AS ct2d ON c2c.id_cat=ct2d.id_cat
+                AND ct2d.id_dom=324
+		EXCEPT
+            SELECT c2d.id_cam AS id
+            FROM Campaign2Domains AS c2d
+            WHERE c2d.id_dom=324 AND c2d.allowed=0
+		EXCEPT
+            SELECT c2a.id_cam AS id
+            FROM Campaign2Accounts AS c2a
+            WHERE c2a.id_acc=324 AND c2a.allowed=0
+        EXCEPT
+            SELECT c2i.id_cam AS id
+            FROM Campaign2Informer AS c2i
+            WHERE c2i.id_inf=3399645854 AND c2i.allowed=0
+) AS c ON ca.id=c.id
+LEFT JOIN tmp19507140160618098432 AS deph ON ofrs.id=deph.id
+LEFT JOIN Informer2OfferRating AS iret ON iret.id_inf=3399645854 AND ofrs.id=iret.id_ofr
+WHERE ofrs.valid=1
+    AND deph.id IS NULL
+;
+
+query0: (@title еда | @title казино)|(@description еда | @description казино)
+retrieved 2 of 2 matches
+Query stats:
+	'=еда' found 2 times in 2 documents
+	'еда*' found 2 times in 2 documents
+	'ед' found 4 times in 4 documents
+	'=казино' found 9 times in 7 documents
+	'казино*' found 9 times in 7 documents
+	'казин' found 9 times in 7 documents
+
+Matches:
+1. doc_id=315, weight=120695, guidint=1379263440, rating=3993.646484, match=nomatch, sphrases=, skeywords=, sexactly_phrases=
+2. doc_id=268, weight=120660, guidint=175701722, rating=0.000000, match=nomatch, sphrases=, skeywords=, sexactly_phrases=
 
 
 

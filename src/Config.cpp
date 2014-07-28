@@ -416,6 +416,7 @@ bool Config::Load()
     range_long_term_ = 0.0;
     range_context_ = 0.0;
     range_search_ = 0.0;
+    range_category_ = 0.0;
 
     if( (history = mRoot->FirstChildElement("history")) )
     {
@@ -480,7 +481,7 @@ bool Config::Load()
                 range_context_ = ::atof(mel->GetText());
             }
         }
-        //context
+        //search
         if( (section = history->FirstChildElement("search")) )
         {
             if( (mel = section->FirstChildElement("value")) && (mel->GetText()) )

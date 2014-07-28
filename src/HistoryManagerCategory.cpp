@@ -33,7 +33,7 @@ void HistoryManager::getCategory()
                 allCats = cfg->Categories[*i];
             }
         }
-        sphinx->addRequest(allCats,1.0,EBranchT::T3);
+        sphinx->addRequest(allCats,inf->range_category,EBranchT::T3);
         isProcessed += "t";
     }
 }
@@ -70,7 +70,7 @@ bool HistoryManager::getCategoryAsync()
     pthread_attr_init(pAttr);
     //pthread_attr_setstacksize(pAttr, THREAD_STACK_SIZE);
 
-    if(pthread_create(&thrGetRetargetingAsync, pAttr, &this->getRetargetingEnv, this))
+    if(pthread_create(&thrGetCategoryAsync, pAttr, &this->getCategoryEnv, this))
     {
         std::clog<<"creating thread failed"<<std::endl;
     }
